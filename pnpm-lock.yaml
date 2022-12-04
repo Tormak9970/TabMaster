@@ -6,10 +6,13 @@ specifiers:
   '@rollup/plugin-node-resolve': ^13.3.0
   '@rollup/plugin-replace': ^4.0.0
   '@rollup/plugin-typescript': ^8.3.3
+  '@types/lodash': ^4.14.191
   '@types/react': 16.14.0
   '@types/webpack': ^5.28.0
   deckbuild: ^1.0.9
   decky-frontend-lib: ^3.6.1
+  lodash: ^4.17.21
+  mobx: '5'
   react-icons: ^4.4.0
   rollup: ^2.77.1
   rollup-plugin-import-assets: ^1.1.1
@@ -18,7 +21,9 @@ specifiers:
   typescript: ^4.7.4
 
 dependencies:
-  decky-frontend-lib: 3.6.1
+  decky-frontend-lib: 3.13.0
+  lodash: 4.17.21
+  mobx: 5.15.7
   react-icons: 4.4.0
 
 devDependencies:
@@ -27,6 +32,7 @@ devDependencies:
   '@rollup/plugin-node-resolve': 13.3.0_rollup@2.77.1
   '@rollup/plugin-replace': 4.0.0_rollup@2.77.1
   '@rollup/plugin-typescript': 8.3.3_ekpmegaybmymq5m2rlmygb35zm
+  '@types/lodash': 4.14.191
   '@types/react': 16.14.0
   '@types/webpack': 5.28.0
   deckbuild: 1.0.9
@@ -196,6 +202,10 @@ packages:
 
   /@types/json-schema/7.0.11:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
+    dev: true
+
+  /@types/lodash/4.14.191:
+    resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
     dev: true
 
   /@types/minimatch/5.1.2:
@@ -518,10 +528,8 @@ packages:
       yargs: 13.2.4
     dev: true
 
-  /decky-frontend-lib/3.6.1:
-    resolution: {integrity: sha512-NBlltn4EktqFgD1fj2AU0ccJJNMNgcqCnmhYd34Z5xR7ypGNT2oSqfSvFIlzU4WbDL9RyrcHSJlSMdYk6n4NXA==}
-    dependencies:
-      minimist: 1.2.7
+  /decky-frontend-lib/3.13.0:
+    resolution: {integrity: sha512-NjSUhAKqlt2CSWDjyAsWa0R0xOVGJbChCIyCkAUhnsnGG4nvH32yfvIifhgHjlFZ7bduqeq3QUacP0L3h1Z+Mg==}
     dev: false
 
   /deepmerge/4.2.2:
@@ -812,6 +820,10 @@ packages:
       path-exists: 3.0.0
     dev: true
 
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: false
+
   /magic-string/0.25.9:
     resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}
     dependencies:
@@ -872,8 +884,8 @@ packages:
     resolution: {integrity: sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==}
     dev: true
 
-  /minimist/1.2.7:
-    resolution: {integrity: sha512-bzfL1YUZsP41gmu/qjrEk0Q6i2ix/cVeAhbCbqH9u3zYutS1cLg00qhrD0M2MVdCcx4Sc0UpP2eBWo9rotpq6g==}
+  /mobx/5.15.7:
+    resolution: {integrity: sha512-wyM3FghTkhmC+hQjyPGGFdpehrcX1KOXsDuERhfK2YbJemkUhEB+6wzEN639T21onxlfYBmriA1PFnvxTUhcKw==}
     dev: false
 
   /neo-async/2.6.2:

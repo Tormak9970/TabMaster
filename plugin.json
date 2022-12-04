@@ -1,10 +1,10 @@
 {
-  "name": "Example Plugin",
-  "author": "John Doe",
-  "flags": ["debug", "_root"],
+  "name": "TabMaster",
+  "author": "Witherking25",
+  "flags": ["debug"],
   "publish": {
-    "tags": ["template", "root"],
-    "description": "Decky example plugin.",
-    "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
+    "tags": ["EmuDeck"],
+    "description": "Allows for adding/removing/rearranging of library tabs. Part of the EmuDeck Project",
+    "image": "https://opengraph.githubassets.com/1/EmuDeck/TabMaster"
   }
 }

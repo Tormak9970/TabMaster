@@ -36,6 +36,8 @@ dist/
 
 __pycache__/
 
+.pnpm-store/
+
 /.yalc
 yalc.lock
 
@@ -44,3 +46,6 @@ yalc.lock
 # Ignore output folder
 
 backend/out
+build
+
+deck.json
