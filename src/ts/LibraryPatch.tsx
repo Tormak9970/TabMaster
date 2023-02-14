@@ -1,6 +1,6 @@
 import {
 	afterPatch,
-	fakeRenderComponent,
+	findInReactTree,
 	RoutePatch,
 	ServerAPI,
 	wrapReactType
@@ -9,18 +9,11 @@ import {JSXElementConstructor, ReactElement} from "react";
 import {SteamCollection, SteamTab} from "./SteamTypes";
 import {cloneDeep} from "lodash";
 import {customTabs, tabOrder, tabsToHide} from "./TabMasterState";
+import Logger from "./logger";
 
-export const patchAppPage = (serverAPI: ServerAPI): RoutePatch =>
+export const patchLibrary = (serverAPI: ServerAPI): RoutePatch =>
 {
-	console.log((() =>
-	{
-		// @ts-ignore
-		let ret1 = window.DeckyPluginLoader.routerHook.routes
-				.find((x: any) => x.props.path=='/library')
-				.props.children.type()
-		wrapReactType(ret1.type)
-		return fakeRenderComponent(ret1.type)
-	}))
+	const logger = new Logger("LibraryPatch");
 	let TabContentTemplate: JSXElementConstructor<{ collection: SteamCollection, eSortBy: number, setSortBy: (e: any) => void, showSortingContextMenu: (e: any) => void }>;
 	let TabContentPropsTemplate: { collection: SteamCollection, eSortBy: number, setSortBy: (e: any) => void, showSortingContextMenu: (e: any) => void };
 	let TabAddonTemplate: JSXElementConstructor<{ count: number }>;
@@ -45,12 +38,15 @@ export const patchAppPage = (serverAPI: ServerAPI): RoutePatch =>
 				})
 				afterPatch(ret2.type, "type", (_: Record<string, unknown>[], ret3: ReactElement) =>
 				{
-					// console.log("ret3", ret3);
-					if (ret3.props.className === "gamepadlibrary_GamepadLibrary_ZBBhe")
-						ret3.props.children.props.isLibrary = true
+					logger.log("ret3", ret3);
+					let element = findInReactTree(ret3, x => x?.props?.tabs)
+					logger.log("className: ", findInReactTree(ret3, x => x?.props?.className), findInReactTree(ret3, x => x?.props?.className).props.className)
+					if (findInReactTree(ret3, x => x?.props?.className === "gamepadlibrary_GamepadLibrary_ZBBhe"))
+						element.props.isLibrary = true
+					logger.log("isLibrary: ", !!element.props?.isLibrary)
 					if (TabContentTemplate===undefined || TabAddonTemplate===undefined)
 					{
-						let tabs = (ret3.props.children.props.tabs as SteamTab[]).filter(value => value!==undefined) as SteamTab[]
+						let tabs = (element.props.tabs as SteamTab[]).filter(value => value!==undefined) as SteamTab[]
 						let tabTemplate = tabs.find(value => value !== undefined && value?.id==="Favorites");
 						// console.log("tabTemplate", tabTemplate)
 						if (tabTemplate)
@@ -68,13 +64,13 @@ export const patchAppPage = (serverAPI: ServerAPI): RoutePatch =>
 							}
 						}
 					}
-					wrapReactType(ret3.props.children.type.type)
+					wrapReactType(element.type.type)
 					if (cache)
 					{
-						ret3.props.children.type = cache;
+						element.type = cache;
 					} else
 					{
-						afterPatch(ret3.props.children.type, "type", (_: Record<string, any>[], ret4: ReactElement) =>
+						afterPatch(element.type, "type", (_: Record<string, any>[], ret4: ReactElement) =>
 						{
 							if (ret4.props?.isLibrary)
 							{
@@ -86,7 +82,7 @@ export const patchAppPage = (serverAPI: ServerAPI): RoutePatch =>
 									if (tabs[0]!==undefined)
 										ret4.props.activeTab = tabs[0].id;
 								}
-
+								logger.log("tabs: ", tabs)
 								ret4.props.activeTab = currentTab;
 								customTabs.forEach((value, key) =>
 								{
@@ -113,15 +109,16 @@ export const patchAppPage = (serverAPI: ServerAPI): RoutePatch =>
 										}
 									}
 								});
-
+								logger.log("customTabs: ", tabs)
 								ret4.props.tabs = tabs.sort((a, b) => (tabOrder.get(a.id) ?? 0) - (tabOrder.get(b.id) ?? 0));
 							} else
 							{
 								ret4.props.tabs = (ret4.props.tabs as SteamTab[]).filter(value => !Array.from(customTabs.keys()).includes(value.id));
 							}
+							logger.log(element)
 							return ret4;
 						});
-						cache = ret3.props.children.type;
+						cache = element.type;
 					}
 					return ret3;
 				});

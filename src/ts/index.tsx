@@ -1,22 +1,22 @@
 import {
 	ButtonItem,
 	ConfirmModal,
-	definePlugin,
+	definePlugin, DialogButton,
 	Menu,
-	MenuItem,
+	MenuItem, RoutePatch,
 	ServerAPI,
 	showContextMenu, showModal,
 	staticClasses,
 } from "decky-frontend-lib";
 import {VFC, Fragment} from "react";
-import {FaShip} from "react-icons/fa";
+import {FaEllipsisH, FaLayerGroup} from "react-icons/fa";
 
-import {patchAppPage} from "./AppPatch";
+import {patchLibrary} from "./LibraryPatch";
 import {AppDetailsStore, CollectionStore, UIStore} from "./SteamTypes";
 import {ReorderableEntry, ReorderableList} from "./ReorderableList";
 import {
-	default_tabs,
-	LibraryTabDictionary, showTab,
+	default_tabs, LibraryTabDictionary,
+	showTab,
 	TabMasterContextProvider,
 	TabMasterState, tabsToHide,
 	useTabMasterState
@@ -25,6 +25,8 @@ import {EditTabModal} from "./EditTabModal";
 import {LibraryTabElement} from "./LibraryTab";
 import {cloneDeep} from "lodash";
 import {get_hidden_tabs, get_tabs} from "./Python";
+import {registerForLoginStateChange, waitForServicesInitialized} from "./LibraryInitializer";
+import Logger from "./logger";
 
 declare global
 {
@@ -33,9 +35,19 @@ declare global
 	let uiStore: UIStore;
 }
 
+type ActionButtonProps<T> = {
+	entry: ReorderableEntry<T>
+}
+
+
+
+type InteractablesProps<T> = {
+	entry: ReorderableEntry<T>
+}
+
 const Content: VFC<{ serverAPI: ServerAPI }> = ({serverAPI}) =>
 {
-	const {libraryTabs, setLibraryTabs, setHiddenTabs, libraryTabsList, reorderableLibraryTabs} = useTabMasterState();
+	const {libraryTabs, setLibraryTabs, setHiddenTabs, libraryTabsList, libraryTabsEntries} = useTabMasterState();
 	async function reload() {
 		let tabs = await get_tabs(serverAPI);
 		let hidden_tabs = await get_hidden_tabs(serverAPI);
@@ -52,13 +64,16 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({serverAPI}) =>
 		setLibraryTabs(cloneDeep(tabs));
 	}
 
-	const reloadData = { "showReload": true, "reload": reload, "reloadLabel": "Library Tabs" };
-
-	function onUpdate(data: LibraryTabDictionary) {
-		setLibraryTabs(data);
+	function onSave(entries: ReorderableEntry<LibraryTabElement>[]) {
+		const dict: LibraryTabDictionary = {}
+		entries.forEach(entry =>
+		{
+			dict[entry.data!.id] = entry.data!
+		})
+		setLibraryTabs(dict);
 	}
-	function action(e: MouseEvent, data: ReorderableEntry<LibraryTabElement>) {
-		const tab = data.data;
+	function action(data: ReorderableEntry<LibraryTabElement>) {
+		const tab = data.data!;
 		showContextMenu(
 				<Menu label="Actions">
 					{(() =>
@@ -105,8 +120,25 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({serverAPI}) =>
 						if (tab.custom) return "Delete"
 						else return "Hide"
 					})()}</MenuItem>
-				</Menu>,
-				e.currentTarget ?? window
+				</Menu>
+		);
+	}
+	function ActionButtion(props:ActionButtonProps<LibraryTabElement>){
+		function onAction(entryReference: ReorderableEntry<LibraryTabElement>): void {
+			action(entryReference)
+		}
+
+		return (
+				<DialogButton style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }} onClick={() => onAction(props.entry)} onOKButton={() => onAction(props.entry)}>
+					<FaEllipsisH />
+				</DialogButton>
+		);
+	}
+	function Interactables(props:InteractablesProps<LibraryTabElement>) {
+		return (
+				<Fragment>
+					<ActionButtion  entry={props.entry} />
+				</Fragment>
 		);
 	}
 	console.log(libraryTabsList)
@@ -133,7 +165,7 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({serverAPI}) =>
 					Add
 				</ButtonItem>
 				{libraryTabsList.length > 0 ? (
-						<ReorderableList<LibraryTabElement> data={reorderableLibraryTabs} reloadData={reloadData} action={action} onUpdate={onUpdate}/>
+						<ReorderableList<LibraryTabElement> entries={libraryTabsEntries} interactables={Interactables} onSave={onSave}/>
 				) : (
 						<div style={{width: "100%", display: "flex", justifyContent: "center", alignItems: "center", padding: "5px"}}>
 							Loading...
@@ -162,36 +194,53 @@ const Content: VFC<{ serverAPI: ServerAPI }> = ({serverAPI}) =>
 
 export default definePlugin((serverAPI: ServerAPI) =>
 {
-	const state = new TabMasterState(serverAPI);
+	const logger = new Logger("Index");
+	let patch: RoutePatch
+	let state: TabMasterState = new TabMasterState(serverAPI);
+	const initCallback = async (username: string): Promise<void> => {
+		if (await waitForServicesInitialized()) {
+			logger.log(`Initializing plugin for ${username}`);
 
-	Promise.all([get_tabs(serverAPI), get_hidden_tabs(serverAPI)]).then(value =>
-	{
-		const tabs = value[0];
-		const hidden_tabs = value[1];
-		Object.entries(default_tabs).forEach(entry =>
-		{
-			const key = entry[0];
-			const value = entry[1];
-			if (!hidden_tabs.includes(key) && !Object.keys(tabs).includes(key))
+			await Promise.all([get_tabs(serverAPI), get_hidden_tabs(serverAPI)]).then(value =>
 			{
-				tabs[key] = value
-			}
-		});
-		state.setHiddenTabs(hidden_tabs);
-		state.setLibraryTabs(cloneDeep(tabs));
-	});
+				const tabs = value[0];
+				const hidden_tabs = value[1];
+				Object.entries(default_tabs).forEach(entry =>
+				{
+					const key = entry[0];
+					const value = entry[1];
+					if (!hidden_tabs.includes(key) && !Object.keys(tabs).includes(key))
+					{
+						tabs[key] = value
+					}
+				});
+				state.setHiddenTabs(hidden_tabs);
+				state.setLibraryTabs(cloneDeep(tabs));
+			});
 
-	const patch = patchAppPage(serverAPI);
+			patch = patchLibrary(serverAPI);
+		}
+	};
+	const deinitCallback = (): void => {
+		logger.log("Deinitializing plugin");
+	};
+	const unregister = registerForLoginStateChange(
+			(username) => { initCallback(username).catch((e) => logger.error(e)); },
+			deinitCallback
+	);
+
 	return {
-		title: <div className={staticClasses.Title}>Example Plugin</div>,
+		title: <div className={staticClasses.Title}>TabMaster</div>,
 		content:
 				<TabMasterContextProvider tabMasterStateClass={state}>
 					<Content serverAPI={serverAPI}/>
 				</TabMasterContextProvider>,
-		icon: <FaShip/>,
+		icon: <FaLayerGroup/>,
 		onDismount()
 		{
 			serverAPI.routerHook.removePatch("/library", patch);
+			unregister();
+			deinitCallback();
 		},
 	};
 });

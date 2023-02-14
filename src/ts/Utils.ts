@@ -9,7 +9,7 @@ export class SteamUtils
 			const {unregister} = SteamClient.Apps.RegisterForAppDetails(appId, (details: any) =>
 			{
 				unregister();
-				resolve(details.unAppID===undefined ? null:details);
+				resolve(details.unAppID ?? null);
 			});
 		});
 	}
@@ -31,4 +31,6 @@ export class SteamUtils
 
 		return false;
 	}
+
+
 }

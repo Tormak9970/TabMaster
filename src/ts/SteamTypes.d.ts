@@ -216,6 +216,7 @@ type SteamCollection = {
 }
 
 type CollectionStore = {
+	userCollections: SteamCollection[]
 	GetUserCollectionsByName: (name: string) => SteamCollection[]
 	allAppsCollection: SteamCollection
 }

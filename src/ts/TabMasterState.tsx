@@ -1,4 +1,4 @@
-import {ReorderableListData} from "./ReorderableList";
+import {ReorderableEntry} from "./ReorderableList";
 import {createContext, FC, useContext, useEffect, useState} from "react";
 import {Filter, LibraryTab, LibraryTabElement} from "./LibraryTab";
 import {CollectionFilter} from "./CollectionFilter";
@@ -15,7 +15,7 @@ interface PublicTabMasterState
 {
 	libraryTabs: LibraryTabDictionary,
 	libraryTabsList: LibraryTabElement[],
-	reorderableLibraryTabs: ReorderableListData<LibraryTabElement>,
+	libraryTabsEntries: ReorderableEntry<LibraryTabElement>[],
 	tabsToHide: string[],
 	customTabs: Map<string, LibraryTab>
 }
@@ -84,7 +84,7 @@ export class TabMasterState
 {
 	private libraryTabs: LibraryTabDictionary = {};
 	private libraryTabsList: LibraryTabElement[] = [];
-	private reorderableLibraryTabs: ReorderableListData<LibraryTabElement> = {};
+	private libraryTabsEntries: ReorderableEntry<LibraryTabElement>[] = [];
 	public eventBus = new EventTarget();
 	private readonly serverAPI: ServerAPI;
 
@@ -99,7 +99,7 @@ export class TabMasterState
 		return {
 			libraryTabs: this.libraryTabs,
 			libraryTabsList: this.libraryTabsList,
-			reorderableLibraryTabs: this.reorderableLibraryTabs,
+			libraryTabsEntries: this.libraryTabsEntries,
 			tabsToHide,
 			customTabs
 		}
@@ -117,7 +117,7 @@ export class TabMasterState
 	{
 		this.libraryTabs = shortcuts;
 		this.libraryTabsList = Object.values(this.libraryTabs).sort((a, b) => a.position - b.position);
-		this.reorderableLibraryTabs = {};
+		this.libraryTabsEntries = [];
 		customTabs.clear()
 		Object.keys(default_tabs).forEach(default_tab =>
 		{
@@ -130,11 +130,11 @@ export class TabMasterState
 		for (let i = 0; i < this.libraryTabsList.length; i++)
 		{
 			const tab = this.libraryTabsList[i];
-			this.reorderableLibraryTabs[tab.id] = {
-				"key": tab.id,
-				"label": tab.title,
-				"data": tab
-			}
+			this.libraryTabsEntries.push({
+				label: tab.title,
+				data: tab,
+				position: tab.position
+			})
 			if (tab.custom)
 			{
 				customTabs.set(tab.id,
@@ -147,7 +147,7 @@ export class TabMasterState
 									switch (filter.type)
 									{
 										case "collection":
-											return new CollectionFilter({collection_name: filter.params.collection_name});
+											return new CollectionFilter({collection: collectionStore.userCollections.find((collection) => collection.id === filter.params.collection)!});
 										case "installed":
 											return new InstalledFilter({installed: filter.params.installed});
 										case "regex":
