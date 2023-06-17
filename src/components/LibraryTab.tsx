@@ -1,20 +1,15 @@
-import {SteamAppOverview} from "./SteamTypes";
-
-export interface LibraryTab
-{
+export interface LibraryTab {
 	title: string,
 	filters: Filter<any>[],
 }
 
-export interface Filter<params>
-{
+export interface Filter<params> {
 	type: string,
 	params: params,
 	filter: (app: SteamAppOverview) => boolean
 }
 
-export interface LibraryTabElement
-{
+export interface LibraryTabElement {
 	custom: boolean,
 	id: string,
 	title: string,
@@ -22,8 +17,7 @@ export interface LibraryTabElement
 	filters: FilterElement<any>[]
 }
 
-export interface FilterElement<params>
-{
+export interface FilterElement<params> {
 	type: string,
 	params: params
 }

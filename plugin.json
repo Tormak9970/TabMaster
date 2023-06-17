@@ -1,10 +1,10 @@
 {
   "name": "TabMaster",
-  "author": "Witherking25",
+  "author": "Tormak, Davocarli, Witherking25",
   "flags": ["debug"],
   "publish": {
-    "tags": ["EmuDeck"],
-    "description": "Allows for adding/removing/rearranging of library tabs. Part of the EmuDeck Project",
-    "image": "https://opengraph.githubassets.com/1/EmuDeck/TabMaster"
+    "tags": ["Customization", "Library", "Tabs"],
+    "description": "Allows for customizing, adding, and removing Library Tabs.",
+    "image": "https://raw.githubusercontent.com/Tormak9970/TabMaster/main/assets/thumbnail.png"
   }
 }

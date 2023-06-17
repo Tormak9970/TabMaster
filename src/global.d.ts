@@ -1,0 +1,3 @@
+type Unregisterer = {
+  unregister: () => void;
+}
