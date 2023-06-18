@@ -22,14 +22,15 @@ import {
 import { EditTabModal } from "./components/EditTabModal";
 import { LibraryTabElement } from "./components/LibraryTab";
 import { cloneDeep } from "lodash";
-import { LogController } from "./lib/controllers/LogController";
 import { PluginController } from "./lib/controllers/PluginController";
 import { PythonInterop } from "./lib/controllers/PythonInterop";
-import { registerForLoginStateChange, waitForServicesInitialized } from "./lib/LibraryInitializer";
 
 declare global {
+  var SteamClient: SteamClient;
 	let collectionStore: CollectionStore;
 	let appDetailsStore: AppDetailsStore;
+  var appStore: AppStore;
+  var loginStore: LoginStore;
 	let uiStore: UIStore;
 }
 
@@ -206,40 +207,26 @@ export default definePlugin((serverAPI: ServerAPI) => {
 	let patch: RoutePatch;
 	let state: TabMasterState = new TabMasterState();
 
-	const initCallback = async (username: string): Promise<void> => {
-    await PluginController.init();
-		if (await waitForServicesInitialized()) {
-			LogController.log(`Initializing plugin for ${username}`);
+	const loginUnregisterer = PluginController.initOnLogin(async () => {
+    await Promise.all([PythonInterop.getTabs(), PythonInterop.getHiddenTabs()]).then(value => {
+      const tabs = value[0] as LibraryTabDictionary;
+      const hiddenTabs = value[1] as string[];
 
-			await Promise.all([PythonInterop.getTabs(), PythonInterop.getHiddenTabs()]).then(value => {
-				const tabs = value[0] as LibraryTabDictionary;
-				const hiddenTabs = value[1] as string[];
+      Object.entries(defaultTabs).forEach(entry => {
+        const key = entry[0];
+        const value = entry[1];
 
-				Object.entries(defaultTabs).forEach(entry => {
-					const key = entry[0];
-					const value = entry[1];
+        if (!hiddenTabs.includes(key) && !Object.keys(tabs).includes(key)) {
+          tabs[key] = value;
+        }
+      });
 
-					if (!hiddenTabs.includes(key) && !Object.keys(tabs).includes(key)) {
-						tabs[key] = value;
-					}
-				});
+      state.setHiddenTabs(hiddenTabs);
+      state.setLibraryTabs(cloneDeep(tabs));
+    });
 
-				state.setHiddenTabs(hiddenTabs);
-				state.setLibraryTabs(cloneDeep(tabs));
-			});
-
-			patch = patchLibrary(serverAPI);
-		}
-	};
-
-	const deinitCallback = (): void => {
-		LogController.log("Deinitializing plugin");
-	};
-
-	const unregister = registerForLoginStateChange(
-    (username) => { initCallback(username).catch((e) => LogController.error(e)); },
-    deinitCallback
-	);
+    patch = patchLibrary(serverAPI);
+  })
 
 	return {
 		title: <div className={staticClasses.Title}>TabMaster</div>,
@@ -250,8 +237,8 @@ export default definePlugin((serverAPI: ServerAPI) => {
 		icon: <FaLayerGroup/>,
 		onDismount: () => {
 			serverAPI.routerHook.removePatch("/library", patch);
-			unregister();
-			deinitCallback();
+			loginUnregisterer.unregister();
+      PluginController.dismount();
 		},
 	};
 });

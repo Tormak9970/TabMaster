@@ -1,6 +1,5 @@
-import { PyInterop } from "./PyInterop";
 import { waitForCondition } from "../Utils";
-import { runInAction } from "mobx";
+import { PythonInterop } from "./PythonInterop";
 /**
  * Wrapper class for the SteamClient interface.
  */
@@ -33,46 +32,9 @@ export class SteamController {
           resolve(details.unAppID === undefined ? null : details);
         });
       } catch (e:any) {
-        PyInterop.log(`Error encountered trying to get app details. Error: ${e.message}`);
+        PythonInterop.log(`Error encountered trying to get app details. Error: ${e.message}`);
       }
     });
-  }
-
-  /**
-   * Sets the achievements for the provided app.
-   * @param appid The id of the app to set achievements for.
-   * @param achievements The achievements of the app.
-   * @returns A promise resolving to true if the achievements were set.
-   */
-  async setAchievements(appid: number, achievements: SteamAppAchievements): Promise<boolean> {
-    let appData = appDetailsStore.GetAppData(appid);
-
-		if (appData && !appData.bLoadingAchievments && appData.details.achievements.nTotal === 0) {
-			appData.bLoadingAchievments = true;
-
-			if (achievements) {
-				runInAction(() => {
-					appData.details.achievements = achievements;
-					console.log("achievementsCachedData", appData.details.achievements);
-					appDetailsCache.SetCachedDataForApp(appid, "achievements", 2, appData.details.achievements);
-				});
-			}
-
-			appData.bLoadingAchievments = false;
-		}
-
-    return true;
-  }
-
-  /**
-   * Gets the achievements for a game.
-   * @param appid The id of the app to get achievements for.
-   * @returns A promise resolving to the list of achievements.
-   */
-  async getAllAchievementsForApp(appid: number): Promise<SteamAppAchievements> {
-    const achievements = await appDetailsStore.GetAchievements(appid);
-    console.log("Details Store Achievements", achievements);
-    return achievements;
   }
 
   /**
@@ -100,7 +62,7 @@ export class SteamController {
         }
       });
     } catch (error) {
-      PyInterop.log(`error with AuthStateChange hook. [DEBUG INFO] error: ${error};`);
+      PythonInterop.log(`error with AuthStateChange hook. [DEBUG INFO] error: ${error};`);
       // @ts-ignore
       return () => { };
     }
@@ -115,13 +77,13 @@ export class SteamController {
     const servicesFound = await waitForCondition(20, 250, () => (window as WindowEx).App?.WaitForServicesInitialized != null);
   
     if (servicesFound) {
-      PyInterop.log(`Services found.`);
+      PythonInterop.log(`Services found.`);
     } else {
-      PyInterop.log(`Couldn't find services.`);
+      PythonInterop.log(`Couldn't find services.`);
     }
   
     return (await (window as WindowEx).App?.WaitForServicesInitialized?.().then((success: boolean) => {
-      PyInterop.log(`Services initialized. Success: ${success}`);
+      PythonInterop.log(`Services initialized. Success: ${success}`);
       return success;
     })) ?? false;
   }

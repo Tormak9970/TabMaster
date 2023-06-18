@@ -28,11 +28,12 @@ export class PluginController {
    * Sets the plugin to initialize once the user logs in.
    * @returns The unregister function for the login hook.
    */
-  static initOnLogin(): Unregisterer {
+  static initOnLogin(onMount: () => Promise<void>): Unregisterer {
     return this.steamController.registerForAuthStateChange(async (username) => {
       PythonInterop.log(`User logged in. [DEBUG] username: ${username}.`);
       if (await this.steamController.waitForServicesToInitialize()) {
         PluginController.init();
+        onMount();
       } else {
         PythonInterop.toast("Error", "Failed to initialize, try restarting.");
       }

@@ -10,7 +10,7 @@ import {
 } from "decky-frontend-lib";
 import { useState, VFC, Fragment } from "react";
 import { FilterElement, LibraryTabElement } from "./LibraryTab";
-import { FaTrash } from "react-icons/all";
+import { FaTrash } from "react-icons/fa";
 import { cloneDeep } from "lodash";
 import camelcase from "camelcase";
 

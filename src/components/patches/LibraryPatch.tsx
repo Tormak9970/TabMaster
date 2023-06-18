@@ -20,10 +20,10 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
 			let cache: any;
 			let currentTab: string;
 
-			// console.log("ret1", ret1);
+			console.log("ret1", ret1);
 			wrapReactType(ret1.type);
 			afterPatch(ret1, "type", (_: Record<string, unknown>[], ret2: ReactElement) => {
-				// console.log("ret2", ret2);
+				console.log("ret2", ret2);
 				currentTab = ret2.props.tab
 
 				// @ts-ignore
@@ -36,15 +36,17 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
 				afterPatch(ret2.type, "type", (_: Record<string, unknown>[], ret3: ReactElement) => {
 					console.log("ret3", ret3);
 
-					let element = findInReactTree(ret3, x => x?.props?.tabs);
+					let element = findInReactTree(ret3, (x) => x?.props?.tabs);
 					console.log("className: ", findInReactTree(ret3, x => x?.props?.className), findInReactTree(ret3, x => x?.props?.className).props.className);
 
-					if (findInReactTree(ret3, x => x?.props?.className === "gamepadlibrary_GamepadLibrary_ZBBhe")) element.props.isLibrary = true;
+					if (findInReactTree(ret3, (x) => x?.props?.className.includes("gamepadlibrary_GamepadLibrary") && !x?.props?.className.includes(" "))) {
+            element.props.isLibrary = true;
+          }
 					console.log("isLibrary: ", !!element.props?.isLibrary);
 
 					if (TabContentTemplate===undefined || TabAddonTemplate===undefined) {
-						let tabs = (element.props.tabs as SteamTab[]).filter(value => value!==undefined) as SteamTab[];
-						let tabTemplate = tabs.find(value => value !== undefined && value?.id==="Favorites");
+						let tabs = (element.props.tabs as SteamTab[]).filter((value) => value !== undefined) as SteamTab[];
+						let tabTemplate = tabs.find((value) => value !== undefined && value?.id === "Favorites");
 						// console.log("tabTemplate", tabTemplate)
 
 						if (tabTemplate) {
@@ -52,11 +54,11 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
 							TabContentPropsTemplate = (tabTemplate.content.props);
 							const tabAddon = (tabTemplate.renderTabAddon().type);
 
-							if (typeof tabContent!=="string" && tabContent!==undefined) {
+							if (typeof tabContent !== "string" && tabContent !== undefined) {
 								TabContentTemplate = tabContent;
 							}
 
-							if (typeof tabAddon!=="string" && tabAddon!==undefined) {
+							if (typeof tabAddon !== "string" && tabAddon !== undefined) {
 								TabAddonTemplate = tabAddon;
 							}
 						}
@@ -68,7 +70,8 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
 					} else {
 						afterPatch(element.type, "type", (_: Record<string, any>[], ret4: ReactElement) => {
 							if (ret4.props?.isLibrary) {
-								// console.log("ret4", ret4);
+								console.log("ret4", ret4);
+                
 								let tabs = (ret4.props.tabs as SteamTab[]).filter(value => value!==undefined) as SteamTab[];
 								tabs = tabs.filter(value => !tabsToHide.includes(value.id));
 								
