@@ -2,8 +2,9 @@ import {
 	ButtonItem,
 	ConfirmModal,
 	definePlugin, DialogButton,
+	gamepadDialogClasses,
 	Menu,
-	MenuItem, ReorderableEntry, ReorderableList, RoutePatch,
+	MenuItem, PanelSection, quickAccessControlsClasses, ReorderableEntry, ReorderableList, RoutePatch,
 	ServerAPI,
 	showContextMenu, showModal,
 	staticClasses,
@@ -168,34 +169,88 @@ const Content: VFC<{}> = ({}) => {
 
 	return (
     <>
-      <div style={{ marginBottom: "5px" }}>
-        Here you can add, re-order, or remove Library Tabs
-      </div>
-      <ButtonItem onClick={onAddClicked}>
-        Add
-      </ButtonItem>
-      {libraryTabsList.length > 0 ? (
-        <ReorderableList<LibraryTabElement> entries={libraryTabsEntries} interactables={Interactables} onSave={onSave}/>
-      ) : (
-        <div style={{width: "100%", display: "flex", justifyContent: "center", alignItems: "center", padding: "5px"}}>
-          Loading...
+      <style>{`
+        .tab-master-scope {
+          width: inherit;
+          height: inherit;
+
+          flex: 1 1 1px;
+          scroll-padding: 48px 0px;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-content: stretch;
+        }
+
+        .tab-master-scope .${quickAccessControlsClasses.PanelSection} {
+          padding: 0px;
+        }
+        .tab-master-scope .${quickAccessControlsClasses.PanelSectionTitle} {
+          margin-top: 3px;
+          margin-left: 5px;
+        }
+
+        .tab-master-scope .${gamepadDialogClasses.FieldChildren} {
+          margin: 0px 16px;
+        }
+        .tab-master-scope .${gamepadDialogClasses.FieldLabel} {
+          margin-left: 16px;
+        }
+
+        .tab-master-scope .add-tab-btn .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
+          display: none;
+        }
+        .tab-master-scope .add-tab-btn .${gamepadDialogClasses.FieldLabel} {
+          display: none;
+        }
+        .tab-master-scope .add-tab-btn .${gamepadDialogClasses.FieldChildren} {
+          width: calc(100% - 32px);
+        }
+
+        .tab-master-scope .seperator {
+          width: 100%;
+          height: 1px;
+          background: #23262e;
+        }
+      `}</style>
+      <div className="tab-master-scope">
+        <div style={{ margin: "5px", marginTop: "0px" }}>
+          Here you can add, re-order, or remove tabs from the library.
         </div>
-      )}
-      {
-        Object.keys(defaultTabs).filter(defaultTab => tabsToHide.includes(defaultTab)).map(defaultTab => defaultTabs[defaultTab]).map(defaultTab =>
-          <ButtonItem
-            label={defaultTab.title}
-            onClick={() => {
-              let tabs = cloneDeep(libraryTabs);
-              tabs[defaultTab.id] = defaultTab;
-              setLibraryTabs(tabs);
-              showTab(defaultTab.id);
-            }}
-          >
-            Show
+        <div className="add-tab-btn">
+          <ButtonItem onClick={onAddClicked}>
+            Add Tab
           </ButtonItem>
-        )
-      }
+        </div>
+        <PanelSection title="Tabs">
+          <div className="seperator"></div>
+          {libraryTabsList.length > 0 ? (
+            <ReorderableList<LibraryTabElement> entries={libraryTabsEntries} interactables={Interactables} onSave={onSave}/>
+          ) : (
+            <div style={{width: "100%", display: "flex", justifyContent: "center", alignItems: "center", padding: "5px"}}>
+              Loading...
+            </div>
+          )}
+        </PanelSection>
+        <PanelSection title="Hidden Tabs">
+          <div className="seperator"></div>
+          {
+            Object.keys(defaultTabs).filter((defaultTab) => tabsToHide.includes(defaultTab)).map((defaultTab) => defaultTabs[defaultTab]).map((defaultTab) =>
+              <ButtonItem
+                label={defaultTab.title}
+                onClick={() => {
+                  let tabs = cloneDeep(libraryTabs);
+                  tabs[defaultTab.id] = defaultTab;
+                  setLibraryTabs(tabs);
+                  showTab(defaultTab.id);
+                }}
+              >
+                Show
+              </ButtonItem>
+            )
+          }
+        </PanelSection>
+      </div>
     </>
 	);
 };
