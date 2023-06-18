@@ -39,7 +39,7 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
         if (outerCache) {
           ret2.type = outerCache;
         } else {
-          //* This runs 129 times, which can 100% be improved
+          //* This runs 3 times, which may be able to be improved
           afterPatch(ret2.type, "type", (_: Record<string, unknown>[], ret3: ReactElement) => {
             console.log("ret3", ret3);
 
