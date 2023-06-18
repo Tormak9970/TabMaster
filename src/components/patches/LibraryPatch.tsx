@@ -14,13 +14,16 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
 	let TabContentPropsTemplate: { collection: SteamCollection, eSortBy: number, setSortBy: (e: any) => void, showSortingContextMenu: (e: any) => void };
 	let TabAddonTemplate: JSXElementConstructor<{ count: number }>;
 
+  //* This only runs 1 time, which is perfect
 	return serverAPI.routerHook.addPatch("/library", (props: { path: string; children: ReactElement }) => {
 		wrapReactType(props.children.type);
 		afterPatch(props.children, "type", (_: Record<string, unknown>[], ret1: ReactElement) => {
-			let cache: any;
+      let outerCache: any;
+			let tabsCache: any;
 			let currentTab: string;
 
-			console.log("ret1", ret1);
+      //* This runs 3 times, which may be able to be improved
+			// console.log("ret1", ret1);
 			wrapReactType(ret1.type);
 			afterPatch(ret1, "type", (_: Record<string, unknown>[], ret2: ReactElement) => {
 				console.log("ret2", ret2);
@@ -33,21 +36,24 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
 					return ret;
 				});
 
+        //* This runs 129 times, which can 100% be improved
 				afterPatch(ret2.type, "type", (_: Record<string, unknown>[], ret3: ReactElement) => {
 					console.log("ret3", ret3);
 
 					let element = findInReactTree(ret3, (x) => x?.props?.tabs);
-					console.log("className: ", findInReactTree(ret3, x => x?.props?.className), findInReactTree(ret3, x => x?.props?.className).props.className);
+					console.log("className: ", findInReactTree(ret3, (x) => x?.props?.className), findInReactTree(ret3, (x) => x?.props?.className).props.className);
 
-					if (findInReactTree(ret3, (x) => x?.props?.className.includes("gamepadlibrary_GamepadLibrary") && !x?.props?.className.includes(" "))) {
+					if (findInReactTree(ret3, (x) => x?.props?.className?.includes("gamepadlibrary_GamepadLibrary") && !x?.props?.className?.includes(" "))) {
             element.props.isLibrary = true;
           }
+
 					console.log("isLibrary: ", !!element.props?.isLibrary);
 
 					if (TabContentTemplate===undefined || TabAddonTemplate===undefined) {
 						let tabs = (element.props.tabs as SteamTab[]).filter((value) => value !== undefined) as SteamTab[];
 						let tabTemplate = tabs.find((value) => value !== undefined && value?.id === "Favorites");
-						// console.log("tabTemplate", tabTemplate)
+
+						console.log("tabTemplate", tabTemplate)
 
 						if (tabTemplate) {
 							const tabContent = (tabTemplate.content.type);
@@ -65,13 +71,13 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
 					}
 
 					wrapReactType(element.type.type);
-					if (cache) {
-						element.type = cache;
+					if (tabsCache) {
+						element.type = tabsCache;
 					} else {
 						afterPatch(element.type, "type", (_: Record<string, any>[], ret4: ReactElement) => {
 							if (ret4.props?.isLibrary) {
 								console.log("ret4", ret4);
-                
+
 								let tabs = (ret4.props.tabs as SteamTab[]).filter(value => value!==undefined) as SteamTab[];
 								tabs = tabs.filter(value => !tabsToHide.includes(value.id));
 								
@@ -114,7 +120,7 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
 
 							return ret4;
 						});
-						cache = element.type;
+						tabsCache = element.type;
 					}
 					return ret3;
 				});

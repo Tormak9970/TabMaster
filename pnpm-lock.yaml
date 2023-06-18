@@ -11,7 +11,7 @@ specifiers:
   '@types/webpack': ^5.28.1
   camelcase: ^7.0.1
   deckbuild: ^1.2.1
-  decky-frontend-lib: ^3.21.1
+  decky-frontend-lib: ^3.21.2
   lodash: ^4.17.21
   mobx: ^5.15.7
   react-icons: ^4.9.0
@@ -24,7 +24,7 @@ specifiers:
 
 dependencies:
   camelcase: 7.0.1
-  decky-frontend-lib: 3.21.1
+  decky-frontend-lib: 3.21.2
   lodash: 4.17.21
   mobx: 5.15.7
   react-icons: 4.9.0
@@ -537,8 +537,8 @@ packages:
       yargs: 13.2.4
     dev: true
 
-  /decky-frontend-lib/3.21.1:
-    resolution: {integrity: sha512-30605ET9qqZ6St6I9WmMmLGgSrTIdMwo7xy85+lRaF1miUd2icOGEJjwnbVcZDdkal+1fJ3tNEDXlchVfG4TrA==}
+  /decky-frontend-lib/3.21.2:
+    resolution: {integrity: sha512-xJNG0GPHJIvBzhU2N72J43liLAzV6lGPBgsuV/TRtH8Rd/SzisXHiPKrkkgt7biLs1MEWxj7lMY+svn6i1+FZA==}
     dev: false
 
   /deepmerge/4.3.1:
