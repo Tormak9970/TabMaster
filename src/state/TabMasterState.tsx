@@ -73,7 +73,14 @@ export const defaultTabs: LibraryTabDictionary = {
 		custom: false,
 		position: 5,
 		filters: []
-	}
+	},
+  Soundtracks: {
+    id: "Soundtracks",
+		title: "Soundtracks",
+		custom: false,
+		position: 6,
+		filters: []
+  }
 }
 
 export class TabMasterState {

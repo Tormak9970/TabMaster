@@ -52,7 +52,7 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
 
             console.log("isLibrary: ", !!element.props?.isLibrary);
 
-            if (TabContentTemplate===undefined || TabAddonTemplate===undefined) {
+            if (TabContentTemplate === undefined || TabAddonTemplate === undefined) {
               let tabs = (element.props.tabs as SteamTab[]).filter((value) => value !== undefined) as SteamTab[];
               let tabTemplate = tabs.find((value) => value !== undefined && value?.id === "Favorites");
 
