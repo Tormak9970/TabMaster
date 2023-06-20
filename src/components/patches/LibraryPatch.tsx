@@ -44,7 +44,7 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
             console.log("ret3", ret3);
 
             let element = findInReactTree(ret3, (x) => x?.props?.tabs);
-            console.log("className: ", findInReactTree(ret3, (x) => x?.props?.className), findInReactTree(ret3, (x) => x?.props?.className).props.className);
+            // console.log("className: ", findInReactTree(ret3, (x) => x?.props?.className), findInReactTree(ret3, (x) => x?.props?.className).props.className);
 
             if (findInReactTree(ret3, (x) => x?.props?.className?.includes("gamepadlibrary_GamepadLibrary") && !x?.props?.className?.includes(" "))) {
               element.props.isLibrary = true;
@@ -56,7 +56,7 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
               let tabs = (element.props.tabs as SteamTab[]).filter((value) => value !== undefined) as SteamTab[];
               let tabTemplate = tabs.find((value) => value !== undefined && value?.id === "Favorites");
 
-              console.log("tabTemplate", tabTemplate)
+              console.log("tabTemplate", tabTemplate);
 
               if (tabTemplate) {
                 const tabContent = (tabTemplate.content.type);
@@ -84,8 +84,8 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
                   let tabs = (ret4.props.tabs as SteamTab[]).filter(value => value!==undefined) as SteamTab[];
                   tabs = tabs.filter(value => !tabsToHide.includes(value.id));
                   
-                  if (tabsToHide.includes(ret4.props.activeTab)) {
-                    if (tabs[0]!==undefined) ret4.props.activeTab = tabs[0].id;
+                  if (tabsToHide.includes(ret4.props.activeTab) && tabs[0] !== undefined) {
+                    ret4.props.activeTab = tabs[0].id;
                   }
                   
                   console.log("tabs: ", tabs);
@@ -108,7 +108,7 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
                         renderTabAddon: () => <TabAddonTemplate count={collection.visibleApps.length}/>,
                       }
 
-                      if (tabs.every(value => value.id! = newTab.id)) {
+                      if (tabs.every((value) => value.id !== newTab.id)) {
                         tabs.push(newTab);
                       }
                     }
@@ -117,7 +117,7 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
                   console.log("customTabs: ", tabs);
                   ret4.props.tabs = tabs.sort((a, b) => (tabOrder.get(a.id) ?? 0) - (tabOrder.get(b.id) ?? 0));
                 } else {
-                  ret4.props.tabs = (ret4.props.tabs as SteamTab[]).filter(value => !Array.from(customTabs.keys()).includes(value.id));
+                  ret4.props.tabs = (ret4.props.tabs as SteamTab[]).filter((value) => !Array.from(customTabs.keys()).includes(value.id));
                 }
                 console.log(element);
 

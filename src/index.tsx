@@ -158,12 +158,11 @@ const Content: VFC<{}> = ({}) => {
           setLibraryTabs(tabs);
         }} 
         tab={{ custom: true, title: "", id: "", filters: [], position: libraryTabsList.length + 1 }}
+        title={"Create a New Tab"}
         closeModal={() => {}}
       />
     );
   }
-
-	console.log(libraryTabsList);
 
 	if (libraryTabsList.length == 0) reload().then(() => {});
 
