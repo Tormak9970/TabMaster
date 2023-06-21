@@ -3,23 +3,17 @@ import {
   ButtonItem,
   ConfirmModal, Dropdown,
   Field,
+  Focusable,
   PanelSection,
   PanelSectionRow,
   SingleDropdownOption,
-  TextField, ToggleField
+  TextField, ToggleField, gamepadDialogClasses
 } from "decky-frontend-lib";
 import { useState, VFC, Fragment } from "react";
 import { FilterElement, LibraryTabElement } from "./LibraryTab";
 import { FaTrash } from "react-icons/fa";
 import { cloneDeep } from "lodash";
 import camelcase from "camelcase";
-
-type EditModalProps = {
-  closeModal: () => void,
-  onConfirm?(shortcut: LibraryTabElement): any,
-  title?: string,
-  tab: LibraryTabElement,
-}
 
 const FilterTypes: string[] = [
   "collection",
@@ -67,9 +61,7 @@ const TabFilterCollections: VFC<TabFilterCollectionsProps> = ({ index, filter, f
         return (
           <Field
             label="Collection"
-            description={
-              <Dropdown rgOptions={collectionDropdownOptions} selectedOption={filter.params.collection} onChange={onCollectionChange} />
-            }
+            description={ <Dropdown rgOptions={collectionDropdownOptions} selectedOption={filter.params.collection} onChange={onCollectionChange} /> }
           />
         );
       case "installed":
@@ -80,9 +72,7 @@ const TabFilterCollections: VFC<TabFilterCollectionsProps> = ({ index, filter, f
         return (
           <Field
             label="Regex"
-            description={
-              <TextField value={filter.params.regex} onChange={onRegexChange} />
-            }
+            description={ <TextField value={filter.params.regex} onChange={onRegexChange} /> }
           />
         );
       default:
@@ -124,12 +114,26 @@ const TabTypeContent: VFC<TabTypeContentProps> = ({ index, filter, filters, setF
 
   if (filter) {
     return (
-      <>
-        <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
-        <Button onClick={onDelete}>
-          <FaTrash />
-        </Button>
-      </>
+      <div className="filter-entry">
+        <Focusable style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "row"
+        }}>
+          <Focusable style={{
+            width: "calc(100% - 55px)"
+          }}>
+            <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
+          </Focusable>
+          <Focusable style={{
+              marginLeft: "10px"
+            }}>
+            <ButtonItem onClick={onDelete}>
+              <FaTrash />
+            </ButtonItem>
+          </Focusable>
+        </Focusable>
+      </div>
     )
   } else {
     return (
@@ -139,65 +143,14 @@ const TabTypeContent: VFC<TabTypeContentProps> = ({ index, filter, filters, setF
 }
 
 
-type TabEditingProps = {
-  id: string,
-  setId: React.Dispatch<React.SetStateAction<string>>,
+type EditModalProps = {
+  closeModal: () => void,
+  onConfirm?(shortcut: LibraryTabElement): any,
+  title?: string,
   tab: LibraryTabElement,
-  filters: FilterElement<any>[],
-  setFilters: React.Dispatch<React.SetStateAction<FilterElement<any>[]>>
 }
 
-const TabEditing: VFC<TabEditingProps> = ({ tab, id, setId, filters, setFilters }) => {
-  function addFilter() {
-    const filter = cloneDeep(filters);
-    filter.push({
-      type: "",
-      params: {}
-    });
-    setFilters(filter);
-  }
-
-  if (tab.custom) {
-    return (
-      <>
-        <PanelSectionRow>
-          <Field
-            label="ID"
-            description={
-              <TextField value={id} onChange={(e) => { setId(e?.target.value) }} />
-            }
-          />
-        </PanelSectionRow>
-        <PanelSectionRow>
-          <Fragment>
-            <ButtonItem onClick={addFilter}>
-              Add Filter
-            </ButtonItem>
-            {filters.map((filter, index) => {
-              return (
-                <>
-                  <Field
-                    label="Type"
-                    description={
-                      <TabTypeContent index={index} filter={filter} filters={filters} setFilters={setFilters} />
-                    }
-                  />
-                  <TabFilterCollections index={index} filter={filter} filters={filters} setFilters={setFilters} />
-                </>
-              );
-            })}
-          </Fragment>
-        </PanelSectionRow>
-      </>
-    );
-  } else {
-    return (
-      <Fragment />
-    );
-  }
-}
-
-export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () => { }, tab, title = `Modifying: ${tab.title}`, }) => {
+export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () => {}, tab, title = `Modifying: ${tab.title}`, }) => {
   const [id, setId] = useState<string>(tab.id);
   const [name, setName] = useState<string>(tab.title);
   const [filters, setFilters] = useState<FilterElement<any>[]>(tab.filters);
@@ -210,34 +163,97 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
   function onSave() {
     const updated: LibraryTabElement = {
       custom: tab.custom,
-      id, title: name,
-      filters,
+      id: id,
+      title: name,
+      filters: filters,
       position: tab.position
     };
     onConfirm(updated);
     closeModal();
   }
 
+  function addFilter() {
+    const filter = cloneDeep(filters);
+    filter.push({
+      type: "",
+      params: {}
+    });
+    setFilters(filter);
+  }
+
   return (
     <>
-      <ConfirmModal
-        bAllowFullSize
-        onCancel={closeModal}
-        onEscKeypress={closeModal}
-        onOK={onSave}
-      >
-        <PanelSection title={title}>
-          <PanelSectionRow>
-            <Field
-              label="Name"
-              description={
-                <TextField value={name} onChange={onNameChange} />
-              }
-            />
-          </PanelSectionRow>
-          <TabEditing tab={tab} id={id} setId={setId} filters={filters} setFilters={setFilters} />
-        </PanelSection>
-      </ConfirmModal>
+      <style>{`
+        .tab-master-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
+          margin-left: 15px;
+        }
+        
+        /* .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
+          display: none;
+        } */
+        .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.FieldLabel} {
+          display: none;
+        }
+        .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.FieldChildren} {
+          width: 100%;
+        }
+
+        /* The button item */
+        .tab-master-scope .filter-entry .${gamepadDialogClasses.GamepadDialogContent} {
+          margin: 0;
+          padding: 0;
+        }
+        /* The button item label */
+        .tab-master-scope .filter-entry .${gamepadDialogClasses.FieldLabel} {
+          display: none;
+        }
+        /* The button item */
+        .tab-master-scope .filter-entry .${gamepadDialogClasses.Button} {
+          padding: 10px;
+          min-width: 45px;
+          width: 45px;
+        }
+      `}</style>
+      <div className="tab-master-modal-scope">
+        <ConfirmModal
+          bAllowFullSize
+          onCancel={closeModal}
+          onEscKeypress={closeModal}
+          strTitle={title}
+          onOK={onSave}
+        >
+          <PanelSection>
+            <PanelSectionRow>
+              <Field
+                label="Name"
+                description={ <TextField value={name} onChange={onNameChange} /> }
+              />
+            </PanelSectionRow>
+          </PanelSection>
+          <PanelSection title="Filters">
+            <PanelSectionRow>
+              <div className="add-filter-btn">
+                <ButtonItem onClick={addFilter}>
+                  Add Filter
+                </ButtonItem>
+              </div>
+            </PanelSectionRow>
+            <PanelSectionRow>
+              {filters.map((filter, index) => {
+                return (
+                  <>
+                    <Field
+                      label="Type"
+                      description={ <TabTypeContent index={index} filter={filter} filters={filters} setFilters={setFilters} /> }
+                    />
+                    <TabFilterCollections index={index} filter={filter} filters={filters} setFilters={setFilters} />
+                  </>
+                );
+              })}
+            </PanelSectionRow>
+          </PanelSection>
+        </ConfirmModal>
+      </div>
     </>
   );
 }
