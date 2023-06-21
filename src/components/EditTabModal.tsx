@@ -3,6 +3,7 @@ import {
   ButtonItem,
   ConfirmModal, Dropdown,
   Field,
+  Focusable,
   PanelSection,
   PanelSectionRow,
   SingleDropdownOption,
@@ -113,12 +114,26 @@ const TabTypeContent: VFC<TabTypeContentProps> = ({ index, filter, filters, setF
 
   if (filter) {
     return (
-      <>
-        <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
-        <Button onClick={onDelete}>
-          <FaTrash />
-        </Button>
-      </>
+      <div className="filter-entry">
+        <Focusable style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "row"
+        }}>
+          <Focusable style={{
+            width: "calc(100% - 55px)"
+          }}>
+            <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
+          </Focusable>
+          <Focusable style={{
+              marginLeft: "10px"
+            }}>
+            <ButtonItem onClick={onDelete}>
+              <FaTrash />
+            </ButtonItem>
+          </Focusable>
+        </Focusable>
+      </div>
     )
   } else {
     return (
@@ -181,6 +196,22 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
         }
         .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.FieldChildren} {
           width: 100%;
+        }
+
+        /* The button item */
+        .tab-master-scope .filter-entry .${gamepadDialogClasses.GamepadDialogContent} {
+          margin: 0;
+          padding: 0;
+        }
+        /* The button item label */
+        .tab-master-scope .filter-entry .${gamepadDialogClasses.FieldLabel} {
+          display: none;
+        }
+        /* The button item */
+        .tab-master-scope .filter-entry .${gamepadDialogClasses.Button} {
+          padding: 10px;
+          min-width: 45px;
+          width: 45px;
         }
       `}</style>
       <div className="tab-master-modal-scope">
