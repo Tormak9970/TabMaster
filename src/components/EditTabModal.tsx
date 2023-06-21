@@ -60,9 +60,7 @@ const TabFilterCollections: VFC<TabFilterCollectionsProps> = ({ index, filter, f
         return (
           <Field
             label="Collection"
-            description={
-              <Dropdown rgOptions={collectionDropdownOptions} selectedOption={filter.params.collection} onChange={onCollectionChange} />
-            }
+            description={ <Dropdown rgOptions={collectionDropdownOptions} selectedOption={filter.params.collection} onChange={onCollectionChange} /> }
           />
         );
       case "installed":
@@ -73,9 +71,7 @@ const TabFilterCollections: VFC<TabFilterCollectionsProps> = ({ index, filter, f
         return (
           <Field
             label="Regex"
-            description={
-              <TextField value={filter.params.regex} onChange={onRegexChange} />
-            }
+            description={ <TextField value={filter.params.regex} onChange={onRegexChange} /> }
           />
         );
       default:
@@ -200,12 +196,6 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
               <Field
                 label="Name"
                 description={ <TextField value={name} onChange={onNameChange} /> }
-              />
-            </PanelSectionRow>
-            <PanelSectionRow>
-              <Field
-                label="Id"
-                description={ <TextField value={id} onChange={(e) => { setId(e?.target.value) }} /> }
               />
             </PanelSectionRow>
           </PanelSection>
