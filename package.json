@@ -62,7 +62,7 @@
     "decky-frontend-lib": "^3.21.2",
     "lodash": "^4.17.21",
     "mobx": "^5.15.7",
-    "react-icons": "^4.9.0"
+    "react-icons": "^4.10.1"
   },
   "pnpm": {
     "peerDependencyRules": {

@@ -126,7 +126,8 @@ const TabTypeContent: VFC<TabTypeContentProps> = ({ index, filter, filters, setF
             <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
           </Focusable>
           <Focusable style={{
-              marginLeft: "10px"
+              marginLeft: "10px",
+              width: "45px"
             }}>
             <ButtonItem onClick={onDelete}>
               <FaTrash />
@@ -173,12 +174,12 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
   }
 
   function addFilter() {
-    const filter = cloneDeep(filters);
-    filter.push({
-      type: "",
-      params: {}
+    const filtersCopy = cloneDeep(filters);
+    filtersCopy.push({
+      type: "regex",
+      params: {  regex: "" }
     });
-    setFilters(filter);
+    setFilters(filtersCopy);
   }
 
   return (
@@ -188,9 +189,10 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
           margin-left: 15px;
         }
         
-        /* .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
-          display: none;
-        } */
+        /* The button item */
+        .tab-master-modal-scope .add-filter-btn {
+          padding: 0 !important;
+        }
         .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.FieldLabel} {
           display: none;
         }
@@ -198,20 +200,47 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
           width: 100%;
         }
 
-        /* The button item */
-        .tab-master-scope .filter-entry .${gamepadDialogClasses.GamepadDialogContent} {
-          margin: 0;
+        /* The button item wrapper */
+        .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.Field} {
           padding: 0;
+          margin: 0;
         }
         /* The button item label */
-        .tab-master-scope .filter-entry .${gamepadDialogClasses.FieldLabel} {
+        .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.FieldLabel} {
           display: none;
         }
         /* The button item */
-        .tab-master-scope .filter-entry .${gamepadDialogClasses.Button} {
+        .tab-master-modal-scope .filter-entry button.${gamepadDialogClasses.Button}.DialogButton {
           padding: 10px;
           min-width: 45px;
-          width: 45px;
+        }
+
+        .tab-master-modal-scope .filter-params-input .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
+          display: none
+        }
+
+        /* Filter section start */
+        .tab-master-modal-scope .filter-start-cont {
+          width: 100%;
+          padding: 0;
+
+          display: flex;
+          flex-direction: row;
+
+          justify-content: space-between;
+          align-items: center;
+
+          font-size: 14px;
+        }
+        .tab-master-modal-scope .filter-start-cont .filter-line {
+          height: 2px;
+          flex-grow: 1;
+          
+          background: #23262e;
+        }
+        .tab-master-modal-scope .filter-start-cont .filter-label {
+          margin: 0px 5px;
+          color: #343945;
         }
       `}</style>
       <div className="tab-master-modal-scope">
@@ -232,24 +261,38 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
           </PanelSection>
           <PanelSection title="Filters">
             <PanelSectionRow>
+              {filters.map((filter, index) => {
+                return (
+                  <>
+                    <div className="filter-start-cont">
+                      <div className="filter-line" />
+                      <div className="filter-label">Filter {index+1} - {filter.type[0].toUpperCase().concat(filter.type.substring(1))}</div>
+                      <div className="filter-line" />
+                    </div>
+                    <Field
+                      label="Filter Type"
+                      description={ <TabTypeContent index={index} filter={filter} filters={filters} setFilters={setFilters} /> }
+                    />
+                    <div className="filter-params-input">
+                      <TabFilterCollections index={index} filter={filter} filters={filters} setFilters={setFilters} />
+                    </div>
+                    {index == filters.length - 1 ? (
+                      <div className="filter-start-cont">
+                        <div className="filter-line" />
+                      </div>
+                    ) : (
+                      <Fragment/>
+                    )}
+                  </>
+                );
+              })}
+            </PanelSectionRow>
+            <PanelSectionRow>
               <div className="add-filter-btn">
                 <ButtonItem onClick={addFilter}>
                   Add Filter
                 </ButtonItem>
               </div>
-            </PanelSectionRow>
-            <PanelSectionRow>
-              {filters.map((filter, index) => {
-                return (
-                  <>
-                    <Field
-                      label="Type"
-                      description={ <TabTypeContent index={index} filter={filter} filters={filters} setFilters={setFilters} /> }
-                    />
-                    <TabFilterCollections index={index} filter={filter} filters={filters} setFilters={setFilters} />
-                  </>
-                );
-              })}
             </PanelSectionRow>
           </PanelSection>
         </ConfirmModal>

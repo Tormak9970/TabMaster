@@ -10,7 +10,8 @@ import {
 	staticClasses,
 } from "decky-frontend-lib";
 import { VFC, Fragment } from "react";
-import { FaEllipsisH, FaLayerGroup } from "react-icons/fa";
+import { FaEllipsisH } from "react-icons/fa";
+import { PiTabs } from "react-icons/pi";
 
 import { patchLibrary } from "./components/patches/LibraryPatch";
 import {
@@ -288,7 +289,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
       <TabMasterContextProvider tabMasterStateClass={state}>
         <Content />
       </TabMasterContextProvider>,
-		icon: <FaLayerGroup/>,
+		icon: <PiTabs/>,
 		onDismount: () => {
 			serverAPI.routerHook.removePatch("/library", patch);
 			loginUnregisterer.unregister();

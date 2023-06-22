@@ -14,7 +14,7 @@ specifiers:
   decky-frontend-lib: ^3.21.2
   lodash: ^4.17.21
   mobx: ^5.15.7
-  react-icons: ^4.9.0
+  react-icons: ^4.10.1
   rollup: ^2.79.1
   rollup-plugin-import-assets: ^1.1.1
   rollup-sourcemap-path-transform: ^1.0.3
@@ -27,7 +27,7 @@ dependencies:
   decky-frontend-lib: 3.21.2
   lodash: 4.17.21
   mobx: 5.15.7
-  react-icons: 4.9.0
+  react-icons: 4.10.1
 
 devDependencies:
   '@rollup/plugin-commonjs': 21.1.0_rollup@2.79.1
@@ -1011,8 +1011,8 @@ packages:
       safe-buffer: 5.2.1
     dev: true
 
-  /react-icons/4.9.0:
-    resolution: {integrity: sha512-ijUnFr//ycebOqujtqtV9PFS7JjhWg0QU6ykURVHuL4cbofvRCf3f6GMn9+fBktEFQOIVZnuAYLZdiyadRQRFg==}
+  /react-icons/4.10.1:
+    resolution: {integrity: sha512-/ngzDP/77tlCfqthiiGNZeYFACw85fUjZtLbedmJ5DTlNDIwETxhwBzdOJ21zj4iJdvc0J3y7yOsX3PpxAJzrw==}
     peerDependencies:
       react: '*'
     peerDependenciesMeta:
