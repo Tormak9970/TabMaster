@@ -1,5 +1,4 @@
 import {
-  Button,
   ButtonItem,
   ConfirmModal, Dropdown,
   Field,
@@ -21,14 +20,14 @@ const FilterTypes: string[] = [
   "regex"
 ];
 
-type TabFilterCollectionsProps = {
+type TabFilterOptionsProps = {
   index: number,
   filter: FilterElement<any>,
   filters: FilterElement<any>[],
   setFilters: React.Dispatch<React.SetStateAction<FilterElement<any>[]>>
 }
 
-const TabFilterCollections: VFC<TabFilterCollectionsProps> = ({ index, filter, filters, setFilters }) => {
+const TabFilterOptions: VFC<TabFilterOptionsProps> = ({ index, filter, filters, setFilters }) => {
   const collectionDropdownOptions = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
   function onCollectionChange(data: SingleDropdownOption) {
@@ -274,7 +273,7 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
                       description={ <TabTypeContent index={index} filter={filter} filters={filters} setFilters={setFilters} /> }
                     />
                     <div className="filter-params-input">
-                      <TabFilterCollections index={index} filter={filter} filters={filters} setFilters={setFilters} />
+                      <TabFilterOptions index={index} filter={filter} filters={filters} setFilters={setFilters} />
                     </div>
                     {index == filters.length - 1 ? (
                       <div className="filter-start-cont">
