@@ -61,3 +61,23 @@ export function debounce(func:Function, wait:number, immediate?:boolean) {
       if (callNow) func.apply(context, args);
   };
 };
+
+/**
+ * Gets a steam user id from two parts.
+ * @param low The low part of the bigint.
+ * @param high The high part of the bigint.
+ * @returns The user's id as a bigint.
+ */
+export function getSteamIdFromParts(low: number, high: number): bigint {
+  return (BigInt(high) << 32n) | (BigInt(low));
+}
+
+/**
+ * Gets a steam user id from two parts.
+ * @param low The low part of the bigint.
+ * @param high The high part of the bigint.
+ * @returns The user's id as a number.
+ */
+export function getNonBigIntUserId(low: number, high: number): number {
+  return Number(getSteamIdFromParts(low, high) - 76561197960265728n);
+}
