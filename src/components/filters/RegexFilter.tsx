@@ -7,7 +7,7 @@ export class RegexFilter implements Filter<{ regex: string }> {
 
   /**
    * Creates a new regex filter.
-   * @param params Props for the Regex filter.
+   * @param params Props for the regex filter.
    */
 	constructor(params: { regex: string }) {
 		this.params = params
@@ -15,9 +15,9 @@ export class RegexFilter implements Filter<{ regex: string }> {
 	}
 
   /**
-   * Filters the app.
+   * Checks if a app complies with this filter.
    * @param appOverview The overview of the app to filter.
-   * @returns Whether to include an app based on wether or not it matches the regex.
+   * @returns Whether or not to include the app.
    */
 	filter(app: SteamAppOverview) {
 		return this.regex.test(app.display_name);

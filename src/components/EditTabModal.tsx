@@ -8,11 +8,13 @@ import {
   SingleDropdownOption,
   TextField, ToggleField, gamepadDialogClasses
 } from "decky-frontend-lib";
-import { useState, VFC, Fragment } from "react";
-import { FilterElement, LibraryTabElement } from "./LibraryTab";
+import { useState, VFC, Fragment, useEffect } from "react";
+import { Filter, FilterElement, LibraryTabElement } from "./LibraryTab";
 import { FaTrash } from "react-icons/fa";
 import { cloneDeep } from "lodash";
 import camelcase from "camelcase";
+import { RegexFilter } from "./filters/RegexFilter";
+import { CollectionFilter } from "./filters/CollectionFilter";
 
 const FilterTypes: string[] = [
   "collection",
@@ -20,14 +22,14 @@ const FilterTypes: string[] = [
   "regex"
 ];
 
-type TabFilterOptionsProps = {
+type FilterOptionsProps = {
   index: number,
   filter: FilterElement<any>,
   filters: FilterElement<any>[],
   setFilters: React.Dispatch<React.SetStateAction<FilterElement<any>[]>>
 }
 
-const TabFilterOptions: VFC<TabFilterOptionsProps> = ({ index, filter, filters, setFilters }) => {
+const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFilters }) => {
   const collectionDropdownOptions = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
   function onCollectionChange(data: SingleDropdownOption) {
@@ -87,14 +89,14 @@ const TabFilterOptions: VFC<TabFilterOptionsProps> = ({ index, filter, filters, 
 }
 
 
-type TabTypeContentProps = {
+type FilterEntryProps = {
   index: number,
   filter: FilterElement<any>,
   filters: FilterElement<any>[],
   setFilters: React.Dispatch<React.SetStateAction<FilterElement<any>[]>>
 }
 
-const TabTypeContent: VFC<TabTypeContentProps> = ({ index, filter, filters, setFilters }) => {
+const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters }) => {
   const filterTypeOptions = FilterTypes.map(type => { return { label: type, data: type } });
 
   function onChange(data: SingleDropdownOption) {
@@ -142,6 +144,20 @@ const TabTypeContent: VFC<TabTypeContentProps> = ({ index, filter, filters, setF
   }
 }
 
+function isDefaultParams(filter: FilterElement<any>): boolean {
+  switch (filter.type) {
+    case "regex":
+      return (filter as RegexFilter).params.regex != "";
+    case "installed":
+      return true;
+    case "collection":
+      return !!(filter as CollectionFilter).params.collection;
+    case "friends":
+      return (filter as RegexFilter).params.friends.length > 0;
+    case "tags":
+      return (filter as RegexFilter).params.tags.length > 0;
+  }
+}
 
 type EditModalProps = {
   closeModal: () => void,
@@ -154,6 +170,17 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
   const [id, setId] = useState<string>(tab.id);
   const [name, setName] = useState<string>(tab.title);
   const [filters, setFilters] = useState<FilterElement<any>[]>(tab.filters);
+
+  const [canSave, setCanSave] = useState<boolean>(false);
+  const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
+
+  useEffect(() => {
+    setCanSave(id != "" && filters.length > 0);
+  }, [id, filters]);
+
+  useEffect(() => {
+    setCanAddFilter(filters.every((filter) => !isDefaultParams(filter)) || filters.length == 0);
+  }, [filters]);
 
   function onNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     setName(e?.target.value);
@@ -270,10 +297,10 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
                     </div>
                     <Field
                       label="Filter Type"
-                      description={ <TabTypeContent index={index} filter={filter} filters={filters} setFilters={setFilters} /> }
+                      description={ <FilterEntry index={index} filter={filter} filters={filters} setFilters={setFilters} /> }
                     />
                     <div className="filter-params-input">
-                      <TabFilterOptions index={index} filter={filter} filters={filters} setFilters={setFilters} />
+                      <FilterOptions index={index} filter={filter} filters={filters} setFilters={setFilters} />
                     </div>
                     {index == filters.length - 1 ? (
                       <div className="filter-start-cont">

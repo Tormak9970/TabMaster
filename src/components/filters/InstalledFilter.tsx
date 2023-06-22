@@ -7,7 +7,7 @@ export class InstalledFilter implements Filter<{ installed: boolean }> {
 
   /**
    * Creates a new installed filter.
-   * @param params Props for the Installed filter.
+   * @param params Props for the installed filter.
    */
 	constructor(params: { installed: boolean }) {
 		this.params = params;
@@ -15,9 +15,9 @@ export class InstalledFilter implements Filter<{ installed: boolean }> {
 	}
 
   /**
-   * Filters the app.
+   * Checks if a app complies with this filter.
    * @param appOverview The overview of the app to filter.
-   * @returns Whether to include an app based on wether or not installed is checked.
+   * @returns Whether or not to include the app.
    */
 	filter(app: SteamAppOverview): boolean {
 		return this.installed ? app.installed : !app.installed;

@@ -6,18 +6,18 @@ export class CollectionFilter implements Filter<{ collection: SteamCollection }>
 
   /**
    * Creates a new collection filter.
-   * @param params Props for the Collection filter.
+   * @param params Props for the collection filter.
    */
   constructor(params: { collection: SteamCollection }) {
     this.params = params;
   }
 
   /**
-   * Filters the collection's app list.
+   * Checks if a app complies with this filter.
    * @param appOverview The overview of the app to filter.
-   * @returns A filtered list of collection apps.
+   * @returns Whether or not to include the app.
    */
-  filter(appOverview: SteamAppOverview) {
+  filter(appOverview: SteamAppOverview): boolean {
     return this.params.collection?.allApps.find((value: any) => value.appid === appOverview.appid) !== undefined && this.params.collection?.visibleApps.find((value: any) => value.appid === appOverview.appid) !== undefined;
   }
 }
