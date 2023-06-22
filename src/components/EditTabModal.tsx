@@ -9,7 +9,7 @@ import {
   TextField, ToggleField, gamepadDialogClasses
 } from "decky-frontend-lib";
 import { useState, VFC, Fragment, useEffect } from "react";
-import { Filter, FilterElement, LibraryTabElement } from "./LibraryTab";
+import { LibraryTabElement } from "./LibraryTab";
 import { FaTrash } from "react-icons/fa";
 import { cloneDeep } from "lodash";
 import camelcase from "camelcase";
@@ -17,6 +17,8 @@ import { RegexFilter } from "./filters/RegexFilter";
 import { CollectionFilter } from "./filters/CollectionFilter";
 import { FriendsFilter } from "./filters/FriendsFilter";
 import { TagsFilter } from "./filters/TagFilter";
+import { FilterType, TabFilterSettings } from "./filters/Filters";
+import { PythonInterop } from "../lib/controllers/PythonInterop";
 
 const FilterTypes: string[] = [
   "collection",
@@ -26,16 +28,16 @@ const FilterTypes: string[] = [
 
 type FilterOptionsProps = {
   index: number,
-  filter: FilterElement<any>,
-  filters: FilterElement<any>[],
-  setFilters: React.Dispatch<React.SetStateAction<FilterElement<any>[]>>
+  filter: TabFilterSettings<FilterType>,
+  filters: TabFilterSettings<FilterType>[],
+  setFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
 }
 
 const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFilters }) => {
   const collectionDropdownOptions = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
   function onCollectionChange(data: SingleDropdownOption) {
-    const filter1 = cloneDeep(filter);
+    const filter1 = cloneDeep(filter) as TabFilterSettings<'collection'>;
     filter1.params.collection = data.data;
     const filters1 = cloneDeep(filters);
     filters1[index] = filter1;
@@ -43,7 +45,7 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
   }
 
   function onInstalledChange(checked: boolean) {
-    const filter1 = cloneDeep(filter);
+    const filter1 = cloneDeep(filter) as TabFilterSettings<'installed'>;
     filter1.params.installed = checked ?? false;
     const filters1 = cloneDeep(filters);
     filters1[index] = filter1;
@@ -51,7 +53,7 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
   }
 
   function onRegexChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const filter1 = cloneDeep(filter);
+    const filter1 = cloneDeep(filter) as TabFilterSettings<'regex'>;
     filter1.params.regex = e?.target.value;
     const filters1 = cloneDeep(filters);
     filters1[index] = filter1;
@@ -72,35 +74,37 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
         return (
           <Field
             label="Regex"
-            description={ <TextField value={filter.params.regex} onChange={onRegexChange} /> }
+            description={ <TextField value={(filter as TabFilterSettings<'regex'>).params.regex} onChange={onRegexChange} /> }
           />
         );
       case "installed":
         return (
-          <ToggleField label="Installed" checked={filter.params.installed} onChange={onInstalledChange} />
+          <ToggleField label="Installed" checked={(filter as TabFilterSettings<'installed'>).params.installed} onChange={onInstalledChange} />
         );
       case "collection":
         return (
           <Field
             label="Collection"
-            description={ <Dropdown rgOptions={collectionDropdownOptions} selectedOption={filter.params.collection} onChange={onCollectionChange} /> }
+            description={ <Dropdown rgOptions={collectionDropdownOptions} selectedOption={(filter as TabFilterSettings<'collection'>).params.collection} onChange={onCollectionChange} /> }
           />
         );
       case "friends":
         return (
-          <Field
-            label="Friends to Include"
-            // TODO: make a multi select here
-            description={ <TextField value={filter.params.friends} onChange={onFriendsChange} /> }
-          />
+          // <Field
+          //   label="Friends to Include"
+          //   // TODO: make a multi select here
+          //   description={ <TextField value={(filter as TabFilterSettings<'friends'>).params.friends} onChange={onFriendsChange} /> }
+          // />
+          <Fragment/>
         );
       case "tags":
         return (
-          <Field
-            label="Tags to include"
-            // TODO: make a multi select here
-            description={ <TextField value={filter.params.tags} onChange={onTagsChange} /> }
-          />
+          // <Field
+          //   label="Tags to include"
+          //   // TODO: make a multi select here
+          //   description={ <TextField value={(filter as TabFilterSettings<'tags'>).params.tags} onChange={onTagsChange} /> }
+          // />
+          <Fragment/>
         );
       default:
         return (
@@ -117,9 +121,9 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
 
 type FilterEntryProps = {
   index: number,
-  filter: FilterElement<any>,
-  filters: FilterElement<any>[],
-  setFilters: React.Dispatch<React.SetStateAction<FilterElement<any>[]>>
+  filter: TabFilterSettings<FilterType>,
+  filters: TabFilterSettings<FilterType>[],
+  setFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
 }
 
 const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters }) => {
@@ -170,7 +174,7 @@ const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters
   }
 }
 
-function isDefaultParams(filter: FilterElement<any>): boolean {
+function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
   switch (filter.type) {
     case "regex":
       return (filter as RegexFilter).params.regex != "";
@@ -195,7 +199,8 @@ type EditModalProps = {
 export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () => {}, tab, title = `Modifying: ${tab.title}`, }) => {
   const [id, setId] = useState<string>(tab.id);
   const [name, setName] = useState<string>(tab.title);
-  const [filters, setFilters] = useState<FilterElement<any>[]>(tab.filters);
+  // TODO: remove the cast once tabs are reworked
+  const [filters, setFilters] = useState<TabFilterSettings<FilterType>[]>(tab.filters as TabFilterSettings<FilterType>[]);
 
   const [canSave, setCanSave] = useState<boolean>(false);
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
@@ -214,15 +219,19 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
   }
 
   function onSave() {
-    const updated: LibraryTabElement = {
-      custom: tab.custom,
-      id: id,
-      title: name,
-      filters: filters,
-      position: tab.position
-    };
-    onConfirm(updated);
-    closeModal();
+    if (canSave) {
+      const updated: LibraryTabElement = {
+        custom: tab.custom,
+        id: id,
+        title: name,
+        filters: filters,
+        position: tab.position
+      };
+      onConfirm(updated);
+      closeModal();
+    } else {
+      PythonInterop.toast("Error", "Please add a name and at least 1 filter before saving")
+    }
   }
 
   function addFilter() {
@@ -341,7 +350,12 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
             </PanelSectionRow>
             <PanelSectionRow>
               <div className="add-filter-btn">
-                <ButtonItem onClick={addFilter}>
+                {!canAddFilter ? (
+                  <div style={{}}>Please finish the current filter before adding another</div>
+                ) : (
+                  <Fragment />
+                )}
+                <ButtonItem onClick={addFilter} disabled={!canAddFilter}>
                   Add Filter
                 </ButtonItem>
               </div>

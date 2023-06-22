@@ -1,4 +1,4 @@
-type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags'
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags'
 
 type CollectionFilterParams = { collection: SteamCollection }
 type InstalledFilterParams = { installed: boolean }
@@ -14,7 +14,7 @@ type FilterParams<T extends FilterType> =
   T extends 'tags' ? TagsFilterParams :
   never
 
-type TabFilterSettings<T extends FilterType> = {
+export type TabFilterSettings<T extends FilterType> = {
   type: T
   params: FilterParams<T>
 }
