@@ -15,6 +15,8 @@ import { cloneDeep } from "lodash";
 import camelcase from "camelcase";
 import { RegexFilter } from "./filters/RegexFilter";
 import { CollectionFilter } from "./filters/CollectionFilter";
+import { FriendsFilter } from "./filters/FriendsFilter";
+import { TagsFilter } from "./filters/TagFilter";
 
 const FilterTypes: string[] = [
   "collection",
@@ -56,8 +58,27 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
     setFilters(filters1);
   }
 
+  function onFriendsChange(e: React.ChangeEvent<HTMLInputElement>) {
+    
+  }
+
+  function onTagsChange(e: React.ChangeEvent<HTMLInputElement>) {
+    
+  }
+
   if (filter) {
     switch (filter.type) {
+      case "regex":
+        return (
+          <Field
+            label="Regex"
+            description={ <TextField value={filter.params.regex} onChange={onRegexChange} /> }
+          />
+        );
+      case "installed":
+        return (
+          <ToggleField label="Installed" checked={filter.params.installed} onChange={onInstalledChange} />
+        );
       case "collection":
         return (
           <Field
@@ -65,15 +86,20 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
             description={ <Dropdown rgOptions={collectionDropdownOptions} selectedOption={filter.params.collection} onChange={onCollectionChange} /> }
           />
         );
-      case "installed":
-        return (
-          <ToggleField label="Installed" checked={filter.params.installed} onChange={onInstalledChange} />
-        );
-      case "regex":
+      case "friends":
         return (
           <Field
-            label="Regex"
-            description={ <TextField value={filter.params.regex} onChange={onRegexChange} /> }
+            label="Friends to Include"
+            // TODO: make a multi select here
+            description={ <TextField value={filter.params.friends} onChange={onFriendsChange} /> }
+          />
+        );
+      case "tags":
+        return (
+          <Field
+            label="Tags to include"
+            // TODO: make a multi select here
+            description={ <TextField value={filter.params.tags} onChange={onTagsChange} /> }
           />
         );
       default:
@@ -153,9 +179,9 @@ function isDefaultParams(filter: FilterElement<any>): boolean {
     case "collection":
       return !!(filter as CollectionFilter).params.collection;
     case "friends":
-      return (filter as RegexFilter).params.friends.length > 0;
+      return (filter as FriendsFilter).params.friends.length > 0;
     case "tags":
-      return (filter as RegexFilter).params.tags.length > 0;
+      return (filter as TagsFilter).params.tags.length > 0;
   }
 }
 
