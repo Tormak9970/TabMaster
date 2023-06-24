@@ -7,8 +7,8 @@ import {
     wrapReactType
 } from "decky-frontend-lib";
 import { ReactElement, useEffect } from "react";
-import { TabMasterManager } from "../../classes/TabMasterManager";
-import { CustomTabContainer } from "../../classes/CustomTabContainer";
+import { TabMasterManager } from "../../state/TabMasterManager";
+import { CustomTabContainer } from "../CustomTabContainer";
 
 export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager): RoutePatch => {
     //* This only runs 1 time, which is perfect
