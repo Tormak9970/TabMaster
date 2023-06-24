@@ -62,34 +62,23 @@ export class TabMasterManager {
     this.hasLoaded = false;
     this.tabsMap = new Map<string, TabContainer>();
 
-    //* subscribe to collection updates
+    //* subscribe to user collection updates
     reaction(() => collectionStore.userCollections, (userCollections: SteamCollection[]) => {
-      console.log("We reacted to collection store changes!");
+      console.log("We reacted to user collection changes!");
       const userHadFavorites = this.userHasFavorites;
-      // const allGamesCollection = userCollections.find((collection: SteamCollection) => collection.id === "uncategorized");
       const favoritesCollection = userCollections.find((collection: SteamCollection) => collection.id === "favorite");
-      const hiddenCollection = userCollections.find((collection: SteamCollection) => collection.id === "hidden");
 
-      let shouldForceUpdate = false;
+      // let shouldForceUpdate = false;
       let shouldRebuildTabs = false;
+      let depsToRebuild: string[] = [];
 
       if (!userHadFavorites && favoritesCollection && favoritesCollection.allApps.length != 0) {
         this.userHasFavorites = true;
-        shouldForceUpdate = true;
+        // shouldForceUpdate = true;
         shouldRebuildTabs = true;
       } else if (userHadFavorites && (!favoritesCollection || favoritesCollection.allApps.length === 0)) {
         this.userHasFavorites = false;
-        shouldForceUpdate = true;
-        shouldRebuildTabs = true;
-      }
-
-      if (!hiddenCollection && this.collectionLengths["hidden"] != 0) {
-        this.collectionLengths["hidden"] = 0;
-        shouldForceUpdate = true;
-        shouldRebuildTabs = true;
-      } else if (hiddenCollection && this.collectionLengths["hidden"] != hiddenCollection.allApps.length) {
-        this.collectionLengths["hidden"] = hiddenCollection.allApps.length;
-        shouldForceUpdate = true;
+        // shouldForceUpdate = true;
         shouldRebuildTabs = true;
       }
 
@@ -97,9 +86,48 @@ export class TabMasterManager {
       for (const collection of userCollections) {
         if (collection && this.collectionLengths[collection.id] != collection.allApps.length) {
           this.collectionLengths[collection.id] = collection.allApps.length;
-          shouldForceUpdate = true;
-          shouldRebuildTabs = true;
+          // shouldForceUpdate = true;
+          depsToRebuild.push(collection.id);
         }
+      }
+
+      // if (shouldForceUpdate) this.update();
+      if (shouldRebuildTabs) {
+        this.rebuildTabLists();
+      } else if (depsToRebuild.length != 0) {
+        this.visibleTabsList.forEach((tabContainer) => {
+          if (tabContainer.filters && tabContainer.filters.length != 0) {
+            const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "collection").map((collectionFilter) => collectionFilter.params.collection);
+            for (const collectionUpdated of depsToRebuild) {
+              if (collectionFilters.includes(collectionUpdated)) {
+                console.log("updating tab", tabContainer.title);
+                (tabContainer as CustomTabContainer).buildCollection();
+                break;
+              }
+            }
+          }
+        });
+      }
+    }, { delay: 50 });
+
+    //* subscribe to hidden collection updates
+    reaction(() => collectionStore.GetCollection("hidden").allApps, (allApps: SteamAppOverview[]) => {
+      console.log("We reacted to hidden collection changes!");
+      const hiddenCollection = collectionStore.GetCollection("hidden");
+
+      let shouldForceUpdate = false;
+      let shouldRebuildTabs = false;
+      let shouldRebuildCollections = false;
+
+      console.log("hidden collection:", hiddenCollection)
+      if (!hiddenCollection && this.collectionLengths["hidden"] != 0) {
+        this.collectionLengths["hidden"] = 0;
+        shouldForceUpdate = true;
+        shouldRebuildTabs = true;
+      } else if (hiddenCollection && this.collectionLengths["hidden"] != allApps.length) {
+        this.collectionLengths["hidden"] = allApps.length;
+        shouldForceUpdate = true;
+        shouldRebuildTabs = true;
       }
 
       if (shouldForceUpdate) this.update();
@@ -132,6 +160,7 @@ export class TabMasterManager {
           this.friendsGameMap.set(friend.steamid, Array.from(res.m_apps));
         });
       })).then(() => {
+        console.log(this.friendsGameMap);
         this.update();
       });
     }, { delay: 50 });

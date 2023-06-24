@@ -232,7 +232,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
 
   function onSave() {
     if (canSave && canAddFilter) {
-      if (!tabsMap.has(name) && tabsMap.get(name)?.id != tabId) {
+      if (!tabsMap.has(name) || tabsMap.get(name)?.id === tabId) {
         const updated: EditableTabSettings = {
           title: name,
           filters: filters,
@@ -329,12 +329,6 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
             <PanelSectionRow>
               <Field
                 label="Name"
-                description={<TextField value={name} onChange={onNameChange} />}
-              />
-            </PanelSectionRow>
-            <PanelSectionRow>
-              <Field
-                label="Include Hidden Games"
                 description={<TextField value={name} onChange={onNameChange} />}
               />
             </PanelSectionRow>
