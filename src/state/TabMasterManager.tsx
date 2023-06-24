@@ -51,6 +51,7 @@ export class TabMasterManager {
   private hasLoaded: boolean;
 
   private currentUsersFriends: FriendEntry[] = [];
+  private friendsGameMap: Map<number, number[]> = new Map();
   private allStoreTags: TagResponse[] = [];
   private userHasFavorites: boolean = false;
 
@@ -108,13 +109,31 @@ export class TabMasterManager {
     //* subscribe to user's friendlist updates
     reaction(() => friendStore.m_mapPersonaCache, (personaMap: PersonaCacheMap) => {
       this.currentUsersFriends = Array.from(personaMap._data.entries()).map(([userid, entry]) => {
+        // friendStore.m_ownedGames.Get(userid);
         return {
           steamid: userid,
-          name: entry.value.m_persona.m_strPlayerName,
+          name: (entry.value.m_strNickname && entry.value.m_strNickname !== "") ? entry.value.m_strNickname : entry.value.m_persona.m_strPlayerName,
         }
       });
-      
-      this.update();
+
+      // const friendGamesArray = Array.from(friendStore.m_ownedGames.m_dataMap._data.entries());
+      // this.friendsGameMap = new Map<number, number[]>(friendGamesArray.map(([userid, entry]) => {
+      //   return [userid, Array.from(entry.value.m_data.m_apps)]
+      // }))
+
+      // for (const friend of this.currentUsersFriends) {
+      //   friendStore.FetchOwnedGames(friend.steamid).then((res) => {
+      //     this.friendsGameMap.set(friend.steamid, Array.from(res.m_apps));
+      //   });
+      // }
+
+      Promise.all(this.currentUsersFriends.map((friend: FriendEntry) => {
+        friendStore.FetchOwnedGames(friend.steamid).then((res) => {
+          this.friendsGameMap.set(friend.steamid, Array.from(res.m_apps));
+        });
+      })).then(() => {
+        this.update();
+      });
     }, { delay: 50 });
 
     //* subscribe to store tag list changes
@@ -244,6 +263,12 @@ export class TabMasterManager {
 
   get hasSettingsLoaded() {
     return this.hasLoaded;
+  }
+
+  getFriendsWhoOwn(appid: number): number[] {
+    return Array.from(this.friendsGameMap.entries())
+      .filter(([, ownedGames]) => ownedGames.includes(appid))
+      .map(([friendId]) => friendId);
   }
 
   private saveTabs() {

@@ -231,7 +231,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
 
   function onSave() {
     if (canSave && canAddFilter) {
-      if (!tabsMap.has(name)) {
+      if (!tabsMap.has(name) && tabsMap.get(name)?.id != tabId) {
         const updated: EditableTabSettings = {
           title: name,
           filters: filters,

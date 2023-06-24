@@ -17,6 +17,24 @@ type FriendStoreEntry = {
   m_strNickname?: string
 }
 
+type FriendOwnedGames = {
+  m_apps: Set<number>,
+  m_nResponseCode: number
+}
+
+type OwnedGamesEntry = {
+  value: {
+    m_data: FriendOwnedGames
+  }
+}
+
+type OwnedGames = {
+  Get: (userid: number) => void,
+  m_dataMap: {
+    _data: Map<number, OwnedGamesEntry>
+  }
+}
+
 type PersonaCacheEntry = {
   value: FriendStoreEntry
 }
@@ -27,6 +45,8 @@ type PersonaCacheMap = {
 
 type FriendStore = {
   allFriendsList: FriendStoreEntry[],
+  m_ownedGames: OwnedGames,
+  FetchOwnedGames: (userid: number) => Promise<FriendOwnedGames>
   GetOwnedGames(userId): Set<any>,
   m_mapPersonaCache: PersonaCacheMap
 }

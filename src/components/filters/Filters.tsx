@@ -1,3 +1,5 @@
+import { PluginController } from "../../lib/controllers/PluginController"
+
 export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags'
 
 type CollectionFilterParams = { collection: SteamCollection['id'] }
@@ -35,8 +37,7 @@ export class Filter {
       return regex.test(appOverview.display_name);
     },
     friends: (params: FilterParams<'friends'>, appOverview: SteamAppOverview) => {
-      // TODO: get friends who have played/own this game
-      const friendsWhoOwn: number[] = [];
+      const friendsWhoOwn: number[] = PluginController.getFriendsWhoOwn(appOverview.appid);
       return params.friends.every((friend) => friendsWhoOwn.includes(friend));
     },
     tags: (params: FilterParams<'tags'>, appOverview: SteamAppOverview) => {
