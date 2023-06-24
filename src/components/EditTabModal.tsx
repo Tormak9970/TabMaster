@@ -36,10 +36,16 @@ type FilterOptionsProps = {
 }
 
 const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFilters }) => {
+    //we can't use this context because it's there no Provider provided to the modal
     const { allStoreTags, currentUsersFriends } = useTabMasterState();
 
+    /*
     const freindsDropdownOptions = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
     const storeTagDropdownOptions = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
+    */
+    //just setting these empty for now
+    const freindsDropdownOptions = []
+    const storeTagDropdownOptions = []
     const collectionDropdownOptions = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
     function onCollectionChange(data: SingleDropdownOption) {
@@ -193,7 +199,7 @@ type EditTabModalProps = {
     tabFilters: TabFilterSettings<FilterType>[]
 }
 
-export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm , tabId, tabTitle, tabFilters }) => {
+export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters }) => {
     const [name, setName] = useState<string>(tabTitle ?? '');
     const [filters, setFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
     const [canSave, setCanSave] = useState<boolean>(false);
@@ -211,6 +217,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm , t
         setName(e?.target.value);
     }
 
+    //we need to make sure user can't confirm if filter'soptions aren't set either
     function onSave() {
         if (canSave) {
             const updated: EditableTabSettings = {
