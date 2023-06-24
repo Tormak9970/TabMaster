@@ -41,7 +41,8 @@ __pycache__/
 /.yalc
 yalc.lock
 
-.vscode/settings.json
-
+# .vscode/settings.json
+.vscode/tasks.json
+.vscode/
 # Ignore output folder
 dist
