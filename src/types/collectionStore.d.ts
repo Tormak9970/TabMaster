@@ -1,14 +1,17 @@
 // Types for the collectionStore global
 
 type CollectionStore = {
-	userCollections: SteamCollection[],
+  appTypeCollectionMap: Map<'type-games', Collection>,
+  userCollections: SteamCollection[],
   deckDesktopApps: Collection,
   userCollections: Collection[],
   localGamesCollection: Collection,
   allAppsCollection: Collection,
   BIsHidden: (appId: number) => boolean,
   SetAppsAsHidden: (appIds: number[], hide: boolean) => void,
-	GetUserCollectionsByName: (name: string) => SteamCollection[]
+  GetUserCollectionsByName: (name: string) => SteamCollection[]
+  GetCollectionListForAppID: (appId: number) => Collection[]
+  GetCollection: (id: SteamCollection['id']) => Collection
 }
 
 type SteamCollection = {

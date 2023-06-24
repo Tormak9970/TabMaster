@@ -6,18 +6,14 @@ import {
     ServerAPI,
     wrapReactType
 } from "decky-frontend-lib";
-import { JSXElementConstructor, ReactElement, useEffect } from "react";
-import { SteamTab } from "../../types/SteamTypes";
+import { ReactElement, useEffect } from "react";
+import { TabMasterManager } from "../../classes/TabManager";
+import { CustomTabContainer } from "../../classes/CustomTabContainer";
 
-export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
-    let TabContentTemplate: JSXElementConstructor<{ collection: SteamCollection, eSortBy: number, setSortBy: (e: any) => void, showSortingContextMenu: (e: any) => void }>;
-    let TabContentPropsTemplate: { collection: SteamCollection, eSortBy: number, setSortBy: (e: any) => void, showSortingContextMenu: (e: any) => void };
-    let TabAddonTemplate: JSXElementConstructor<{ count: number }>;
+export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager): RoutePatch => {
     //* This only runs 1 time, which is perfect
     return serverAPI.routerHook.addPatch("/library", (props: { path: string; children: ReactElement }) => {
-        // console.log('route', props)
         afterPatch(props.children, "type", (_: Record<string, unknown>[], ret1: ReactElement) => {
-            // console.log("ret1", ret1);
             let innerPatch: Patch
             let memoCache: any
 
@@ -27,7 +23,6 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
 
             //* This patch always runs twice
             afterPatch(ret1, "type", (_: Record<string, unknown>[], ret2: ReactElement) => {
-                // console.log("ret2", ret2);
                 if (memoCache) {
                     ret2.type = memoCache;
                 } else {
@@ -42,18 +37,22 @@ export const patchLibrary = (serverAPI: ServerAPI): RoutePatch => {
                         const realUseMemo = hooks.useMemo
                         const fakeUseMemo = (fn: () => any, deps: any[]) => {
                             return realUseMemo(() => {
-                                const tabs = fn()
-                                if (TabContentTemplate === undefined) {
+                                const tabs: SteamTab[] = fn()
+                                if (CustomTabContainer.TabContentTemplate === undefined) {
                                     const tabTemplate = tabs.find((tab: SteamTab) => tab?.id === "AllGames");
-                                    if (tabTemplate) {
-                                        TabContentTemplate = tabTemplate.content.type
-                                        TabContentPropsTemplate = tabTemplate.content.props
-                                        TabAddonTemplate = tabTemplate.renderTabAddon().type
-                                    }
+                                    if (tabTemplate) CustomTabContainer.TabContentTemplate = tabTemplate.content.type as TabContentComponent
                                 }
-                                //* Alter tabs array here
-
-                                return tabs
+                                let pacthedTabs: SteamTab[]
+                                if (tabMasterManager.hasSettingsLoaded) {
+                                    const tablist = tabMasterManager.getTabs().visibleTabsList
+                                    console.log('tabs to build list', tablist)
+                                    pacthedTabs = tablist.map(tabContainer => {
+                                        if (tabContainer.filters) return (tabContainer as CustomTabContainer).actualTab
+                                        else return tabs.find(actualTab => actualTab.id === tabContainer.id)!
+                                    })
+                                } else pacthedTabs = tabs
+                                console.log('tabs', pacthedTabs)
+                                return pacthedTabs
                             }, deps)
                         }
                         hooks.useMemo = fakeUseMemo
