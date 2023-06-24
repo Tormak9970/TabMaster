@@ -1,6 +1,8 @@
 // Types for SteamClient.Apps
 
 type Apps = {
+  GetStoreTagLocalization: (tags: number[]) => Promise<TagResponse[]>
+
   RunGame: (gameId: string, unk1: string, unk2: number, unk3: number) => void,
   TerminateApp: (gameId: string, unk1: boolean) => void,
   SetAppLaunchOptions: (appId: number, options: string) => void,

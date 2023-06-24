@@ -1,3 +1,5 @@
+type AppId = number
+
 interface SteamClient {
     Apps: Apps,
     Browser: any,
@@ -60,7 +62,6 @@ type SteamGameClientData = {
     is_available_on_current_platform: boolean,
     status_percentage: number
 }
-
 
 type SteamTab = {
     title: string,

@@ -1,7 +1,7 @@
 import { VFC } from "react"
 import { EditableTabSettings } from "../components/EditTabModal"
 import { useSortingHook } from "../hooks/useSortingHook"
-import { Filter } from "./Filter"
+import { TabFilterSettings, FilterType, Filter } from "../components/filters/Filters"
 
 interface TabContentWrapperProps {
     collection: Collection

@@ -11,8 +11,8 @@ dependencies:
     specifier: ^5.15.7
     version: 5.15.7
   react-icons:
-    specifier: ^4.9.0
-    version: 4.9.0
+    specifier: ^4.10.1
+    version: 4.10.1
   uuid:
     specifier: ^9.0.0
     version: 9.0.0
@@ -1031,8 +1031,8 @@ packages:
       safe-buffer: 5.2.1
     dev: true
 
-  /react-icons@4.9.0:
-    resolution: {integrity: sha512-ijUnFr//ycebOqujtqtV9PFS7JjhWg0QU6ykURVHuL4cbofvRCf3f6GMn9+fBktEFQOIVZnuAYLZdiyadRQRFg==}
+  /react-icons@4.10.1:
+    resolution: {integrity: sha512-/ngzDP/77tlCfqthiiGNZeYFACw85fUjZtLbedmJ5DTlNDIwETxhwBzdOJ21zj4iJdvc0J3y7yOsX3PpxAJzrw==}
     peerDependencies:
       react: '*'
     peerDependenciesMeta:

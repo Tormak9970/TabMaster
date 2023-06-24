@@ -7,7 +7,7 @@ import {
     wrapReactType
 } from "decky-frontend-lib";
 import { ReactElement, useEffect } from "react";
-import { TabMasterManager } from "../../classes/TabManager";
+import { TabMasterManager } from "../../classes/TabMasterManager";
 import { CustomTabContainer } from "../../classes/CustomTabContainer";
 
 export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager): RoutePatch => {

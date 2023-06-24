@@ -1,6 +1,6 @@
 {
   "name": "TabMaster",
-  "author": "Tormak, Davocarli, Witherking25",
+  "author": "Tormak, Jessebofill, Witherking25, Davocarli",
   "flags": ["debug"],
   "publish": {
     "tags": ["Customization", "Library", "Tabs"],

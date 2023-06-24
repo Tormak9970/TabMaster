@@ -8,13 +8,15 @@ import {
     staticClasses,
 } from "decky-frontend-lib";
 import { VFC, Fragment } from "react";
-import { FaLayerGroup } from "react-icons/fa";
+import { FaEllipsisH } from "react-icons/fa";
+import { PiTabs } from "react-icons/pi";
+
 import { patchLibrary } from "./components/patches/LibraryPatch";
 import { TabMasterContextProvider, useTabMasterState } from "./state/TabMasterState";
 import { EditableTabSettings, EditTabModal } from "./components/EditTabModal";
 import { PluginController } from "./lib/controllers/PluginController";
 import { PythonInterop } from "./lib/controllers/PythonInterop";
-import { TabMasterManager } from "./classes/TabManager";
+import { TabMasterManager } from "./classes/TabMasterManager";
 import { TabActionsButton } from "./components/TabActions";
 
 declare global {
@@ -171,7 +173,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
             <TabMasterContextProvider tabMasterManager={tabMasterManager}>
                 <Content />
             </TabMasterContextProvider>,
-        icon: <FaLayerGroup />,
+        icon: <PiTabs />,
         onDismount: () => {
             serverAPI.routerHook.removePatch("/library", patch);
             loginUnregisterer.unregister();
