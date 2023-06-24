@@ -52,9 +52,12 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
 
                   console.log('tabs to build list', tablist);
 
-                  pacthedTabs = tablist.map(tabContainer => {
-                    if (tabContainer.filters) return (tabContainer as CustomTabContainer).actualTab
-                    else return tabs.find(actualTab => actualTab.id === tabContainer.id)!
+                  pacthedTabs = tablist.map((tabContainer) => {
+                    if (tabContainer.filters && tabContainer.filters.length > 0) {
+                      return (tabContainer as CustomTabContainer).actualTab;
+                    } else {
+                      return tabs.find(actualTab => actualTab.id === tabContainer.id)!;
+                    }
                   });
                 } else {
                   pacthedTabs = tabs;

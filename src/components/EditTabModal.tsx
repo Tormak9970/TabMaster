@@ -207,6 +207,7 @@ type EditTabModalProps = {
 
 export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager }) => {
   const tabsMap: Map<string, TabContainer> = tabMasterManager.getTabs().tabsMap;
+
   const [name, setName] = useState<string>(tabTitle ?? '');
   const [filters, setFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
   const [canSave, setCanSave] = useState<boolean>(false);
@@ -257,7 +258,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
 
   return (
     <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-        <style>{`
+      <style>{`
         .tab-master-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
           margin-left: 15px;
         }
@@ -328,6 +329,12 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
             <PanelSectionRow>
               <Field
                 label="Name"
+                description={<TextField value={name} onChange={onNameChange} />}
+              />
+            </PanelSectionRow>
+            <PanelSectionRow>
+              <Field
+                label="Include Hidden Games"
                 description={<TextField value={name} onChange={onNameChange} />}
               />
             </PanelSectionRow>
