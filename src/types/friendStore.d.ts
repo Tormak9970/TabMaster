@@ -44,7 +44,7 @@ type PersonaCacheMap = {
 }
 
 type FriendStore = {
-  allFriendsList: FriendStoreEntry[],
+  allFriends: FriendStoreEntry[],
   m_ownedGames: OwnedGames,
   FetchOwnedGames: (userid: number) => Promise<FriendOwnedGames>
   GetOwnedGames(userId): Set<any>,

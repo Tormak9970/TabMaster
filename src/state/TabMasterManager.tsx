@@ -4,6 +4,7 @@ import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { v4 as uuidv4 } from "uuid";
 import { reaction } from "mobx"
+import { getNonBigIntUserId } from "../lib/Utils";
 
 export const defaultTabsSettings: TabSettingsDictionary = {
   DeckGames: {
@@ -127,36 +128,9 @@ export class TabMasterManager {
     }, { delay: 50 });
 
     //* subscribe to user's friendlist updates
-    reaction(() => friendStore.m_mapPersonaCache, (personaMap: PersonaCacheMap) => {
-      console.log("We reacted to friend store changes!");
-      this.currentUsersFriends = Array.from(personaMap._data.entries()).map(([userid, entry]) => {
-        // friendStore.m_ownedGames.Get(userid);
-        return {
-          steamid: userid,
-          name: (entry.value.m_strNickname && entry.value.m_strNickname !== "") ? entry.value.m_strNickname : entry.value.m_persona.m_strPlayerName,
-        }
-      });
+    reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
 
-      // const friendGamesArray = Array.from(friendStore.m_ownedGames.m_dataMap._data.entries());
-      // this.friendsGameMap = new Map<number, number[]>(friendGamesArray.map(([userid, entry]) => {
-      //   return [userid, Array.from(entry.value.m_data.m_apps)]
-      // }))
-
-      // for (const friend of this.currentUsersFriends) {
-      //   friendStore.FetchOwnedGames(friend.steamid).then((res) => {
-      //     this.friendsGameMap.set(friend.steamid, Array.from(res.m_apps));
-      //   });
-      // }
-
-      Promise.all(this.currentUsersFriends.map((friend: FriendEntry) => {
-        friendStore.FetchOwnedGames(friend.steamid).then((res) => {
-          this.friendsGameMap.set(friend.steamid, Array.from(res.m_apps));
-        });
-      })).then(() => {
-        console.log(this.friendsGameMap);
-        this.update();
-      });
-    }, { delay: 50 });
+    this.handleFriendsReaction(friendStore.allFriends);
 
     //* subscribe to store tag list changes
     reaction(() => appStore.m_mapStoreTagLocalization, (storeTagLocalizationMap: StoreTagLocalizationMap) => {
@@ -169,6 +143,26 @@ export class TabMasterManager {
 
       this.update();
     }, { delay: 50 });
+  }
+
+  private handleFriendsReaction(friends: FriendStoreEntry[]) {
+    console.log("We reacted to friend store changes!");
+    this.currentUsersFriends = friends.map((storeEntry: FriendStoreEntry) => {
+      const entry = storeEntry;
+      const userid = getNonBigIntUserId(entry.m_persona.m_steamid.m_ulSteamID.low, entry.m_persona.m_steamid.m_ulSteamID.high);
+      return {
+        steamid: userid,
+        name: (entry.m_strNickname && entry.m_strNickname !== "") ? entry.m_strNickname : entry.m_persona.m_strPlayerName,
+      }
+    });
+
+    Promise.all(this.currentUsersFriends.map((friend: FriendEntry) => {
+      friendStore.FetchOwnedGames(friend.steamid).then((res) => {
+        this.friendsGameMap.set(friend.steamid, Array.from(res.m_apps));
+      });
+    })).then(() => {
+      this.update();
+    });
   }
 
   updateCustomTab(customTabId: string, updatedTabSettings: EditableTabSettings) {
