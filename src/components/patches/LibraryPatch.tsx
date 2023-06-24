@@ -18,7 +18,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
             let memoCache: any
 
             useEffect(() => {
-                return innerPatch.unpatch()
+                return innerPatch.unpatch();
             })
 
             //* This patch always runs twice
@@ -27,14 +27,14 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                     ret2.type = memoCache;
                 } else {
                     // @ts-ignore
-                    const origMemoFn = ret2.type.type
+                    const origMemoFn = ret2.type.type;
                     // @ts-ignore
                     wrapReactType(ret2.type.type);
 
                     //* This runs once for every outer run
                     innerPatch = replacePatch(ret2.type, 'type', (args) => {
-                        const hooks = (window.SP_REACT as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentDispatcher.current
-                        const realUseMemo = hooks.useMemo
+                        const hooks = (window.SP_REACT as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentDispatcher.current;
+                        const realUseMemo = hooks.useMemo;
                         const fakeUseMemo = (fn: () => any, deps: any[]) => {
                             return realUseMemo(() => {
                                 const tabs: SteamTab[] = fn()
@@ -55,12 +55,12 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                                 return pacthedTabs
                             }, deps)
                         }
-                        hooks.useMemo = fakeUseMemo
-                        const res = origMemoFn(...args)
-                        hooks.useMemo = realUseMemo
-                        return res
+                        hooks.useMemo = fakeUseMemo;
+                        const res = origMemoFn(...args);
+                        hooks.useMemo = realUseMemo;
+                        return res;
                     })
-                    memoCache = ret2.type
+                    memoCache = ret2.type;
                 }
                 return ret2;
             });

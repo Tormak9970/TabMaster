@@ -1,12 +1,12 @@
 import {
-    Button,
     ButtonItem,
     ConfirmModal, Dropdown,
     Field,
+    Focusable,
     PanelSection,
     PanelSectionRow,
     SingleDropdownOption,
-    TextField, ToggleField
+    TextField, ToggleField, gamepadDialogClasses
 } from "decky-frontend-lib";
 import { useState, VFC, Fragment } from "react";
 import { FaTrash } from "react-icons/fa";
@@ -120,13 +120,26 @@ const FilterTypeRow: VFC<FilterTypeRowProps> = ({ index, filter, filters, setFil
 
     if (filter) {
         return (
-            <>
-                <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
-                {/*this does not work*/}
-                <Button onClick={onDelete}>
-                    <FaTrash />
-                </Button>
-            </>
+            <div className="filter-entry">
+                <Focusable style={{
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "row"
+                }}>
+                    <Focusable style={{
+                        width: "calc(100% - 55px)"
+                    }}>
+                        <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
+                    </Focusable>
+                    <Focusable style={{
+                        marginLeft: "10px"
+                    }}>
+                        <ButtonItem onClick={onDelete}>
+                            <FaTrash />
+                        </ButtonItem>
+                    </Focusable>
+                </Focusable>
+            </div>
         )
     } else {
         return (
@@ -135,13 +148,31 @@ const FilterTypeRow: VFC<FilterTypeRowProps> = ({ index, filter, filters, setFil
     }
 }
 
-
-type EditFiltersProps = {
-    filters: TabFilterSettings<FilterType>[],
-    setFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
+type EditTabModalProps = {
+    closeModal: () => void
+    onConfirm: (tabId: string | undefined, tabSettings: EditableTabSettings) => void
+    tabId?: string
+    tabTitle?: string
+    tabFilters: TabFilterSettings<FilterType>[]
 }
 
-const EditFilters: VFC<EditFiltersProps> = ({ filters, setFilters }) => {
+export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm = () => { }, tabId, tabTitle, tabFilters }) => {
+    const [name, setName] = useState<string>(tabTitle ?? '');
+    const [filters, setFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
+
+    function onNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+        setName(e?.target.value);
+    }
+
+    function onSave() {
+        const updated: EditableTabSettings = {
+            title: name,
+            filters: filters
+        };
+        onConfirm(tabId, updated);
+        closeModal();
+    }
+
     function addFilter() {
         const updatedFilters = cloneDeep(filters);
         updatedFilters.push({
@@ -155,75 +186,77 @@ const EditFilters: VFC<EditFiltersProps> = ({ filters, setFilters }) => {
 
     return (
         <>
-            <PanelSectionRow>
-                <Fragment>
-                    <ButtonItem onClick={addFilter}>
-                        Add Filter
-                    </ButtonItem>
-                    {filters.map((filter, index) => {
-                        return (
-                            <>
-                                <Field
-                                    label="Type"
-                                    description={
-                                        <FilterTypeRow index={index} filter={filter} filters={filters} setFilters={setFilters} />
-                                    }
-                                />
-                                <SetFilterParameters index={index} filter={filter} filters={filters} setFilters={setFilters} />
-                            </>
-                        );
-                    })}
-                </Fragment>
-            </PanelSectionRow>
-        </>
-    );
-}
+            <style>{`
+        .tab-master-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
+          margin-left: 15px;
+        }
+        
+        /* .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
+          display: none;
+        } */
+        .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.FieldLabel} {
+          display: none;
+        }
+        .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.FieldChildren} {
+          width: 100%;
+        }
 
-type EditTabModalProps = {
-    closeModal: () => void
-    onConfirm: (tabId: string | undefined, tabSettings: EditableTabSettings) => void
-    tabId?: string
-    tabTitle?: string
-    tabFilters: TabFilterSettings<FilterType>[]
-}
-
-export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm = () => { }, tabId, tabTitle, tabFilters}) => {
-    const [name, setName] = useState<string>(tabTitle ?? '');
-    const [filters, setFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
-
-    function onNameChange(e: React.ChangeEvent<HTMLInputElement>) {
-        setName(e?.target.value);
-    }
-
-    function onSave() {
-        const updated: EditableTabSettings = {
-            title: name,
-            filters,
-        };
-        onConfirm(tabId, updated);
-        closeModal();
-    }
-
-    return (
-        <>
-            <ConfirmModal
-                bAllowFullSize
-                onCancel={closeModal}
-                onEscKeypress={closeModal}
-                onOK={onSave}
-            >
-                <PanelSection title={tabTitle ? `Modifying: ${tabTitle}` : '' }>
-                    <PanelSectionRow>
-                        <Field
-                            label="Name"
-                            description={
-                                <TextField value={name} onChange={onNameChange} />
-                            }
-                        />
-                    </PanelSectionRow>
-                    <EditFilters filters={filters} setFilters={setFilters} />
-                </PanelSection>
-            </ConfirmModal>
+        /* The button item */
+        .tab-master-scope .filter-entry .${gamepadDialogClasses.GamepadDialogContent} {
+          margin: 0;
+          padding: 0;
+        }
+        /* The button item label */
+        .tab-master-scope .filter-entry .${gamepadDialogClasses.FieldLabel} {
+          display: none;
+        }
+        /* The button item */
+        .tab-master-scope .filter-entry .${gamepadDialogClasses.Button} {
+          padding: 10px;
+          min-width: 45px;
+          width: 45px;
+        }
+      `}</style>
+            <div className="tab-master-modal-scope">
+                <ConfirmModal
+                    bAllowFullSize
+                    onCancel={closeModal}
+                    onEscKeypress={closeModal}
+                    strTitle={tabTitle ? `Modifying: ${tabTitle}` : ''}
+                    onOK={onSave}
+                >
+                    <PanelSection>
+                        <PanelSectionRow>
+                            <Field
+                                label="Name"
+                                description={<TextField value={name} onChange={onNameChange} />}
+                            />
+                        </PanelSectionRow>
+                    </PanelSection>
+                    <PanelSection title="Filters">
+                        <PanelSectionRow>
+                            <div className="add-filter-btn">
+                                <ButtonItem onClick={addFilter}>
+                                    Add Filter
+                                </ButtonItem>
+                            </div>
+                        </PanelSectionRow>
+                        <PanelSectionRow>
+                            {filters.map((filter, index) => {
+                                return (
+                                    <>
+                                        <Field
+                                            label="Type"
+                                            description={<FilterTypeRow index={index} filter={filter} filters={filters} setFilters={setFilters} />}
+                                        />
+                                        <SetFilterParameters index={index} filter={filter} filters={filters} setFilters={setFilters} />
+                                    </>
+                                );
+                            })}
+                        </PanelSectionRow>
+                    </PanelSection>
+                </ConfirmModal>
+            </div>
         </>
     );
 }

@@ -1,6 +1,6 @@
 import {
     ButtonItem,
-    definePlugin, 
+    definePlugin,
     gamepadDialogClasses,
     PanelSection, quickAccessControlsClasses, ReorderableEntry, ReorderableList, RoutePatch,
     ServerAPI,
@@ -53,11 +53,11 @@ const Content: VFC<{}> = ({ }) => {
             />
         );
     }
-    
+
     const entries = visibleTabsList.map(tabContainer => {
         return { label: tabContainer.title, position: tabContainer.position, data: { id: tabContainer.id } }
     })
-    
+
     // console.log('visible list', visibleTabsList)
     // console.log('hidden list', hiddenTabsList)
     // console.log('entries', entries)
@@ -136,7 +136,7 @@ const Content: VFC<{}> = ({ }) => {
                 <PanelSection title="Hidden Tabs">
                     <div className="seperator"></div>
                     {
-                        hiddenTabsList.map(tabContainer => 
+                        hiddenTabsList.map(tabContainer =>
                             <ButtonItem
                                 label={tabContainer.title}
                                 onClick={() => tabMasterManager.showTab(tabContainer.id)}
