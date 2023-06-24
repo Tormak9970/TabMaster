@@ -17,7 +17,16 @@ type FriendStoreEntry = {
   m_strNickname?: string
 }
 
+type PersonaCacheEntry = {
+  value: FriendStoreEntry
+}
+
+type PersonaCacheMap = {
+  _data: Map<number, PersonaCacheEntry>
+}
+
 type FriendStore = {
   allFriendsList: FriendStoreEntry[],
-  GetOwnedGames(userId): Set<any>
+  GetOwnedGames(userId): Set<any>,
+  m_mapPersonaCache: PersonaCacheMap
 }

@@ -15,7 +15,8 @@ import { cloneDeep } from "lodash";
 import { FilterType, TabFilterSettings } from "./filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { MultiSelect } from "./MultiSelect";
-import { useTabMasterState } from "../state/TabMasterState";
+import { TabMasterContextProvider, useTabMasterState } from "../state/TabMasterState";
+import { TabMasterManager } from "../state/TabMasterManager";
 
 export type EditableTabSettings = {
   title: string,
@@ -69,11 +70,19 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
   }
 
   function onFriendsChange(selected: DropdownOption[]) {
-
+    const filter1 = cloneDeep(filter) as TabFilterSettings<'friends'>;
+    filter1.params.friends = selected.map((friendEntry) => friendEntry.data as number);
+    const filters1 = cloneDeep(filters);
+    filters1[index] = filter1;
+    setFilters(filters1);
   }
 
   function onTagsChange(selected: DropdownOption[]) {
-
+    const filter1 = cloneDeep(filter) as TabFilterSettings<'tags'>;
+    filter1.params.tags = selected.map((tagEntry) => tagEntry.data as number);
+    const filters1 = cloneDeep(filters);
+    filters1[index] = filter1;
+    setFilters(filters1);
   }
 
   if (filter) {
@@ -188,14 +197,16 @@ function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
 }
 
 type EditTabModalProps = {
-  closeModal: () => void
-  onConfirm: (tabId: string | undefined, tabSettings: EditableTabSettings) => void
-  tabId?: string
-  tabTitle?: string
-  tabFilters: TabFilterSettings<FilterType>[]
+  closeModal: () => void,
+  onConfirm: (tabId: string | undefined, tabSettings: EditableTabSettings) => void,
+  tabId?: string,
+  tabTitle?: string,
+  tabFilters: TabFilterSettings<FilterType>[],
+  tabMasterManager: TabMasterManager
 }
 
-export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters }) => {
+export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager }) => {
+  const tabsMap: Map<string, TabContainer> = tabMasterManager.getTabs().tabsMap;
   const [name, setName] = useState<string>(tabTitle ?? '');
   const [filters, setFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
   const [canSave, setCanSave] = useState<boolean>(false);
@@ -206,39 +217,47 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   }, [name, filters]);
 
   useEffect(() => {
-    setCanAddFilter(filters.every((filter) => !isDefaultParams(filter)) || filters.length == 0);
+    setCanAddFilter(filters.length == 0 || filters.every((filter) => {
+      if (filter.type === "friends" && !(filter as TabFilterSettings<'friends'>).params.friends) (filter as TabFilterSettings<'friends'>).params.friends = [];
+      if (filter.type === "tags" && !(filter as TabFilterSettings<'tags'>).params.tags) (filter as TabFilterSettings<'tags'>).params.tags = [];
+
+      return !isDefaultParams(filter);
+    }));
   }, [filters]);
 
   function onNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     setName(e?.target.value);
   }
 
-  //we need to make sure user can't confirm if filter'soptions aren't set either
   function onSave() {
-    if (canSave) {
-      const updated: EditableTabSettings = {
-        title: name,
-        filters: filters,
-      };
-      onConfirm(tabId, updated);
-      closeModal();
+    if (canSave && canAddFilter) {
+      if (!tabsMap.has(name)) {
+        const updated: EditableTabSettings = {
+          title: name,
+          filters: filters,
+        };
+        onConfirm(tabId, updated);
+        closeModal();
+      } else {
+        PythonInterop.toast("Error", "A tab with that name already exists!");
+      }
     } else {
-      PythonInterop.toast("Error", "Please add a name and at least 1 filter before saving")
+      PythonInterop.toast("Error", "Please add a name and at least 1 filter before saving");
     }
   }
 
   function addFilter() {
     const filtersCopy = cloneDeep(filters);
     filtersCopy.push({
-      type: "regex",
-      params: { regex: "" }
+      type: "collection",
+      params: { collection: "" }
     });
     setFilters(filtersCopy);
   }
 
   return (
-    <>
-      <style>{`
+    <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+        <style>{`
         .tab-master-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
           margin-left: 15px;
         }
@@ -302,7 +321,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
           bAllowFullSize
           onCancel={closeModal}
           onEscKeypress={closeModal}
-          strTitle={tabTitle ? `Modifying: ${tabTitle}` : ''}
+          strTitle={tabTitle ? `Modifying: ${tabTitle}` : 'Create New Tab'}
           onOK={onSave}
         >
           <PanelSection>
@@ -356,6 +375,6 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
           </PanelSection>
         </ConfirmModal>
       </div>
-    </>
+    </TabMasterContextProvider>
   );
 }

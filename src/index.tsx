@@ -22,9 +22,10 @@ declare global {
   var SteamClient: SteamClient;
   let collectionStore: CollectionStore;
   let appDetailsStore: AppDetailsStore;
-  var appStore: AppStore;
-  var loginStore: LoginStore;
+  let appStore: AppStore;
+  let loginStore: LoginStore;
   let uiStore: UIStore;
+  let friendStore: FriendStore;
 }
 
 type TabIdEntryType = {
@@ -45,19 +46,19 @@ const Content: VFC<{}> = ({ }) => {
 
   function onAddClicked() {
     showModal(
-      <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-        <EditTabModal
-          onConfirm={(_: any, tabSettings: EditableTabSettings) => {
-            tabMasterManager.createNewTab(tabSettings.title, visibleTabsList.length, tabSettings.filters)
-          }}
-          tabFilters={[]}
-          closeModal={() => { }}
-        />
-      </TabMasterContextProvider>
+      // @ts-ignore
+      //? This is here because showModal passes the closeModal function automatically
+      <EditTabModal
+        onConfirm={(_: any, tabSettings: EditableTabSettings) => {
+          tabMasterManager.createNewTab(tabSettings.title, visibleTabsList.length, tabSettings.filters)
+        }}
+        tabFilters={[]}
+        tabMasterManager={tabMasterManager}
+      />
     );
   }
 
-  const entries = visibleTabsList.map(tabContainer => {
+  const entries = visibleTabsList.map((tabContainer) => {
     return { label: tabContainer.title, position: tabContainer.position, data: { id: tabContainer.id } }
   })
 

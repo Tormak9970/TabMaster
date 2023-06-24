@@ -35,7 +35,9 @@ export class Filter {
       return regex.test(appOverview.display_name);
     },
     friends: (params: FilterParams<'friends'>, appOverview: SteamAppOverview) => {
-      return false;
+      // TODO: get friends who have played/own this game
+      const friendsWhoOwn: number[] = [];
+      return params.friends.every((friend) => friendsWhoOwn.includes(friend));
     },
     tags: (params: FilterParams<'tags'>, appOverview: SteamAppOverview) => {
       return params.tags.every((tag: number) => appOverview.store_tag.includes(tag));

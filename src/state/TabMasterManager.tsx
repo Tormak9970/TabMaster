@@ -21,29 +21,26 @@ export const defaultTabsSettings: TabSettingsDictionary = {
     title: "Installed",
     position: 2,
   },
-  Collections: {
-    id: "Collections",
-    title: "Collections",
-    position: 3,
-  },
-  DesktopApps: {
-    id: "DesktopApps",
-    title: "Non-Steam",
-    position: 4,
-  },
-  Soundtracks: {
-    id: "Soundtracks",
-    title: "Soundtracks",
-    position: 5,
-  }
-}
-
-export const favoritesTab: TabSettingsDictionary = {
   Favorites: {
     id: "Favorites",
     title: "Favorites",
     position: 3,
   },
+  Collections: {
+    id: "Collections",
+    title: "Collections",
+    position: 4,
+  },
+  DesktopApps: {
+    id: "DesktopApps",
+    title: "Non-Steam",
+    position: 5,
+  },
+  Soundtracks: {
+    id: "Soundtracks",
+    title: "Soundtracks",
+    position: 6,
+  }
 }
 
 export class TabMasterManager {
@@ -64,6 +61,7 @@ export class TabMasterManager {
     this.hasLoaded = false;
     this.tabsMap = new Map<string, TabContainer>();
 
+    //* subscribe to collection updates
     reaction(() => collectionStore.userCollections, (userCollections: SteamCollection[]) => {
       console.log("We reacted to collection store changes!");
       const userHadFavorites = this.userHasFavorites;
@@ -107,12 +105,19 @@ export class TabMasterManager {
       if (shouldRebuildTabs) this.rebuildTabLists();
     }, { delay: 50 });
 
-    //TODO: users friends subscription
-    reaction(() => friendStore.m_mapPersonaCache, (personaMap) => {
-
+    //* subscribe to user's friendlist updates
+    reaction(() => friendStore.m_mapPersonaCache, (personaMap: PersonaCacheMap) => {
+      this.currentUsersFriends = Array.from(personaMap._data.entries()).map(([userid, entry]) => {
+        return {
+          steamid: userid,
+          name: entry.value.m_persona.m_strPlayerName,
+        }
+      });
+      
+      this.update();
     }, { delay: 50 });
 
-    //TODO: store tags subscription
+    //* subscribe to store tag list changes
     reaction(() => appStore.m_mapStoreTagLocalization, (storeTagLocalizationMap: StoreTagLocalizationMap) => {
       this.allStoreTags = Array.from(storeTagLocalizationMap._data.entries()).map(([tag, entry]) => {
         return {
@@ -182,6 +187,21 @@ export class TabMasterManager {
     this.update();
   }
 
+  private validateFavorites(visibleTabs: TabContainer[]): TabContainer[] {
+    let res = visibleTabs;
+    const favoritesTabIndex = visibleTabs.findIndex((tab) => tab.id == "favorite");
+
+    if (!this.userHasFavorites && favoritesTabIndex >= 0) {
+      const favoritesTab = visibleTabs.splice(favoritesTabIndex, 1)[0];
+      res = visibleTabs.map((tab) => {
+        if (tab.position > favoritesTab.position) tab.position--;
+        return tab;
+      });
+    }
+
+    return res;
+  }
+
   loadTabs = async () => {
     const settings = await PythonInterop.getTabs();
 
@@ -200,7 +220,7 @@ export class TabMasterManager {
       tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer);
     }
 
-    this.visibleTabsList = visibleTabContainers;
+    this.visibleTabsList = this.validateFavorites(visibleTabContainers);
     this.hiddenTabsList = hiddenTabContainers;
     this.hasLoaded = true;
 
@@ -263,7 +283,7 @@ export class TabMasterManager {
       tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer);
     });
 
-    this.visibleTabsList = visibleTabContainers;
+    this.visibleTabsList = this.validateFavorites(visibleTabContainers);
     this.hiddenTabsList = hiddenTabContainers;
   }
 

@@ -54,6 +54,7 @@ export class CustomTabContainer implements TabContainer {
       />,
       //* this is just temporary for now as it won't show correct count with native filters applied
       renderTabAddon: () => {
+        // TODO: use staticClasses here
         return <span className='gamepadtabbedpage_TabCount_1ui4I'>
           {this.collection.visibleApps.length}
         </span>
