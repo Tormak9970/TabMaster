@@ -1,10 +1,12 @@
+import { PluginController } from "../../lib/controllers/PluginController"
+
 export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags'
 
 type CollectionFilterParams = { collection: SteamCollection }
 type InstalledFilterParams = { installed: boolean }
 type RegexFilterParams = { regex: string }
-type FriendsFilterParams = { friends: SteamFriend[] }
-type TagsFilterParams = { tags: string[] }
+type FriendsFilterParams = { friends: number[] }
+type TagsFilterParams = { tags: number[] }
 
 type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -37,7 +39,7 @@ export class Filter {
       return false;
     },
     tags: (params: FilterParams<'tags'>, appOverview: SteamAppOverview) => {
-      return false;
+      return params.tags.every((tag: number) => appOverview.store_tag.includes(tag));
     },
   }
 

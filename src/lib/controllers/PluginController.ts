@@ -57,6 +57,21 @@ export class PluginController {
   }
 
   /**
+   * Gets the localized tags from a list of ids.
+   * @param tags The list of tag ids.
+   * @return The list of localized tags.
+   */
+  static getGameTags(tags: number[]): TagResponse[] {
+    // return await this.steamController.getLocalizedTags(tags);
+    return tags.map((tag: number) => {
+      return {
+        tag: tag,
+        string: appStore.m_mapStoreTagLocalization._data.get(tag)?.value
+      }
+    })
+  }
+
+  /**
    * Function to run when the plugin dismounts.
    */
   static dismount(): void {

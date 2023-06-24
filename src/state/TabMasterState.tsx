@@ -5,15 +5,19 @@ import { InstalledFilter } from "../components/filters/InstalledFilter";
 import { ReorderableEntry } from "decky-frontend-lib";
 import { RegexFilter } from "../components/filters/RegexFilter";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
+import { reaction } from "mobx";
 
 export type LibraryTabDictionary = {
 	[key: string]: LibraryTabElement
 }
 
 interface PublicTabMasterState {
+  userHasFavorites: boolean,
 	libraryTabs: LibraryTabDictionary,
 	libraryTabsList: LibraryTabElement[],
 	libraryTabsEntries: ReorderableEntry<LibraryTabElement>[],
+  currentUsersFriends: FriendEntry[],
+  allStoreTags: TagResponse[],
 	tabsToHide: string[],
 	customTabs: Map<string, LibraryTab>
 }
@@ -87,15 +91,82 @@ export class TabMasterState {
 	private libraryTabs: LibraryTabDictionary = {};
 	private libraryTabsList: LibraryTabElement[] = [];
 	private libraryTabsEntries: ReorderableEntry<LibraryTabElement>[] = [];
+  private currentUsersFriends: FriendEntry[] = [];
+  private allStoreTags: TagResponse[] = [];
+  private userHasFavorites: boolean = false;
 	public eventBus = new EventTarget();
 
-	constructor() {}
+  //* These are for internal use only
+  private collectionLengths: { [collectionId: string]: number} = {}
+
+	constructor() {
+    reaction(() => collectionStore.userCollections, (userCollections: SteamCollection[]) => {
+      console.log("We reacted to collection store changes!");
+      const userHadFavorites = this.userHasFavorites;
+      // const allGamesCollection = userCollections.find((collection: SteamCollection) => collection.id === "uncategorized");
+      const favoritesCollection = userCollections.find((collection: SteamCollection) => collection.id === "favorite");
+      const hiddenCollection = userCollections.find((collection: SteamCollection) => collection.id === "hidden");
+
+      let shouldForceUpdate = false;
+      let shouldRebuildTabs = false;
+
+      if (!userHadFavorites && favoritesCollection && favoritesCollection.allApps.length != 0) {
+        this.userHasFavorites = true;
+        shouldForceUpdate = true;
+        shouldRebuildTabs = true;
+      } else if (userHadFavorites && (!favoritesCollection || favoritesCollection.allApps.length === 0)) {
+        this.userHasFavorites = false;
+        shouldForceUpdate = true;
+        shouldRebuildTabs = true;
+      }
+
+      if (!hiddenCollection && this.collectionLengths["hidden"] != 0) {
+        this.collectionLengths["hidden"] = 0;
+        shouldForceUpdate = true;
+        shouldRebuildTabs = true;
+      } else if (hiddenCollection && this.collectionLengths["hidden"] != hiddenCollection.allApps.length) {
+        this.collectionLengths["hidden"] = hiddenCollection.allApps.length;
+        shouldForceUpdate = true;
+        shouldRebuildTabs = true;
+      }
+
+      //* check if contents of any collection changed
+      for (const collection of userCollections) {
+        if (collection && this.collectionLengths[collection.id] != collection.allApps.length) {
+          this.collectionLengths[collection.id] = collection.allApps.length;
+          shouldForceUpdate = true;
+          shouldRebuildTabs = true;
+        }
+      }
+
+      if (shouldForceUpdate) this.forceUpdate();
+      if (shouldRebuildTabs) {
+        // TODO: rebuild tabs
+      }
+    }, { delay: 50 });
+
+    //TODO: users friends subscription
+
+    //TODO: store tags subscription
+    reaction(() => appStore.m_mapStoreTagLocalization, (storeTagLocalizationMap: StoreTagLocalizationMap) => {
+      this.allStoreTags = Array.from(storeTagLocalizationMap._data.entries()).map(([tag, entry]) => {
+        return {
+          tag: tag,
+          string: entry.value
+        }
+      });
+      this.forceUpdate();
+    }, { delay: 50 });
+  }
 
 	getPublicState(): PublicTabMasterState {
 		return {
+      userHasFavorites: this.userHasFavorites,
 			libraryTabs: this.libraryTabs,
 			libraryTabsList: this.libraryTabsList,
 			libraryTabsEntries: this.libraryTabsEntries,
+      currentUsersFriends: this.currentUsersFriends,
+      allStoreTags: this.allStoreTags,
 			tabsToHide,
 			customTabs
 		}

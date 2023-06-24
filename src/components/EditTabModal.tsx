@@ -1,6 +1,7 @@
 import {
   ButtonItem,
   ConfirmModal, Dropdown,
+  DropdownOption,
   Field,
   Focusable,
   PanelSection,
@@ -19,6 +20,8 @@ import { FriendsFilter } from "./filters/FriendsFilter";
 import { TagsFilter } from "./filters/TagFilter";
 import { FilterType, TabFilterSettings } from "./filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
+import { MultiSelect } from "./MultiSelect";
+import { useTabMasterState } from "../state/TabMasterState";
 
 const FilterTypes: string[] = [
   "collection",
@@ -34,6 +37,10 @@ type FilterOptionsProps = {
 }
 
 const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFilters }) => {
+  const { allStoreTags, currentUsersFriends } = useTabMasterState();
+
+  const storeTagDropdownOptions = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
+  const freindsDropdownOptions = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
   const collectionDropdownOptions = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
   function onCollectionChange(data: SingleDropdownOption) {
@@ -60,11 +67,11 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
     setFilters(filters1);
   }
 
-  function onFriendsChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function onFriendsChange(selected: DropdownOption[]) {
     
   }
 
-  function onTagsChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function onTagsChange(selected: DropdownOption[]) {
     
   }
 
@@ -84,27 +91,17 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
       case "collection":
         return (
           <Field
-            label="Collection"
+            label="Selected Collection"
             description={ <Dropdown rgOptions={collectionDropdownOptions} selectedOption={(filter as TabFilterSettings<'collection'>).params.collection} onChange={onCollectionChange} /> }
           />
         );
       case "friends":
         return (
-          // <Field
-          //   label="Friends to Include"
-          //   // TODO: make a multi select here
-          //   description={ <TextField value={(filter as TabFilterSettings<'friends'>).params.friends} onChange={onFriendsChange} /> }
-          // />
-          <Fragment/>
+          <MultiSelect label="Selected Friends" options={freindsDropdownOptions} selected={[]} onChange={onFriendsChange} />
         );
       case "tags":
         return (
-          // <Field
-          //   label="Tags to include"
-          //   // TODO: make a multi select here
-          //   description={ <TextField value={(filter as TabFilterSettings<'tags'>).params.tags} onChange={onTagsChange} /> }
-          // />
-          <Fragment/>
+          <MultiSelect label="Selected Tags" options={storeTagDropdownOptions} selected={[]} onChange={onTagsChange} />
         );
       default:
         return (
@@ -177,15 +174,15 @@ const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters
 function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
   switch (filter.type) {
     case "regex":
-      return (filter as RegexFilter).params.regex != "";
+      return (filter as TabFilterSettings<'regex'>).params.regex == "";
     case "installed":
-      return true;
+      return false;
     case "collection":
-      return !!(filter as CollectionFilter).params.collection;
+      return !(filter as TabFilterSettings<'collection'>).params.collection;
     case "friends":
-      return (filter as FriendsFilter).params.friends.length > 0;
+      return (filter as TabFilterSettings<'friends'>).params.friends.length === 0;
     case "tags":
-      return (filter as TagsFilter).params.tags.length > 0;
+      return (filter as TabFilterSettings<'tags'>).params.tags.length === 0;
   }
 }
 

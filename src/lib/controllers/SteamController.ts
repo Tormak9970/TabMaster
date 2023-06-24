@@ -89,14 +89,12 @@ export class SteamController {
   }
 
   /**
-   * Registers a callback for achievement notification events.
-   * @param callback The callback to run.
-   * @returns An Unregisterer for this hook.
+   * Gets the localized tags from a list of ids.
+   * @param tags The list of tag ids.
+   * @return A promise resolving to a list of localized tags.
    */
-  registerForGameAchievementNotification(callback: (data: AchievementNotification) => void): Unregisterer {
-    return SteamClient.GameSessions.RegisterForAchievementNotification((data: AchievementNotification) => {
-      callback(data);
-    });
+  async getLocalizedTags(tags: number[]): Promise<TagResponse[]> {
+    return await SteamClient.Apps.GetStoreTagLocalization(tags);
   }
 
   /**
