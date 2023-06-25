@@ -1,4 +1,5 @@
 import asyncio
+import os
 import decky_plugin
 from settings import SettingsManager
 from typing import TypeVar, Dict, List
@@ -50,13 +51,6 @@ class Plugin:
     Plugin.settings.read()
     Plugin.tabs = await Plugin.get_setting(self, "tabs", {})
 
-  async def commit(self) -> None:
-    """
-    Commits the json to disk
-    """
-    Plugin.settings.commit()
-    await Plugin.set_setting(self, "tabs", Plugin.tabs)
-
   T = TypeVar("T")
 
   async def get_setting(self, key, default: T) -> T:
@@ -89,7 +83,7 @@ class Plugin:
 
     Initialized = True
 
-    Plugin.settings = SettingsManager("tabmaster")
+    Plugin.settings = SettingsManager(name="settings", settings_directory=os.environ["DECKY_PLUGIN_SETTINGS_DIR"])
     await Plugin.read(self)
 
     log("Initializing Tab Master.")
@@ -97,7 +91,6 @@ class Plugin:
   # Function called first during the unload process, utilize this to handle your plugin being removed
   async def _unload(self):
     decky_plugin.logger.info("Unloading Tab Master.")
-    await Plugin.commit(self)
 
   # Migrations that should be performed before entering `_main()`.
   async def _migration(self):
