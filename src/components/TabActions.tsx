@@ -49,6 +49,7 @@ export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabCont
                 tabMasterManager.deleteTab(tabContainer.id);
               }}
               bDestructiveWarning={true}
+              strTitle="WARNING!"
             >
               Are you sure you want to delete this Tab? This can't be undone.
             </ConfirmModal>
