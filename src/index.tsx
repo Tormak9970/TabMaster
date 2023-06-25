@@ -98,13 +98,15 @@ const Content: VFC<{}> = ({ }) => {
           <div className="seperator"></div>
           {
             hiddenTabsList.map(tabContainer =>
-              <ButtonItem
-                label={tabContainer.title}
-                onClick={() => tabMasterManager.showTab(tabContainer.id)}
-                onOKActionDescription="Unhide tab"
-              >
-                Show
-              </ButtonItem>
+              <div className="hidden-tab-btn">
+                <ButtonItem
+                  label={tabContainer.title}
+                  onClick={() => tabMasterManager.showTab(tabContainer.id)}
+                  onOKActionDescription="Unhide tab"
+                >
+                  Show
+                </ButtonItem>
+              </div>
             )
           }
         </PanelSection>
