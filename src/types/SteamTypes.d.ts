@@ -39,30 +39,6 @@ interface SteamClient {
     Window: Window
 }
 
-type SteamAppAchievements = {
-    nAchieved: number
-    nTotal: number
-    vecAchievedHidden: any[]
-    vecHighlight: any[]
-    vecUnachieved: any[]
-}
-
-type SteamAppLanguages = {
-    strDisplayName: string,
-    strShortName: string
-}
-
-type SteamGameClientData = {
-    bytes_downloaded: string,
-    bytes_total: string,
-    client_name: string,
-    clientid: string,
-    cloud_status: number,
-    display_status: number,
-    is_available_on_current_platform: boolean,
-    status_percentage: number
-}
-
 type SteamTab = {
     title: string,
     id: string,

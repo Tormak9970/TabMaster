@@ -1,8 +1,10 @@
 import {
   ButtonItem,
   definePlugin,
-  gamepadDialogClasses,
-  PanelSection, quickAccessControlsClasses, ReorderableEntry, ReorderableList, RoutePatch,
+  PanelSection,
+  ReorderableEntry,
+  ReorderableList,
+  RoutePatch,
   ServerAPI,
   showModal,
   staticClasses,
@@ -17,14 +19,13 @@ import { PluginController } from "./lib/controllers/PluginController";
 import { PythonInterop } from "./lib/controllers/PythonInterop";
 import { TabMasterManager } from "./state/TabMasterManager";
 import { TabActionsButton } from "./components/TabActions";
+import { QamStyles } from "./components/styles/QamStyles";
 
 declare global {
   var SteamClient: SteamClient;
   let collectionStore: CollectionStore;
-  let appDetailsStore: AppDetailsStore;
   let appStore: AppStore;
   let loginStore: LoginStore;
-  let uiStore: UIStore;
   let friendStore: FriendStore;
 }
 
@@ -60,58 +61,11 @@ const Content: VFC<{}> = ({ }) => {
 
   const entries = visibleTabsList.map((tabContainer) => {
     return { label: tabContainer.title, position: tabContainer.position, data: { id: tabContainer.id } }
-  })
-  
-  // console.log('visible list', visibleTabsList)
-  // console.log('hidden list', hiddenTabsList)
-  // console.log('entries', entries)
+  });
 
   return (
     <>
-      <style>{`
-        .tab-master-scope {
-          width: inherit;
-          height: inherit;
-
-          flex: 1 1 1px;
-          scroll-padding: 48px 0px;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-start;
-          align-content: stretch;
-        }
-
-        .tab-master-scope .${quickAccessControlsClasses.PanelSection} {
-          padding: 0px;
-        }
-        .tab-master-scope .${quickAccessControlsClasses.PanelSectionTitle} {
-          margin-top: 3px;
-          margin-left: 5px;
-        }
-
-        .tab-master-scope .${gamepadDialogClasses.FieldChildren} {
-          margin: 0px 16px;
-        }
-        .tab-master-scope .${gamepadDialogClasses.FieldLabel} {
-          margin-left: 16px;
-        }
-
-        .tab-master-scope .add-tab-btn .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
-          display: none;
-        }
-        .tab-master-scope .add-tab-btn .${gamepadDialogClasses.FieldLabel} {
-          display: none;
-        }
-        .tab-master-scope .add-tab-btn .${gamepadDialogClasses.FieldChildren} {
-          width: calc(100% - 32px);
-        }
-
-        .tab-master-scope .seperator {
-          width: 100%;
-          height: 1px;
-          background: #23262e;
-        }
-      `}</style>
+      <QamStyles />
       <div className="tab-master-scope">
         <div style={{ margin: "5px", marginTop: "0px" }}>
           Here you can add, re-order, or remove tabs from the library.
@@ -162,13 +116,10 @@ export default definePlugin((serverAPI: ServerAPI) => {
   PluginController.setup(serverAPI, tabMasterManager);
   PythonInterop.setServer(serverAPI);
 
-  // window.tabMasterManager = tabMasterManager
   const loginUnregisterer = PluginController.initOnLogin(async () => {
-    // console.log('loading')
-    await tabMasterManager.loadTabs()
-    // console.log('tabs loaded') 
+    await tabMasterManager.loadTabs();
     patch = patchLibrary(serverAPI, tabMasterManager);
-  })
+  });
 
   return {
     title: <div className={staticClasses.Title}>TabMaster</div>,

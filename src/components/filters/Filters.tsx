@@ -5,8 +5,8 @@ export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tag
 type CollectionFilterParams = { collection: SteamCollection['id'] }
 type InstalledFilterParams = { installed: boolean }
 type RegexFilterParams = { regex: string }
-type FriendsFilterParams = { friends: number[] }
-type TagsFilterParams = { tags: number[] }
+type FriendsFilterParams = { friends: number[], mode: string }
+type TagsFilterParams = { tags: number[], mode: string }
 
 type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -38,10 +38,19 @@ export class Filter {
     },
     friends: (params: FilterParams<'friends'>, appOverview: SteamAppOverview) => {
       const friendsWhoOwn: number[] = PluginController.getFriendsWhoOwn(appOverview.appid);
-      return params.friends.every((friend) => friendsWhoOwn.includes(friend));
+      
+      if (params.mode === "and") {
+        return params.friends.every((friend) => friendsWhoOwn.includes(friend));
+      } else {
+        return params.friends.some((friend) => friendsWhoOwn.includes(friend));
+      }
     },
     tags: (params: FilterParams<'tags'>, appOverview: SteamAppOverview) => {
-      return params.tags.every((tag: number) => appOverview.store_tag.includes(tag));
+      if (params.mode === "and") {
+        return params.tags.every((tag: number) => appOverview.store_tag.includes(tag));
+      } else {
+        return params.tags.some((tag: number) => appOverview.store_tag.includes(tag));
+      }
     },
   }
 
