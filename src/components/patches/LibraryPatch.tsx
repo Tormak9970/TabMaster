@@ -56,7 +56,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                 if (tabMasterManager.hasSettingsLoaded) {
                   let tablist = tabMasterManager.getTabs().visibleTabsList;
 
-                  console.log('tabs to build list', tablist);
+                  // console.log('tabs to build list', tablist);
 
                   pacthedTabs = tablist.map((tabContainer) => {
                     //* we shouldn't check if filter.length > 0 here as user shouldn't be able to create a tab without setting filters
@@ -71,7 +71,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                   pacthedTabs = tabs;
                 }
 
-                console.log('tabs', pacthedTabs);
+                // console.log('tabs', pacthedTabs);
 
                 return pacthedTabs;
               }, deps);

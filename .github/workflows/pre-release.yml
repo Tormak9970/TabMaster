@@ -41,7 +41,7 @@ jobs:
               prerelease: true
             });
 
-            core.setOutput("tag", `debug-${process.env.PACKAGE_VERSION}`);
+            core.setOutput("tag", `pre-${process.env.PACKAGE_VERSION}`);
 
             return data.id
 
