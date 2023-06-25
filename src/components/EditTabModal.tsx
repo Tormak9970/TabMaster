@@ -1,32 +1,36 @@
 import {
   ButtonItem,
-  ConfirmModal, Dropdown,
+  ConfirmModal,
+  Dropdown,
   DropdownOption,
   Field,
   Focusable,
   PanelSection,
   PanelSectionRow,
   SingleDropdownOption,
-  TextField, ToggleField, gamepadDialogClasses
+  TextField,
+  ToggleField
 } from "decky-frontend-lib";
 import { useState, VFC, Fragment, useEffect } from "react";
-import { LibraryTabElement } from "./LibraryTab";
 import { FaTrash } from "react-icons/fa";
-import { cloneDeep } from "lodash";
-import camelcase from "camelcase";
-import { RegexFilter } from "./filters/RegexFilter";
-import { CollectionFilter } from "./filters/CollectionFilter";
-import { FriendsFilter } from "./filters/FriendsFilter";
-import { TagsFilter } from "./filters/TagFilter";
 import { FilterType, TabFilterSettings } from "./filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { MultiSelect } from "./MultiSelect";
-import { useTabMasterState } from "../state/TabMasterState";
+import { TabMasterContextProvider, useTabMasterContext } from "../state/TabMasterContext";
+import { TabMasterManager } from "../state/TabMasterManager";
+import { ModalStyles } from "./styles/ModalStyles";
+
+export type EditableTabSettings = {
+  title: string,
+  filters: TabFilterSettings<any>[]
+}
 
 const FilterTypes: string[] = [
   "collection",
   "installed",
-  "regex"
+  "regex",
+  "friends",
+  "tags"
 ];
 
 type FilterOptionsProps = {
@@ -36,43 +40,72 @@ type FilterOptionsProps = {
   setFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
 }
 
+/**
+ * The options for an individual filter.
+ */
 const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFilters }) => {
-  const { allStoreTags, currentUsersFriends } = useTabMasterState();
+  const { allStoreTags, currentUsersFriends } = useTabMasterContext();
 
-  const storeTagDropdownOptions = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
-  const freindsDropdownOptions = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
-  const collectionDropdownOptions = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
+  const friendsDropdownOptions: DropdownOption[] = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
+  const friendsSelected: DropdownOption[] = (filter.type === "friends" && (filter as TabFilterSettings<"friends">).params.friends) ? (filter as TabFilterSettings<"friends">).params.friends.map((id: number) => {
+    return {
+      label: currentUsersFriends.find((friend) => friend.steamid === id)!.name,
+      data: id
+    }
+  }) : [];
+  const friendsMode = (filter.type === "friends" && (filter as TabFilterSettings<"friends">).params.mode) ? (filter as TabFilterSettings<"friends">).params.mode ?? "and" : "and";
+
+  const storeTagDropdownOptions: DropdownOption[] = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
+  const tagsSelected: DropdownOption[] = (filter.type === "tags" && (filter as TabFilterSettings<"tags">).params.tags) ? (filter as TabFilterSettings<"tags">).params.tags.map((tagNum: number) => {
+    return {
+      label: allStoreTags.find((tag) => tag.tag === tagNum)!.string,
+      data: tagNum
+    }
+  }) : [];
+  const tagsMode = (filter.type === "tags" && (filter as TabFilterSettings<"tags">).params.mode) ? (filter as TabFilterSettings<"tags">).params.mode : "and";
+
+  const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
   function onCollectionChange(data: SingleDropdownOption) {
-    const filter1 = cloneDeep(filter) as TabFilterSettings<'collection'>;
-    filter1.params.collection = data.data;
-    const filters1 = cloneDeep(filters);
-    filters1[index] = filter1;
-    setFilters(filters1);
+    const updatedFilter = {...filter} as TabFilterSettings<'collection'>;
+    updatedFilter.params.collection = data.data;
+    const updatedFilters = [...filters];
+    updatedFilters[index] = updatedFilter;
+    setFilters(updatedFilters);
   }
 
   function onInstalledChange(checked: boolean) {
-    const filter1 = cloneDeep(filter) as TabFilterSettings<'installed'>;
-    filter1.params.installed = checked ?? false;
-    const filters1 = cloneDeep(filters);
-    filters1[index] = filter1;
-    setFilters(filters1);
+    const updatedFilter = {...filter} as TabFilterSettings<'installed'>;
+    updatedFilter.params.installed = checked ?? false;
+    const updatedFilters = [...filters];
+    updatedFilters[index] = updatedFilter;
+    setFilters(updatedFilters);
   }
 
   function onRegexChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const filter1 = cloneDeep(filter) as TabFilterSettings<'regex'>;
-    filter1.params.regex = e?.target.value;
-    const filters1 = cloneDeep(filters);
-    filters1[index] = filter1;
-    setFilters(filters1);
+    const updatedFilter = {...filter} as TabFilterSettings<'regex'>;
+    updatedFilter.params.regex = e?.target.value;
+    const updatedFilters = [...filters];
+    updatedFilters[index] = updatedFilter;
+    setFilters(updatedFilters);
   }
 
-  function onFriendsChange(selected: DropdownOption[]) {
-    
+  function onFriendsChange(selected: DropdownOption[], mode: string) {
+    const updatedFilter = {...filter} as TabFilterSettings<'friends'>;
+    updatedFilter.params.friends = selected.map((friendEntry) => friendEntry.data as number);
+    updatedFilter.params.mode = mode;
+    const updatedFilters = [...filters];
+    updatedFilters[index] = updatedFilter;
+    setFilters(updatedFilters);
   }
 
-  function onTagsChange(selected: DropdownOption[]) {
-    
+  function onTagsChange(selected: DropdownOption[], mode: string) {
+    const updatedFilter = {...filter} as TabFilterSettings<'tags'>;
+    updatedFilter.params.tags = selected.map((tagEntry) => tagEntry.data as number);
+    updatedFilter.params.mode = mode;
+    const updatedFilters = [...filters];
+    updatedFilters[index] = updatedFilter;
+    setFilters(updatedFilters);
   }
 
   if (filter) {
@@ -81,7 +114,7 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
         return (
           <Field
             label="Regex"
-            description={ <TextField value={(filter as TabFilterSettings<'regex'>).params.regex} onChange={onRegexChange} /> }
+            description={<TextField value={(filter as TabFilterSettings<'regex'>).params.regex} onChange={onRegexChange} />}
           />
         );
       case "installed":
@@ -92,21 +125,21 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
         return (
           <Field
             label="Selected Collection"
-            description={ <Dropdown rgOptions={collectionDropdownOptions} selectedOption={(filter as TabFilterSettings<'collection'>).params.collection} onChange={onCollectionChange} /> }
+            description={<Dropdown rgOptions={collectionDropdownOptions} selectedOption={(filter as TabFilterSettings<'collection'>).params.collection} onChange={onCollectionChange} />}
           />
         );
       case "friends":
         return (
-          <MultiSelect label="Selected Friends" options={freindsDropdownOptions} selected={[]} onChange={onFriendsChange} />
+          <MultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={friendsMode} options={friendsDropdownOptions} selected={friendsSelected} onChange={onFriendsChange} />
         );
       case "tags":
         return (
-          <MultiSelect label="Selected Tags" options={storeTagDropdownOptions} selected={[]} onChange={onTagsChange} />
+          <MultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={tagsMode} options={storeTagDropdownOptions} selected={tagsSelected} onChange={onTagsChange} />
         );
       default:
         return (
-        <Fragment />
-      );
+          <Fragment />
+        );
     }
   } else {
     return (
@@ -123,21 +156,24 @@ type FilterEntryProps = {
   setFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
 }
 
+/**
+ * An individual filter for a tab.
+ */
 const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters }) => {
   const filterTypeOptions = FilterTypes.map(type => { return { label: type, data: type } });
 
   function onChange(data: SingleDropdownOption) {
-    const filter1 = cloneDeep(filter);
-    filter1.type = data.data;
-    const filters1 = cloneDeep(filters);
-    filters1[index] = filter1;
-    setFilters(filters1);
+    const updatedFilter = {...filter};
+    updatedFilter.type = data.data;
+    const updatedFilters = [...filters];
+    updatedFilters[index] = updatedFilter;
+    setFilters(updatedFilters);
   }
 
   function onDelete() {
-    const filters1 = cloneDeep(filters);
-    delete filters1[index];
-    setFilters((filters1));
+    const updatedFilters = {...filters};
+    updatedFilters.splice(index, 1);
+    setFilters(updatedFilters);
   }
 
   if (filter) {
@@ -154,9 +190,9 @@ const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters
             <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
           </Focusable>
           <Focusable style={{
-              marginLeft: "10px",
-              width: "45px"
-            }}>
+            marginLeft: "10px",
+            width: "45px"
+          }}>
             <ButtonItem onClick={onDelete}>
               <FaTrash />
             </ButtonItem>
@@ -166,11 +202,16 @@ const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters
     )
   } else {
     return (
-      <Fragment/>
+      <Fragment />
     );
   }
 }
 
+/**
+ * Checks if the user has made any changes to a filter.
+ * @param filter The filter to check.
+ * @returns True if the filter is the default (wont filter anything).
+ */
 function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
   switch (filter.type) {
     case "regex":
@@ -186,134 +227,85 @@ function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
   }
 }
 
-type EditModalProps = {
+type EditTabModalProps = {
   closeModal: () => void,
-  onConfirm?(shortcut: LibraryTabElement): any,
-  title?: string,
-  tab: LibraryTabElement,
+  onConfirm: (tabId: string | undefined, tabSettings: EditableTabSettings) => void,
+  tabId?: string,
+  tabTitle?: string,
+  tabFilters: TabFilterSettings<FilterType>[],
+  tabMasterManager: TabMasterManager
 }
 
-export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () => {}, tab, title = `Modifying: ${tab.title}`, }) => {
-  const [id, setId] = useState<string>(tab.id);
-  const [name, setName] = useState<string>(tab.title);
-  // TODO: remove the cast once tabs are reworked
-  const [filters, setFilters] = useState<TabFilterSettings<FilterType>[]>(tab.filters as TabFilterSettings<FilterType>[]);
+/**
+ * The modal for editing and creating custom tabs.
+ */
+export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager }) => {
+  const tabsMap: Map<string, TabContainer> = tabMasterManager.getTabs().tabsMap;
 
+  const [name, setName] = useState<string>(tabTitle ?? '');
+  const [filters, setFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
 
   useEffect(() => {
-    setCanSave(id != "" && filters.length > 0);
-  }, [id, filters]);
+    setCanSave(name != "" && filters.length > 0);
+  }, [name, filters]);
 
   useEffect(() => {
-    setCanAddFilter(filters.every((filter) => !isDefaultParams(filter)) || filters.length == 0);
+    setCanAddFilter(filters.length == 0 || filters.every((filter) => {
+      if (filter.type === "friends" && !(filter as TabFilterSettings<'friends'>).params.friends) (filter as TabFilterSettings<'friends'>).params.friends = [];
+      if (filter.type === "tags" && !(filter as TabFilterSettings<'tags'>).params.tags) (filter as TabFilterSettings<'tags'>).params.tags = [];
+
+      return !isDefaultParams(filter);
+    }));
   }, [filters]);
 
   function onNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     setName(e?.target.value);
-    setId(camelcase(e?.target.value, { pascalCase: true }));
   }
 
   function onSave() {
-    if (canSave) {
-      const updated: LibraryTabElement = {
-        custom: tab.custom,
-        id: id,
-        title: name,
-        filters: filters,
-        position: tab.position
-      };
-      onConfirm(updated);
-      closeModal();
+    if (canSave && canAddFilter) {
+      if (!tabsMap.has(name) || tabsMap.get(name)?.id === tabId) {
+        const updated: EditableTabSettings = {
+          title: name,
+          filters: filters,
+        };
+        onConfirm(tabId, updated);
+        closeModal();
+      } else {
+        PythonInterop.toast("Error", "A tab with that name already exists!");
+      }
     } else {
-      PythonInterop.toast("Error", "Please add a name and at least 1 filter before saving")
+      PythonInterop.toast("Error", "Please add a name and at least 1 filter before saving");
     }
   }
 
   function addFilter() {
-    const filtersCopy = cloneDeep(filters);
-    filtersCopy.push({
-      type: "regex",
-      params: {  regex: "" }
+    const updatedFilters = [...filters];
+    updatedFilters.push({
+      type: "collection",
+      params: { collection: "" }
     });
-    setFilters(filtersCopy);
+    setFilters(updatedFilters);
   }
 
   return (
-    <>
-      <style>{`
-        .tab-master-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
-          margin-left: 15px;
-        }
-        
-        /* The button item */
-        .tab-master-modal-scope .add-filter-btn {
-          padding: 0 !important;
-        }
-        .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.FieldLabel} {
-          display: none;
-        }
-        .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.FieldChildren} {
-          width: 100%;
-        }
-
-        /* The button item wrapper */
-        .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.Field} {
-          padding: 0;
-          margin: 0;
-        }
-        /* The button item label */
-        .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.FieldLabel} {
-          display: none;
-        }
-        /* The button item */
-        .tab-master-modal-scope .filter-entry button.${gamepadDialogClasses.Button}.DialogButton {
-          padding: 10px;
-          min-width: 45px;
-        }
-
-        .tab-master-modal-scope .filter-params-input .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
-          display: none
-        }
-
-        /* Filter section start */
-        .tab-master-modal-scope .filter-start-cont {
-          width: 100%;
-          padding: 0;
-
-          display: flex;
-          flex-direction: row;
-
-          justify-content: space-between;
-          align-items: center;
-
-          font-size: 14px;
-        }
-        .tab-master-modal-scope .filter-start-cont .filter-line {
-          height: 2px;
-          flex-grow: 1;
-          
-          background: #23262e;
-        }
-        .tab-master-modal-scope .filter-start-cont .filter-label {
-          margin: 0px 5px;
-          color: #343945;
-        }
-      `}</style>
+    <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+      <ModalStyles />
       <div className="tab-master-modal-scope">
         <ConfirmModal
           bAllowFullSize
           onCancel={closeModal}
           onEscKeypress={closeModal}
-          strTitle={title}
+          strTitle={tabTitle ? `Modifying: ${tabTitle}` : 'Create New Tab'}
           onOK={onSave}
         >
           <PanelSection>
             <PanelSectionRow>
               <Field
                 label="Name"
-                description={ <TextField value={name} onChange={onNameChange} /> }
+                description={<TextField value={name} onChange={onNameChange} />}
               />
             </PanelSectionRow>
           </PanelSection>
@@ -324,14 +316,16 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
                   <>
                     <div className="filter-start-cont">
                       <div className="filter-line" />
-                      <div className="filter-label">Filter {index+1} - {filter.type[0].toUpperCase().concat(filter.type.substring(1))}</div>
+                      <div className="filter-label">Filter {index + 1} - {filter.type[0].toUpperCase().concat(filter.type.substring(1))}</div>
                       <div className="filter-line" />
                     </div>
-                    <Field
-                      label="Filter Type"
-                      description={ <FilterEntry index={index} filter={filter} filters={filters} setFilters={setFilters} /> }
-                    />
                     <div className="filter-params-input">
+                      <Field
+                        label="Filter Type"
+                        description={<FilterEntry index={index} filter={filter} filters={filters} setFilters={setFilters} />}
+                      />
+                    </div>
+                    <div className="filter-params-input" key={`${filter.type}`}>
                       <FilterOptions index={index} filter={filter} filters={filters} setFilters={setFilters} />
                     </div>
                     {index == filters.length - 1 ? (
@@ -339,7 +333,7 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
                         <div className="filter-line" />
                       </div>
                     ) : (
-                      <Fragment/>
+                      <Fragment />
                     )}
                   </>
                 );
@@ -348,7 +342,7 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
             <PanelSectionRow>
               <div className="add-filter-btn">
                 {!canAddFilter ? (
-                  <div style={{}}>Please finish the current filter before adding another</div>
+                  <div style={{ marginTop: "5px" }}>Please finish the current filter before adding another</div>
                 ) : (
                   <Fragment />
                 )}
@@ -360,6 +354,6 @@ export const EditTabModal: VFC<EditModalProps> = ({ closeModal, onConfirm = () =
           </PanelSection>
         </ConfirmModal>
       </div>
-    </>
+    </TabMasterContextProvider>
   );
 }
