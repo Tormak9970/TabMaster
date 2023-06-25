@@ -65,7 +65,7 @@ export class TabMasterManager {
 
     //* subscribe to user collection updates
     reaction(() => collectionStore.userCollections, (userCollections: SteamCollection[]) => {
-      if (!this.hasLoaded) return
+      if (!this.hasLoaded) return;
 
       // console.log("We reacted to user collection changes!");
       const userHadFavorites = this.userHasFavorites;
@@ -73,15 +73,15 @@ export class TabMasterManager {
 
       let depsToRebuild: string[] = [];
 
-      if (!userHadFavorites && favoritesCollection && favoritesCollection.allApps.length != 0) {
-        this.userHasFavorites = true
-        const favoriteTabContainer = { ...defaultTabsSettings.Favorites, position: this.visibleTabsList.length }
+      if (!userHadFavorites && favoritesCollection && favoritesCollection.allApps.length !== 0) {
+        this.userHasFavorites = true;
+        const favoriteTabContainer = { ...defaultTabsSettings.Favorites, position: this.visibleTabsList.length };
         this.visibleTabsList.push(this.addDefaultTabContainer(favoriteTabContainer));
-        this.update()
+        this.update();
       }
       if (userHadFavorites && (!favoritesCollection || favoritesCollection.allApps.length === 0)) {
-        this.userHasFavorites = false
-        this.deleteTab('Favorites')
+        this.userHasFavorites = false;
+        this.deleteTab('Favorites');
       }
 
       //* check if contents of any collection changed
@@ -92,10 +92,11 @@ export class TabMasterManager {
         }
       }
 
-      if (depsToRebuild.length != 0) {
+      if (depsToRebuild.length !== 0) {
         this.visibleTabsList.forEach((tabContainer) => {
-          if (tabContainer.filters && tabContainer.filters.length != 0) {
+          if (tabContainer.filters && tabContainer.filters.length !== 0) {
             const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "collection").map((collectionFilter) => collectionFilter.params.collection);
+
             for (const collectionUpdated of depsToRebuild) {
               if (collectionFilters.includes(collectionUpdated)) {
                 (tabContainer as CustomTabContainer).buildCollection();
@@ -109,12 +110,12 @@ export class TabMasterManager {
 
     //* subscribe to hidden collection updates
     reaction(() => collectionStore.GetCollection("hidden").allApps, (allApps: SteamAppOverview[]) => {
-      if (!this.hasLoaded) return
+      if (!this.hasLoaded) return;
       
       // console.log("We reacted to hidden collection changes!");
       let shouldRebuildCollections = false;
 
-      if (!allApps && this.collectionLengths["hidden"] != 0) {
+      if (!allApps && this.collectionLengths["hidden"] !== 0) {
         this.collectionLengths["hidden"] = 0;
         shouldRebuildCollections = true;
       } else if (this.collectionLengths["hidden"] != allApps.length) {
@@ -124,8 +125,47 @@ export class TabMasterManager {
 
       if (shouldRebuildCollections) {
         this.visibleTabsList.forEach((tabContainer) => {
-          if (tabContainer.filters && tabContainer.filters.length != 0) {
+          if (tabContainer.filters && tabContainer.filters.length !== 0) {
             (tabContainer as CustomTabContainer).buildCollection();
+          }
+        });
+      }
+    }, { delay: 50 });
+
+    //* subscribe to hidden collection updates
+    reaction(() => collectionStore.GetCollection("installed").allApps, (allApps: SteamAppOverview[]) => {
+      if (!this.hasLoaded) return;
+
+      console.log("We reacted to installed collection changes!");
+      let shouldRebuildUninstalled = false;
+      let shouldRebuildInstalled = false;
+      
+      if (this.collectionLengths["installed"] > allApps.length) {
+        this.collectionLengths["installed"] = allApps.length;
+        shouldRebuildUninstalled = true;
+      } else if (this.collectionLengths["installed"] < allApps.length) {
+        this.collectionLengths["installed"] = allApps.length;
+        shouldRebuildInstalled = true;
+      }
+
+      if (shouldRebuildInstalled) {
+        this.visibleTabsList.forEach((tabContainer) => {
+          if (tabContainer.filters && tabContainer.filters.length !== 0) {
+            const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
+            
+            if (collectionFilters.some((filter: TabFilterSettings<"installed">) => filter.params.installed)) {
+              (tabContainer as CustomTabContainer).buildCollection();
+            }
+          }
+        });
+      } else if (shouldRebuildUninstalled) {
+        this.visibleTabsList.forEach((tabContainer) => {
+          if (tabContainer.filters && tabContainer.filters.length !== 0) {
+            const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
+            
+            if (collectionFilters.some((filter: TabFilterSettings<"installed">) => !filter.params.installed)) {
+              (tabContainer as CustomTabContainer).buildCollection();
+            }
           }
         });
       }
@@ -149,14 +189,14 @@ export class TabMasterManager {
         string: entry.value
       }
     });
-    if(!this.hasLoaded) return
+    if(!this.hasLoaded) return;
 
-    //? if this is for filters then shouldn't we rebuild the tabs collection and not update?
+    //? we call update here because we mainly want the list of available tags to update.
     this.update();
   }
 
   private handleFriendsReaction(friends: FriendStoreEntry[]) {
-    console.log("We reacted to friend store changes!");
+    // console.log("We reacted to friend store changes!");
     this.currentUsersFriends = friends.map((storeEntry: FriendStoreEntry) => {
       const entry = storeEntry;
       const userid = getNonBigIntUserId(entry.m_persona.m_steamid.m_ulSteamID.low, entry.m_persona.m_steamid.m_ulSteamID.high);
@@ -171,9 +211,51 @@ export class TabMasterManager {
         this.friendsGameMap.set(friend.steamid, Array.from(res.m_apps));
       });
     })).then(() => {
-      if(!this.hasLoaded) return
+      if(!this.hasLoaded) return;
 
-      //? same thing here, see above
+      const listOfBadFriends: Set<number> = new Set();
+      const customTabsList = this.visibleTabsList.filter((tabContainer) => tabContainer.filters && tabContainer.filters.length !== 0)
+
+      //* splitting these loops up is technically more efficient, otherwise we end up with 3 or 4 nested loops
+      customTabsList.forEach((tabContainer: TabContainer) => {
+        const friendsFilters = tabContainer.filters!.filter((filter: TabFilterSettings<FilterType>) => filter.type === "friends");
+        const friendsIds2D: number[][] = friendsFilters.map((collectionFilter) => collectionFilter.params.friends);
+        
+        if (friendsIds2D.length > 0) {
+          //* cheap way to remove duplicates, so we only have to do one loop later
+          const friendsIds: number[] = [...new Set(friendsIds2D.flat())];
+
+          for (const id of friendsIds) {
+            const stillFriends = this.currentUsersFriends.find((friendEntry) => friendEntry.steamid === id);
+
+            if (!stillFriends) listOfBadFriends.add(id);
+          }
+        }
+      });
+
+      customTabsList.forEach((tabContainer) => {
+        let shouldRebuildCollection = false;
+        const friendsFilters = tabContainer.filters!.filter((filter: TabFilterSettings<FilterType>) => filter.type === "friends");
+
+        //* remove friend's id from filter
+        friendsFilters.forEach((friendFilter: TabFilterSettings<"friends">) => {
+
+          for (const id of listOfBadFriends) {
+            const badFriendIdx = friendFilter.params.friends.indexOf(id);
+
+            if (badFriendIdx >= 0) {
+              shouldRebuildCollection = true;
+              friendFilter.params.friends.splice(badFriendIdx, 1);
+            }
+          }
+        });
+        
+        if (shouldRebuildCollection) {
+          (tabContainer as CustomTabContainer).buildCollection();
+        }
+      });
+
+      //? now update state to ensure the friends list changes will be visible
       this.update();
     });
   }
