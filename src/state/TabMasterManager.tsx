@@ -268,9 +268,6 @@ export class TabMasterManager {
           (tabContainer as CustomTabContainer).buildCollection();
         }
       });
-
-      //? now update state to ensure the friends list changes will be visible
-      this.update();
     });
   }
 
