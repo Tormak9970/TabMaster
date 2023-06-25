@@ -44,7 +44,7 @@ type FilterOptionsProps = {
 const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFilters }) => {
   const { allStoreTags, currentUsersFriends } = useTabMasterState();
 
-  const freindsDropdownOptions: DropdownOption[] = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
+  const friendsDropdownOptions: DropdownOption[] = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
   const storeTagDropdownOptions: DropdownOption[] = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
   const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
@@ -72,17 +72,19 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
     setFilters(filters1);
   }
 
-  function onFriendsChange(selected: DropdownOption[]) {
+  function onFriendsChange(selected: DropdownOption[], mode: string) {
     const filter1 = cloneDeep(filter) as TabFilterSettings<'friends'>;
     filter1.params.friends = selected.map((friendEntry) => friendEntry.data as number);
+    filter1.params.mode = mode;
     const filters1 = cloneDeep(filters);
     filters1[index] = filter1;
     setFilters(filters1);
   }
 
-  function onTagsChange(selected: DropdownOption[]) {
+  function onTagsChange(selected: DropdownOption[], mode: string) {
     const filter1 = cloneDeep(filter) as TabFilterSettings<'tags'>;
     filter1.params.tags = selected.map((tagEntry) => tagEntry.data as number);
+    filter1.params.mode = mode;
     const filters1 = cloneDeep(filters);
     filters1[index] = filter1;
     setFilters(filters1);
@@ -110,11 +112,11 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
         );
       case "friends":
         return (
-          <MultiSelect label="Selected Friends" options={freindsDropdownOptions} selected={[]} onChange={onFriendsChange} />
+          <MultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={"and"} options={friendsDropdownOptions} selected={[]} onChange={onFriendsChange} />
         );
       case "tags":
         return (
-          <MultiSelect label="Selected Tags" options={storeTagDropdownOptions} selected={[]} onChange={onTagsChange} />
+          <MultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={"and"} options={storeTagDropdownOptions} selected={[]} onChange={onTagsChange} />
         );
       default:
         return (
@@ -288,11 +290,13 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
                       <div className="filter-label">Filter {index + 1} - {filter.type[0].toUpperCase().concat(filter.type.substring(1))}</div>
                       <div className="filter-line" />
                     </div>
-                    <Field
-                      label="Filter Type"
-                      description={<FilterEntry index={index} filter={filter} filters={filters} setFilters={setFilters} />}
-                    />
                     <div className="filter-params-input">
+                      <Field
+                        label="Filter Type"
+                        description={<FilterEntry index={index} filter={filter} filters={filters} setFilters={setFilters} />}
+                      />
+                    </div>
+                    <div className="filter-params-input" key={`${filter.type}`}>
                       <FilterOptions index={index} filter={filter} filters={filters} setFilters={setFilters} />
                     </div>
                     {index == filters.length - 1 ? (
@@ -309,7 +313,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
             <PanelSectionRow>
               <div className="add-filter-btn">
                 {!canAddFilter ? (
-                  <div style={{}}>Please finish the current filter before adding another</div>
+                  <div style={{ marginTop: "5px" }}>Please finish the current filter before adding another</div>
                 ) : (
                   <Fragment />
                 )}

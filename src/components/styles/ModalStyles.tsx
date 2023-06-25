@@ -40,7 +40,8 @@ export const ModalStyles: VFC<{}> = ({}) => {
 
       /* Filter section start */
       .tab-master-modal-scope .filter-start-cont {
-        width: 100%;
+        width: 114%;
+        margin-left: -40px;
         padding: 0;
 
         display: flex;
