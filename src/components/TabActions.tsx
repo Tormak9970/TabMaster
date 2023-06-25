@@ -50,7 +50,7 @@ export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabCont
               }}
               bDestructiveWarning={true}
             >
-              Are you sure you want to delete this shortcut?
+              Are you sure you want to delete this Tab? This can't be undone.
             </ConfirmModal>
           )
         }
