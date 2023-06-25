@@ -2,7 +2,7 @@ import { createContext, FC, useContext, useEffect, useState } from "react";
 import { TabMasterManager } from "./TabMasterManager";
 
 const TabMasterContext = createContext<PublicTabMasterContext>(null as any);
-export const useTabMasterState = () => useContext(TabMasterContext);
+export const useTabMasterContext = () => useContext(TabMasterContext);
 
 interface ProviderProps {
   tabMasterManager: TabMasterManager
