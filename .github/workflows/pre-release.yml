@@ -141,7 +141,7 @@ jobs:
 
             // * zip
             child_process.execSync("pnpm i zip-a-folder");
-            import { zip, COMPRESSION_LEVEL } from 'zip-a-folder';
+            const { zip, COMPRESSION_LEVEL } = require('zip-a-folder');
 
             const outputZipPath = path.join(cwdPath, "bundle.zip");
             await zip(path.join(cwdPath, "bundle"), outputZipPath, {compression: COMPRESSION_LEVEL.high});
