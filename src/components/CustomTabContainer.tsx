@@ -26,7 +26,7 @@ export class CustomTabContainer implements TabContainer {
     this.title = title;
     this.position = position;
     this.filters = filterSettingsList;
-    
+
     //@ts-ignore
     this.collection = {
       AsDeletableCollection: () => null,
@@ -81,7 +81,7 @@ export class CustomTabContainer implements TabContainer {
       const allAppsMap = collectionStore.allAppsCollection.apps;
       const appMap = new Map<AppId, SteamAppOverview>();
       appsList.forEach((appItem: SteamAppOverview) => appMap.set(appItem.appid, allAppsMap.get(appItem.appid)!));
-      
+
       this.collection.apps = appMap;
     }
   }
@@ -90,9 +90,7 @@ export class CustomTabContainer implements TabContainer {
     const { filters, title } = updatedTabInfo;
     this.title = title;
 
-    if (this.filters !== filters) {
-      this.filters = filters;
-      this.buildCollection();
-    }
+    this.filters = filters;
+    this.buildCollection();
   }
 }

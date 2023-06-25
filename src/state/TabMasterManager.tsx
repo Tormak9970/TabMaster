@@ -145,6 +145,8 @@ export class TabMasterManager {
         }
       });
       if(!this.hasLoaded) return
+
+      //? if this is for filters then shouldn't we rebuild the tabs collection and not update?
       this.update();
     }, { delay: 50 });
   }
@@ -166,6 +168,8 @@ export class TabMasterManager {
       });
     })).then(() => {
       if(!this.hasLoaded) return
+
+      //? same thing here, see above
       this.update();
     });
   }
