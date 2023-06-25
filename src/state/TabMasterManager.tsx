@@ -133,16 +133,20 @@ export class TabMasterManager {
     this.handleFriendsReaction(friendStore.allFriends);
 
     //* subscribe to store tag list changes
-    reaction(() => appStore.m_mapStoreTagLocalization, (storeTagLocalizationMap: StoreTagLocalizationMap) => {
-      this.allStoreTags = Array.from(storeTagLocalizationMap._data.entries()).map(([tag, entry]) => {
-        return {
-          tag: tag,
-          string: entry.value
-        }
-      });
+    reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 });
 
-      this.update();
-    }, { delay: 50 });
+    this.storeTagReaction(appStore.m_mapStoreTagLocalization);
+  }
+
+  private storeTagReaction(storeTagLocalizationMap: StoreTagLocalizationMap) {
+    this.allStoreTags = Array.from(storeTagLocalizationMap._data.entries()).map(([tag, entry]) => {
+      return {
+        tag: tag,
+        string: entry.value
+      }
+    });
+
+    this.update();
   }
 
   private handleFriendsReaction(friends: FriendStoreEntry[]) {

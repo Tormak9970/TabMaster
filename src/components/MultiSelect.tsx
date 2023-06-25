@@ -59,8 +59,16 @@ export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, label, on
   const [ available, setAvailable ] = useState(options.filter((opt) => !selected.includes(opt)));
   const [ dropLabel, setDropLabel ] = useState(label);
 
+  
+  console.log("options:", options);
+  console.log("selected:", sel);
+  console.log("available:", available);
+
   useEffect(() => {
+    console.log("options:", options);
+    console.log("selected:", sel);
     const avail = options.filter((opt) => !sel.includes(opt));
+    console.log("available:", avail);
     setAvailable(avail);
     setDropLabel(avail.length == 0 ? "All selected" : (!!maxOptions && sel.length == maxOptions ? "Max selected" : label));
     onChange(sel);

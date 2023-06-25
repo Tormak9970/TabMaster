@@ -1,13 +1,15 @@
 import {
   ButtonItem,
-  ConfirmModal, Dropdown,
+  ConfirmModal,
+  Dropdown,
   DropdownOption,
   Field,
   Focusable,
   PanelSection,
   PanelSectionRow,
   SingleDropdownOption,
-  TextField, ToggleField, gamepadDialogClasses
+  TextField,
+  ToggleField
 } from "decky-frontend-lib";
 import { useState, VFC, Fragment, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
@@ -17,6 +19,7 @@ import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { MultiSelect } from "./MultiSelect";
 import { TabMasterContextProvider, useTabMasterState } from "../state/TabMasterState";
 import { TabMasterManager } from "../state/TabMasterManager";
+import { ModalStyles } from "./styles/ModalStyles";
 
 export type EditableTabSettings = {
   title: string,
@@ -41,9 +44,9 @@ type FilterOptionsProps = {
 const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFilters }) => {
   const { allStoreTags, currentUsersFriends } = useTabMasterState();
 
-  const freindsDropdownOptions = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
-  const storeTagDropdownOptions = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
-  const collectionDropdownOptions = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
+  const freindsDropdownOptions: DropdownOption[] = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
+  const storeTagDropdownOptions: DropdownOption[] = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
+  const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
   function onCollectionChange(data: SingleDropdownOption) {
     const filter1 = cloneDeep(filter) as TabFilterSettings<'collection'>;
@@ -258,65 +261,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
 
   return (
     <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-      <style>{`
-        .tab-master-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
-          margin-left: 15px;
-        }
-        
-        /* The button item */
-        .tab-master-modal-scope .add-filter-btn {
-          padding: 0 !important;
-        }
-        .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.FieldLabel} {
-          display: none;
-        }
-        .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.FieldChildren} {
-          width: 100%;
-        }
-
-        /* The button item wrapper */
-        .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.Field} {
-          padding: 0;
-          margin: 0;
-        }
-        /* The button item label */
-        .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.FieldLabel} {
-          display: none;
-        }
-        /* The button item */
-        .tab-master-modal-scope .filter-entry button.${gamepadDialogClasses.Button}.DialogButton {
-          padding: 10px;
-          min-width: 45px;
-        }
-
-        .tab-master-modal-scope .filter-params-input .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
-          display: none
-        }
-
-        /* Filter section start */
-        .tab-master-modal-scope .filter-start-cont {
-          width: 100%;
-          padding: 0;
-
-          display: flex;
-          flex-direction: row;
-
-          justify-content: space-between;
-          align-items: center;
-
-          font-size: 14px;
-        }
-        .tab-master-modal-scope .filter-start-cont .filter-line {
-          height: 2px;
-          flex-grow: 1;
-          
-          background: #23262e;
-        }
-        .tab-master-modal-scope .filter-start-cont .filter-label {
-          margin: 0px 5px;
-          color: #343945;
-        }
-      `}</style>
+      <ModalStyles />
       <div className="tab-master-modal-scope">
         <ConfirmModal
           bAllowFullSize
