@@ -54,6 +54,8 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
       data: id
     }
   }) : [];
+  const friendsMode = filter.type === "friends" ? (filter as TabFilterSettings<"friends">).params.mode : "and";
+
   const storeTagDropdownOptions: DropdownOption[] = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
   const tagsSelected: DropdownOption[] = filter.type === "tags" ? (filter as TabFilterSettings<"tags">).params.tags.map((tagNum: number) => {
     return {
@@ -61,6 +63,8 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
       data: tagNum
     }
   }) : [];
+  const tagsMode = filter.type === "tags" ? (filter as TabFilterSettings<"tags">).params.mode : "and";
+
   const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
   function onCollectionChange(data: SingleDropdownOption) {
@@ -127,11 +131,11 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
         );
       case "friends":
         return (
-          <MultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={"and"} options={friendsDropdownOptions} selected={friendsSelected} onChange={onFriendsChange} />
+          <MultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={friendsMode} options={friendsDropdownOptions} selected={friendsSelected} onChange={onFriendsChange} />
         );
       case "tags":
         return (
-          <MultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={"and"} options={storeTagDropdownOptions} selected={tagsSelected} onChange={onTagsChange} />
+          <MultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={tagsMode} options={storeTagDropdownOptions} selected={tagsSelected} onChange={onTagsChange} />
         );
       default:
         return (
