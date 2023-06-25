@@ -48,22 +48,22 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
   const { allStoreTags, currentUsersFriends } = useTabMasterContext();
 
   const friendsDropdownOptions: DropdownOption[] = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
-  const friendsSelected: DropdownOption[] = filter.type === "friends" ? (filter as TabFilterSettings<"friends">).params.friends.map((id: number) => {
+  const friendsSelected: DropdownOption[] = (filter.type === "friends" && (filter as TabFilterSettings<"friends">).params.friends) ? (filter as TabFilterSettings<"friends">).params.friends.map((id: number) => {
     return {
       label: currentUsersFriends.find((friend) => friend.steamid === id)!.name,
       data: id
     }
   }) : [];
-  const friendsMode = filter.type === "friends" ? (filter as TabFilterSettings<"friends">).params.mode : "and";
+  const friendsMode = (filter.type === "friends" && (filter as TabFilterSettings<"friends">).params.mode) ? (filter as TabFilterSettings<"friends">).params.mode ?? "and" : "and";
 
   const storeTagDropdownOptions: DropdownOption[] = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
-  const tagsSelected: DropdownOption[] = filter.type === "tags" ? (filter as TabFilterSettings<"tags">).params.tags.map((tagNum: number) => {
+  const tagsSelected: DropdownOption[] = (filter.type === "tags" && (filter as TabFilterSettings<"tags">).params.tags) ? (filter as TabFilterSettings<"tags">).params.tags.map((tagNum: number) => {
     return {
       label: allStoreTags.find((tag) => tag.tag === tagNum)!.string,
       data: tagNum
     }
   }) : [];
-  const tagsMode = filter.type === "tags" ? (filter as TabFilterSettings<"tags">).params.mode : "and";
+  const tagsMode = (filter.type === "tags" && (filter as TabFilterSettings<"tags">).params.mode) ? (filter as TabFilterSettings<"tags">).params.mode : "and";
 
   const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
@@ -173,7 +173,7 @@ const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters
 
   function onDelete() {
     const filters1 = cloneDeep(filters);
-    delete filters1[index];
+    filters1.splice(index, 1);
     setFilters((filters1));
   }
 
