@@ -13,7 +13,6 @@ import {
 } from "decky-frontend-lib";
 import { useState, VFC, Fragment, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
-import { cloneDeep } from "lodash";
 import { FilterType, TabFilterSettings } from "./filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { MultiSelect } from "./MultiSelect";
@@ -68,43 +67,43 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
   const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
   function onCollectionChange(data: SingleDropdownOption) {
-    const filter1 = cloneDeep(filter) as TabFilterSettings<'collection'>;
+    const filter1 = {...filter} as TabFilterSettings<'collection'>;
     filter1.params.collection = data.data;
-    const filters1 = cloneDeep(filters);
+    const filters1 = [...filters];
     filters1[index] = filter1;
     setFilters(filters1);
   }
 
   function onInstalledChange(checked: boolean) {
-    const filter1 = cloneDeep(filter) as TabFilterSettings<'installed'>;
+    const filter1 = {...filter} as TabFilterSettings<'installed'>;
     filter1.params.installed = checked ?? false;
-    const filters1 = cloneDeep(filters);
+    const filters1 = [...filters];
     filters1[index] = filter1;
     setFilters(filters1);
   }
 
   function onRegexChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const filter1 = cloneDeep(filter) as TabFilterSettings<'regex'>;
+    const filter1 = {...filter} as TabFilterSettings<'regex'>;
     filter1.params.regex = e?.target.value;
-    const filters1 = cloneDeep(filters);
+    const filters1 = [...filters];
     filters1[index] = filter1;
     setFilters(filters1);
   }
 
   function onFriendsChange(selected: DropdownOption[], mode: string) {
-    const filter1 = cloneDeep(filter) as TabFilterSettings<'friends'>;
+    const filter1 = {...filter} as TabFilterSettings<'friends'>;
     filter1.params.friends = selected.map((friendEntry) => friendEntry.data as number);
     filter1.params.mode = mode;
-    const filters1 = cloneDeep(filters);
+    const filters1 = [...filters];
     filters1[index] = filter1;
     setFilters(filters1);
   }
 
   function onTagsChange(selected: DropdownOption[], mode: string) {
-    const filter1 = cloneDeep(filter) as TabFilterSettings<'tags'>;
+    const filter1 = {...filter} as TabFilterSettings<'tags'>;
     filter1.params.tags = selected.map((tagEntry) => tagEntry.data as number);
     filter1.params.mode = mode;
-    const filters1 = cloneDeep(filters);
+    const filters1 = [...filters];
     filters1[index] = filter1;
     setFilters(filters1);
   }
@@ -164,15 +163,15 @@ const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters
   const filterTypeOptions = FilterTypes.map(type => { return { label: type, data: type } });
 
   function onChange(data: SingleDropdownOption) {
-    const filter1 = cloneDeep(filter);
+    const filter1 = {...filter};
     filter1.type = data.data;
-    const filters1 = cloneDeep(filters);
+    const filters1 = [...filters];
     filters1[index] = filter1;
     setFilters(filters1);
   }
 
   function onDelete() {
-    const filters1 = cloneDeep(filters);
+    const filters1 = {...filters};
     filters1.splice(index, 1);
     setFilters((filters1));
   }
@@ -283,7 +282,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   }
 
   function addFilter() {
-    const filtersCopy = cloneDeep(filters);
+    const filtersCopy = [...filters];
     filtersCopy.push({
       type: "collection",
       params: { collection: "" }
