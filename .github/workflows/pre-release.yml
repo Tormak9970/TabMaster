@@ -122,7 +122,9 @@ jobs:
             child_process.execSync("pnpm build");
 
             // * once finished, make folder with all files in includeInBuild
-            fs.mkdirSync("bundle");
+            const bundlePath = path.join(cwdPath, "bundle");
+            fs.mkdirSync(bundlePath);
+            fs.mkdirSync(path.join(bundlePath, "dist"));
 
             for (const fileToInclude of includeInBuild) {
               const srcPath = path.join(cwdPath, fileToInclude);
@@ -144,7 +146,7 @@ jobs:
             const { zip, COMPRESSION_LEVEL } = require('zip-a-folder');
 
             const outputZipPath = path.join(cwdPath, "bundle.zip");
-            await zip(path.join(cwdPath, "bundle"), outputZipPath, {compression: COMPRESSION_LEVEL.high});
+            await zip(bundlePath, outputZipPath, {compression: COMPRESSION_LEVEL.high});
 
             // * upload to release
             await uploadReleaseAsset(`TabMaster_${process.env.release_tag}.zip`, fs.readFileSync(outputZipPath));
