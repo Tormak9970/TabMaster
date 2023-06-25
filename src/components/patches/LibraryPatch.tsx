@@ -10,6 +10,12 @@ import { ReactElement, useEffect } from "react";
 import { TabMasterManager } from "../../state/TabMasterManager";
 import { CustomTabContainer } from "../CustomTabContainer";
 
+/**
+ * Patches the Steam library to allow the plugin to change the tabs.
+ * @param serverAPI The plugin's serverAPI.
+ * @param tabMasterManager The plugin's core state manager.
+ * @returns A routepatch for the library.
+ */
 export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager): RoutePatch => {
   //* This only runs 1 time, which is perfect
   return serverAPI.routerHook.addPatch("/library", (props: { path: string; children: ReactElement }) => {
@@ -68,7 +74,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                 console.log('tabs', pacthedTabs);
 
                 return pacthedTabs;
-              }, deps)
+              }, deps);
             }
             
             hooks.useMemo = fakeUseMemo;

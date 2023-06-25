@@ -1,6 +1,9 @@
 import { gamepadDialogClasses } from "decky-frontend-lib";
 import { VFC } from "react";
 
+/**
+ * All css styling for TabMaster's modals.
+ */
 export const ModalStyles: VFC<{}> = ({}) => {
   return (
     <style>{`

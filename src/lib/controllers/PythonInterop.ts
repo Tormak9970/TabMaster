@@ -1,7 +1,7 @@
 import { ServerAPI } from "decky-frontend-lib";
 
 /**
- * Class for frontend - backend communication.
+ * Class for frontend -> backend communication.
  */
 export class PythonInterop {
   private static serverAPI: ServerAPI;

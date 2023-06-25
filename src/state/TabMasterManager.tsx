@@ -44,6 +44,9 @@ export const defaultTabsSettings: TabSettingsDictionary = {
   }
 }
 
+/**
+ * Class that handles TabMaster's core state.
+ */
 export class TabMasterManager {
   private tabsMap: Map<string, TabContainer>;
   private visibleTabsList: TabContainer[] = [];
@@ -59,6 +62,9 @@ export class TabMasterManager {
   public eventBus = new EventTarget();
   private collectionLengths: { [collectionId: string]: number } = {}
 
+  /**
+   * Creates a new TabMasterManager.
+   */
   constructor() {
     this.hasLoaded = false;
     this.tabsMap = new Map<string, TabContainer>();
@@ -70,6 +76,7 @@ export class TabMasterManager {
       // console.log("We reacted to user collection changes!");
       const userHadFavorites = this.userHasFavorites;
       const favoritesCollection = collectionStore.GetCollection("favorite");
+      const installedCollection = userCollections.find((collection) => collection.id === "local-install");
 
       let depsToRebuild: string[] = [];
 
@@ -92,9 +99,51 @@ export class TabMasterManager {
         }
       }
 
-      if (depsToRebuild.length !== 0) {
+      let shouldRebuildUninstalled = false;
+      let shouldRebuildInstalled = false;
+      
+      if (installedCollection) {
+        if (this.collectionLengths["installed"] > installedCollection.allApps.length) {
+          this.collectionLengths["installed"] = installedCollection.allApps.length;
+          shouldRebuildUninstalled = true;
+        } else if (this.collectionLengths["installed"] < installedCollection.allApps.length) {
+          this.collectionLengths["installed"] = installedCollection.allApps.length;
+          shouldRebuildInstalled = true;
+        }
+      } else {
+        //? This is here for when valve inevitably changes the collection's id.
+        console.error("Installed collection should always exists!!");
+      }
+
+      const tabsAlreadyBuilt: string[] = [];
+
+      if (shouldRebuildInstalled) {
         this.visibleTabsList.forEach((tabContainer) => {
           if (tabContainer.filters && tabContainer.filters.length !== 0) {
+            const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
+            
+            if (collectionFilters.some((filter: TabFilterSettings<"installed">) => filter.params.installed)) {
+              (tabContainer as CustomTabContainer).buildCollection();
+              tabsAlreadyBuilt.push(tabContainer.id);
+            }
+          }
+        });
+      } else if (shouldRebuildUninstalled) {
+        this.visibleTabsList.forEach((tabContainer) => {
+          if (tabContainer.filters && tabContainer.filters.length !== 0) {
+            const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
+            
+            if (collectionFilters.some((filter: TabFilterSettings<"installed">) => !filter.params.installed)) {
+              (tabContainer as CustomTabContainer).buildCollection();
+              tabsAlreadyBuilt.push(tabContainer.id);
+            }
+          }
+        });
+      }
+
+      if (depsToRebuild.length !== 0) {
+        this.visibleTabsList.forEach((tabContainer) => {
+          if (tabContainer.filters && tabContainer.filters.length !== 0 && !tabsAlreadyBuilt.includes(tabContainer.id)) {
             const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "collection").map((collectionFilter) => collectionFilter.params.collection);
 
             for (const collectionUpdated of depsToRebuild) {
@@ -132,45 +181,6 @@ export class TabMasterManager {
       }
     }, { delay: 50 });
 
-    //* subscribe to hidden collection updates
-    reaction(() => collectionStore.GetCollection("installed").allApps, (allApps: SteamAppOverview[]) => {
-      if (!this.hasLoaded) return;
-
-      console.log("We reacted to installed collection changes!");
-      let shouldRebuildUninstalled = false;
-      let shouldRebuildInstalled = false;
-      
-      if (this.collectionLengths["installed"] > allApps.length) {
-        this.collectionLengths["installed"] = allApps.length;
-        shouldRebuildUninstalled = true;
-      } else if (this.collectionLengths["installed"] < allApps.length) {
-        this.collectionLengths["installed"] = allApps.length;
-        shouldRebuildInstalled = true;
-      }
-
-      if (shouldRebuildInstalled) {
-        this.visibleTabsList.forEach((tabContainer) => {
-          if (tabContainer.filters && tabContainer.filters.length !== 0) {
-            const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
-            
-            if (collectionFilters.some((filter: TabFilterSettings<"installed">) => filter.params.installed)) {
-              (tabContainer as CustomTabContainer).buildCollection();
-            }
-          }
-        });
-      } else if (shouldRebuildUninstalled) {
-        this.visibleTabsList.forEach((tabContainer) => {
-          if (tabContainer.filters && tabContainer.filters.length !== 0) {
-            const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
-            
-            if (collectionFilters.some((filter: TabFilterSettings<"installed">) => !filter.params.installed)) {
-              (tabContainer as CustomTabContainer).buildCollection();
-            }
-          }
-        });
-      }
-    }, { delay: 50 });
-
     //* subscribe to user's friendlist updates
     reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
 
@@ -182,6 +192,10 @@ export class TabMasterManager {
     this.storeTagReaction(appStore.m_mapStoreTagLocalization);
   }
 
+  /**
+   * Handles updating state when the store tag localization map changes.
+   * @param storeTagLocalizationMap The store tag localization map.
+   */
   private storeTagReaction(storeTagLocalizationMap: StoreTagLocalizationMap) {
     this.allStoreTags = Array.from(storeTagLocalizationMap._data.entries()).map(([tag, entry]) => {
       return {
@@ -195,6 +209,10 @@ export class TabMasterManager {
     this.update();
   }
 
+  /**
+   * Handles updating state when the user's friends list changes.
+   * @param friends An array of the user's friends.
+   */
   private handleFriendsReaction(friends: FriendStoreEntry[]) {
     // console.log("We reacted to friend store changes!");
     this.currentUsersFriends = friends.map((storeEntry: FriendStoreEntry) => {
@@ -260,11 +278,20 @@ export class TabMasterManager {
     });
   }
 
+  /**
+   * Updates the settings for a custom tab.
+   * @param customTabId The id of the custom tab.
+   * @param updatedTabSettings The new settings for the tab.
+   */
   updateCustomTab(customTabId: string, updatedTabSettings: EditableTabSettings) {
     (this.tabsMap.get(customTabId) as CustomTabContainer).update(updatedTabSettings);
     this.update();
   }
 
+  /**
+   * Reorders the tabs.
+   * @param orederedTabIds The updated order of tabs.
+   */
   reorderTabs(orederedTabIds: string[]) {
     for (let i = 0; i < orederedTabIds.length; i++) {
       this.tabsMap.get(orederedTabIds[i])!.position = i;
@@ -274,6 +301,10 @@ export class TabMasterManager {
     this.update();
   }
 
+  /**
+   * Hides a tab from the library.
+   * @param tabId The id of the tab to hide.
+   */
   hideTab(tabId: string) {
     const tabContainer = this.tabsMap.get(tabId)!;
 
@@ -285,6 +316,10 @@ export class TabMasterManager {
     this.update();
   }
 
+  /**
+   * Unhides a hidden tab in the library.
+   * @param tabId The id of the tab to show.
+   */
   showTab(tabId: string) {
     const tabContainer = this.tabsMap.get(tabId)!;
     const hiddenIndex = this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer);
@@ -299,6 +334,10 @@ export class TabMasterManager {
     this.update();
   }
 
+  /**
+   * Deletes a tab.
+   * @param tabId The id of the tab to delete.
+   */
   deleteTab(tabId: string) {
     let tabContainer = this.tabsMap.get(tabId)!;
 
@@ -311,18 +350,27 @@ export class TabMasterManager {
     this.update();
   }
 
+  /**
+   * Creates a new custom tab.
+   * @param title The title of the tab.
+   * @param position The position of the tab.
+   * @param filterSettingsList The list of filters for the tab.
+   */
   createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[]) {
     const id = uuidv4();
     this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList));
     this.update();
   }
 
+  /**
+   * Loads the user's tabs from the backend.
+   */
   loadTabs = async () => {
     const settings = await PythonInterop.getTabs();
 
     if (settings instanceof Error) {
       console.log("Tab Master couldn't load tab settings");
-      return
+      return;
     }
 
     const tabsSettings = Object.keys(settings).length > 0 ? settings : { ...defaultTabsSettings };
@@ -354,6 +402,10 @@ export class TabMasterManager {
     this.eventBus.dispatchEvent(new Event("stateUpdate"));
   }
 
+  /**
+   * Gets the user's tabs
+   * @returns The visibleTabs, hiddenTabs and tabsMap.
+   */
   getTabs() {
     return {
       visibleTabsList: this.visibleTabsList,
@@ -362,6 +414,10 @@ export class TabMasterManager {
     }
   }
 
+  /**
+   * Gets the userFriends and store tags.
+   * @returns The tags and userFriends currently in state.
+   */
   getFriendsAndTags() {
     return {
       currentUsersFriends: this.currentUsersFriends,
@@ -373,12 +429,20 @@ export class TabMasterManager {
     return this.hasLoaded;
   }
 
+  /**
+   * Gets the list of the user's friends who own an app.
+   * @param appid The id of the app.
+   * @returns A list of ids of friends who own this app.
+   */
   getFriendsWhoOwn(appid: number): number[] {
     return Array.from(this.friendsGameMap.entries())
       .filter(([, ownedGames]) => ownedGames.includes(appid))
       .map(([friendId]) => friendId);
   }
 
+  /**
+   * Saves the tabs to the backend.
+   */
   private saveTabs() {
     console.log('saving tabs');
 
@@ -396,17 +460,33 @@ export class TabMasterManager {
     PythonInterop.setTabs(allTabsSettings);
   }
 
+  /**
+   * Creates a new tab container from the provided tab data.
+   * @param tabId The id of the tab.
+   * @param title The title of the tab.
+   * @param position The position of the tab.
+   * @param filterSettingsList The tab's filters.
+   * @returns A tab container for this tab.
+   */
   private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[]) {
     const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList);
     this.tabsMap.set(tabId, tabContainer);
     return tabContainer;
   }
 
+  /**
+   * Creates a new tab container for each of the default tabs.
+   * @param defaultTabSettings The default tabs.
+   * @returns Tab containers for all of the default tabs.
+   */
   private addDefaultTabContainer(defaultTabSettings: TabContainer) {
     this.tabsMap.set(defaultTabSettings.id, defaultTabSettings);
     return defaultTabSettings;
   }
 
+  /**
+   * Rebuilds the library tab list.
+   */
   private rebuildTabLists() {
     const visibleTabContainers: TabContainer[] = []
     const hiddenTabContainers: TabContainer[] = []
@@ -417,6 +497,9 @@ export class TabMasterManager {
     this.hiddenTabsList = hiddenTabContainers
   }
 
+  /**
+   * Updates the plugin's state.
+   */
   private update() {
     this.saveTabs();
     this.eventBus.dispatchEvent(new Event("stateUpdate"));

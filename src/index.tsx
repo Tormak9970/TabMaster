@@ -37,6 +37,9 @@ interface TabEntryInteractablesProps {
   entry: ReorderableEntry<TabIdEntryType>
 }
 
+/**
+ * The Quick Access Menu content for TabMaster.
+ */
 const Content: VFC<{}> = ({ }) => {
   const { visibleTabsList, hiddenTabsList, tabsMap, tabMasterManager } = useTabMasterState();
 
@@ -98,6 +101,7 @@ const Content: VFC<{}> = ({ }) => {
               <ButtonItem
                 label={tabContainer.title}
                 onClick={() => tabMasterManager.showTab(tabContainer.id)}
+                onOKActionDescription="Unhide tab"
               >
                 Show
               </ButtonItem>

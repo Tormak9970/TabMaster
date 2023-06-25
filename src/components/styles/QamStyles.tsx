@@ -1,6 +1,9 @@
 import { gamepadDialogClasses, quickAccessControlsClasses } from "decky-frontend-lib";
 import { VFC } from "react";
 
+/**
+ * All css styling for the Quick Access Menu part of TabMaster.
+ */
 export const QamStyles: VFC<{}> = ({}) => {
   return (
     <style>{`

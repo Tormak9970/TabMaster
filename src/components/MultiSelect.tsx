@@ -3,12 +3,7 @@ import { useState, VFC, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 import { MultiSelectStyles } from "./styles/MultiSelectStyles";
 
-/**
- * The properties for the MultiSelectedOption component.
- * @param option This entry's option.
- * @param onRemove The function to run when the user deselects this option.
- * @param fieldProps Optional fieldProps for this entry.
- */
+
 type MultiSelectedOptionProps = {
   option: DropdownOption,
   fieldProps?: FieldProps,
@@ -17,8 +12,6 @@ type MultiSelectedOptionProps = {
 
 /**
  * A component for multi select dropdown options.
- * @param props The MultiSelectedOptionProps for this component.
- * @returns A MultiSelectedOption component.
  */
 const MultiSelectedOption:VFC<MultiSelectedOptionProps> = ({ option, fieldProps, onRemove }) => {
   return (
@@ -46,7 +39,6 @@ export type MultiSelectProps = {
 
 /**
  * A component for multi select dropdown menus.
- * @returns A MultiSelect component.
  */
 export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps }) => {
   const [ sel, setSel ] = useState(selected);
@@ -83,8 +75,7 @@ export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, fieldLabe
   }
 
   const onSelectedChange = (option: DropdownOption) => {
-    // option = undefined
-    selected = [...sel, JSON.parse(JSON.stringify(option))];
+    selected = [...sel, option];
     setSel(selected);
   }
 
@@ -110,7 +101,8 @@ export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, fieldLabe
                 marginLeft: "10px",
                 width: "90px"
               }}>
-                <Dropdown rgOptions={modes} selectedOption={innerMode} onChange={onModeChange} focusable={true} />
+                {/* @ts-ignore */}
+                <Dropdown rgOptions={modes} selectedOption={innerMode} onChange={onModeChange} focusable={true} onOKActionDescription="Change the filter mode" />
               </Focusable>
             </Focusable>
           </div>

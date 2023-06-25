@@ -41,6 +41,9 @@ type FilterOptionsProps = {
   setFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
 }
 
+/**
+ * The options for an individual filter.
+ */
 const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFilters }) => {
   const { allStoreTags, currentUsersFriends } = useTabMasterState();
 
@@ -138,6 +141,9 @@ type FilterEntryProps = {
   setFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
 }
 
+/**
+ * An individual filter for a tab.
+ */
 const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters }) => {
   const filterTypeOptions = FilterTypes.map(type => { return { label: type, data: type } });
 
@@ -186,6 +192,11 @@ const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters
   }
 }
 
+/**
+ * Checks if the user has made any changes to a filter.
+ * @param filter The filter to check.
+ * @returns True if the filter is the default (wont filter anything).
+ */
 function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
   switch (filter.type) {
     case "regex":
@@ -210,6 +221,9 @@ type EditTabModalProps = {
   tabMasterManager: TabMasterManager
 }
 
+/**
+ * The modal for editing and creating custom tabs.
+ */
 export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager }) => {
   const tabsMap: Map<string, TabContainer> = tabMasterManager.getTabs().tabsMap;
 

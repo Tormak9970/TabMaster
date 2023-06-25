@@ -9,6 +9,9 @@ interface TabActionsContextMenuProps {
   tabMasterManager: TabMasterManager
 }
 
+/**
+ * The context menu for Tab Actions.
+ */
 export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabContainer, tabMasterManager }) => {
   const menuItems = [
     <MenuItem onSelected={() => tabMasterManager.hideTab(tabContainer.id)}>
@@ -68,6 +71,9 @@ interface TabActionButtionProps {
   tabMasterManager: TabMasterManager
 }
 
+/**
+ * The Tab Action button.
+ */
 export const TabActionsButton: VFC<TabActionButtionProps> = (props) => {
   const onClick = () => {
     showContextMenu(<TabActionsContextMenu {...props} />);
@@ -77,6 +83,7 @@ export const TabActionsButton: VFC<TabActionButtionProps> = (props) => {
       style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}
       onClick={onClick}
       onOKButton={onClick}
+      onOKActionDescription="Open tab options"
     >
       <FaEllipsisH />
     </DialogButton>

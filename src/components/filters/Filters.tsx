@@ -23,6 +23,9 @@ export type TabFilterSettings<T extends FilterType> = {
 
 type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview) => boolean
 
+/**
+ * Utility class for filtering games.
+ */
 export class Filter {
   private static filterFunctions = {
     collection: (params: FilterParams<'collection'>, appOverview: SteamAppOverview) => {
@@ -54,6 +57,12 @@ export class Filter {
     },
   }
 
+  /**
+   * Checks if a game passes a given filter.
+   * @param filterSettings The filter to run.
+   * @param appOverview The app to check
+   * @returns True if the app meets the filter criteria.
+   */
   static run(filterSettings: TabFilterSettings<FilterType>, appOverview: SteamAppOverview): boolean {
     return (this.filterFunctions[filterSettings.type] as FilterFunction)(filterSettings.params, appOverview);
   }

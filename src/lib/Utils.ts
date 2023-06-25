@@ -1,4 +1,4 @@
-import { findModuleChild, sleep } from 'decky-frontend-lib';
+import { sleep } from 'decky-frontend-lib';
 
 /**
  * Waits for a condition to be true.
@@ -29,38 +29,6 @@ export async function waitForCondition(retries: number, delay: number, check: ()
 
   return await waitImpl();
 }
-
-/**
- * The react History object.
- */
-export const History = findModuleChild((m) => {
-  if (typeof m !== "object") return undefined;
-  for (let prop in m) {
-    if (m[prop]?.m_history) return m[prop].m_history
-  }
-});
-
-/**
- * Provides a debounced version of a function.
- * @param func The function to debounce.
- * @param wait How long before function gets run.
- * @param immediate Wether the function should run immediately.
- * @returns A debounced version of the function.
- */
-export function debounce(func:Function, wait:number, immediate?:boolean) {
-  let timeout:NodeJS.Timeout|null;
-  return function (this:any) {
-      const context = this, args = arguments;
-      const later = function () {
-          timeout = null;
-          if (!immediate) func.apply(context, args);
-      };
-      const callNow = immediate && !timeout;
-      clearTimeout(timeout as NodeJS.Timeout);
-      timeout = setTimeout(later, wait);
-      if (callNow) func.apply(context, args);
-  };
-};
 
 /**
  * Gets a steam user id from two parts.

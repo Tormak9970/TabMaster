@@ -48,15 +48,6 @@ export class PluginController {
   }
 
   /**
-   * Gets the details for the provided app.
-   * @param appid The id of the app to get the details of.
-   * @returns A promise resolving to the app's details, or null if failed.
-   */
-  static async getAppDetails(appid: number): Promise<SteamAppDetails | null> {
-    return await PluginController.steamController.getAppDetails(appid);
-  }
-
-  /**
    * Get the ids of all the users friends who own a game.
    * @param appid The id of the game.
    * @return The list of friends.

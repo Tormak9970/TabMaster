@@ -1,6 +1,9 @@
 import { gamepadDialogClasses } from "decky-frontend-lib";
 import { VFC } from "react";
 
+/**
+ * All css styling for the TabMaster MultiSelect component.
+ */
 export const MultiSelectStyles: VFC<{}> = ({}) => {
   return (
     <style>{`
