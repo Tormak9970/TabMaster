@@ -1,3 +1,0 @@
-type Unregisterer = {
-  unregister: () => void;
-}

@@ -2,6 +2,7 @@ import { ServerAPI } from "decky-frontend-lib";
 import { PythonInterop } from "./PythonInterop";
 import { SteamController } from "./SteamController";
 import { LogController } from "./LogController";
+import { TabMasterManager } from "../../state/TabMasterManager";
 
 /**
  * Main controller class for the plugin.
@@ -9,18 +10,17 @@ import { LogController } from "./LogController";
 export class PluginController {
   // @ts-ignore
   private static server: ServerAPI;
+  private static tabMasterManager: TabMasterManager;
 
   private static steamController: SteamController;
-
-  private static gameLifetimeRegister: Unregisterer;
-  private static historyListener: () => void;
 
   /**
    * Sets the plugin's serverAPI.
    * @param server The serverAPI to use.
    */
-  static setup(server: ServerAPI): void {
+  static setup(server: ServerAPI, tabMasterManager: TabMasterManager): void {
     this.server = server;
+    this.tabMasterManager = tabMasterManager;
     this.steamController = new SteamController();
   }
 
@@ -48,21 +48,18 @@ export class PluginController {
   }
 
   /**
-   * Gets the details for the provided app.
-   * @param appid The id of the app to get the details of.
-   * @returns A promise resolving to the app's details, or null if failed.
+   * Get the ids of all the users friends who own a game.
+   * @param appid The id of the game.
+   * @return The list of friends.
    */
-  static async getAppDetails(appid: number): Promise<SteamAppDetails | null> {
-    return await PluginController.steamController.getAppDetails(appid);
+  static getFriendsWhoOwn(appid: number): number[] {
+    return this.tabMasterManager.getFriendsWhoOwn(appid);
   }
 
   /**
    * Function to run when the plugin dismounts.
    */
   static dismount(): void {
-    this.gameLifetimeRegister.unregister();
-    this.historyListener();
-    
     LogController.log("PluginController dismounted.");
   }
 }

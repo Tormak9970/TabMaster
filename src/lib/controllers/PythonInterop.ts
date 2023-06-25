@@ -1,8 +1,7 @@
 import { ServerAPI } from "decky-frontend-lib";
-import { LibraryTabDictionary } from "../../state/TabMasterState";
 
 /**
- * Class for frontend - backend communication.
+ * Class for frontend -> backend communication.
  */
 export class PythonInterop {
   private static serverAPI: ServerAPI;
@@ -51,8 +50,8 @@ export class PythonInterop {
    * Gets the plugin's tabs.
    * @returns The plugin's tabs.
    */
-  static async getTabs(): Promise<LibraryTabDictionary | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{}, LibraryTabDictionary>("get_tabs", {});
+  static async getTabs(): Promise<TabSettingsDictionary | Error> {
+    let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabSettingsDictionary>("get_tabs", {});
 
     if (result.success) {
       return result.result;
@@ -66,43 +65,14 @@ export class PythonInterop {
    * @param tabs The plugin's tabsDictionary.
    * @returns A promise resolving to whether or not the tabs were successfully set.
    */
-  static async setTabs(tabs: LibraryTabDictionary): Promise<void | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{ tabs: LibraryTabDictionary, }, void>("set_tabs", { tabs: tabs });
+  static async setTabs(tabs: TabSettingsDictionary): Promise<void | Error> {
+    let result = await PythonInterop.serverAPI.callPluginMethod<{ tabs: TabSettingsDictionary, }, void>("set_tabs", { tabs: tabs });
 
     if (result.success) {
       return result.result;
     } else {
       return new Error(result.result);
     };
-  }
-
-  /**
-   * Gets the plugin's hidden tabs.
-   * @returns A promise resolving to the plugin's hidden tabs.
-   */
-  static async getHiddenTabs(): Promise<string[] | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{}, string[]>("get_hidden_tabs", {});
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
-    };
-  }
-
-  /**
-   * Sets the plugin's hidden tabs.
-   * @param tabs The plugin's hidden tabs.
-   * @returns A promise resolving to whether or not the tabs were successfuly set.
-   */
-  static async setHiddenTabs(tabs: string[]) {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{ tabs: string[], }, void>("set_hidden_tabs", { tabs: tabs });
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
-    }
   }
 
   /**

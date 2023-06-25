@@ -1,0 +1,184 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  create-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+    outputs:
+      release_id: ${{ steps.create-release.outputs.result }}
+      change_log: ${{ steps.changelog.outputs.clean_changelog }}
+      version: ${{ steps.changelog.outputs.version }}
+      tag: ${{ steps.changelog.outputs.tag }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Conventional Changelog Action
+        id: changelog
+        uses: ./.github/workflows/custom-changelog
+        with:
+          github-token: ${{ secrets.github_token }}
+
+      - name: Create Release
+        id: create-release
+        uses: actions/github-script@v6
+        env:
+          RELEASE_TAG: ${{ steps.changelog.outputs.tag }}
+          RELEASE_LOG: ${{ steps.changelog.outputs.clean_changelog }}
+        with:
+          script: |
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `${process.env.RELEASE_TAG}`,
+              name: `TabMaster ${process.env.RELEASE_TAG}`,
+              body: `${process.env.RELEASE_LOG}`,
+              draft: true,
+              prerelease: false
+            });
+            return data.id
+
+  build-plugin:
+    needs: create-release
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: release
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Setup Pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 6.0.2
+
+      - name: Install Frontend Dependencies
+        run: pnpm install
+
+      - name: Build TabMaster
+        uses: actions/github-script@v6
+        env:
+          GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+          release_id: ${{ inputs.release_id }}
+          release_tag: ${{ inputs.release_tag }}
+        with:
+          script: |
+            const fs = require("fs");
+            const child_process = require("child_process");
+            const path = require("path");
+
+            const includeInBuild = [
+              "plugin.json",
+              "package.json",
+              "dist/index.js",
+              "main.py",
+              "README.md",
+              "LICENSE"
+            ];
+
+            async function uploadReleaseAsset(name, contents) {
+              await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: process.env.release_id,
+                name: name,
+                data: contents
+              });
+            }
+
+            function copyDirRecursive(parentPath, contents, dest) {
+              for (const file of contents) {
+                const srcPath = path.join(cwdPath, parentPath, file);
+                const destPath = path.join(cwdPath, dest, file);
+
+                if (fs.lstatSync(srcPath).isDirectory()) {
+                  const dirContents = fs.readdirSync(srcPath, { withFileTypes: true });
+                  copyDirRecursive(path.join(parentPath, file), dirContents, path.join(dest, file));
+                } else {
+                  fs.copyFileSync(srcPath, destPath);
+                }
+              }
+            }
+
+            const cwdPath = path.resolve(process.cwd());
+
+            # * build the plugin with `pnpm build`
+            child_process.execSync("pnpm build");
+
+            # * once finished, make folder with all files in includeInBuild
+            fs.mkdirSync("bundle");
+
+            for (const fileToInclude of includeInBuild) {
+              const srcPath = path.join(cwdPath, fileToInclude);
+              const destPath = path.join(cwdPath, "bundle", fileToInclude);
+
+              fs.copyFileSync(srcPath, destPath);
+            }
+
+            # * check contents of defaults
+            const defaultsPath = path.join(cwdPath, "defaults");
+            
+            if (fs.existsSync(defaultsPath)) {
+              const defaultContents = fs.readdirSync(defaultsPath, { withFileTypes: true });
+              copyDirRecursive("defaults", defaultContents, "bundle");
+            }
+
+            # * zip
+            child_process.execSync("pnpm i zip-a-folder");
+            import { zip, COMPRESSION_LEVEL } from 'zip-a-folder';
+
+            const outputZipPath = path.join(cwdPath, "bundle.zip");
+            await zip(path.join(cwdPath, "bundle"), outputZipPath, {compression: COMPRESSION_LEVEL.high});
+
+            # * upload to release
+            await uploadReleaseAsset(`TabMaster_${process.env.release_tag}.zip`, fs.readFileSync(outputZipPath));
+
+  publish-release:
+    needs: [create-release, build-plugin]
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: release
+          
+      - name: Publish Release
+        id: publish-release
+        uses: actions/github-script@v6
+        env:
+          release_id: ${{ needs.create-release.outputs.release_id }}
+        with:
+          script: |
+            github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: process.env.release_id,
+              draft: false,
+              prerelease: false
+            })
+  
