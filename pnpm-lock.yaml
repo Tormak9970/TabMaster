@@ -4,9 +4,6 @@ dependencies:
   decky-frontend-lib:
     specifier: ^3.21.6
     version: 3.21.6
-  lodash:
-    specifier: ^4.17.21
-    version: 4.17.21
   mobx:
     specifier: ^5.15.7
     version: 5.15.7
@@ -848,10 +845,6 @@ packages:
       p-locate: 3.0.0
       path-exists: 3.0.0
     dev: true
-
-  /lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: false
 
   /magic-string@0.25.9:
     resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}

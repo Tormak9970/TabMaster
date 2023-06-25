@@ -57,7 +57,6 @@
   },
   "dependencies": {
     "decky-frontend-lib": "^3.21.6",
-    "lodash": "^4.17.21",
     "mobx": "^5.15.7",
     "react-icons": "^4.10.1",
     "uuid": "^9.0.0"
