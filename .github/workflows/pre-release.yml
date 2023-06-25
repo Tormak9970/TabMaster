@@ -76,7 +76,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
           release_id: ${{ inputs.release_id }}
-          release_tag: ${{ inputs.release_tag }}
+          release_tag: ${{ inputs.tag }}
         with:
           script: |
             const fs = require("fs");
