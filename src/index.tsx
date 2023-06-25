@@ -10,7 +10,7 @@ import {
   staticClasses,
 } from "decky-frontend-lib";
 import { VFC, Fragment } from "react";
-import { PiTabs } from "react-icons/pi";
+import { TbLayoutNavbarExpand } from "react-icons/tb";
 
 import { patchLibrary } from "./components/patches/LibraryPatch";
 import { TabMasterContextProvider, useTabMasterContext } from "./state/TabMasterContext";
@@ -133,7 +133,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
       <TabMasterContextProvider tabMasterManager={tabMasterManager}>
         <Content />
       </TabMasterContextProvider>,
-    icon: <PiTabs />,
+    icon: <TbLayoutNavbarExpand />,
     onDismount: () => {
       serverAPI.routerHook.removePatch("/library", patch);
       loginUnregisterer.unregister();

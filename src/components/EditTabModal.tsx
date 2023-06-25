@@ -48,7 +48,19 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
   const { allStoreTags, currentUsersFriends } = useTabMasterContext();
 
   const friendsDropdownOptions: DropdownOption[] = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
+  const friendsSelected: DropdownOption[] = filter.type === "friends" ? (filter as TabFilterSettings<"friends">).params.friends.map((id: number) => {
+    return {
+      label: currentUsersFriends.find((friend) => friend.steamid === id)!.name,
+      data: id
+    }
+  }) : [];
   const storeTagDropdownOptions: DropdownOption[] = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
+  const tagsSelected: DropdownOption[] = filter.type === "tags" ? (filter as TabFilterSettings<"tags">).params.tags.map((tagNum: number) => {
+    return {
+      label: allStoreTags.find((tag) => tag.tag === tagNum)!.string,
+      data: tagNum
+    }
+  }) : [];
   const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
   function onCollectionChange(data: SingleDropdownOption) {
@@ -115,11 +127,11 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
         );
       case "friends":
         return (
-          <MultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={"and"} options={friendsDropdownOptions} selected={[]} onChange={onFriendsChange} />
+          <MultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={"and"} options={friendsDropdownOptions} selected={friendsSelected} onChange={onFriendsChange} />
         );
       case "tags":
         return (
-          <MultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={"and"} options={storeTagDropdownOptions} selected={[]} onChange={onTagsChange} />
+          <MultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={"and"} options={storeTagDropdownOptions} selected={tagsSelected} onChange={onTagsChange} />
         );
       default:
         return (

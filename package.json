@@ -1,7 +1,7 @@
 {
   "name": "tabmaster",
   "version": "1.0.0",
-  "description": "Allows for customizing, adding, and removing Library Tabs.",
+  "description": "Gives you full control over your Steam library! Support for customizing, adding, and hiding Library Tabs.",
   "scripts": {
     "build": "shx rm -rf dist && rollup -c",
     "watch": "rollup -c -w",
@@ -34,9 +34,9 @@
   ],
   "license": "GPL-3",
   "bugs": {
-    "url": "https://github.com/EmuDeck/Tormak9970/issues"
+    "url": "https://github.com/Tormak9970/TabMaster/issues"
   },
-  "homepage": "https://github.com/EmuDeck/Tormak9970#readme",
+  "homepage": "https://github.com/Tormak9970/TabMaster#readme",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.1.0",
     "@rollup/plugin-json": "^4.1.0",
