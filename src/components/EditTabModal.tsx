@@ -67,45 +67,45 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
   const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
 
   function onCollectionChange(data: SingleDropdownOption) {
-    const filter1 = {...filter} as TabFilterSettings<'collection'>;
-    filter1.params.collection = data.data;
-    const filters1 = [...filters];
-    filters1[index] = filter1;
-    setFilters(filters1);
+    const updatedFilter = {...filter} as TabFilterSettings<'collection'>;
+    updatedFilter.params.collection = data.data;
+    const updatedFilters = [...filters];
+    updatedFilters[index] = updatedFilter;
+    setFilters(updatedFilters);
   }
 
   function onInstalledChange(checked: boolean) {
-    const filter1 = {...filter} as TabFilterSettings<'installed'>;
-    filter1.params.installed = checked ?? false;
-    const filters1 = [...filters];
-    filters1[index] = filter1;
-    setFilters(filters1);
+    const updatedFilter = {...filter} as TabFilterSettings<'installed'>;
+    updatedFilter.params.installed = checked ?? false;
+    const updatedFilters = [...filters];
+    updatedFilters[index] = updatedFilter;
+    setFilters(updatedFilters);
   }
 
   function onRegexChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const filter1 = {...filter} as TabFilterSettings<'regex'>;
-    filter1.params.regex = e?.target.value;
-    const filters1 = [...filters];
-    filters1[index] = filter1;
-    setFilters(filters1);
+    const updatedFilter = {...filter} as TabFilterSettings<'regex'>;
+    updatedFilter.params.regex = e?.target.value;
+    const updatedFilters = [...filters];
+    updatedFilters[index] = updatedFilter;
+    setFilters(updatedFilters);
   }
 
   function onFriendsChange(selected: DropdownOption[], mode: string) {
-    const filter1 = {...filter} as TabFilterSettings<'friends'>;
-    filter1.params.friends = selected.map((friendEntry) => friendEntry.data as number);
-    filter1.params.mode = mode;
-    const filters1 = [...filters];
-    filters1[index] = filter1;
-    setFilters(filters1);
+    const updatedFilter = {...filter} as TabFilterSettings<'friends'>;
+    updatedFilter.params.friends = selected.map((friendEntry) => friendEntry.data as number);
+    updatedFilter.params.mode = mode;
+    const updatedFilters = [...filters];
+    updatedFilters[index] = updatedFilter;
+    setFilters(updatedFilters);
   }
 
   function onTagsChange(selected: DropdownOption[], mode: string) {
-    const filter1 = {...filter} as TabFilterSettings<'tags'>;
-    filter1.params.tags = selected.map((tagEntry) => tagEntry.data as number);
-    filter1.params.mode = mode;
-    const filters1 = [...filters];
-    filters1[index] = filter1;
-    setFilters(filters1);
+    const updatedFilter = {...filter} as TabFilterSettings<'tags'>;
+    updatedFilter.params.tags = selected.map((tagEntry) => tagEntry.data as number);
+    updatedFilter.params.mode = mode;
+    const updatedFilters = [...filters];
+    updatedFilters[index] = updatedFilter;
+    setFilters(updatedFilters);
   }
 
   if (filter) {
@@ -163,17 +163,17 @@ const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters
   const filterTypeOptions = FilterTypes.map(type => { return { label: type, data: type } });
 
   function onChange(data: SingleDropdownOption) {
-    const filter1 = {...filter};
-    filter1.type = data.data;
-    const filters1 = [...filters];
-    filters1[index] = filter1;
-    setFilters(filters1);
+    const updatedFilter = {...filter};
+    updatedFilter.type = data.data;
+    const updatedFilters = [...filters];
+    updatedFilters[index] = updatedFilter;
+    setFilters(updatedFilters);
   }
 
   function onDelete() {
-    const filters1 = {...filters};
-    filters1.splice(index, 1);
-    setFilters((filters1));
+    const updatedFilters = {...filters};
+    updatedFilters.splice(index, 1);
+    setFilters(updatedFilters);
   }
 
   if (filter) {
@@ -282,12 +282,12 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   }
 
   function addFilter() {
-    const filtersCopy = [...filters];
-    filtersCopy.push({
+    const updatedFilters = [...filters];
+    updatedFilters.push({
       type: "collection",
       params: { collection: "" }
     });
-    setFilters(filtersCopy);
+    setFilters(updatedFilters);
   }
 
   return (
