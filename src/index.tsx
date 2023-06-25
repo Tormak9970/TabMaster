@@ -24,10 +24,8 @@ import { QamStyles } from "./components/styles/QamStyles";
 declare global {
   var SteamClient: SteamClient;
   let collectionStore: CollectionStore;
-  let appDetailsStore: AppDetailsStore;
   let appStore: AppStore;
   let loginStore: LoginStore;
-  let uiStore: UIStore;
   let friendStore: FriendStore;
 }
 
