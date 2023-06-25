@@ -50,7 +50,7 @@ const Content: VFC<{}> = ({ }) => {
       //? This is here because showModal passes the closeModal function automatically
       <EditTabModal
         onConfirm={(_: any, tabSettings: EditableTabSettings) => {
-          tabMasterManager.createNewTab(tabSettings.title, visibleTabsList.length, tabSettings.filters)
+          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters)
         }}
         tabFilters={[]}
         tabMasterManager={tabMasterManager}
@@ -61,7 +61,7 @@ const Content: VFC<{}> = ({ }) => {
   const entries = visibleTabsList.map((tabContainer) => {
     return { label: tabContainer.title, position: tabContainer.position, data: { id: tabContainer.id } }
   })
-
+  
   // console.log('visible list', visibleTabsList)
   // console.log('hidden list', hiddenTabsList)
   // console.log('entries', entries)
