@@ -203,10 +203,6 @@ export class TabMasterManager {
         string: entry.value
       }
     });
-    if(!this.hasLoaded) return;
-
-    //? we call update here because we mainly want the list of available tags to update.
-    this.update();
   }
 
   /**
