@@ -41,7 +41,7 @@ jobs:
               prerelease: true
             });
 
-            core.setOutput("tag", `debug-${process.env.PACKAGE_VERSION}`);
+            core.setOutput("tag", `pre-${process.env.PACKAGE_VERSION}`);
 
             return data.id
 
@@ -74,9 +74,8 @@ jobs:
       - name: Build TabMaster
         uses: actions/github-script@v6
         env:
-          GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
-          release_id: ${{ inputs.release_id }}
-          release_tag: ${{ inputs.release_tag }}
+          release_id: ${{ needs.create-release.outputs.release_id }}
+          release_tag: ${{ needs.create-release.outputs.tag }}
         with:
           script: |
             const fs = require("fs");
@@ -118,11 +117,13 @@ jobs:
 
             const cwdPath = path.resolve(process.cwd());
 
-            # * build the plugin with `pnpm build`
+            // * build the plugin with `pnpm build`
             child_process.execSync("pnpm build");
 
-            # * once finished, make folder with all files in includeInBuild
-            fs.mkdirSync("bundle");
+            // * once finished, make folder with all files in includeInBuild
+            const bundlePath = path.join(cwdPath, "bundle");
+            fs.mkdirSync(bundlePath);
+            fs.mkdirSync(path.join(bundlePath, "dist"));
 
             for (const fileToInclude of includeInBuild) {
               const srcPath = path.join(cwdPath, fileToInclude);
@@ -131,7 +132,7 @@ jobs:
               fs.copyFileSync(srcPath, destPath);
             }
 
-            # * check contents of defaults
+            // * check contents of defaults
             const defaultsPath = path.join(cwdPath, "defaults");
             
             if (fs.existsSync(defaultsPath)) {
@@ -139,14 +140,14 @@ jobs:
               copyDirRecursive("defaults", defaultContents, "bundle");
             }
 
-            # * zip
+            // * zip
             child_process.execSync("pnpm i zip-a-folder");
-            import { zip, COMPRESSION_LEVEL } from 'zip-a-folder';
+            const { zip, COMPRESSION_LEVEL } = require('zip-a-folder');
 
             const outputZipPath = path.join(cwdPath, "bundle.zip");
-            await zip(path.join(cwdPath, "bundle"), outputZipPath, {compression: COMPRESSION_LEVEL.high});
+            await zip(bundlePath, outputZipPath, {compression: COMPRESSION_LEVEL.high});
 
-            # * upload to release
+            // * upload to release
             await uploadReleaseAsset(`TabMaster_${process.env.release_tag}.zip`, fs.readFileSync(outputZipPath));
             
   publish-release:
