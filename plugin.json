@@ -4,7 +4,7 @@
   "flags": ["debug"],
   "publish": {
     "tags": ["Customization", "Library", "Tabs"],
-    "description": "Allows for customizing, adding, and removing Library Tabs.",
+    "description": "Gives you full control over your Steam library! Support for customizing, adding, and hiding Library Tabs.",
     "image": "https://raw.githubusercontent.com/Tormak9970/TabMaster/main/assets/thumbnail.png"
   }
 }
