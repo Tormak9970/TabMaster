@@ -74,8 +74,8 @@ jobs:
       - name: Build TabMaster
         uses: actions/github-script@v6
         env:
-          release_id: ${{ needs.create-release.release_id }}
-          release_tag: ${{ needs.create-release.tag }}
+          release_id: ${{ needs.create-release.outputs.release_id }}
+          release_tag: ${{ needs.create-release.outputs.tag }}
         with:
           script: |
             const fs = require("fs");
