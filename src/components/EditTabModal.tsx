@@ -17,7 +17,7 @@ import { cloneDeep } from "lodash";
 import { FilterType, TabFilterSettings } from "./filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { MultiSelect } from "./MultiSelect";
-import { TabMasterContextProvider, useTabMasterState } from "../state/TabMasterState";
+import { TabMasterContextProvider, useTabMasterContext } from "../state/TabMasterContext";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { ModalStyles } from "./styles/ModalStyles";
 
@@ -45,7 +45,7 @@ type FilterOptionsProps = {
  * The options for an individual filter.
  */
 const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFilters }) => {
-  const { allStoreTags, currentUsersFriends } = useTabMasterState();
+  const { allStoreTags, currentUsersFriends } = useTabMasterContext();
 
   const friendsDropdownOptions: DropdownOption[] = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
   const storeTagDropdownOptions: DropdownOption[] = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });

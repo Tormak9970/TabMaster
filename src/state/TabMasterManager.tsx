@@ -84,7 +84,7 @@ export class TabMasterManager {
         this.userHasFavorites = true;
         const favoriteTabContainer = { ...defaultTabsSettings.Favorites, position: this.visibleTabsList.length };
         this.visibleTabsList.push(this.addDefaultTabContainer(favoriteTabContainer));
-        this.update();
+        this.updateAndSave();
       }
       if (userHadFavorites && (!favoritesCollection || favoritesCollection.allApps.length === 0)) {
         this.userHasFavorites = false;
@@ -101,7 +101,7 @@ export class TabMasterManager {
 
       let shouldRebuildUninstalled = false;
       let shouldRebuildInstalled = false;
-      
+
       if (installedCollection) {
         if (this.collectionLengths["installed"] > installedCollection.allApps.length) {
           this.collectionLengths["installed"] = installedCollection.allApps.length;
@@ -121,7 +121,7 @@ export class TabMasterManager {
         this.visibleTabsList.forEach((tabContainer) => {
           if (tabContainer.filters && tabContainer.filters.length !== 0) {
             const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
-            
+
             if (collectionFilters.some((filter: TabFilterSettings<"installed">) => filter.params.installed)) {
               (tabContainer as CustomTabContainer).buildCollection();
               tabsAlreadyBuilt.push(tabContainer.id);
@@ -132,7 +132,7 @@ export class TabMasterManager {
         this.visibleTabsList.forEach((tabContainer) => {
           if (tabContainer.filters && tabContainer.filters.length !== 0) {
             const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
-            
+
             if (collectionFilters.some((filter: TabFilterSettings<"installed">) => !filter.params.installed)) {
               (tabContainer as CustomTabContainer).buildCollection();
               tabsAlreadyBuilt.push(tabContainer.id);
@@ -160,7 +160,7 @@ export class TabMasterManager {
     //* subscribe to hidden collection updates
     reaction(() => collectionStore.GetCollection("hidden").allApps, (allApps: SteamAppOverview[]) => {
       if (!this.hasLoaded) return;
-      
+
       // console.log("We reacted to hidden collection changes!");
       let shouldRebuildCollections = false;
 
@@ -225,7 +225,7 @@ export class TabMasterManager {
         this.friendsGameMap.set(friend.steamid, Array.from(res.m_apps));
       });
     })).then(() => {
-      if(!this.hasLoaded) return;
+      if (!this.hasLoaded) return;
 
       const listOfBadFriends: Set<number> = new Set();
       const customTabsList = this.visibleTabsList.filter((tabContainer) => tabContainer.filters && tabContainer.filters.length !== 0)
@@ -234,7 +234,7 @@ export class TabMasterManager {
       customTabsList.forEach((tabContainer: TabContainer) => {
         const friendsFilters = tabContainer.filters!.filter((filter: TabFilterSettings<FilterType>) => filter.type === "friends");
         const friendsIds2D: number[][] = friendsFilters.map((collectionFilter) => collectionFilter.params.friends);
-        
+
         if (friendsIds2D.length > 0) {
           //* cheap way to remove duplicates, so we only have to do one loop later
           const friendsIds: number[] = [...new Set(friendsIds2D.flat())];
@@ -263,7 +263,7 @@ export class TabMasterManager {
             }
           }
         });
-        
+
         if (shouldRebuildCollection) {
           (tabContainer as CustomTabContainer).buildCollection();
         }
@@ -278,7 +278,7 @@ export class TabMasterManager {
    */
   updateCustomTab(customTabId: string, updatedTabSettings: EditableTabSettings) {
     (this.tabsMap.get(customTabId) as CustomTabContainer).update(updatedTabSettings);
-    this.update();
+    this.updateAndSave();
   }
 
   /**
@@ -291,7 +291,7 @@ export class TabMasterManager {
     }
 
     this.rebuildTabLists();
-    this.update();
+    this.updateAndSave();
   }
 
   /**
@@ -306,7 +306,7 @@ export class TabMasterManager {
 
     tabContainer.position = -1;
 
-    this.update();
+    this.updateAndSave();
   }
 
   /**
@@ -324,7 +324,7 @@ export class TabMasterManager {
       (tabContainer as CustomTabContainer).buildCollection();
     }
 
-    this.update();
+    this.updateAndSave();
   }
 
   /**
@@ -340,7 +340,7 @@ export class TabMasterManager {
     tabsArrayToRemoveFrom.splice(index, 1);
 
     this.tabsMap.delete(tabId);
-    this.update();
+    this.updateAndSave();
   }
 
   /**
@@ -352,7 +352,7 @@ export class TabMasterManager {
   createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[]) {
     const id = uuidv4();
     this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList));
-    this.update();
+    this.updateAndSave();
   }
 
   /**
@@ -392,7 +392,7 @@ export class TabMasterManager {
     this.hiddenTabsList = hiddenTabContainers;
     this.hasLoaded = true;
 
-    this.eventBus.dispatchEvent(new Event("stateUpdate"));
+    this.update();
   }
 
   /**
@@ -491,10 +491,17 @@ export class TabMasterManager {
   }
 
   /**
-   * Updates the plugin's state.
+   * Saves tab settings and dispatches event to update context provider
+   */
+  private updateAndSave() {
+    this.saveTabs();
+    this.update()
+  }
+
+  /**
+   * Dispatches event to update context provider
    */
   private update() {
-    this.saveTabs();
     this.eventBus.dispatchEvent(new Event("stateUpdate"));
   }
 }

@@ -13,7 +13,7 @@ import { VFC, Fragment } from "react";
 import { PiTabs } from "react-icons/pi";
 
 import { patchLibrary } from "./components/patches/LibraryPatch";
-import { TabMasterContextProvider, useTabMasterState } from "./state/TabMasterState";
+import { TabMasterContextProvider, useTabMasterContext } from "./state/TabMasterContext";
 import { EditableTabSettings, EditTabModal } from "./components/EditTabModal";
 import { PluginController } from "./lib/controllers/PluginController";
 import { PythonInterop } from "./lib/controllers/PythonInterop";
@@ -41,7 +41,7 @@ interface TabEntryInteractablesProps {
  * The Quick Access Menu content for TabMaster.
  */
 const Content: VFC<{}> = ({ }) => {
-  const { visibleTabsList, hiddenTabsList, tabsMap, tabMasterManager } = useTabMasterState();
+  const { visibleTabsList, hiddenTabsList, tabsMap, tabMasterManager } = useTabMasterContext();
 
   function TabEntryInteractables({ entry }: TabEntryInteractablesProps) {
     const tabContainer = tabsMap.get(entry.data!.id)!;
