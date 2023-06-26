@@ -1,4 +1,5 @@
-import { ServerAPI } from "decky-frontend-lib";
+import { ServerAPI, sleep } from "decky-frontend-lib";
+import { validateTabs } from "../Utils";
 
 /**
  * Class for frontend -> backend communication.
@@ -54,7 +55,13 @@ export class PythonInterop {
     let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabSettingsDictionary>("get_tabs", {});
 
     if (result.success) {
-      // TODO: verify the tab data is good
+      //* Verify the config data.
+      if (!validateTabs(result.result)) {
+        PythonInterop.error(`Tabs were corrupted.`);
+        PythonInterop.setTabs({});
+        PythonInterop.toast("Error", "Config corrupted, please restart.");
+        return {};
+      }
   
       return result.result;
     } else {
@@ -114,7 +121,12 @@ export class PythonInterop {
    * @returns A promise resolving to whether or not the tabs were successfully set.
    */
   static async setTabs(tabs: TabSettingsDictionary): Promise<void | Error> {
-    // TODO: verify the tab data is good
+    //* Verify the config
+    if (!validateTabs(tabs)) {
+      PythonInterop.error(`Tabs were corrupted when trying to set.`);
+      PythonInterop.toast("Error", "Config corrupted, please restart.");
+      return;
+    }
 
     let result = await PythonInterop.serverAPI.callPluginMethod<{ tabs: TabSettingsDictionary, }, void>("set_tabs", { tabs: tabs });
 
@@ -131,13 +143,27 @@ export class PythonInterop {
    * @returns A promise resolving to whether or not the tags were successfully set.
    */
   static async setTags(tags: TagResponse[]): Promise<void | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{ tags: TagResponse[], }, void>("set_tags", { tags: tags });
+    let tries = 10;
 
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
-    };
+    const wrapper: () => Promise<any> = async () => {
+      if (PythonInterop.serverAPI) {
+        let result = await PythonInterop.serverAPI.callPluginMethod<{ tags: TagResponse[], }, void>("set_tags", { tags: tags });
+    
+        if (result.success) {
+          return result.result;
+        } else {
+          return new Error(result.result);
+        }
+      } else if (tries > 0) {
+        tries--;
+        await sleep(1000);
+        return await wrapper();
+      } else {
+        return new Error(`Unable to set friends after ${tries} attempts!`);
+      }
+    }
+
+    return await wrapper();
   }
 
   /**
@@ -146,13 +172,27 @@ export class PythonInterop {
    * @returns A promise resolving to whether or not the friends were successfully set.
    */
   static async setFriends(friends: FriendEntry[]): Promise<void | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{ friends: FriendEntry[], }, void>("set_friends", { friends: friends });
+    let tries = 10;
 
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
-    };
+    const wrapper: () => Promise<any> = async () => {
+      if (PythonInterop.serverAPI) {
+        let result = await PythonInterop.serverAPI.callPluginMethod<{ friends: FriendEntry[], }, void>("set_friends", { friends: friends });
+
+        if (result.success) {
+          return result.result;
+        } else {
+          return new Error(result.result);
+        }
+      } else if (tries > 0) {
+        tries--;
+        await sleep(1000);
+        return await wrapper();
+      } else {
+        return new Error(`Unable to set friends after ${tries} attempts!`);
+      }
+    }
+
+    return await wrapper();
   }
 
   /**
@@ -164,14 +204,28 @@ export class PythonInterop {
     const serializedGames = Object.fromEntries(Array.from(friendsGames.entries()).map(([id, gamesOwned]) => {
       return [id.toString(), gamesOwned];
     }));
+    
+    let tries = 10;
 
-    let result = await PythonInterop.serverAPI.callPluginMethod<{ friends_games: { [id: string ]: number[] }, }, void>("set_friends_games", { friends_games: serializedGames });
+    const wrapper: () => Promise<any> = async () => {
+      if (PythonInterop.serverAPI) {
+        let result = await PythonInterop.serverAPI.callPluginMethod<{ friends_games: { [id: string ]: number[] }, }, void>("set_friends_games", { friends_games: serializedGames });
 
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
-    };
+        if (result.success) {
+          return result.result;
+        } else {
+          return new Error(result.result);
+        }
+      } else if (tries > 0) {
+        tries--;
+        await sleep(1000);
+        return await wrapper();
+      } else {
+        return new Error(`Unable to set friends games after ${tries} attempts!`);
+      }
+    }
+
+    return await wrapper();
   }
 
   /**
