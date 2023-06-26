@@ -128,7 +128,7 @@ jobs:
             // * once finished, make folder with all files in includeInBuild
             const bundleWrapperPath = path.join(cwdPath, "bundle");
             const bundlePath = path.join(bundleWrapperPath, "TabMaster");
-            fs.mkdirSync(bundlePath, { resursive: true });
+            fs.mkdirSync(bundlePath, { recursive: true });
             fs.mkdirSync(path.join(bundlePath, "dist"));
 
             for (const fileToInclude of includeInBuild) {
