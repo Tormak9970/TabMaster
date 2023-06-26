@@ -1,4 +1,6 @@
 import { sleep } from 'decky-frontend-lib';
+import { FilterType, TabFilterSettings } from "../components/filters/Filters";
+import { defaultTabsSettings } from "../state/TabMasterManager";
 
 /**
  * Waits for a condition to be true.
@@ -48,4 +50,21 @@ export function getSteamIdFromParts(low: number, high: number): bigint {
  */
 export function getNonBigIntUserId(low: number, high: number): number {
   return Number(getSteamIdFromParts(low, high) - 76561197960265728n);
+}
+
+/**
+ * Validates that the tabs adhere to the expected structure.
+ * @param tabs The tabs to check.
+ * @returns True if there were no issues.
+ */
+export function validateTabs(tabs: TabSettingsDictionary): boolean {
+  return Object.values(tabs).every((tab: TabSettings) => {
+    if (tab.filters) {
+      return tab.filters.every((filter: any) => {
+        return (filter as TabFilterSettings<FilterType>).type !== undefined
+      });
+    } else {
+      return Object.keys(defaultTabsSettings).includes(tab.id);
+    }
+  });
 }
