@@ -76,7 +76,7 @@ export class TabMasterManager {
 
       // console.log("We reacted to user collection changes!");
       const userHadFavorites = this.userHasFavorites;
-      const userHadSoundtracks = this.userHasFavorites;
+      const userHadSoundtracks = this.userHasSoundtracks;
       const favoritesCollection = collectionStore.GetCollection("favorite");
       const soundtracksCollection = collectionStore.GetCollection('type-music');
       const installedCollection = collectionStore.GetCollection("local-install");
@@ -430,7 +430,7 @@ export class TabMasterManager {
       favoritesOriginalIndex = tabsSettings.Favorites.position
       delete tabsSettings['Favorites']
     }
-    if (tabsSettings.Soundtracks && !this.userHasFavorites) {
+    if (tabsSettings.Soundtracks && !this.userHasSoundtracks) {
       soundtracksOriginalIndex = tabsSettings.Soundtracks.position
       delete tabsSettings['Soundtracks']
     }
