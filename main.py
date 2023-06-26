@@ -20,7 +20,7 @@ class Plugin:
   tabs: Dict[str, dict] = None
   tags: List[dict] = None
   friends: List[dict] = None
-  friends_games: Dict[int, List[int]] = None
+  friends_games: Dict[str, List[int]] = None
 
   settings: SettingsManager
 
@@ -94,7 +94,7 @@ class Plugin:
     Plugin.friends = friends
     await Plugin.set_setting(self, "friends", Plugin.friends)
 
-  async def set_friends_games(self, friends_games: Dict[int, List[int]]):
+  async def set_friends_games(self, friends_games: Dict[str, List[int]]):
     Plugin.friends_games = friends_games
     await Plugin.set_setting(self, "friendsGames", Plugin.friends_games)
 

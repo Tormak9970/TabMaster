@@ -203,6 +203,8 @@ export class TabMasterManager {
         string: entry.value
       }
     });
+
+    PythonInterop.setTags(this.allStoreTags);
   }
 
   /**
@@ -220,11 +222,15 @@ export class TabMasterManager {
       }
     });
 
+    PythonInterop.setFriends(this.currentUsersFriends);
+
     Promise.all(this.currentUsersFriends.map((friend: FriendEntry) => {
       friendStore.FetchOwnedGames(friend.steamid).then((res) => {
         this.friendsGameMap.set(friend.steamid, Array.from(res.m_apps));
       });
     })).then(() => {
+      PythonInterop.setFriendGames(this.friendsGameMap);
+
       if (!this.hasLoaded) return;
 
       const listOfBadFriends: Set<number> = new Set();
@@ -360,9 +366,37 @@ export class TabMasterManager {
    */
   loadTabs = async () => {
     const settings = await PythonInterop.getTabs();
+    //* We don't need to wait for these, as if we get the store ones, we don't care about them
+    PythonInterop.getTags().then((res: TagResponse[] | Error) => {
+      if (res instanceof Error){
+        console.log("TabMaster couldn't load tags settings");
+      } else {
+        if (this.allStoreTags.length === 0) {
+          this.allStoreTags = res;
+        }
+      }
+    });
+    PythonInterop.getFriends().then((res: FriendEntry[] | Error) => {
+      if (res instanceof Error){
+        console.log("TabMaster couldn't load friends settings");
+      } else {
+        if (this.currentUsersFriends.length === 0) {
+          this.currentUsersFriends = res;
+        }
+      }
+    });
+    PythonInterop.getFriendsGames().then((res: Map<number, number[]> | Error) => {
+      if (res instanceof Error){
+        console.log("TabMaster couldn't load friends games settings");
+      } else {
+        if (this.friendsGameMap.size === 0) {
+          this.friendsGameMap = res;
+        }
+      }
+    });
 
     if (settings instanceof Error) {
-      console.log("Tab Master couldn't load tab settings");
+      console.log("TabMaster couldn't load tab settings");
       return;
     }
 
