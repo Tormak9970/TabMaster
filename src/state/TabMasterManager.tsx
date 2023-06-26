@@ -371,10 +371,10 @@ export class TabMasterManager {
     const hiddenTabContainers: TabContainer[] = [];
     const favoritesCollection = collectionStore.GetCollection("favorite");
     this.userHasFavorites = favoritesCollection && favoritesCollection.allApps.length > 0
-    let favortitesOriginalIndex = null
+    let favoritesOriginalIndex = null
 
     if (tabsSettings.Favorites && !this.userHasFavorites) {
-      favortitesOriginalIndex = tabsSettings.Favorites.position
+      favoritesOriginalIndex = tabsSettings.Favorites.position
       delete tabsSettings['Favorites']
     }
 
@@ -382,7 +382,7 @@ export class TabMasterManager {
       const { id, title, filters, position } = tabsSettings[keyId];
       const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters) : this.addDefaultTabContainer(tabsSettings[keyId]);
 
-      if (favortitesOriginalIndex !== null && favortitesOriginalIndex > -1 && tabContainer.position > favortitesOriginalIndex) {
+      if (favoritesOriginalIndex !== null && favoritesOriginalIndex > -1 && tabContainer.position > favoritesOriginalIndex) {
         tabContainer.position--
       }
       tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer);
