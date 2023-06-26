@@ -58,6 +58,7 @@ export class TabMasterManager {
   private friendsGameMap: Map<number, number[]> = new Map();
   private allStoreTags: TagResponse[] = [];
   private userHasFavorites: boolean = false;
+  private userHasSoundtracks: boolean = false;
 
   public eventBus = new EventTarget();
   private collectionLengths: { [collectionId: string]: number } = {}
@@ -75,20 +76,35 @@ export class TabMasterManager {
 
       // console.log("We reacted to user collection changes!");
       const userHadFavorites = this.userHasFavorites;
+      const userHadSoundtracks = this.userHasFavorites;
       const favoritesCollection = collectionStore.GetCollection("favorite");
-      const installedCollection = userCollections.find((collection) => collection.id === "local-install");
+      const soundtracksCollection = collectionStore.GetCollection('type-music');
+      const installedCollection = collectionStore.GetCollection("local-install");
 
       let depsToRebuild: string[] = [];
 
-      if (!userHadFavorites && favoritesCollection && favoritesCollection.allApps.length !== 0) {
+      //* react to favorites visibility change
+      if (!userHadFavorites && favoritesCollection && favoritesCollection.visibleApps.length !== 0) {
         this.userHasFavorites = true;
         const favoriteTabContainer = { ...defaultTabsSettings.Favorites, position: this.visibleTabsList.length };
         this.visibleTabsList.push(this.addDefaultTabContainer(favoriteTabContainer));
         this.updateAndSave();
       }
-      if (userHadFavorites && (!favoritesCollection || favoritesCollection.allApps.length === 0)) {
+      if (userHadFavorites && (!favoritesCollection || favoritesCollection.visibleApps.length === 0)) {
         this.userHasFavorites = false;
         this.deleteTab('Favorites');
+      }
+      
+      //* react to soundtracks visibility change
+      if (!userHadSoundtracks && soundtracksCollection && soundtracksCollection.visibleApps.length !== 0) {
+        this.userHasSoundtracks = true;
+        const soundtrackTabContainer = { ...defaultTabsSettings.Soundtracks, position: this.visibleTabsList.length };
+        this.visibleTabsList.push(this.addDefaultTabContainer(soundtrackTabContainer));
+        this.updateAndSave();
+      }
+      if (userHadSoundtracks && (!soundtracksCollection || soundtracksCollection.visibleApps.length === 0)) {
+        this.userHasSoundtracks = false;
+        this.deleteTab('Soundtracks');
       }
 
       //* check if contents of any collection changed
@@ -370,12 +386,19 @@ export class TabMasterManager {
     const visibleTabContainers: TabContainer[] = [];
     const hiddenTabContainers: TabContainer[] = [];
     const favoritesCollection = collectionStore.GetCollection("favorite");
-    this.userHasFavorites = favoritesCollection && favoritesCollection.allApps.length > 0
+    const soundtracksCollection = collectionStore.GetCollection('type-music');
+    this.userHasFavorites = favoritesCollection && favoritesCollection.visibleApps.length > 0
+    this.userHasSoundtracks = soundtracksCollection && soundtracksCollection.visibleApps.length > 0
     let favoritesOriginalIndex = null
+    let soundtracksOriginalIndex = null
 
     if (tabsSettings.Favorites && !this.userHasFavorites) {
       favoritesOriginalIndex = tabsSettings.Favorites.position
       delete tabsSettings['Favorites']
+    }
+    if (tabsSettings.Soundtracks && !this.userHasFavorites) {
+      soundtracksOriginalIndex = tabsSettings.Soundtracks.position
+      delete tabsSettings['Soundtracks']
     }
 
     for (const keyId in tabsSettings) {
@@ -383,6 +406,9 @@ export class TabMasterManager {
       const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters) : this.addDefaultTabContainer(tabsSettings[keyId]);
 
       if (favoritesOriginalIndex !== null && favoritesOriginalIndex > -1 && tabContainer.position > favoritesOriginalIndex) {
+        tabContainer.position--
+      }
+      if (soundtracksOriginalIndex !== null && soundtracksOriginalIndex > -1 && tabContainer.position > soundtracksOriginalIndex) {
         tabContainer.position--
       }
       tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer);
