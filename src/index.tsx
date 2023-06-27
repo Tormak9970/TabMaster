@@ -117,10 +117,10 @@ const Content: VFC<{}> = ({ }) => {
 
 export default definePlugin((serverAPI: ServerAPI) => {
   let patch: RoutePatch;
-  const tabMasterManager = new TabMasterManager();
   
-  PluginController.setup(serverAPI, tabMasterManager);
   PythonInterop.setServer(serverAPI);
+  const tabMasterManager = new TabMasterManager();
+  PluginController.setup(serverAPI, tabMasterManager);
 
   const loginUnregisterer = PluginController.initOnLogin(async () => {
     await tabMasterManager.loadTabs();

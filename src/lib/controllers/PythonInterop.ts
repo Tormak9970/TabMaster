@@ -1,4 +1,4 @@
-import { ServerAPI, sleep } from "decky-frontend-lib";
+import { ServerAPI } from "decky-frontend-lib";
 import { validateTabs } from "../Utils";
 
 /**
@@ -62,7 +62,7 @@ export class PythonInterop {
         PythonInterop.toast("Error", "Config corrupted, please restart.");
         return {};
       }
-  
+
       return result.result;
     } else {
       return new Error(result.result);
@@ -82,7 +82,7 @@ export class PythonInterop {
       return new Error(result.result);
     }
   }
-  
+
   /**
    * Gets the cached user friends.
    * @returns The cached user friends.
@@ -96,7 +96,7 @@ export class PythonInterop {
       return new Error(result.result);
     }
   }
-  
+
   /**
    * Gets the cached friends games.
    * @returns The cached friends games.
@@ -108,7 +108,7 @@ export class PythonInterop {
       const adjustedGames: [number, number[]][] = Object.entries(result.result).map(([id, ownedGames]) => {
         return [parseInt(id), ownedGames];
       });
-  
+
       return new Map<number, number[]>(adjustedGames);
     } else {
       return new Error(result.result);
@@ -143,27 +143,13 @@ export class PythonInterop {
    * @returns A promise resolving to whether or not the tags were successfully set.
    */
   static async setTags(tags: TagResponse[]): Promise<void | Error> {
-    let tries = 10;
+    let result = await PythonInterop.serverAPI.callPluginMethod<{ tags: TagResponse[], }, void>("set_tags", { tags: tags });
 
-    const wrapper: () => Promise<any> = async () => {
-      if (PythonInterop.serverAPI) {
-        let result = await PythonInterop.serverAPI.callPluginMethod<{ tags: TagResponse[], }, void>("set_tags", { tags: tags });
-    
-        if (result.success) {
-          return result.result;
-        } else {
-          return new Error(result.result);
-        }
-      } else if (tries > 0) {
-        tries--;
-        await sleep(1000);
-        return await wrapper();
-      } else {
-        return new Error(`Unable to set friends after ${tries} attempts!`);
-      }
-    }
-
-    return await wrapper();
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    };
   }
 
   /**
@@ -172,27 +158,13 @@ export class PythonInterop {
    * @returns A promise resolving to whether or not the friends were successfully set.
    */
   static async setFriends(friends: FriendEntry[]): Promise<void | Error> {
-    let tries = 10;
+    let result = await PythonInterop.serverAPI.callPluginMethod<{ friends: FriendEntry[], }, void>("set_friends", { friends: friends });
 
-    const wrapper: () => Promise<any> = async () => {
-      if (PythonInterop.serverAPI) {
-        let result = await PythonInterop.serverAPI.callPluginMethod<{ friends: FriendEntry[], }, void>("set_friends", { friends: friends });
-
-        if (result.success) {
-          return result.result;
-        } else {
-          return new Error(result.result);
-        }
-      } else if (tries > 0) {
-        tries--;
-        await sleep(1000);
-        return await wrapper();
-      } else {
-        return new Error(`Unable to set friends after ${tries} attempts!`);
-      }
-    }
-
-    return await wrapper();
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    };
   }
 
   /**
@@ -204,28 +176,14 @@ export class PythonInterop {
     const serializedGames = Object.fromEntries(Array.from(friendsGames.entries()).map(([id, gamesOwned]) => {
       return [id.toString(), gamesOwned];
     }));
-    
-    let tries = 10;
 
-    const wrapper: () => Promise<any> = async () => {
-      if (PythonInterop.serverAPI) {
-        let result = await PythonInterop.serverAPI.callPluginMethod<{ friends_games: { [id: string ]: number[] }, }, void>("set_friends_games", { friends_games: serializedGames });
+    let result = await PythonInterop.serverAPI.callPluginMethod<{ friends_games: { [id: string]: number[] }, }, void>("set_friends_games", { friends_games: serializedGames });
 
-        if (result.success) {
-          return result.result;
-        } else {
-          return new Error(result.result);
-        }
-      } else if (tries > 0) {
-        tries--;
-        await sleep(1000);
-        return await wrapper();
-      } else {
-        return new Error(`Unable to set friends games after ${tries} attempts!`);
-      }
-    }
-
-    return await wrapper();
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    };
   }
 
   /**

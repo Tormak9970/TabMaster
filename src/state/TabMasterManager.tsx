@@ -57,7 +57,8 @@ export class TabMasterManager {
   private currentUsersFriends: FriendEntry[] = [];
   private friendsGameMap: Map<number, number[]> = new Map();
   private allStoreTags: TagResponse[] = [];
-  private userHasFavorites: boolean = false;
+  private userHasVisibleFavorites: boolean = false;
+  private userHasVisibleSoundtracks: boolean = false;
 
   public eventBus = new EventTarget();
   private collectionLengths: { [collectionId: string]: number } = {}
@@ -69,27 +70,21 @@ export class TabMasterManager {
     this.hasLoaded = false;
     this.tabsMap = new Map<string, TabContainer>();
 
+    //* subscribe to when visible favorites change
+    reaction(() => collectionStore.GetCollection('favorite').visibleApps.length, this.handleNumOfVisibleFavoritesChanged)
+
+    //*subscribe to when visible soundtracks change
+    reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged)
+
     //* subscribe to user collection updates
     reaction(() => collectionStore.userCollections, (userCollections: SteamCollection[]) => {
       if (!this.hasLoaded) return;
 
       // console.log("We reacted to user collection changes!");
-      const userHadFavorites = this.userHasFavorites;
-      const favoritesCollection = collectionStore.GetCollection("favorite");
-      const installedCollection = userCollections.find((collection) => collection.id === "local-install");
+
+      const installedCollection = collectionStore.GetCollection("local-install");
 
       let depsToRebuild: string[] = [];
-
-      if (!userHadFavorites && favoritesCollection && favoritesCollection.allApps.length !== 0) {
-        this.userHasFavorites = true;
-        const favoriteTabContainer = { ...defaultTabsSettings.Favorites, position: this.visibleTabsList.length };
-        this.visibleTabsList.push(this.addDefaultTabContainer(favoriteTabContainer));
-        this.updateAndSave();
-      }
-      if (userHadFavorites && (!favoritesCollection || favoritesCollection.allApps.length === 0)) {
-        this.userHasFavorites = false;
-        this.deleteTab('Favorites');
-      }
 
       //* check if contents of any collection changed
       for (const collection of userCollections) {
@@ -157,29 +152,8 @@ export class TabMasterManager {
       }
     }, { delay: 50 });
 
-    //* subscribe to hidden collection updates
-    reaction(() => collectionStore.GetCollection("hidden").allApps, (allApps: SteamAppOverview[]) => {
-      if (!this.hasLoaded) return;
-
-      // console.log("We reacted to hidden collection changes!");
-      let shouldRebuildCollections = false;
-
-      if (!allApps && this.collectionLengths["hidden"] !== 0) {
-        this.collectionLengths["hidden"] = 0;
-        shouldRebuildCollections = true;
-      } else if (this.collectionLengths["hidden"] != allApps.length) {
-        this.collectionLengths["hidden"] = allApps.length;
-        shouldRebuildCollections = true;
-      }
-
-      if (shouldRebuildCollections) {
-        this.visibleTabsList.forEach((tabContainer) => {
-          if (tabContainer.filters && tabContainer.filters.length !== 0) {
-            (tabContainer as CustomTabContainer).buildCollection();
-          }
-        });
-      }
-    }, { delay: 50 });
+    //* subscribe to game hide or show
+    reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.handleGameHideOrShow, { delay: 50 });
 
     //* subscribe to user's friendlist updates
     reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
@@ -190,6 +164,45 @@ export class TabMasterManager {
     reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 });
 
     this.storeTagReaction(appStore.m_mapStoreTagLocalization);
+  }
+
+  private handleNumOfVisibleFavoritesChanged = (numOfVisibleFavorites: number) => {
+    if (!this.hasLoaded) return;
+    const userHadVisibleFavorites = this.userHasVisibleFavorites;
+    if (!userHadVisibleFavorites && numOfVisibleFavorites !== 0) {
+      this.userHasVisibleFavorites = true;
+      const favoriteTabContainer = { ...defaultTabsSettings.Favorites, position: this.visibleTabsList.length };
+      this.visibleTabsList.push(this.addDefaultTabContainer(favoriteTabContainer));
+      this.updateAndSave();
+    }
+    if (userHadVisibleFavorites && numOfVisibleFavorites === 0) {
+      this.userHasVisibleFavorites = false;
+      this.deleteTab('Favorites');
+    }
+  }
+
+  private handleNumOfVisibleSoundtracksChanged = (numOfVisibleSoundtracks: number) => {
+    if (!this.hasLoaded) return;
+    const userHadVisibleSoundtracks = this.userHasVisibleSoundtracks;
+    if (!userHadVisibleSoundtracks && numOfVisibleSoundtracks !== 0) {
+      this.userHasVisibleSoundtracks = true;
+      const soundtrackTabContainer = { ...defaultTabsSettings.Soundtracks, position: this.visibleTabsList.length };
+      this.visibleTabsList.push(this.addDefaultTabContainer(soundtrackTabContainer));
+      this.updateAndSave();
+    }
+    if (userHadVisibleSoundtracks && numOfVisibleSoundtracks === 0) {
+      this.userHasVisibleSoundtracks = false;
+      this.deleteTab('Soundtracks');
+    }
+  }
+
+  private handleGameHideOrShow = () => {
+    if (!this.hasLoaded) return;
+      this.visibleTabsList.forEach((tabContainer) => {
+        if (tabContainer.filters && tabContainer.filters.length !== 0) {
+          (tabContainer as CustomTabContainer).buildCollection();
+        }
+      })
   }
 
   /**
@@ -338,13 +351,26 @@ export class TabMasterManager {
    * @param tabId The id of the tab to delete.
    */
   deleteTab(tabId: string) {
-    let tabContainer = this.tabsMap.get(tabId)!;
+    const tabContainer = this.tabsMap.get(tabId)!;
 
-    const tabsArrayToRemoveFrom = tabContainer.position > -1 ? this.visibleTabsList : this.hiddenTabsList;
-    const index = tabContainer.position > -1 ? tabContainer.position : this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer);
+    let tabsArrayToRemoveFrom: TabContainer[];
+    let updateIndexes = false;
+    let index: number
 
+    if (tabContainer.position > -1) {
+      tabsArrayToRemoveFrom = this.visibleTabsList;
+      index = tabContainer.position;
+      updateIndexes = true;
+    } else {
+      tabsArrayToRemoveFrom = this.hiddenTabsList;
+      index = this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer);
+    }
     tabsArrayToRemoveFrom.splice(index, 1);
-
+    if (updateIndexes) {
+      for (let i = index; i < this.visibleTabsList.length; i++) {
+        this.visibleTabsList[i].position--;
+      }
+    }
     this.tabsMap.delete(tabId);
     this.updateAndSave();
   }
@@ -368,7 +394,7 @@ export class TabMasterManager {
     const settings = await PythonInterop.getTabs();
     //* We don't need to wait for these, as if we get the store ones, we don't care about them
     PythonInterop.getTags().then((res: TagResponse[] | Error) => {
-      if (res instanceof Error){
+      if (res instanceof Error) {
         console.log("TabMaster couldn't load tags settings");
       } else {
         if (this.allStoreTags.length === 0) {
@@ -377,7 +403,7 @@ export class TabMasterManager {
       }
     });
     PythonInterop.getFriends().then((res: FriendEntry[] | Error) => {
-      if (res instanceof Error){
+      if (res instanceof Error) {
         console.log("TabMaster couldn't load friends settings");
       } else {
         if (this.currentUsersFriends.length === 0) {
@@ -386,7 +412,7 @@ export class TabMasterManager {
       }
     });
     PythonInterop.getFriendsGames().then((res: Map<number, number[]> | Error) => {
-      if (res instanceof Error){
+      if (res instanceof Error) {
         console.log("TabMaster couldn't load friends games settings");
       } else {
         if (this.friendsGameMap.size === 0) {
@@ -404,12 +430,19 @@ export class TabMasterManager {
     const visibleTabContainers: TabContainer[] = [];
     const hiddenTabContainers: TabContainer[] = [];
     const favoritesCollection = collectionStore.GetCollection("favorite");
-    this.userHasFavorites = favoritesCollection && favoritesCollection.allApps.length > 0
+    const soundtracksCollection = collectionStore.GetCollection('type-music');
+    this.userHasVisibleFavorites = favoritesCollection && favoritesCollection.visibleApps.length > 0
+    this.userHasVisibleSoundtracks = soundtracksCollection && soundtracksCollection.visibleApps.length > 0
     let favoritesOriginalIndex = null
+    let soundtracksOriginalIndex = null
 
-    if (tabsSettings.Favorites && !this.userHasFavorites) {
+    if (tabsSettings.Favorites && !this.userHasVisibleFavorites) {
       favoritesOriginalIndex = tabsSettings.Favorites.position
       delete tabsSettings['Favorites']
+    }
+    if (tabsSettings.Soundtracks && !this.userHasVisibleSoundtracks) {
+      soundtracksOriginalIndex = tabsSettings.Soundtracks.position
+      delete tabsSettings['Soundtracks']
     }
 
     for (const keyId in tabsSettings) {
@@ -417,6 +450,9 @@ export class TabMasterManager {
       const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters) : this.addDefaultTabContainer(tabsSettings[keyId]);
 
       if (favoritesOriginalIndex !== null && favoritesOriginalIndex > -1 && tabContainer.position > favoritesOriginalIndex) {
+        tabContainer.position--
+      }
+      if (soundtracksOriginalIndex !== null && soundtracksOriginalIndex > -1 && tabContainer.position > soundtracksOriginalIndex) {
         tabContainer.position--
       }
       tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer);
