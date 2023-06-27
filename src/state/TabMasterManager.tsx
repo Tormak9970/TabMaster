@@ -81,7 +81,7 @@ export class TabMasterManager {
       if (!this.hasLoaded) return;
 
       // console.log("We reacted to user collection changes!");
-      
+
       const installedCollection = collectionStore.GetCollection("local-install");
 
       let depsToRebuild: string[] = [];
@@ -168,7 +168,7 @@ export class TabMasterManager {
 
   private handleNumOfVisibleFavoritesChanged = (numOfVisibleFavorites: number) => {
     if (!this.hasLoaded) return;
-    const userHadVisibleFavorites = this.userHasVisibleFavorites
+    const userHadVisibleFavorites = this.userHasVisibleFavorites;
     if (!userHadVisibleFavorites && numOfVisibleFavorites !== 0) {
       this.userHasVisibleFavorites = true;
       const favoriteTabContainer = { ...defaultTabsSettings.Favorites, position: this.visibleTabsList.length };
@@ -183,7 +183,7 @@ export class TabMasterManager {
 
   private handleNumOfVisibleSoundtracksChanged = (numOfVisibleSoundtracks: number) => {
     if (!this.hasLoaded) return;
-    const userHadVisibleSoundtracks = this.userHasVisibleSoundtracks
+    const userHadVisibleSoundtracks = this.userHasVisibleSoundtracks;
     if (!userHadVisibleSoundtracks && numOfVisibleSoundtracks !== 0) {
       this.userHasVisibleSoundtracks = true;
       const soundtrackTabContainer = { ...defaultTabsSettings.Soundtracks, position: this.visibleTabsList.length };
@@ -197,12 +197,12 @@ export class TabMasterManager {
   }
 
   private handleGameHideOrShow = () => {
-    if(!this.hasLoaded)
-    this.visibleTabsList.forEach((tabContainer) => {
-      if (tabContainer.filters && tabContainer.filters.length !== 0) {
-        (tabContainer as CustomTabContainer).buildCollection();
-      }
-    })
+    if (!this.hasLoaded) return;
+      this.visibleTabsList.forEach((tabContainer) => {
+        if (tabContainer.filters && tabContainer.filters.length !== 0) {
+          (tabContainer as CustomTabContainer).buildCollection();
+        }
+      })
   }
 
   /**
@@ -351,13 +351,26 @@ export class TabMasterManager {
    * @param tabId The id of the tab to delete.
    */
   deleteTab(tabId: string) {
-    let tabContainer = this.tabsMap.get(tabId)!;
+    const tabContainer = this.tabsMap.get(tabId)!;
 
-    const tabsArrayToRemoveFrom = tabContainer.position > -1 ? this.visibleTabsList : this.hiddenTabsList;
-    const index = tabContainer.position > -1 ? tabContainer.position : this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer);
+    let tabsArrayToRemoveFrom: TabContainer[];
+    let updateIndexes = false;
+    let index: number
 
+    if (tabContainer.position > -1) {
+      tabsArrayToRemoveFrom = this.visibleTabsList;
+      index = tabContainer.position;
+      updateIndexes = true;
+    } else {
+      tabsArrayToRemoveFrom = this.hiddenTabsList;
+      index = this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer);
+    }
     tabsArrayToRemoveFrom.splice(index, 1);
-
+    if (updateIndexes) {
+      for (let i = index; i < this.visibleTabsList.length; i++) {
+        this.visibleTabsList[i].position--;
+      }
+    }
     this.tabsMap.delete(tabId);
     this.updateAndSave();
   }
