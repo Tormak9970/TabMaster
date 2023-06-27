@@ -111,43 +111,19 @@ export class TabMasterManager {
 
   /**
    * Handles the installed/uninstalled reaction.
-   * @param numOfInstalled The number of installed games.
    */
-  private handleNumOfInstalledChanged(numOfInstalled: number) {
+  private handleNumOfInstalledChanged() {
     if (!this.hasLoaded) return;
 
-    let shouldRebuildUninstalled = false;
-    let shouldRebuildInstalled = false;
+    this.visibleTabsList.forEach((tabContainer) => {
+      if (tabContainer.filters && tabContainer.filters.length !== 0) {
+        const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
 
-    if (this.collectionLengths["installed"] > numOfInstalled) {
-      this.collectionLengths["installed"] = numOfInstalled;
-      shouldRebuildUninstalled = true;
-    } else if (this.collectionLengths["installed"] < numOfInstalled) {
-      this.collectionLengths["installed"] = numOfInstalled;
-      shouldRebuildInstalled = true;
-    }
-
-    if (shouldRebuildInstalled) {
-      this.visibleTabsList.forEach((tabContainer) => {
-        if (tabContainer.filters && tabContainer.filters.length !== 0) {
-          const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
-
-          if (collectionFilters.some((filter: TabFilterSettings<"installed">) => filter.params.installed)) {
-            (tabContainer as CustomTabContainer).buildCollection();
-          }
+        if (collectionFilters.some((filter: TabFilterSettings<"installed">) => filter.params.installed)) {
+          (tabContainer as CustomTabContainer).buildCollection();
         }
-      });
-    } else if (shouldRebuildUninstalled) {
-      this.visibleTabsList.forEach((tabContainer) => {
-        if (tabContainer.filters && tabContainer.filters.length !== 0) {
-          const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
-
-          if (collectionFilters.some((filter: TabFilterSettings<"installed">) => !filter.params.installed)) {
-            (tabContainer as CustomTabContainer).buildCollection();
-          }
-        }
-      });
-    }
+      }
+    });
   }
 
   /**
