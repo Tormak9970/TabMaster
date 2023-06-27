@@ -4,45 +4,7 @@ import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { v4 as uuidv4 } from "uuid";
 import { IReactionDisposer, reaction } from "mobx"
-import { getNonBigIntUserId } from "../lib/Utils";
-
-export const defaultTabsSettings: TabSettingsDictionary = {
-  DeckGames: {
-    id: "DeckGames",
-    title: "Great On Deck",
-    position: 0,
-  },
-  AllGames: {
-    id: "AllGames",
-    title: "All Games",
-    position: 1,
-  },
-  Installed: {
-    id: "Installed",
-    title: "Installed",
-    position: 2,
-  },
-  Favorites: {
-    id: "Favorites",
-    title: "Favorites",
-    position: 3,
-  },
-  Collections: {
-    id: "Collections",
-    title: "Collections",
-    position: 4,
-  },
-  DesktopApps: {
-    id: "DesktopApps",
-    title: "Non-Steam",
-    position: 5,
-  },
-  Soundtracks: {
-    id: "Soundtracks",
-    title: "Soundtracks",
-    position: 6,
-  }
-}
+import { defaultTabsSettings, getNonBigIntUserId } from "../lib/Utils";
 
 /**
  * Class that handles TabMaster's core state.
