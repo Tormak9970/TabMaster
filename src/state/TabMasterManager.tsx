@@ -71,18 +71,19 @@ export class TabMasterManager {
     this.tabsMap = new Map<string, TabContainer>();
 
     //* subscribe to when visible favorites change
-    reaction(() => collectionStore.GetCollection('favorite').visibleApps.length, this.handleNumOfVisibleFavoritesChanged)
+    reaction(() => collectionStore.GetCollection('favorite').visibleApps.length, this.handleNumOfVisibleFavoritesChanged);
 
     //*subscribe to when visible soundtracks change
-    reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged)
+    reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged);
+
+    //*subscribe to when installed games change
+    reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.handleNumOfInstalledChanged);
 
     //* subscribe to user collection updates
     reaction(() => collectionStore.userCollections, (userCollections: SteamCollection[]) => {
       if (!this.hasLoaded) return;
 
       // console.log("We reacted to user collection changes!");
-
-      const installedCollection = collectionStore.GetCollection("local-install");
 
       let depsToRebuild: string[] = [];
 
@@ -94,51 +95,9 @@ export class TabMasterManager {
         }
       }
 
-      let shouldRebuildUninstalled = false;
-      let shouldRebuildInstalled = false;
-
-      if (installedCollection) {
-        if (this.collectionLengths["installed"] > installedCollection.allApps.length) {
-          this.collectionLengths["installed"] = installedCollection.allApps.length;
-          shouldRebuildUninstalled = true;
-        } else if (this.collectionLengths["installed"] < installedCollection.allApps.length) {
-          this.collectionLengths["installed"] = installedCollection.allApps.length;
-          shouldRebuildInstalled = true;
-        }
-      } else {
-        //? This is here for when valve inevitably changes the collection's id.
-        console.error("Installed collection should always exists!!");
-      }
-
-      const tabsAlreadyBuilt: string[] = [];
-
-      if (shouldRebuildInstalled) {
-        this.visibleTabsList.forEach((tabContainer) => {
-          if (tabContainer.filters && tabContainer.filters.length !== 0) {
-            const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
-
-            if (collectionFilters.some((filter: TabFilterSettings<"installed">) => filter.params.installed)) {
-              (tabContainer as CustomTabContainer).buildCollection();
-              tabsAlreadyBuilt.push(tabContainer.id);
-            }
-          }
-        });
-      } else if (shouldRebuildUninstalled) {
-        this.visibleTabsList.forEach((tabContainer) => {
-          if (tabContainer.filters && tabContainer.filters.length !== 0) {
-            const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
-
-            if (collectionFilters.some((filter: TabFilterSettings<"installed">) => !filter.params.installed)) {
-              (tabContainer as CustomTabContainer).buildCollection();
-              tabsAlreadyBuilt.push(tabContainer.id);
-            }
-          }
-        });
-      }
-
       if (depsToRebuild.length !== 0) {
         this.visibleTabsList.forEach((tabContainer) => {
-          if (tabContainer.filters && tabContainer.filters.length !== 0 && !tabsAlreadyBuilt.includes(tabContainer.id)) {
+          if (tabContainer.filters && tabContainer.filters.length !== 0) {
             const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "collection").map((collectionFilter) => collectionFilter.params.collection);
 
             for (const collectionUpdated of depsToRebuild) {
@@ -166,43 +125,102 @@ export class TabMasterManager {
     this.storeTagReaction(appStore.m_mapStoreTagLocalization);
   }
 
-  private handleNumOfVisibleFavoritesChanged = (numOfVisibleFavorites: number) => {
+  /**
+   * Handles the installed/uninstalled reaction.
+   * @param numOfInstalled The number of installed games.
+   */
+  private handleNumOfInstalledChanged(numOfInstalled: number) {
     if (!this.hasLoaded) return;
+
+    let shouldRebuildUninstalled = false;
+    let shouldRebuildInstalled = false;
+
+    if (this.collectionLengths["installed"] > numOfInstalled) {
+      this.collectionLengths["installed"] = numOfInstalled;
+      shouldRebuildUninstalled = true;
+    } else if (this.collectionLengths["installed"] < numOfInstalled) {
+      this.collectionLengths["installed"] = numOfInstalled;
+      shouldRebuildInstalled = true;
+    }
+
+    if (shouldRebuildInstalled) {
+      this.visibleTabsList.forEach((tabContainer) => {
+        if (tabContainer.filters && tabContainer.filters.length !== 0) {
+          const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
+
+          if (collectionFilters.some((filter: TabFilterSettings<"installed">) => filter.params.installed)) {
+            (tabContainer as CustomTabContainer).buildCollection();
+          }
+        }
+      });
+    } else if (shouldRebuildUninstalled) {
+      this.visibleTabsList.forEach((tabContainer) => {
+        if (tabContainer.filters && tabContainer.filters.length !== 0) {
+          const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
+
+          if (collectionFilters.some((filter: TabFilterSettings<"installed">) => !filter.params.installed)) {
+            (tabContainer as CustomTabContainer).buildCollection();
+          }
+        }
+      });
+    }
+  }
+
+  /**
+   * Handles the favorites reaction.
+   * @param numOfVisibleFavorites The number of visible favorites.
+   */
+  private handleNumOfVisibleFavoritesChanged(numOfVisibleFavorites: number) {
+    if (!this.hasLoaded) return;
+
     const userHadVisibleFavorites = this.userHasVisibleFavorites;
+
     if (!userHadVisibleFavorites && numOfVisibleFavorites !== 0) {
       this.userHasVisibleFavorites = true;
       const favoriteTabContainer = { ...defaultTabsSettings.Favorites, position: this.visibleTabsList.length };
       this.visibleTabsList.push(this.addDefaultTabContainer(favoriteTabContainer));
       this.updateAndSave();
     }
+
     if (userHadVisibleFavorites && numOfVisibleFavorites === 0) {
       this.userHasVisibleFavorites = false;
       this.deleteTab('Favorites');
     }
   }
 
-  private handleNumOfVisibleSoundtracksChanged = (numOfVisibleSoundtracks: number) => {
+  /**
+   * Handles the soundtrack reaction.
+   * @param numOfVisibleSoundtracks The number of visible soundtracks.
+   */
+  private handleNumOfVisibleSoundtracksChanged(numOfVisibleSoundtracks: number) {
     if (!this.hasLoaded) return;
+
     const userHadVisibleSoundtracks = this.userHasVisibleSoundtracks;
+
     if (!userHadVisibleSoundtracks && numOfVisibleSoundtracks !== 0) {
       this.userHasVisibleSoundtracks = true;
       const soundtrackTabContainer = { ...defaultTabsSettings.Soundtracks, position: this.visibleTabsList.length };
       this.visibleTabsList.push(this.addDefaultTabContainer(soundtrackTabContainer));
       this.updateAndSave();
     }
+
     if (userHadVisibleSoundtracks && numOfVisibleSoundtracks === 0) {
       this.userHasVisibleSoundtracks = false;
       this.deleteTab('Soundtracks');
     }
   }
 
-  private handleGameHideOrShow = () => {
+  /**
+   * Handles the hidden collection reaction.
+   */
+  private handleGameHideOrShow() {
     if (!this.hasLoaded) return;
-      this.visibleTabsList.forEach((tabContainer) => {
-        if (tabContainer.filters && tabContainer.filters.length !== 0) {
-          (tabContainer as CustomTabContainer).buildCollection();
-        }
-      })
+
+    this.visibleTabsList.forEach((tabContainer) => {
+      if (tabContainer.filters && tabContainer.filters.length !== 0) {
+        (tabContainer as CustomTabContainer).buildCollection();
+      }
+    });
   }
 
   /**
