@@ -312,6 +312,7 @@ export class TabMasterManager {
    */
   showTab(tabId: string) {
     const tabContainer = this.tabsMap.get(tabId)!;
+    if(tabContainer.position > -1) return;
     const hiddenIndex = this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer);
 
     tabContainer.position = this.visibleTabsList.length;
