@@ -71,13 +71,13 @@ export class TabMasterManager {
     this.tabsMap = new Map<string, TabContainer>();
 
     //* subscribe to when visible favorites change
-    reaction(() => collectionStore.GetCollection('favorite').visibleApps.length, this.handleNumOfVisibleFavoritesChanged);
+    reaction(() => collectionStore.GetCollection('favorite').visibleApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this));
 
     //*subscribe to when visible soundtracks change
-    reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged);
+    reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged.bind(this));
 
     //*subscribe to when installed games change
-    reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.handleNumOfInstalledChanged);
+    reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.handleNumOfInstalledChanged.bind(this));
 
     //* subscribe to user collection updates
     reaction(() => collectionStore.userCollections, (userCollections: SteamCollection[]) => {
@@ -112,7 +112,7 @@ export class TabMasterManager {
     }, { delay: 50 });
 
     //* subscribe to game hide or show
-    reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.handleGameHideOrShow, { delay: 50 });
+    reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.handleGameHideOrShow.bind(this), { delay: 50 });
 
     //* subscribe to user's friendlist updates
     reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
@@ -127,43 +127,19 @@ export class TabMasterManager {
 
   /**
    * Handles the installed/uninstalled reaction.
-   * @param numOfInstalled The number of installed games.
    */
-  private handleNumOfInstalledChanged(numOfInstalled: number) {
+  private handleNumOfInstalledChanged() {
     if (!this.hasLoaded) return;
 
-    let shouldRebuildUninstalled = false;
-    let shouldRebuildInstalled = false;
+    this.visibleTabsList.forEach((tabContainer) => {
+      if (tabContainer.filters && tabContainer.filters.length !== 0) {
+        const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
 
-    if (this.collectionLengths["installed"] > numOfInstalled) {
-      this.collectionLengths["installed"] = numOfInstalled;
-      shouldRebuildUninstalled = true;
-    } else if (this.collectionLengths["installed"] < numOfInstalled) {
-      this.collectionLengths["installed"] = numOfInstalled;
-      shouldRebuildInstalled = true;
-    }
-
-    if (shouldRebuildInstalled) {
-      this.visibleTabsList.forEach((tabContainer) => {
-        if (tabContainer.filters && tabContainer.filters.length !== 0) {
-          const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
-
-          if (collectionFilters.some((filter: TabFilterSettings<"installed">) => filter.params.installed)) {
-            (tabContainer as CustomTabContainer).buildCollection();
-          }
+        if (collectionFilters.some((filter: TabFilterSettings<"installed">) => filter.params.installed)) {
+          (tabContainer as CustomTabContainer).buildCollection();
         }
-      });
-    } else if (shouldRebuildUninstalled) {
-      this.visibleTabsList.forEach((tabContainer) => {
-        if (tabContainer.filters && tabContainer.filters.length !== 0) {
-          const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
-
-          if (collectionFilters.some((filter: TabFilterSettings<"installed">) => !filter.params.installed)) {
-            (tabContainer as CustomTabContainer).buildCollection();
-          }
-        }
-      });
-    }
+      }
+    });
   }
 
   /**
