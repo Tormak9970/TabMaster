@@ -23,7 +23,6 @@ export class TabMasterManager {
   private userHasVisibleSoundtracks: boolean = false;
 
   public eventBus = new EventTarget();
-  private collectionLengths: { [collectionId: string]: number } = {};
 
   private favoriteReaction: IReactionDisposer | undefined;
   private soundtrackReaction: IReactionDisposer | undefined;
@@ -144,9 +143,8 @@ export class TabMasterManager {
   /**
    * Handles a general userCollection reaction.
    * @param collectionId The id of the collection.
-   * @param numOfIncluded The number of games in the collection.
    */
-  private handleUserCollectionLengthChange(collectionId: string, numOfIncluded: number) {
+  private handleUserCollectionLengthChange(collectionId: string) {
     if (!this.hasLoaded) return;
 
     // console.log("We reacted to user collection changes!");
@@ -380,8 +378,8 @@ export class TabMasterManager {
 
         if (!this.collectionReactions[collectionId]) {
           //* subscribe to user collection updates
-          this.collectionReactions[collectionId] = reaction(() => collectionStore.GetCollection(collectionId).allApps.length, (collectionLength: number) => {
-            this.handleUserCollectionLengthChange(collectionId, collectionLength);
+          this.collectionReactions[collectionId] = reaction(() => collectionStore.GetCollection(collectionId).allApps.length, () => {
+            this.handleUserCollectionLengthChange(collectionId);
           });
         }
       }
