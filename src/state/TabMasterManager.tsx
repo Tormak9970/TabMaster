@@ -25,15 +25,15 @@ export class TabMasterManager {
   public eventBus = new EventTarget();
   private collectionLengths: { [collectionId: string]: number } = {};
 
-  private favoriteReaction: IReactionDisposer;
-  private soundtrackReaction: IReactionDisposer;
-  private installedReaction: IReactionDisposer;
-  private hiddenReaction: IReactionDisposer;
+  private favoriteReaction: IReactionDisposer | undefined;
+  private soundtrackReaction: IReactionDisposer | undefined;
+  private installedReaction: IReactionDisposer | undefined;
+  private hiddenReaction: IReactionDisposer | undefined;
 
   private collectionReactions: { [collectionId: string]: IReactionDisposer } = {};
 
-  private friendsReaction: IReactionDisposer;
-  private tagsReaction: IReactionDisposer;
+  private friendsReaction: IReactionDisposer | undefined;
+  private tagsReaction: IReactionDisposer | undefined;
 
   /**
    * Creates a new TabMasterManager.
@@ -41,7 +41,9 @@ export class TabMasterManager {
   constructor() {
     this.hasLoaded = false;
     this.tabsMap = new Map<string, TabContainer>();
+  }
 
+  private initReactions(): void {
     //* subscribe to when visible favorites change
     this.favoriteReaction = reaction(() => collectionStore.GetCollection('favorite').visibleApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this));
 
@@ -414,6 +416,7 @@ export class TabMasterManager {
    * Loads the user's tabs from the backend.
    */
   loadTabs = async () => {
+    this.initReactions();
     const settings = await PythonInterop.getTabs();
     //* We don't need to wait for these, as if we get the store ones, we don't care about them
     PythonInterop.getTags().then((res: TagResponse[] | Error) => {
