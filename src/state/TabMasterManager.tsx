@@ -43,16 +43,16 @@ export class TabMasterManager {
     this.tabsMap = new Map<string, TabContainer>();
 
     //* subscribe to when visible favorites change
-    this.favoriteReaction = reaction(() => collectionStore.GetCollection('favorite').visibleApps.length, this.handleNumOfVisibleFavoritesChanged);
+    this.favoriteReaction = reaction(() => collectionStore.GetCollection('favorite').visibleApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this));
 
     //*subscribe to when visible soundtracks change
-    this.soundtrackReaction = reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged);
+    this.soundtrackReaction = reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged.bind(this));
 
     //*subscribe to when installed games change
-    this.installedReaction = reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.handleNumOfInstalledChanged);
+    this.installedReaction = reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.handleNumOfInstalledChanged.bind(this));
 
     //* subscribe to game hide or show
-    this.hiddenReaction = reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.handleGameHideOrShow, { delay: 50 });
+    this.hiddenReaction = reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.handleGameHideOrShow.bind(this), { delay: 50 });
 
     //* subscribe to user's friendlist updates
     this.friendsReaction = reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
