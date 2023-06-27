@@ -60,6 +60,7 @@ export class PluginController {
    * Function to run when the plugin dismounts.
    */
   static dismount(): void {
+    this.tabMasterManager.disposeReactions();
     LogController.log("PluginController dismounted.");
   }
 }
