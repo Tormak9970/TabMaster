@@ -1,10 +1,14 @@
 import {
+  Button,
   ButtonItem,
   ConfirmModal,
+  Dropdown,
   Field,
+  Focusable,
   PanelSection,
   PanelSectionRow,
-  TextField
+  TextField,
+  gamepadDialogClasses
 } from "decky-frontend-lib";
 import { useState, VFC, Fragment, useEffect } from "react";
 import { FilterType, TabFilterSettings } from "./filters/Filters";
@@ -48,17 +52,19 @@ type EditTabModalProps = {
   tabId?: string,
   tabTitle?: string,
   tabFilters: TabFilterSettings<FilterType>[],
-  tabMasterManager: TabMasterManager
+  tabMasterManager: TabMasterManager,
+  filtersMode: string
 }
 
 /**
  * The modal for editing and creating custom tabs.
  */
-export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager }) => {
+export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager, filtersMode }) => {
   const tabsMap: Map<string, TabContainer> = tabMasterManager.getTabs().tabsMap;
 
   const [name, setName] = useState<string>(tabTitle ?? '');
   const [filters, setFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
+  const [filterLogicMode, setFilterLogicMode] = useState<string>(filtersMode ?? 'and');
   const [canSave, setCanSave] = useState<boolean>(false);
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
 
@@ -161,9 +167,19 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
                 ) : (
                   <Fragment />
                 )}
-                <ButtonItem onClick={addFilter} disabled={!canAddFilter}>
-                  Add Filter
-                </ButtonItem>
+                <Field >
+                  <div style={{ textAlign: 'right' }}>Filter Combination Logic</div>
+                  <Focusable style={{ width: "100%", display: "flex", flexDirection: "row", marginBottom: "5px" }}>
+                    <div style={{ width: "calc(100% - 100px)" }}>
+                      <ButtonItem onClick={addFilter} disabled={!canAddFilter}>
+                        Add Filter
+                      </ButtonItem>
+                    </div>
+                    <div style={{ marginLeft: "10px", width: "90px", marginTop: '10px', marginBottom: '10px', display: 'flex' }}>
+                      <Dropdown rgOptions={[{ label: "And", data: "and" }, { label: "Or", data: "or" },]} selectedOption={filterLogicMode} onChange={option => setFilterLogicMode(option.data)} focusable={true} />
+                    </div>
+                  </Focusable>
+                </Field>
               </div>
             </PanelSectionRow>
           </PanelSection>

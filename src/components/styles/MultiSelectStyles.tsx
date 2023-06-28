@@ -25,6 +25,11 @@ export const MultiSelectStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .filter-params-input .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
         display: none
       }
+
+      .tab-master-modal-scope .add-filter-button .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
+        display: none
+      }
+
     `}</style>
   );
 }
