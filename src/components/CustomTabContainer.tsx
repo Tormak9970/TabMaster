@@ -22,6 +22,7 @@ export class CustomTabContainer implements TabContainer {
   position: number;
   filters: TabFilterSettings<FilterType>[];
   collection: Collection;
+  filtersMode: string;
   static TabContentTemplate: TabContentComponent;
 
   /**
@@ -31,12 +32,12 @@ export class CustomTabContainer implements TabContainer {
    * @param position The position of the tab.
    * @param filterSettingsList The tab's filters.
    */
-  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[]) {
+  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: string) {
     this.id = id;
     this.title = title;
     this.position = position;
     this.filters = filterSettingsList;
-
+    this.filtersMode = filtersMode;
     //@ts-ignore
     this.collection = {
       AsDeletableCollection: () => null,
@@ -96,7 +97,13 @@ export class CustomTabContainer implements TabContainer {
    */
   buildCollection() {
     if (this.position > -1) {
-      const appsList = collectionStore.appTypeCollectionMap.get('type-games')!.visibleApps.filter(appItem => this.filters.every(filterSettings => Filter.run(filterSettings, appItem)));
+      const appsList = collectionStore.appTypeCollectionMap.get('type-games')!.visibleApps.filter(appItem => {
+        if (this.filtersMode === 'and'){
+          return this.filters.every(filterSettings => Filter.run(filterSettings, appItem))
+        } else {
+          return this.filters.some(filterSettings => Filter.run(filterSettings, appItem))
+        }
+      });
 
       this.collection.allApps = appsList;
       this.collection.visibleApps = [...appsList];
@@ -114,9 +121,9 @@ export class CustomTabContainer implements TabContainer {
    * @param updatedTabInfo The updated tab settings.
    */
   update(updatedTabInfo: EditableTabSettings) {
-    const { filters, title } = updatedTabInfo;
+    const { filters, title, filtersMode } = updatedTabInfo;
     this.title = title;
-
+    this.filtersMode = filtersMode;
     this.filters = filters;
     this.buildCollection();
   }

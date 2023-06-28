@@ -1,5 +1,4 @@
 import {
-  Button,
   ButtonItem,
   ConfirmModal,
   Dropdown,
@@ -7,9 +6,7 @@ import {
   Focusable,
   PanelSection,
   PanelSectionRow,
-  TextField,
-  gamepadDialogClasses
-} from "decky-frontend-lib";
+  TextField} from "decky-frontend-lib";
 import { useState, VFC, Fragment, useEffect } from "react";
 import { FilterType, TabFilterSettings } from "./filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
@@ -22,6 +19,7 @@ import { FilterEntry } from "./filters/FilterEntry";
 export type EditableTabSettings = {
   title: string,
   filters: TabFilterSettings<any>[]
+  filtersMode: string
 }
 
 /**
@@ -43,11 +41,13 @@ function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
     case "whitelist":
     case "blacklist":
       return false
+    case "group":
+      return false
   }
 }
 
 type EditTabModalProps = {
-  closeModal: () => void,
+  closeModal?: () => void,
   onConfirm: (tabId: string | undefined, tabSettings: EditableTabSettings) => void,
   tabId?: string,
   tabTitle?: string,
@@ -64,7 +64,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
 
   const [name, setName] = useState<string>(tabTitle ?? '');
   const [filters, setFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
-  const [filterLogicMode, setFilterLogicMode] = useState<string>(filtersMode ?? 'and');
+  const [filterLogicMode, setFilterLogicMode] = useState<string>(filtersMode);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
 
@@ -91,9 +91,10 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
         const updated: EditableTabSettings = {
           title: name,
           filters: filters,
+          filtersMode: filterLogicMode
         };
         onConfirm(tabId, updated);
-        closeModal();
+        closeModal!();
       } else {
         PythonInterop.toast("Error", "A tab with that name already exists!");
       }
@@ -130,6 +131,13 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
               />
             </PanelSectionRow>
           </PanelSection>
+
+          {/**
+           * NOTE: I'd like to move this whole filters section out into it's own component as well because the plan
+           * is to reuse it for group boolean logic
+           * 
+           * From here...
+          */}
           <PanelSection title="Filters">
             <PanelSectionRow>
               {filters.map((filter, index) => {
@@ -183,6 +191,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
               </div>
             </PanelSectionRow>
           </PanelSection>
+          {/* ... to here  */}
         </ConfirmModal>
       </div>
     </TabMasterContextProvider>

@@ -360,9 +360,9 @@ export class TabMasterManager {
    * @param position The position of the tab.
    * @param filterSettingsList The list of filters for the tab.
    */
-  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[]) {
+  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: string) {
     const id = uuidv4();
-    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList));
+    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode));
     this.updateAndSave();
   }
 
@@ -447,8 +447,8 @@ export class TabMasterManager {
     }
 
     for (const keyId in tabsSettings) {
-      const { id, title, filters, position } = tabsSettings[keyId];
-      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters) : this.addDefaultTabContainer(tabsSettings[keyId]);
+      const { id, title, filters, position, filtersMode } = tabsSettings[keyId];
+      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!) : this.addDefaultTabContainer(tabsSettings[keyId]);
 
       if (favoritesOriginalIndex !== null && favoritesOriginalIndex > -1 && tabContainer.position > favoritesOriginalIndex) {
         tabContainer.position--
@@ -518,7 +518,7 @@ export class TabMasterManager {
 
     this.tabsMap.forEach(tabContainer => {
       const tabSettings = tabContainer.filters ?
-        { id: tabContainer.id, title: tabContainer.title, position: tabContainer.position, filters: tabContainer.filters }
+        { id: tabContainer.id, title: tabContainer.title, position: tabContainer.position, filters: tabContainer.filters, filtersMode: (tabContainer as CustomTabContainer).filtersMode }
         : tabContainer;
 
       // console.log('saving with settings :', tabSettings)
@@ -536,8 +536,8 @@ export class TabMasterManager {
    * @param filterSettingsList The tab's filters.
    * @returns A tab container for this tab.
    */
-  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[]) {
-    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList);
+  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: string) {
+    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode);
     this.tabsMap.set(tabId, tabContainer);
     return tabContainer;
   }
