@@ -1,9 +1,13 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   decky-frontend-lib:
-    specifier: ^3.21.6
-    version: 3.21.6
+    specifier: ^3.21.7
+    version: 3.21.7
   mobx:
     specifier: ^5.15.7
     version: 5.15.7
@@ -51,9 +55,6 @@ devDependencies:
   rollup-plugin-import-assets:
     specifier: ^1.1.1
     version: 1.1.1(rollup@2.79.1)
-  rollup-sourcemap-path-transform:
-    specifier: ^1.0.3
-    version: 1.0.3(rollup@2.79.1)
   shx:
     specifier: ^0.3.4
     version: 0.3.4
@@ -461,7 +462,7 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001507
+      caniuse-lite: 1.0.30001508
       electron-to-chromium: 1.4.440
       node-releases: 2.0.12
       update-browserslist-db: 1.0.11(browserslist@4.21.9)
@@ -481,8 +482,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /caniuse-lite@1.0.30001507:
-    resolution: {integrity: sha512-SFpUDoSLCaE5XYL2jfqe9ova/pbQHEmbheDf5r4diNwbAgR3qxM9NQtfsiSscjqoya5K7kFcHPUQ+VsUkIJR4A==}
+  /caniuse-lite@1.0.30001508:
+    resolution: {integrity: sha512-sdQZOJdmt3GJs1UMNpCCCyeuS2IEGLXnHyAo9yIO5JJDjbjoVRij4M1qep6P6gFpptD1PqIYgzM+gwJbOi92mw==}
     dev: true
 
   /chrome-trace-event@1.0.3:
@@ -554,8 +555,8 @@ packages:
       yargs: 13.2.4
     dev: true
 
-  /decky-frontend-lib@3.21.6:
-    resolution: {integrity: sha512-f5F52cZ/PtHOo2kxWFHLE6i3ixsODQFdLL6F1JzTCv7zdzkpECj4Z23IiN/YEcGmXKLcLT3AkrbjbYx7yrBRUg==}
+  /decky-frontend-lib@3.21.7:
+    resolution: {integrity: sha512-MxqEBOcxPjQaXwCt7hZ481dpaOBK701E6xkA4QO816KfDsfG7zKaA7hdAT8xFUZ7GpHN1J7fODG7h21P4N1+DA==}
     dev: false
 
   /deepmerge@4.3.1:
@@ -1076,15 +1077,6 @@ packages:
     resolution: {integrity: sha512-EEp9NhnUkwY8aif6bxgovPHMoMoNr2FulJziTndpt5H9RdwC47GSGuII9XxpSdzVGM0GWrNPHV6ie1LTNJPaLQ==}
     dependencies:
       estree-walker: 0.6.1
-    dev: true
-
-  /rollup-sourcemap-path-transform@1.0.3(rollup@2.79.1):
-    resolution: {integrity: sha512-uTyxkJVehOBX/NxxafULq4l7DpYxhIzqqudfNJsiujntYsfFSeUndU2Ui51HpOlmwPWUezCzn2KZUOFbbXdwBQ==}
-    engines: {node: '>= 14.18'}
-    peerDependencies:
-      rollup: ^2 || ^3
-    dependencies:
-      rollup: 2.79.1
     dev: true
 
   /rollup@2.79.1:

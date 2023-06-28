@@ -76,18 +76,20 @@ export class CustomTabContainer implements TabContainer {
    * Hides an app from this tab.
    * @param appId The id of the app to hide.
    */
-  hideAppFromList(appId: AppId) {
-    const appItemIndex = this.collection.visibleApps.findIndex((appItem: SteamAppOverview) => appItem.appid === appId);
-    if (appItemIndex >= 0) this.collection.visibleApps.splice(appItemIndex, 1);
-  }
+  //unused in current implementation
+  // hideAppFromList(appId: AppId) {
+  //   const appItemIndex = this.collection.visibleApps.findIndex((appItem: SteamAppOverview) => appItem.appid === appId);
+  //   if (appItemIndex >= 0) this.collection.visibleApps.splice(appItemIndex, 1);
+  // }
 
   /**
    * Unhides an app from this tab.
    * @param appId The id of the app to show.
    */
-  unhideAppFromList(appId: AppId) {
-    this.collection.visibleApps.push(collectionStore.allAppsCollection.apps.get(appId)!);
-  }
+  //unused in current implementation
+  // unhideAppFromList(appId: AppId) {
+  //   this.collection.visibleApps.push(collectionStore.allAppsCollection.apps.get(appId)!);
+  // }
 
   /**
    * Builds the list of games for this tab.
@@ -97,7 +99,7 @@ export class CustomTabContainer implements TabContainer {
       const appsList = collectionStore.appTypeCollectionMap.get('type-games')!.visibleApps.filter(appItem => this.filters.every(filterSettings => Filter.run(filterSettings, appItem)));
 
       this.collection.allApps = appsList;
-      this.collection.visibleApps = appsList.filter((appItem: SteamAppOverview) => !collectionStore.BIsHidden(appItem.appid));
+      this.collection.visibleApps = [...appsList];
 
       const allAppsMap = collectionStore.allAppsCollection.apps;
       const appMap = new Map<AppId, SteamAppOverview>();

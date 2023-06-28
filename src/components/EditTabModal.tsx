@@ -171,7 +171,7 @@ const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters
   }
 
   function onDelete() {
-    const updatedFilters = {...filters};
+    const updatedFilters = [...filters];
     updatedFilters.splice(index, 1);
     setFilters(updatedFilters);
   }

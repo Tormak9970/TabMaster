@@ -55,24 +55,17 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
 
                 if (tabMasterManager.hasSettingsLoaded) {
                   let tablist = tabMasterManager.getTabs().visibleTabsList;
-
-                  // console.log('tabs to build list', tablist);
-
-                  pacthedTabs = tablist.map((tabContainer) => {
-                    //* we shouldn't check if filter.length > 0 here as user shouldn't be able to create a tab without setting filters
-                    //* so it should never be empty but even if it was we still want to return the custom tabs data
+                  pacthedTabs = tablist.flatMap((tabContainer) => {
                     if (tabContainer.filters) {
                       return (tabContainer as CustomTabContainer).actualTab;
                     } else {
-                      return tabs.find(actualTab => actualTab.id === tabContainer.id)!;
+                      return tabs.find(actualTab => actualTab.id === tabContainer.id) ?? [];
                     }
                   });
                 } else {
                   pacthedTabs = tabs;
                 }
-
-                // console.log('tabs', pacthedTabs);
-
+                
                 return pacthedTabs;
               }, deps);
             }
