@@ -15,7 +15,7 @@ import { useState, VFC, Fragment, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
 import { FilterType, TabFilterSettings } from "./filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
-import { MultiSelect } from "./MultiSelect";
+import { ModeMultiSelect } from "./multi-selects/ModeMultiSelect";
 import { TabMasterContextProvider, useTabMasterContext } from "../state/TabMasterContext";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { ModalStyles } from "./styles/ModalStyles";
@@ -130,11 +130,11 @@ const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFil
         );
       case "friends":
         return (
-          <MultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={friendsMode} options={friendsDropdownOptions} selected={friendsSelected} onChange={onFriendsChange} />
+          <ModeMultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={friendsMode} options={friendsDropdownOptions} selected={friendsSelected} onChange={onFriendsChange} />
         );
       case "tags":
         return (
-          <MultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={tagsMode} options={storeTagDropdownOptions} selected={tagsSelected} onChange={onTagsChange} />
+          <ModeMultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={tagsMode} options={storeTagDropdownOptions} selected={tagsSelected} onChange={onTagsChange} />
         );
       default:
         return (
@@ -216,14 +216,16 @@ function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
   switch (filter.type) {
     case "regex":
       return (filter as TabFilterSettings<'regex'>).params.regex == "";
-    case "installed":
-      return false;
     case "collection":
       return !(filter as TabFilterSettings<'collection'>).params.collection;
     case "friends":
       return (filter as TabFilterSettings<'friends'>).params.friends.length === 0;
     case "tags":
       return (filter as TabFilterSettings<'tags'>).params.tags.length === 0;
+    case "installed":
+    case "whitelist":
+    case "blacklist":
+      return false
   }
 }
 

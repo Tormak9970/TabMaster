@@ -1,29 +1,7 @@
-import { DialogButton, Dropdown, DropdownOption, Field, FieldProps, Focusable } from "decky-frontend-lib";
+import { Dropdown, DropdownOption, Field, FieldProps, Focusable } from "decky-frontend-lib";
 import { useState, VFC, useEffect } from "react";
-import { FaTimes } from "react-icons/fa";
-import { MultiSelectStyles } from "./styles/MultiSelectStyles";
-
-
-type MultiSelectedOptionProps = {
-  option: DropdownOption,
-  fieldProps?: FieldProps,
-  onRemove: (option: DropdownOption) => void
-}
-
-/**
- * A component for multi select dropdown options.
- */
-const MultiSelectedOption:VFC<MultiSelectedOptionProps> = ({ option, fieldProps, onRemove }) => {
-  return (
-    <Field label={option.label} {...fieldProps} >
-      <Focusable style={{ display: 'flex', width: '100%', position: 'relative' }}>
-        <DialogButton style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }} onClick={() => onRemove(option)} onOKButton={() => onRemove(option)} onOKActionDescription={`Remove ${option.label}`}>
-          <FaTimes />
-        </DialogButton>
-      </Focusable>
-    </Field>
-  );
-}
+import { MultiSelectStyles } from "../styles/MultiSelectStyles";
+import { MultiSelectedOption } from "./MultiSelectOption";
 
 
 export type MultiSelectProps = {
@@ -40,7 +18,7 @@ export type MultiSelectProps = {
 /**
  * A component for multi select dropdown menus.
  */
-export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps }) => {
+export const ModeMultiSelect:VFC<MultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps }) => {
   const [ sel, setSel ] = useState(selected);
   const [ available, setAvailable ] = useState(options.filter((opt) => !selected.includes(opt)));
   const [ innerMode, setInnerMode ] = useState(mode);

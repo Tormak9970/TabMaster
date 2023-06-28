@@ -1,12 +1,14 @@
 import { PluginController } from "../../lib/controllers/PluginController"
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist';
 
 type CollectionFilterParams = { collection: SteamCollection['id'] };
 type InstalledFilterParams = { installed: boolean };
 type RegexFilterParams = { regex: string };
 type FriendsFilterParams = { friends: number[], mode: string };
 type TagsFilterParams = { tags: number[], mode: string };
+type WhitelistFilterParams = { games: number[] }
+type BlacklistFilterParams = { games: number[] }
 
 type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -14,6 +16,8 @@ type FilterParams<T extends FilterType> =
   T extends 'regex' ? RegexFilterParams :
   T extends 'friends' ? FriendsFilterParams :
   T extends 'tags' ? TagsFilterParams :
+  T extends 'whitelist' ? WhitelistFilterParams :
+  T extends 'blacklist' ? BlacklistFilterParams :
   never
 
 export type TabFilterSettings<T extends FilterType> = {
@@ -55,6 +59,12 @@ export class Filter {
         return params.tags.some((tag: number) => appOverview.store_tag.includes(tag));
       }
     },
+    whitelist: (params: FilterParams<'whitelist'>, appOverview: SteamAppOverview) => {
+      return params.games.includes(appOverview.appid);
+    },
+    blacklist: (params: FilterParams<'whitelist'>, appOverview: SteamAppOverview) => {
+      return !params.games.includes(appOverview.appid);
+    }
   }
 
   /**
