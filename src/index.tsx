@@ -20,6 +20,7 @@ import { PythonInterop } from "./lib/controllers/PythonInterop";
 import { TabMasterManager } from "./state/TabMasterManager";
 import { TabActionsButton } from "./components/TabActions";
 import { QamStyles } from "./components/styles/QamStyles";
+import { patchSettings } from "./components/patches/SettingsPatch";
 
 declare global {
   var SteamClient: SteamClient;
@@ -116,15 +117,17 @@ const Content: VFC<{}> = ({ }) => {
 };
 
 export default definePlugin((serverAPI: ServerAPI) => {
-  let patch: RoutePatch;
-  
+  let libraryPatch: RoutePatch;
+  let settingsPatch: RoutePatch;
+
   PythonInterop.setServer(serverAPI);
   const tabMasterManager = new TabMasterManager();
   PluginController.setup(serverAPI, tabMasterManager);
 
   const loginUnregisterer = PluginController.initOnLogin(async () => {
     await tabMasterManager.loadTabs();
-    patch = patchLibrary(serverAPI, tabMasterManager);
+    libraryPatch = patchLibrary(serverAPI, tabMasterManager);
+    settingsPatch = patchSettings(serverAPI,tabMasterManager)
   });
 
   return {
@@ -135,9 +138,11 @@ export default definePlugin((serverAPI: ServerAPI) => {
       </TabMasterContextProvider>,
     icon: <TbLayoutNavbarExpand />,
     onDismount: () => {
-      serverAPI.routerHook.removePatch("/library", patch);
+      serverAPI.routerHook.removePatch("/library", libraryPatch);
+      serverAPI.routerHook.removePatch("/library", settingsPatch);
       loginUnregisterer.unregister();
       PluginController.dismount();
     },
   };
 });
+

@@ -7,7 +7,6 @@ import { defineConfig } from 'rollup';
 import importAssets from 'rollup-plugin-import-assets';
 
 import { name } from "./plugin.json";
-import { createPathTransform } from "rollup-sourcemap-path-transform";
 
 
 const production = process.env.NODE_ENV !== 'development';
