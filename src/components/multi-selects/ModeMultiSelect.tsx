@@ -1,24 +1,19 @@
-import { Dropdown, DropdownOption, Field, FieldProps, Focusable } from "decky-frontend-lib";
+import { Dropdown, DropdownOption, Field, Focusable } from "decky-frontend-lib";
 import { useState, VFC, useEffect } from "react";
 import { MultiSelectStyles } from "../styles/MultiSelectStyles";
 import { MultiSelectedOption } from "./MultiSelectOption";
+import { MultiSelectProps } from "./MultiSelect";
 
 
-export type MultiSelectProps = {
-  options: DropdownOption[],
-  selected: DropdownOption[],
-  fieldLabel: string,
-  dropdownLabel?: string,
-  mode: string
-  onChange?: (selected:DropdownOption[], mode: string) => void,
-  maxOptions?: number,
-  fieldProps?: FieldProps,
+export interface ModeMultiSelectProps extends Omit<MultiSelectProps, 'onChange'> {
+  mode: string,
+  onChange?: (selected:DropdownOption[], mode: string) => void
 }
 
 /**
- * A component for multi select dropdown menus.
+ * A component for multi select dropdown menus that supports modes.
  */
-export const ModeMultiSelect:VFC<MultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps }) => {
+export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps }) => {
   const [ sel, setSel ] = useState(selected);
   const [ available, setAvailable ] = useState(options.filter((opt) => !selected.includes(opt)));
   const [ innerMode, setInnerMode ] = useState(mode);
