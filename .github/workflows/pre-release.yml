@@ -3,7 +3,7 @@ name: Pre Release
 on:
   push:
     branches:
-      - "dev"
+      - "pre-release"
 
 jobs:
   create-release:
@@ -59,7 +59,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          ref: "dev"
+          ref: "pre-release"
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -124,13 +124,14 @@ jobs:
             child_process.execSync("pnpm build");
 
             // * once finished, make folder with all files in includeInBuild
-            const bundlePath = path.join(cwdPath, "bundle");
-            fs.mkdirSync(bundlePath);
+            const bundleWrapperPath = path.join(cwdPath, "bundle");
+            const bundlePath = path.join(bundleWrapperPath, "TabMaster");
+            fs.mkdirSync(bundlePath, { recursive: true });
             fs.mkdirSync(path.join(bundlePath, "dist"));
 
             for (const fileToInclude of includeInBuild) {
               const srcPath = path.join(cwdPath, fileToInclude);
-              const destPath = path.join(cwdPath, "bundle", fileToInclude);
+              const destPath = path.join(bundlePath, fileToInclude);
 
               fs.copyFileSync(srcPath, destPath);
             }
@@ -140,7 +141,7 @@ jobs:
             
             if (fs.existsSync(defaultsPath)) {
               const defaultContents = fs.readdirSync(defaultsPath, { withFileTypes: true });
-              copyDirRecursive("defaults", defaultContents, "bundle");
+              copyDirRecursive("defaults", defaultContents, `bundle${path.sep}TabMaster`);
             }
 
             // * zip
@@ -148,7 +149,7 @@ jobs:
             const { zip, COMPRESSION_LEVEL } = require('zip-a-folder');
 
             const outputZipPath = path.join(cwdPath, "bundle.zip");
-            await zip(bundlePath, outputZipPath, {compression: COMPRESSION_LEVEL.high});
+            await zip(bundleWrapperPath, outputZipPath, {compression: COMPRESSION_LEVEL.high});
 
             // * upload to release
             await uploadReleaseAsset(`TabMaster_${process.env.release_tag}.zip`, fs.readFileSync(outputZipPath));
