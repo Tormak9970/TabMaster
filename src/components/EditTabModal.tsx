@@ -1,210 +1,23 @@
 import {
   ButtonItem,
   ConfirmModal,
-  Dropdown,
-  DropdownOption,
   Field,
-  Focusable,
   PanelSection,
   PanelSectionRow,
-  SingleDropdownOption,
-  TextField,
-  ToggleField
+  TextField
 } from "decky-frontend-lib";
 import { useState, VFC, Fragment, useEffect } from "react";
-import { FaTrash } from "react-icons/fa";
 import { FilterType, TabFilterSettings } from "./filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
-import { MultiSelect } from "./MultiSelect";
-import { TabMasterContextProvider, useTabMasterContext } from "../state/TabMasterContext";
+import { TabMasterContextProvider } from "../state/TabMasterContext";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { ModalStyles } from "./styles/ModalStyles";
+import { FilterOptions } from "./filters/FilterOptions";
+import { FilterEntry } from "./filters/FilterEntry";
 
 export type EditableTabSettings = {
   title: string,
   filters: TabFilterSettings<any>[]
-}
-
-const FilterTypes: string[] = [
-  "collection",
-  "installed",
-  "regex",
-  "friends",
-  "tags"
-];
-
-type FilterOptionsProps = {
-  index: number,
-  filter: TabFilterSettings<FilterType>,
-  filters: TabFilterSettings<FilterType>[],
-  setFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
-}
-
-/**
- * The options for an individual filter.
- */
-const FilterOptions: VFC<FilterOptionsProps> = ({ index, filter, filters, setFilters }) => {
-  const { allStoreTags, currentUsersFriends } = useTabMasterContext();
-
-  const friendsDropdownOptions: DropdownOption[] = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
-  const friendsSelected: DropdownOption[] = (filter.type === "friends" && (filter as TabFilterSettings<"friends">).params.friends) ? (filter as TabFilterSettings<"friends">).params.friends.map((id: number) => {
-    return {
-      label: currentUsersFriends.find((friend) => friend.steamid === id)!.name,
-      data: id
-    }
-  }) : [];
-  const friendsMode = (filter.type === "friends" && (filter as TabFilterSettings<"friends">).params.mode) ? (filter as TabFilterSettings<"friends">).params.mode ?? "and" : "and";
-
-  const storeTagDropdownOptions: DropdownOption[] = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
-  const tagsSelected: DropdownOption[] = (filter.type === "tags" && (filter as TabFilterSettings<"tags">).params.tags) ? (filter as TabFilterSettings<"tags">).params.tags.map((tagNum: number) => {
-    return {
-      label: allStoreTags.find((tag) => tag.tag === tagNum)!.string,
-      data: tagNum
-    }
-  }) : [];
-  const tagsMode = (filter.type === "tags" && (filter as TabFilterSettings<"tags">).params.mode) ? (filter as TabFilterSettings<"tags">).params.mode : "and";
-
-  const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map((collection: { displayName: any; id: any; }) => { return { label: collection.displayName, data: collection.id } });
-
-  function onCollectionChange(data: SingleDropdownOption) {
-    const updatedFilter = {...filter} as TabFilterSettings<'collection'>;
-    updatedFilter.params.collection = data.data;
-    const updatedFilters = [...filters];
-    updatedFilters[index] = updatedFilter;
-    setFilters(updatedFilters);
-  }
-
-  function onInstalledChange(checked: boolean) {
-    const updatedFilter = {...filter} as TabFilterSettings<'installed'>;
-    updatedFilter.params.installed = checked ?? false;
-    const updatedFilters = [...filters];
-    updatedFilters[index] = updatedFilter;
-    setFilters(updatedFilters);
-  }
-
-  function onRegexChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const updatedFilter = {...filter} as TabFilterSettings<'regex'>;
-    updatedFilter.params.regex = e?.target.value;
-    const updatedFilters = [...filters];
-    updatedFilters[index] = updatedFilter;
-    setFilters(updatedFilters);
-  }
-
-  function onFriendsChange(selected: DropdownOption[], mode: string) {
-    const updatedFilter = {...filter} as TabFilterSettings<'friends'>;
-    updatedFilter.params.friends = selected.map((friendEntry) => friendEntry.data as number);
-    updatedFilter.params.mode = mode;
-    const updatedFilters = [...filters];
-    updatedFilters[index] = updatedFilter;
-    setFilters(updatedFilters);
-  }
-
-  function onTagsChange(selected: DropdownOption[], mode: string) {
-    const updatedFilter = {...filter} as TabFilterSettings<'tags'>;
-    updatedFilter.params.tags = selected.map((tagEntry) => tagEntry.data as number);
-    updatedFilter.params.mode = mode;
-    const updatedFilters = [...filters];
-    updatedFilters[index] = updatedFilter;
-    setFilters(updatedFilters);
-  }
-
-  if (filter) {
-    switch (filter.type) {
-      case "regex":
-        return (
-          <Field
-            label="Regex"
-            description={<TextField value={(filter as TabFilterSettings<'regex'>).params.regex} onChange={onRegexChange} />}
-          />
-        );
-      case "installed":
-        return (
-          <ToggleField label="Installed" checked={(filter as TabFilterSettings<'installed'>).params.installed} onChange={onInstalledChange} />
-        );
-      case "collection":
-        return (
-          <Field
-            label="Selected Collection"
-            description={<Dropdown rgOptions={collectionDropdownOptions} selectedOption={(filter as TabFilterSettings<'collection'>).params.collection} onChange={onCollectionChange} />}
-          />
-        );
-      case "friends":
-        return (
-          <MultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={friendsMode} options={friendsDropdownOptions} selected={friendsSelected} onChange={onFriendsChange} />
-        );
-      case "tags":
-        return (
-          <MultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={tagsMode} options={storeTagDropdownOptions} selected={tagsSelected} onChange={onTagsChange} />
-        );
-      default:
-        return (
-          <Fragment />
-        );
-    }
-  } else {
-    return (
-      <Fragment />
-    );
-  }
-}
-
-
-type FilterEntryProps = {
-  index: number,
-  filter: TabFilterSettings<FilterType>,
-  filters: TabFilterSettings<FilterType>[],
-  setFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
-}
-
-/**
- * An individual filter for a tab.
- */
-const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters }) => {
-  const filterTypeOptions = FilterTypes.map(type => { return { label: type, data: type } });
-
-  function onChange(data: SingleDropdownOption) {
-    const updatedFilter = {...filter};
-    updatedFilter.type = data.data;
-    const updatedFilters = [...filters];
-    updatedFilters[index] = updatedFilter;
-    setFilters(updatedFilters);
-  }
-
-  function onDelete() {
-    const updatedFilters = [...filters];
-    updatedFilters.splice(index, 1);
-    setFilters(updatedFilters);
-  }
-
-  if (filter) {
-    return (
-      <div className="filter-entry">
-        <Focusable style={{
-          width: "100%",
-          display: "flex",
-          flexDirection: "row"
-        }}>
-          <Focusable style={{
-            width: "calc(100% - 55px)"
-          }}>
-            <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
-          </Focusable>
-          <Focusable style={{
-            marginLeft: "10px",
-            width: "45px"
-          }}>
-            <ButtonItem onClick={onDelete}>
-              <FaTrash />
-            </ButtonItem>
-          </Focusable>
-        </Focusable>
-      </div>
-    )
-  } else {
-    return (
-      <Fragment />
-    );
-  }
 }
 
 /**
@@ -216,14 +29,16 @@ function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
   switch (filter.type) {
     case "regex":
       return (filter as TabFilterSettings<'regex'>).params.regex == "";
-    case "installed":
-      return false;
     case "collection":
       return !(filter as TabFilterSettings<'collection'>).params.collection;
     case "friends":
       return (filter as TabFilterSettings<'friends'>).params.friends.length === 0;
     case "tags":
       return (filter as TabFilterSettings<'tags'>).params.tags.length === 0;
+    case "installed":
+    case "whitelist":
+    case "blacklist":
+      return false
   }
 }
 
