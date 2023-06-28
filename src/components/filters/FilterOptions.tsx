@@ -123,6 +123,18 @@ const TagsFilterOptions: VFC<FilterOptionsProps> = ({ index, setFilters, filter,
 }
 
 const WhitelistFilterOptions: VFC<FilterOptionsProps> = ({ index, setFilters, filter, filters }) => {
+  const usersGames:SteamAppOverview[] = collectionStore.appTypeCollectionMap.get('type-games')!.allApps;
+  const selected: DropdownOption[] = [];
+
+  (filter as TabFilterSettings<"whitelist">).params.games ??= [];
+
+  for (const gameid of (filter as TabFilterSettings<"whitelist">).params.games) {
+    const game = usersGames.find((game) => game.appid === gameid);
+
+    if (game) selected.push({ label: game.display_name, data: gameid });
+  }
+
+  const dropdownOptions: DropdownOption[] = usersGames.map((game: SteamAppOverview) => { return { label: game.display_name, data: game.appid } });
 
   function onChange(selected: DropdownOption[]) {
     const updatedFilter = {...filter} as TabFilterSettings<'whitelist'>;
@@ -133,12 +145,23 @@ const WhitelistFilterOptions: VFC<FilterOptionsProps> = ({ index, setFilters, fi
   }
 
   return (
-    <Fragment />
+    <MultiSelect fieldLabel="Whitelisted Games" dropdownLabel="Add a game" options={dropdownOptions} selected={selected} onChange={onChange} />
   );
 }
 
 const BlackListFilterOptions: VFC<FilterOptionsProps> = ({ index, setFilters, filter, filters }) => {
+  const usersGames:SteamAppOverview[] = collectionStore.appTypeCollectionMap.get('type-games')!.allApps;
+  const selected: DropdownOption[] = [];
+  
+  (filter as TabFilterSettings<"blacklist">).params.games ??= [];
 
+  for (const gameid of (filter as TabFilterSettings<"blacklist">).params.games) {
+    const game = usersGames.find((game) => game.appid === gameid);
+
+    if (game) selected.push({ label: game.display_name, data: gameid });
+  }
+
+  const dropdownOptions: DropdownOption[] = usersGames.map((game: SteamAppOverview) => { return { label: game.display_name, data: game.appid } });
 
   function onChange(selected: DropdownOption[]) {
     const updatedFilter = {...filter} as TabFilterSettings<'blacklist'>;
@@ -149,7 +172,7 @@ const BlackListFilterOptions: VFC<FilterOptionsProps> = ({ index, setFilters, fi
   }
 
   return (
-    <Fragment />
+    <MultiSelect fieldLabel="Blacklisted Games" dropdownLabel="Add a game" options={dropdownOptions} selected={selected} onChange={onChange} />
   );
 }
 
