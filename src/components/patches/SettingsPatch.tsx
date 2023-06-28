@@ -30,13 +30,14 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
               });
     
               // console.log('button', buttonElement);
+
+              afterPatch(buttonElement, 'type', (_: any, ret: any) => {
+                // console.log('ret 4', ret);
+                
+                const origOnClick = ret.props.onClick;
     
-              if (tabMasterManager.getTabs().tabsMap.get('Collections')!.position === -1) {
-                afterPatch(buttonElement, 'type', (_: any, ret: any) => {
-                  // console.log('ret 4', ret);
-                  const origOnClick = ret.props.onClick;
-    
-                  ret.props.onClick = () => {
+                ret.props.onClick = () => {
+                  if (tabMasterManager.getTabs().tabsMap.get('Collections')!.position === -1) {
                     showModal(
                       <ConfirmModal
                         strOKButtonText='Unhide and Manage'
@@ -49,12 +50,14 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
                       >
                         In order to manage hidden games, Tab Master must unhide your Collections tab.
                       </ConfirmModal>
-                    )
+                    );
+                  } else {
+                    origOnClick();
                   }
-  
-                  return ret;
-                });
-              }
+                }
+
+                return ret;
+              });
     
               return ret;
             });
