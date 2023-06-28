@@ -124,20 +124,6 @@ const TagsFilterOptions: VFC<FilterOptionsProps> = ({ index, setFilters, filter,
 
 const WhitelistFilterOptions: VFC<FilterOptionsProps> = ({ index, setFilters, filter, filters }) => {
 
-  const usersGames:SteamAppOverview[] = [];
-
-  const dropdownOptions: DropdownOption[] = usersGames.map((game: SteamAppOverview) => { return { label: game.display_name, data: game.appid } });
-  const selected: DropdownOption[] = (filter as TabFilterSettings<"whitelist">).params.games?.filter((gameid: number) => {
-      
-    })
-    .map((gameid: number) => {
-      return {
-        // TODO: account for if the user no longer has the game
-        label: usersGames.find((game) => game.appid === gameid).display_name,
-        data: gameid
-      }
-    }) ?? [];
-
   function onChange(selected: DropdownOption[]) {
     const updatedFilter = {...filter} as TabFilterSettings<'whitelist'>;
     updatedFilter.params.games = selected.map((gameEntry) => gameEntry.data as number);
@@ -147,7 +133,7 @@ const WhitelistFilterOptions: VFC<FilterOptionsProps> = ({ index, setFilters, fi
   }
 
   return (
-    <MultiSelect fieldLabel="Whitelisted Games" dropdownLabel="Add a game" options={dropdownOptions} selected={selected} onChange={onChange} />
+    <Fragment />
   );
 }
 
@@ -163,7 +149,7 @@ const BlackListFilterOptions: VFC<FilterOptionsProps> = ({ index, setFilters, fi
   }
 
   return (
-    <MultiSelect fieldLabel="Blacklisted Games" dropdownLabel="Add a game" options={dropdownOptions} selected={selected} onChange={onChange} />
+    <Fragment />
   );
 }
 
