@@ -30,7 +30,9 @@ const FilterTypes: string[] = [
   "installed",
   "regex",
   "friends",
-  "tags"
+  "tags",
+  "whitelist",
+  "blacklist"
 ];
 
 type FilterOptionsProps = {

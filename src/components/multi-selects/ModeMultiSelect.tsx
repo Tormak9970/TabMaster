@@ -31,7 +31,7 @@ export const ModeMultiSelect:VFC<MultiSelectProps> = ({ options, selected, field
   ];
 
   useEffect(() => {
-    const avail = options.filter((opt) => !sel.includes(opt));
+    const avail = options.filter((opt) => !sel.some((selOpt) => selOpt.data === opt.data));
     setAvailable(avail);
     setDropdownSelected({
       label: avail.length == 0 ? "All selected" : (!!maxOptions && sel.length == maxOptions ? "Max selected" : dropdownLabel) as string,
