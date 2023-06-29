@@ -10,35 +10,37 @@ const FilterTypes: string[] = [
   "friends",
   "tags",
   "whitelist",
-  "blacklist"
+  "blacklist",
+  "union"
 ];
 
 
 type FilterEntryProps = {
   index: number,
   filter: TabFilterSettings<FilterType>,
-  filters: TabFilterSettings<FilterType>[],
-  setFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
+  containingGroupFilters: TabFilterSettings<FilterType>[],
+  setContainingGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
 }
 
 /**
  * An individual filter for a tab.
  */
-export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters }) => {
+export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
   const filterTypeOptions = FilterTypes.map(type => { return { label: type, data: type } });
 
+  //*maybe params object should 
   function onChange(data: SingleDropdownOption) {
-    const updatedFilter = {...filter};
+    const updatedFilter = { ...filter };
     updatedFilter.type = data.data;
-    const updatedFilters = [...filters];
+    const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
-    setFilters(updatedFilters);
+    setContainingGroupFilters(updatedFilters);
   }
 
   function onDelete() {
-    const updatedFilters = [...filters];
+    const updatedFilters = [...containingGroupFilters];
     updatedFilters.splice(index, 1);
-    setFilters(updatedFilters);
+    setContainingGroupFilters(updatedFilters);
   }
 
   if (filter) {

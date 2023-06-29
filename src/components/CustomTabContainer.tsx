@@ -22,7 +22,7 @@ export class CustomTabContainer implements TabContainer {
   position: number;
   filters: TabFilterSettings<FilterType>[];
   collection: Collection;
-  filtersMode: string;
+  filtersMode: LogicalMode;
   static TabContentTemplate: TabContentComponent;
 
   /**
@@ -32,7 +32,7 @@ export class CustomTabContainer implements TabContainer {
    * @param position The position of the tab.
    * @param filterSettingsList The tab's filters.
    */
-  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: string) {
+  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode) {
     this.id = id;
     this.title = title;
     this.position = position;

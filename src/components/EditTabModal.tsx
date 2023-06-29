@@ -1,25 +1,22 @@
 import {
-  ButtonItem,
   ConfirmModal,
-  Dropdown,
   Field,
-  Focusable,
   PanelSection,
   PanelSectionRow,
-  TextField} from "decky-frontend-lib";
-import { useState, VFC, Fragment, useEffect } from "react";
+  TextField
+} from "decky-frontend-lib";
+import { useState, VFC, useEffect } from "react";
 import { FilterType, TabFilterSettings } from "./filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { TabMasterContextProvider } from "../state/TabMasterContext";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { ModalStyles } from "./styles/ModalStyles";
-import { FilterOptions } from "./filters/FilterOptions";
-import { FilterEntry } from "./filters/FilterEntry";
+import { FilterEditorPanel } from "./filters/FilterEditorPanel";
 
 export type EditableTabSettings = {
   title: string,
   filters: TabFilterSettings<any>[]
-  filtersMode: string
+  filtersMode: LogicalMode
 }
 
 /**
@@ -41,7 +38,7 @@ function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
     case "whitelist":
     case "blacklist":
       return false
-    case "group":
+    case "union":
       return false
   }
 }
@@ -53,7 +50,7 @@ type EditTabModalProps = {
   tabTitle?: string,
   tabFilters: TabFilterSettings<FilterType>[],
   tabMasterManager: TabMasterManager,
-  filtersMode: string
+  filtersMode: LogicalMode
 }
 
 /**
@@ -63,23 +60,23 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   const tabsMap: Map<string, TabContainer> = tabMasterManager.getTabs().tabsMap;
 
   const [name, setName] = useState<string>(tabTitle ?? '');
-  const [filters, setFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
-  const [filterLogicMode, setFilterLogicMode] = useState<string>(filtersMode);
+  const [topLevelFilters, setTopLevelFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
+  const [topLevelLogicMode, setTopLevelLogicMode] = useState<LogicalMode>(filtersMode);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
 
   useEffect(() => {
-    setCanSave(name != "" && filters.length > 0);
-  }, [name, filters]);
+    setCanSave(name != "" && topLevelFilters.length > 0);
+  }, [name, topLevelFilters]);
 
   useEffect(() => {
-    setCanAddFilter(filters.length == 0 || filters.every((filter) => {
+    setCanAddFilter(topLevelFilters.length == 0 || topLevelFilters.every((filter) => {
       if (filter.type === "friends" && !(filter as TabFilterSettings<'friends'>).params.friends) (filter as TabFilterSettings<'friends'>).params.friends = [];
       if (filter.type === "tags" && !(filter as TabFilterSettings<'tags'>).params.tags) (filter as TabFilterSettings<'tags'>).params.tags = [];
 
       return !isDefaultParams(filter);
     }));
-  }, [filters]);
+  }, [topLevelFilters]);
 
   function onNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     setName(e?.target.value);
@@ -90,8 +87,8 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
       if (!tabsMap.has(name) || tabsMap.get(name)?.id === tabId) {
         const updated: EditableTabSettings = {
           title: name,
-          filters: filters,
-          filtersMode: filterLogicMode
+          filters: topLevelFilters,
+          filtersMode: topLevelLogicMode
         };
         onConfirm(tabId, updated);
         closeModal!();
@@ -104,12 +101,12 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   }
 
   function addFilter() {
-    const updatedFilters = [...filters];
+    const updatedFilters = [...topLevelFilters];
     updatedFilters.push({
       type: "collection",
       params: { collection: "" }
     });
-    setFilters(updatedFilters);
+    setTopLevelFilters(updatedFilters);
   }
 
   return (
@@ -131,67 +128,14 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
               />
             </PanelSectionRow>
           </PanelSection>
-
-          {/**
-           * NOTE: I'd like to move this whole filters section out into it's own component as well because the plan
-           * is to reuse it for group boolean logic
-           * 
-           * From here...
-          */}
-          <PanelSection title="Filters">
-            <PanelSectionRow>
-              {filters.map((filter, index) => {
-                return (
-                  <>
-                    <div className="filter-start-cont">
-                      <div className="filter-line" />
-                      <div className="filter-label">Filter {index + 1} - {filter.type[0].toUpperCase().concat(filter.type.substring(1))}</div>
-                      <div className="filter-line" />
-                    </div>
-                    <div className="filter-params-input">
-                      <Field
-                        label="Filter Type"
-                        description={<FilterEntry index={index} filter={filter} filters={filters} setFilters={setFilters} />}
-                      />
-                    </div>
-                    <div className="filter-params-input" key={`${filter.type}`}>
-                      <FilterOptions index={index} filter={filter} filters={filters} setFilters={setFilters} />
-                    </div>
-                    {index == filters.length - 1 ? (
-                      <div className="filter-start-cont">
-                        <div className="filter-line" />
-                      </div>
-                    ) : (
-                      <Fragment />
-                    )}
-                  </>
-                );
-              })}
-            </PanelSectionRow>
-            <PanelSectionRow>
-              <div className="add-filter-btn">
-                {!canAddFilter ? (
-                  <div style={{ marginTop: "5px" }}>Please finish the current filter before adding another</div>
-                ) : (
-                  <Fragment />
-                )}
-                <Field >
-                  <div style={{ textAlign: 'right' }}>Filter Combination Logic</div>
-                  <Focusable style={{ width: "100%", display: "flex", flexDirection: "row", marginBottom: "5px" }}>
-                    <div style={{ width: "calc(100% - 100px)" }}>
-                      <ButtonItem onClick={addFilter} disabled={!canAddFilter}>
-                        Add Filter
-                      </ButtonItem>
-                    </div>
-                    <div style={{ marginLeft: "10px", width: "90px", marginTop: '10px', marginBottom: '10px', display: 'flex' }}>
-                      <Dropdown rgOptions={[{ label: "And", data: "and" }, { label: "Or", data: "or" },]} selectedOption={filterLogicMode} onChange={option => setFilterLogicMode(option.data)} focusable={true} />
-                    </div>
-                  </Focusable>
-                </Field>
-              </div>
-            </PanelSectionRow>
-          </PanelSection>
-          {/* ... to here  */}
+          <FilterEditorPanel
+            groupFilters={topLevelFilters}
+            setGroupFilters={setTopLevelFilters}
+            addFilter={addFilter}
+            groupLogicMode={topLevelLogicMode}
+            setGroupLogicMode={setTopLevelLogicMode}
+            canAddFilter={canAddFilter}
+          />
         </ConfirmModal>
       </div>
     </TabMasterContextProvider>

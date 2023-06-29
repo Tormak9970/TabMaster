@@ -18,7 +18,7 @@ type TabContainer = {
     title: string
     position: number    //-1 position is a hidden tab
     filters?: TabFilterSettings<FilterType>[] //undefined filters is a default tab else it's a CustomTabContainer
-    filtersMode?: string //boolean operation combine filters
+    filtersMode?: LogicalMode //boolean operation combine filters
 }
 
 interface TabSettings extends TabContainer { }
@@ -40,3 +40,5 @@ type FriendEntry = {
   name: string,
   steamid: number
 }
+
+type LogicalMode = 'and' | 'or'

@@ -1,15 +1,15 @@
 import { PluginController } from "../../lib/controllers/PluginController"
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'group';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'union';
 
 type CollectionFilterParams = { collection: SteamCollection['id'] };
 type InstalledFilterParams = { installed: boolean };
 type RegexFilterParams = { regex: string };
-type FriendsFilterParams = { friends: number[], mode: string };
-type TagsFilterParams = { tags: number[], mode: string };
+type FriendsFilterParams = { friends: number[], mode: LogicalMode };
+type TagsFilterParams = { tags: number[], mode: LogicalMode };
 type WhitelistFilterParams = { games: number[] }
 type BlacklistFilterParams = { games: number[] }
-type GroupFilterParams = { filters: TabFilterSettings<FilterType>[], mode: 'and' | 'or' }
+type UnionFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode }
 
 type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -19,7 +19,7 @@ type FilterParams<T extends FilterType> =
   T extends 'tags' ? TagsFilterParams :
   T extends 'whitelist' ? WhitelistFilterParams :
   T extends 'blacklist' ? BlacklistFilterParams :
-  T extends 'group' ? GroupFilterParams :
+  T extends 'union' ? UnionFilterParams :
   never
 
 export type TabFilterSettings<T extends FilterType> = {
@@ -67,7 +67,7 @@ export class Filter {
     blacklist: (params: FilterParams<'whitelist'>, appOverview: SteamAppOverview) => {
       return !params.games.includes(appOverview.appid);
     },
-    group: (params: FilterParams<'group'>, appOverView: SteamAppOverview) => {
+    union: (params: FilterParams<'union'>, appOverView: SteamAppOverview) => {
       if (params.mode === "and") {
         return params.filters.every(filterSettings => Filter.run(filterSettings, appOverView));
       } else {

@@ -360,7 +360,7 @@ export class TabMasterManager {
    * @param position The position of the tab.
    * @param filterSettingsList The list of filters for the tab.
    */
-  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: string) {
+  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode) {
     const id = uuidv4();
     this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode));
     this.updateAndSave();
@@ -536,7 +536,7 @@ export class TabMasterManager {
    * @param filterSettingsList The tab's filters.
    * @returns A tab container for this tab.
    */
-  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: string) {
+  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode) {
     const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode);
     this.tabsMap.set(tabId, tabContainer);
     return tabContainer;
