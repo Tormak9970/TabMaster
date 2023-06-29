@@ -11,6 +11,7 @@ import {
 } from "decky-frontend-lib";
 import { VFC, Fragment } from "react";
 import { TbLayoutNavbarExpand } from "react-icons/tb";
+import { FaSteam } from "react-icons/fa";
 
 import { patchLibrary } from "./components/patches/LibraryPatch";
 import { TabMasterContextProvider, useTabMasterContext } from "./state/TabMasterContext";
@@ -63,7 +64,15 @@ const Content: VFC<{}> = ({ }) => {
   }
 
   const entries = visibleTabsList.map((tabContainer) => {
-    return { label: tabContainer.title, position: tabContainer.position, data: { id: tabContainer.id } }
+    return {
+      label: 
+      <div className="tab-label-cont">
+        <div className="tab-label">{tabContainer.title}</div>
+        {tabContainer.filters ? <Fragment/> : <FaSteam />}
+      </div>,
+      position: tabContainer.position,
+      data: { id: tabContainer.id }
+    }
   });
 
   return (
@@ -100,7 +109,12 @@ const Content: VFC<{}> = ({ }) => {
             hiddenTabsList.map(tabContainer =>
               <div className="hidden-tab-btn">
                 <ButtonItem
-                  label={tabContainer.title}
+                  label={
+                    <div className="tab-label-cont">
+                      <div className="tab-label">{tabContainer.title}</div>
+                      {tabContainer.filters ? <Fragment/> : <FaSteam />}
+                    </div>
+                  }
                   onClick={() => tabMasterManager.showTab(tabContainer.id)}
                   onOKActionDescription="Unhide tab"
                 >
