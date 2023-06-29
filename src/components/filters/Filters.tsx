@@ -11,7 +11,7 @@ type WhitelistFilterParams = { games: number[] }
 type BlacklistFilterParams = { games: number[] }
 type UnionFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode }
 
-type FilterParams<T extends FilterType> =
+export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
   T extends 'installed' ? InstalledFilterParams :
   T extends 'regex' ? RegexFilterParams :
@@ -28,6 +28,45 @@ export type TabFilterSettings<T extends FilterType> = {
 }
 
 type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview) => boolean;
+
+/**
+ * Define the deafult params for a filter type here
+ * Checking and settings defaults in component is unnecessary
+ */
+export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
+  "collection": { collection: "" },
+  "installed": { installed: false },
+  "regex": { regex: "" },
+  "friends": { friends: [], mode: 'and' },
+  "tags": { tags: [], mode: 'and' },
+  "whitelist": { games: [] },
+  "blacklist": { games: [] },
+  "union": { filters: [], mode: 'and' }
+};
+
+/**
+ * Checks if the user has made any changes to a filter.
+ * @param filter The filter to check.
+ * @returns True if the filter is the default (wont filter anything).
+ */
+export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
+  switch (filter.type) {
+    case "regex":
+      return (filter as TabFilterSettings<'regex'>).params.regex == "";
+    case "collection":
+      return (filter as TabFilterSettings<'collection'>).params.collection === "";
+    case "friends":
+      return (filter as TabFilterSettings<'friends'>).params.friends.length === 0;
+    case "tags":
+      return (filter as TabFilterSettings<'tags'>).params.tags.length === 0;
+    case "installed":
+    case "whitelist":
+    case "blacklist":
+      return false
+    case "union":
+      return (filter as TabFilterSettings<'union'>).params.filters.length === 0
+  }
+}
 
 /**
  * Utility class for filtering games.

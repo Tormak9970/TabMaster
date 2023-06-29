@@ -77,13 +77,13 @@ const FriendsFilterOptions: VFC<FilterOptionsProps<'friends'>> = ({ index, setCo
   const { currentUsersFriends } = useTabMasterContext();
 
   const dropdownOptions: DropdownOption[] = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
-  const selected: DropdownOption[] = filter.params.friends?.map((id: number) => {
+  const selected: DropdownOption[] = filter.params.friends.map((id: number) => {
     return {
       label: currentUsersFriends.find((friend) => friend.steamid === id)!.name,
       data: id
     }
-  }) ?? [];
-  const friendsMode = filter.params.mode ?? "and";
+  });
+  const friendsMode = filter.params.mode;
 
   function onChange(selected: DropdownOption[], mode: LogicalMode) {
     const updatedFilter = { ...filter };
@@ -103,13 +103,13 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContaini
   const { allStoreTags } = useTabMasterContext();
 
   const dropdownOptions: DropdownOption[] = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
-  const selected: DropdownOption[] = filter.params.tags?.map((tagNum: number) => {
+  const selected: DropdownOption[] = filter.params.tags.map((tagNum: number) => {
     return {
       label: allStoreTags.find((tag) => tag.tag === tagNum)!.string,
       data: tagNum
     }
-  }) ?? [];
-  const tagsMode = filter.params.mode ?? "and";
+  });
+  const tagsMode = filter.params.mode
 
   function onChange(selected: DropdownOption[], mode: LogicalMode) {
     const updatedFilter = { ...filter };
@@ -128,8 +128,6 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContaini
 const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const usersGames: SteamAppOverview[] = collectionStore.appTypeCollectionMap.get('type-games')!.allApps;
   const selected: DropdownOption[] = [];
-
-  filter.params.games ??= [];
 
   for (const gameid of filter.params.games) {
     const game = usersGames.find((game) => game.appid === gameid);
@@ -156,8 +154,6 @@ const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, s
   const usersGames: SteamAppOverview[] = collectionStore.appTypeCollectionMap.get('type-games')!.allApps;
   const selected: DropdownOption[] = [];
 
-  filter.params.games ??= [];
-
   for (const gameid of filter.params.games) {
     const game = usersGames.find((game) => game.appid === gameid);
 
@@ -182,10 +178,10 @@ const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, s
 const UnionFilterOptions: VFC<FilterOptionsProps<'union'>> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
   const tabMasterManager = useTabMasterContext().tabMasterManager
   const initialParams = {
-    filters: filter.params.filters ?? [],
-    mode: filter.params.mode ?? 'and'
+    filters: [...filter.params.filters],
+    mode: filter.params.mode
   }
-  const [isEditing, setIsEditing] = useState<boolean>(!!filter.params.filters)
+  const [isEditing, setIsEditing] = useState<boolean>(filter.params.filters.length !== 0)
   const [unionParams, setUnionParams] = useState<TabFilterSettings<'union'>['params']>(initialParams)
 
   function saveUnion(unionParams: TabFilterSettings<'union'>['params']) {
@@ -233,6 +229,7 @@ const UnionFilterOptions: VFC<FilterOptionsProps<'union'>> = ({ index, filter, c
  * The options for an individual filter.
  */
 export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
+  console.log('new filter type', filter)
   if (filter) {
     switch (filter.type) {
       case "collection":

@@ -1,19 +1,7 @@
 import { Fragment, VFC } from "react";
-import { FilterType, TabFilterSettings } from "./Filters";
-import { ButtonItem, Dropdown, Focusable, SingleDropdownOption } from "decky-frontend-lib";
+import { FilterDefaultParams, FilterType, TabFilterSettings } from "./Filters";
+import { ButtonItem, Dropdown, Focusable } from "decky-frontend-lib";
 import { FaTrash } from "react-icons/fa";
-
-const FilterTypes: string[] = [
-  "collection",
-  "installed",
-  "regex",
-  "friends",
-  "tags",
-  "whitelist",
-  "blacklist",
-  "union"
-];
-
 
 type FilterEntryProps = {
   index: number,
@@ -26,14 +14,18 @@ type FilterEntryProps = {
  * An individual filter for a tab.
  */
 export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
-  const filterTypeOptions = FilterTypes.map(type => { return { label: type, data: type } });
+  const filterTypeOptions = Object.keys(FilterDefaultParams).map(type => { return { label: type, data: type } });
 
-  //*maybe params object should 
-  function onChange(data: SingleDropdownOption) {
-    const updatedFilter = { ...filter };
-    updatedFilter.type = data.data;
+  //* new filter is made with default params
+  function onChange(data: {data: FilterType}) {
+    const updatedFilter = {
+      type: data.data,
+      params: {...FilterDefaultParams[data.data]}
+    }
+    console.log('filter type changed', updatedFilter.params)
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
+    console.log(updatedFilters)
     setContainingGroupFilters(updatedFilters);
   }
 

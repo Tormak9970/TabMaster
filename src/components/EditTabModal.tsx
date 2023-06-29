@@ -6,7 +6,7 @@ import {
   TextField
 } from "decky-frontend-lib";
 import { useState, VFC, useEffect } from "react";
-import { FilterType, TabFilterSettings } from "./filters/Filters";
+import { FilterType, TabFilterSettings, isDefaultParams } from "./filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { TabMasterContextProvider } from "../state/TabMasterContext";
 import { TabMasterManager } from "../state/TabMasterManager";
@@ -17,30 +17,6 @@ export type EditableTabSettings = {
   title: string,
   filters: TabFilterSettings<any>[]
   filtersMode: LogicalMode
-}
-
-/**
- * Checks if the user has made any changes to a filter.
- * @param filter The filter to check.
- * @returns True if the filter is the default (wont filter anything).
- */
-export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
-  switch (filter.type) {
-    case "regex":
-      return (filter as TabFilterSettings<'regex'>).params.regex == "";
-    case "collection":
-      return !(filter as TabFilterSettings<'collection'>).params.collection;
-    case "friends":
-      return (filter as TabFilterSettings<'friends'>).params.friends.length === 0;
-    case "tags":
-      return (filter as TabFilterSettings<'tags'>).params.tags.length === 0;
-    case "installed":
-    case "whitelist":
-    case "blacklist":
-      return false
-    case "union":
-      return !(filter as TabFilterSettings<'union'>).params.filters
-  }
 }
 
 type EditTabModalProps = {
@@ -57,8 +33,6 @@ type EditTabModalProps = {
  * The modal for editing and creating custom tabs.
  */
 export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager, filtersMode }) => {
-  const tabsMap: Map<string, TabContainer> = tabMasterManager.getTabs().tabsMap;
-
   const [name, setName] = useState<string>(tabTitle ?? '');
   const [topLevelFilters, setTopLevelFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
   const [topLevelLogicMode, setTopLevelLogicMode] = useState<LogicalMode>(filtersMode);
@@ -70,12 +44,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   }, [name, topLevelFilters]);
 
   useEffect(() => {
-    setCanAddFilter(topLevelFilters.length == 0 || topLevelFilters.every((filter) => {
-      if (filter.type === "friends" && !(filter as TabFilterSettings<'friends'>).params.friends) (filter as TabFilterSettings<'friends'>).params.friends = [];
-      if (filter.type === "tags" && !(filter as TabFilterSettings<'tags'>).params.tags) (filter as TabFilterSettings<'tags'>).params.tags = [];
-
-      return !isDefaultParams(filter);
-    }));
+    setCanAddFilter(topLevelFilters.length == 0 || topLevelFilters.every(filter => !isDefaultParams(filter)));
   }, [topLevelFilters]);
 
   function onNameChange(e: React.ChangeEvent<HTMLInputElement>) {

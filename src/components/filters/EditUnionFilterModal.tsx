@@ -3,7 +3,7 @@ import { VFC, useState, Fragment, useEffect } from "react"
 import { ModalStyles } from "../styles/ModalStyles"
 import { FilterEditorPanel } from "./FilterEditorPanel"
 import { TabFilterSettings, FilterType } from "./Filters"
-import { isDefaultParams } from "../EditTabModal"
+import { isDefaultParams } from "./Filters"
 import { PythonInterop } from "../../lib/controllers/PythonInterop"
 
 interface EditUnionFilterModalProps {
@@ -23,12 +23,7 @@ export const EditUnionFilterModal: VFC<EditUnionFilterModalProps> = ({ closeModa
   }, [groupFilters]);
 
   useEffect(() => {
-    setCanAddFilter(groupFilters.length == 0 || groupFilters.every((filter) => {
-      if (filter.type === "friends" && !(filter as TabFilterSettings<'friends'>).params.friends) (filter as TabFilterSettings<'friends'>).params.friends = [];
-      if (filter.type === "tags" && !(filter as TabFilterSettings<'tags'>).params.tags) (filter as TabFilterSettings<'tags'>).params.tags = [];
-
-      return !isDefaultParams(filter);
-    }));
+    setCanAddFilter(groupFilters.length == 0 || groupFilters.every(filter => !isDefaultParams(filter)));
   }, [groupFilters]);
 
   function addFilterToGroup() {
@@ -43,7 +38,7 @@ export const EditUnionFilterModal: VFC<EditUnionFilterModalProps> = ({ closeModa
   function onOkButton() {
     if (canSave && canAddFilter) {
       const unionParams = {
-        filters: groupFilters,
+        filters: [...groupFilters],
         mode: groupLogicMode
       }
       saveUnion(unionParams)
