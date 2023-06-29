@@ -1,8 +1,10 @@
 import { ConfirmModal } from "decky-frontend-lib"
-import { VFC, useState, Fragment } from "react"
+import { VFC, useState, Fragment, useEffect } from "react"
 import { ModalStyles } from "../styles/ModalStyles"
 import { FilterEditorPanel } from "./FilterEditorPanel"
 import { TabFilterSettings, FilterType } from "./Filters"
+import { isDefaultParams } from "../EditTabModal"
+import { PythonInterop } from "../../lib/controllers/PythonInterop"
 
 interface EditUnionFilterModalProps {
   unionParams: TabFilterSettings<'union'>['params']
@@ -13,6 +15,21 @@ interface EditUnionFilterModalProps {
 export const EditUnionFilterModal: VFC<EditUnionFilterModalProps> = ({ closeModal, unionParams, saveUnion }) => {
   const [groupFilters, setGroupFilters] = useState<TabFilterSettings<FilterType>[]>(unionParams.filters)
   const [groupLogicMode, setGroupLogicMode] = useState<LogicalMode>(unionParams.mode)
+  const [canSave, setCanSave] = useState<boolean>(false);
+  const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
+
+  useEffect(() => {
+    setCanSave(groupFilters.length >= 2);
+  }, [groupFilters]);
+
+  useEffect(() => {
+    setCanAddFilter(groupFilters.length == 0 || groupFilters.every((filter) => {
+      if (filter.type === "friends" && !(filter as TabFilterSettings<'friends'>).params.friends) (filter as TabFilterSettings<'friends'>).params.friends = [];
+      if (filter.type === "tags" && !(filter as TabFilterSettings<'tags'>).params.tags) (filter as TabFilterSettings<'tags'>).params.tags = [];
+
+      return !isDefaultParams(filter);
+    }));
+  }, [groupFilters]);
 
   function addFilterToGroup() {
     const updatedFilters = [...groupFilters];
@@ -24,28 +41,30 @@ export const EditUnionFilterModal: VFC<EditUnionFilterModalProps> = ({ closeModa
   }
 
   function onOkButton() {
-    const unionParams = {
-      filters: groupFilters,
-      mode: groupLogicMode
+    if (canSave && canAddFilter) {
+      const unionParams = {
+        filters: groupFilters,
+        mode: groupLogicMode
+      }
+      saveUnion(unionParams)
+      closeModal()
+    } else {
+      PythonInterop.toast("Error", "A Union group should have at least 2 filters");
     }
-    saveUnion(unionParams)
-    closeModal()
   }
-
-  //*filter adding and saving checks still need to be implemented
 
   return (
     <>
       <ModalStyles />
       <div className="tab-master-modal-scope">
-        <ConfirmModal onOK={onOkButton} onCancel={closeModal} closeModal={closeModal} strTitle="Union Group">
+        <ConfirmModal onOK={onOkButton} onCancel={closeModal} strTitle="Union Group">
           <FilterEditorPanel
             groupFilters={groupFilters}
             setGroupFilters={setGroupFilters}
             addFilter={addFilterToGroup}
             groupLogicMode={groupLogicMode}
             setGroupLogicMode={setGroupLogicMode}
-            canAddFilter={true}
+            canAddFilter={canAddFilter}
           />
         </ConfirmModal>
       </div>

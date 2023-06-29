@@ -24,7 +24,7 @@ export type EditableTabSettings = {
  * @param filter The filter to check.
  * @returns True if the filter is the default (wont filter anything).
  */
-function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
+export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
   switch (filter.type) {
     case "regex":
       return (filter as TabFilterSettings<'regex'>).params.regex == "";
@@ -39,7 +39,7 @@ function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
     case "blacklist":
       return false
     case "union":
-      return false
+      return !(filter as TabFilterSettings<'union'>).params.filters
   }
 }
 
@@ -84,17 +84,13 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
 
   function onSave() {
     if (canSave && canAddFilter) {
-      if (!tabsMap.has(name) || tabsMap.get(name)?.id === tabId) {
-        const updated: EditableTabSettings = {
-          title: name,
-          filters: topLevelFilters,
-          filtersMode: topLevelLogicMode
-        };
-        onConfirm(tabId, updated);
-        closeModal!();
-      } else {
-        PythonInterop.toast("Error", "A tab with that name already exists!");
-      }
+      const updated: EditableTabSettings = {
+        title: name,
+        filters: topLevelFilters,
+        filtersMode: topLevelLogicMode
+      };
+      onConfirm(tabId, updated);
+      closeModal!();
     } else {
       PythonInterop.toast("Error", "Please add a name and at least 1 filter before saving");
     }
