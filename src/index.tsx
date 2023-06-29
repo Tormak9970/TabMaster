@@ -126,7 +126,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
   const loginUnregisterer = PluginController.initOnLogin(async () => {
     await tabMasterManager.loadTabs();
     libraryPatch = patchLibrary(serverAPI, tabMasterManager);
-    settingsPatch = patchSettings(serverAPI,tabMasterManager)
+    settingsPatch = patchSettings(serverAPI, tabMasterManager);
   });
 
   return {

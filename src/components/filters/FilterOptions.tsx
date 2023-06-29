@@ -13,6 +13,7 @@ import { FilterType, TabFilterSettings } from "./Filters";
 import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMasterContext";
 import { ModeMultiSelect } from "../multi-selects/ModeMultiSelect";
 import { EditUnionFilterModal } from "./EditUnionFilterModal";
+import { MultiSelect } from "../multi-selects/MultiSelect";
 
 type FilterOptionsProps<T extends FilterType> = {
   index: number,
@@ -125,9 +126,21 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContaini
 }
 
 const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const usersGames: SteamAppOverview[] = collectionStore.appTypeCollectionMap.get('type-games')!.allApps;
+  const selected: DropdownOption[] = [];
+
+  filter.params.games ??= [];
+
+  for (const gameid of filter.params.games) {
+    const game = usersGames.find((game) => game.appid === gameid);
+
+    if (game) selected.push({ label: game.display_name, data: gameid });
+  }
+
+  const dropdownOptions: DropdownOption[] = usersGames.map((game: SteamAppOverview) => { return { label: game.display_name, data: game.appid } });
 
   function onChange(selected: DropdownOption[]) {
-    const updatedFilter = { ...filter } as TabFilterSettings<'whitelist'>;
+    const updatedFilter = { ...filter };
     updatedFilter.params.games = selected.map((gameEntry) => gameEntry.data as number);
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
@@ -135,15 +148,26 @@ const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, s
   }
 
   return (
-    <Fragment />
+    <MultiSelect fieldLabel="Whitelisted Games" dropdownLabel="Add a game" options={dropdownOptions} selected={selected} onChange={onChange} />
   );
 }
 
 const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const usersGames: SteamAppOverview[] = collectionStore.appTypeCollectionMap.get('type-games')!.allApps;
+  const selected: DropdownOption[] = [];
 
+  filter.params.games ??= [];
+
+  for (const gameid of filter.params.games) {
+    const game = usersGames.find((game) => game.appid === gameid);
+
+    if (game) selected.push({ label: game.display_name, data: gameid });
+  }
+
+  const dropdownOptions: DropdownOption[] = usersGames.map((game: SteamAppOverview) => { return { label: game.display_name, data: game.appid } });
 
   function onChange(selected: DropdownOption[]) {
-    const updatedFilter = { ...filter } as TabFilterSettings<'blacklist'>;
+    const updatedFilter = { ...filter };
     updatedFilter.params.games = selected.map((gameEntry) => gameEntry.data as number);
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
@@ -151,7 +175,7 @@ const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, s
   }
 
   return (
-    <Fragment />
+    <MultiSelect fieldLabel="Blacklisted Games" dropdownLabel="Add a game" options={dropdownOptions} selected={selected} onChange={onChange} />
   );
 }
 
