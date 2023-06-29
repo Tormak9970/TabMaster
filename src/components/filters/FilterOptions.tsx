@@ -12,7 +12,7 @@ import { VFC, Fragment, useState } from "react";
 import { FilterType, TabFilterSettings } from "./Filters";
 import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMasterContext";
 import { ModeMultiSelect } from "../multi-selects/ModeMultiSelect";
-import { EditUnionFilterModal } from "./EditUnionFilterModal";
+import { EditMergeFilterModal } from "./EditMergeFilterModal";
 import { MultiSelect } from "../multi-selects/MultiSelect";
 
 type FilterOptionsProps<T extends FilterType> = {
@@ -175,23 +175,23 @@ const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, s
   );
 }
 
-const UnionFilterOptions: VFC<FilterOptionsProps<'union'>> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
+const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
   const tabMasterManager = useTabMasterContext().tabMasterManager
   const initialParams = {
     filters: [...filter.params.filters],
     mode: filter.params.mode
   }
   const [isEditing, setIsEditing] = useState<boolean>(filter.params.filters.length !== 0)
-  const [unionParams, setUnionParams] = useState<TabFilterSettings<'union'>['params']>(initialParams)
+  const [mergeParams, setMergeParams] = useState<TabFilterSettings<'merge'>['params']>(initialParams)
 
-  function saveUnion(unionParams: TabFilterSettings<'union'>['params']) {
+  function saveMerge(mergeParams: TabFilterSettings<'merge'>['params']) {
     const updatedFilter = { ...filter };
-    updatedFilter.params.filters = unionParams.filters
-    updatedFilter.params.mode = unionParams.mode
+    updatedFilter.params.filters = mergeParams.filters
+    updatedFilter.params.mode = mergeParams.mode
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
     setIsEditing(true)
-    setUnionParams({ ...unionParams })
+    setMergeParams({ ...mergeParams })
     setContainingGroupFilters(updatedFilters);
   }
 
@@ -200,9 +200,9 @@ const UnionFilterOptions: VFC<FilterOptionsProps<'union'>> = ({ index, filter, c
     const modal: { instance: any } = { instance: null }
     modal.instance = showModal(
       <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-        <EditUnionFilterModal
-          unionParams={unionParams}
-          saveUnion={saveUnion}
+        <EditMergeFilterModal
+          mergeParams={mergeParams}
+          saveMerge={saveMerge}
           closeModal={() => modal.instance.Close()}
         />
       </TabMasterContextProvider>
@@ -213,14 +213,14 @@ const UnionFilterOptions: VFC<FilterOptionsProps<'union'>> = ({ index, filter, c
     <div style={{ width: "100%", display: "flex", flexDirection: "row" }}>
       <div style={{ width: "calc(100% - 100px)" }}>
         <ButtonItem onClick={onClick}>
-          {(isEditing ? "Edit" : "Make") + " Union Group"}
+          {(isEditing ? "Edit" : "Make") + " Merge Group"}
         </ButtonItem>
       </div>
       <div style={{ marginLeft: "10px", width: "90px", marginTop: '10px', marginBottom: '10px', display: 'flex' }}>
-        {isEditing ? unionParams.mode : ""}
+        {isEditing ? mergeParams.mode : ""}
       </div>
     </div>
-    {unionParams.filters.map(filter => <div>{filter.type}</div>)}
+    {mergeParams.filters.map(filter => <div>{filter.type}</div>)}
   </Field>
 }
 
@@ -246,8 +246,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <WhitelistFilterOptions index={index} filter={filter as TabFilterSettings<'whitelist'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
       case "blacklist":
         return <BlackListFilterOptions index={index} filter={filter as TabFilterSettings<'blacklist'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
-      case "union":
-        return <UnionFilterOptions index={index} filter={filter as TabFilterSettings<'union'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
+      case "merge":
+        return <MergeFilterOptions index={index} filter={filter as TabFilterSettings<'merge'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
       default:
         return <Fragment />
     }

@@ -1,6 +1,6 @@
 import { PluginController } from "../../lib/controllers/PluginController"
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'union';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge';
 
 type CollectionFilterParams = { collection: SteamCollection['id'] };
 type InstalledFilterParams = { installed: boolean };
@@ -9,7 +9,7 @@ type FriendsFilterParams = { friends: number[], mode: LogicalMode };
 type TagsFilterParams = { tags: number[], mode: LogicalMode };
 type WhitelistFilterParams = { games: number[] }
 type BlacklistFilterParams = { games: number[] }
-type UnionFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode }
+type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode }
 
 export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -19,7 +19,7 @@ export type FilterParams<T extends FilterType> =
   T extends 'tags' ? TagsFilterParams :
   T extends 'whitelist' ? WhitelistFilterParams :
   T extends 'blacklist' ? BlacklistFilterParams :
-  T extends 'union' ? UnionFilterParams :
+  T extends 'merge' ? MergeFilterParams :
   never
 
 export type TabFilterSettings<T extends FilterType> = {
@@ -41,7 +41,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "tags": { tags: [], mode: 'and' },
   "whitelist": { games: [] },
   "blacklist": { games: [] },
-  "union": { filters: [], mode: 'and' }
+  "merge": { filters: [], mode: 'and' }
 };
 
 /**
@@ -63,8 +63,8 @@ export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean 
     case "whitelist":
     case "blacklist":
       return false
-    case "union":
-      return (filter as TabFilterSettings<'union'>).params.filters.length === 0
+    case "merge":
+      return (filter as TabFilterSettings<'merge'>).params.filters.length === 0
   }
 }
 
@@ -106,7 +106,7 @@ export class Filter {
     blacklist: (params: FilterParams<'whitelist'>, appOverview: SteamAppOverview) => {
       return !params.games.includes(appOverview.appid);
     },
-    union: (params: FilterParams<'union'>, appOverView: SteamAppOverview) => {
+    merge: (params: FilterParams<'merge'>, appOverView: SteamAppOverview) => {
       if (params.mode === "and") {
         return params.filters.every(filterSettings => Filter.run(filterSettings, appOverView));
       } else {

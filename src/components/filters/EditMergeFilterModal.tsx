@@ -6,15 +6,15 @@ import { TabFilterSettings, FilterType } from "./Filters"
 import { isDefaultParams } from "./Filters"
 import { PythonInterop } from "../../lib/controllers/PythonInterop"
 
-interface EditUnionFilterModalProps {
-  unionParams: TabFilterSettings<'union'>['params']
-  saveUnion: (groupParams: TabFilterSettings<'union'>['params']) => void
+interface EditMergeFilterModalProps {
+  mergeParams: TabFilterSettings<'merge'>['params']
+  saveMerge: (groupParams: TabFilterSettings<'merge'>['params']) => void
   closeModal: () => void
 }
 
-export const EditUnionFilterModal: VFC<EditUnionFilterModalProps> = ({ closeModal, unionParams, saveUnion }) => {
-  const [groupFilters, setGroupFilters] = useState<TabFilterSettings<FilterType>[]>(unionParams.filters)
-  const [groupLogicMode, setGroupLogicMode] = useState<LogicalMode>(unionParams.mode)
+export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModal, mergeParams, saveMerge }) => {
+  const [groupFilters, setGroupFilters] = useState<TabFilterSettings<FilterType>[]>(mergeParams.filters)
+  const [groupLogicMode, setGroupLogicMode] = useState<LogicalMode>(mergeParams.mode)
   const [canSave, setCanSave] = useState<boolean>(false);
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
 
@@ -37,11 +37,11 @@ export const EditUnionFilterModal: VFC<EditUnionFilterModalProps> = ({ closeModa
 
   function onOkButton() {
     if (canSave && canAddFilter) {
-      const unionParams = {
+      const mergeParams = {
         filters: [...groupFilters],
         mode: groupLogicMode
       }
-      saveUnion(unionParams)
+      saveMerge(mergeParams)
       closeModal()
     } else {
       PythonInterop.toast("Error", "A Union group should have at least 2 filters");
