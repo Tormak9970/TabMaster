@@ -2,7 +2,7 @@
 name: Filter request
 about: Suggest an idea for a Tab filter
 title: ''
-labels: enhancement
+labels: enhancement, filter
 assignees: Tormak9970, jessebofill
 
 ---
