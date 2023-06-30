@@ -10,7 +10,7 @@ import {
   showModal
 } from "decky-frontend-lib";
 import { VFC, Fragment, useState } from "react";
-import { FilterType, TabFilterSettings } from "./Filters";
+import { FilterType, TabFilterSettings, categoryToLabel } from "./Filters";
 import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMasterContext";
 import { ModeMultiSelect } from "../multi-selects/ModeMultiSelect";
 import { EditMergeFilterModal } from "../modals/EditMergeFilterModal";
@@ -225,6 +225,49 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
   )
 }
 
+const PlatformFilterOptions: VFC<FilterOptionsProps<'platform'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const dropdownOptions: DropdownOption[] = [
+    { label: "Steam", data: "steam" },
+    { label: "Non Steam", data: "nonSteam" }
+  ];
+
+  function onChange(selected: DropdownOption) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.platform = selected.data;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  return (
+    <Field
+      label="Selected Platform"
+      description={<Dropdown rgOptions={dropdownOptions} selectedOption={(filter as TabFilterSettings<'platform'>).params.platform} onChange={onChange} />}
+    />
+  );
+}
+
+const DeckCompatFilterOptions: VFC<FilterOptionsProps<'deck compatibility'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const dropdownOptions: DropdownOption[] = [0, 1, 2, 3].map((level) => {
+    return { label: categoryToLabel(level), data: level };
+  });
+
+  function onChange(selected: DropdownOption) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.category = selected.data;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  return (
+    <Field
+      label="Selected Compatibility"
+      description={<Dropdown rgOptions={dropdownOptions} selectedOption={categoryToLabel((filter as TabFilterSettings<'deck compatibility'>).params.category)} onChange={onChange} />}
+    />
+  );
+}
+
 
 /**
  * The options for an individual filter.
@@ -248,6 +291,10 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <BlackListFilterOptions index={index} filter={filter as TabFilterSettings<'blacklist'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
       case "merge":
         return <MergeFilterOptions index={index} filter={filter as TabFilterSettings<'merge'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
+      case "platform":
+        return <PlatformFilterOptions index={index} filter={filter as TabFilterSettings<'platform'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
+      case "deck compatibility":
+        return <DeckCompatFilterOptions index={index} filter={filter as TabFilterSettings<'deck compatibility'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
       default:
         return <Fragment />
     }
