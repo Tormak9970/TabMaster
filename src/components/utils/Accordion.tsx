@@ -14,7 +14,7 @@ type FilterSectionAccordionProps = {
  * Filter Section accordion component
  */
 export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index, filter, isOpen, children }) => {
-  const [ open, setOpen ] = useState(isOpen);
+  const [open, setOpen] = useState(isOpen);
 
   function onClick(e: any) {
     e.stopPropagation();
@@ -31,7 +31,7 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
           background: "transparent",
           outline: "none",
           border: "none",
-          
+
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
@@ -42,9 +42,7 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
           <div className="filter-line" />
         </Button>
       </Focusable>
-      <div style={{ width: "100%", display: open ? "block" : "none" }}>
-        {children}
-      </div>
+      {open && children}
     </Focusable>
   )
 }
