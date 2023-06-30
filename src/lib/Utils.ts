@@ -106,3 +106,12 @@ export function validateTabs(tabs: TabSettingsDictionary): boolean {
     }
   });
 }
+
+/**
+ * Capitalizes the first letter of a word.
+ * @param word The word to capitalize.
+ * @returns The capitalized word.
+ */
+export function capitalizeFirstLetter(word: string): string {
+  return word[0].toUpperCase().concat(word.substring(1));
+}

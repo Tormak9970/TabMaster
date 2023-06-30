@@ -11,10 +11,11 @@ import {
 } from "decky-frontend-lib";
 import { VFC, Fragment } from "react";
 import { TbLayoutNavbarExpand } from "react-icons/tb";
+import { FaSteam } from "react-icons/fa";
 
 import { patchLibrary } from "./components/patches/LibraryPatch";
 import { TabMasterContextProvider, useTabMasterContext } from "./state/TabMasterContext";
-import { EditableTabSettings, EditTabModal } from "./components/EditTabModal";
+import { EditableTabSettings, EditTabModal } from "./components/modals/EditTabModal";
 import { PluginController } from "./lib/controllers/PluginController";
 import { PythonInterop } from "./lib/controllers/PythonInterop";
 import { TabMasterManager } from "./state/TabMasterManager";
@@ -51,20 +52,27 @@ const Content: VFC<{}> = ({ }) => {
 
   function onAddClicked() {
     showModal(
-      // @ts-ignore
-      //? This is here because showModal passes the closeModal function automatically
       <EditTabModal
         onConfirm={(_: any, tabSettings: EditableTabSettings) => {
-          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters)
+          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode)
         }}
         tabFilters={[]}
         tabMasterManager={tabMasterManager}
+        filtersMode="and"
       />
     );
   }
 
   const entries = visibleTabsList.map((tabContainer) => {
-    return { label: tabContainer.title, position: tabContainer.position, data: { id: tabContainer.id } }
+    return {
+      label: 
+      <div className="tab-label-cont">
+        <div className="tab-label">{tabContainer.title}</div>
+        {tabContainer.filters ? <Fragment/> : <FaSteam />}
+      </div>,
+      position: tabContainer.position,
+      data: { id: tabContainer.id }
+    }
   });
 
   return (
@@ -101,7 +109,12 @@ const Content: VFC<{}> = ({ }) => {
             hiddenTabsList.map(tabContainer =>
               <div className="hidden-tab-btn">
                 <ButtonItem
-                  label={tabContainer.title}
+                  label={
+                    <div className="tab-label-cont">
+                      <div className="tab-label">{tabContainer.title}</div>
+                      {tabContainer.filters ? <Fragment/> : <FaSteam />}
+                    </div>
+                  }
                   onClick={() => tabMasterManager.showTab(tabContainer.id)}
                   onOKActionDescription="Unhide tab"
                 >
@@ -123,7 +136,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
   PythonInterop.setServer(serverAPI);
   const tabMasterManager = new TabMasterManager();
   PluginController.setup(serverAPI, tabMasterManager);
-
+  
   const loginUnregisterer = PluginController.initOnLogin(async () => {
     await tabMasterManager.loadTabs();
     libraryPatch = patchLibrary(serverAPI, tabMasterManager);

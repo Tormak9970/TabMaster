@@ -1,16 +1,17 @@
 import { PluginController } from "../../lib/controllers/PluginController"
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge';
 
 type CollectionFilterParams = { collection: SteamCollection['id'] };
 type InstalledFilterParams = { installed: boolean };
 type RegexFilterParams = { regex: string };
-type FriendsFilterParams = { friends: number[], mode: string };
-type TagsFilterParams = { tags: number[], mode: string };
+type FriendsFilterParams = { friends: number[], mode: LogicalMode };
+type TagsFilterParams = { tags: number[], mode: LogicalMode };
 type WhitelistFilterParams = { games: number[] }
 type BlacklistFilterParams = { games: number[] }
+type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode }
 
-type FilterParams<T extends FilterType> =
+export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
   T extends 'installed' ? InstalledFilterParams :
   T extends 'regex' ? RegexFilterParams :
@@ -18,6 +19,7 @@ type FilterParams<T extends FilterType> =
   T extends 'tags' ? TagsFilterParams :
   T extends 'whitelist' ? WhitelistFilterParams :
   T extends 'blacklist' ? BlacklistFilterParams :
+  T extends 'merge' ? MergeFilterParams :
   never
 
 export type TabFilterSettings<T extends FilterType> = {
@@ -26,6 +28,45 @@ export type TabFilterSettings<T extends FilterType> = {
 }
 
 type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview) => boolean;
+
+/**
+ * Define the deafult params for a filter type here
+ * Checking and settings defaults in component is unnecessary
+ */
+export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
+  "collection": { collection: "" },
+  "installed": { installed: false },
+  "regex": { regex: "" },
+  "friends": { friends: [], mode: 'and' },
+  "tags": { tags: [], mode: 'and' },
+  "whitelist": { games: [] },
+  "blacklist": { games: [] },
+  "merge": { filters: [], mode: 'and' }
+};
+
+/**
+ * Checks if the user has made any changes to a filter.
+ * @param filter The filter to check.
+ * @returns True if the filter is the default (wont filter anything).
+ */
+export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
+  switch (filter.type) {
+    case "regex":
+      return (filter as TabFilterSettings<'regex'>).params.regex == "";
+    case "collection":
+      return (filter as TabFilterSettings<'collection'>).params.collection === "";
+    case "friends":
+      return (filter as TabFilterSettings<'friends'>).params.friends.length === 0;
+    case "tags":
+      return (filter as TabFilterSettings<'tags'>).params.tags.length === 0;
+    case "installed":
+    case "whitelist":
+    case "blacklist":
+      return false
+    case "merge":
+      return (filter as TabFilterSettings<'merge'>).params.filters.length === 0
+  }
+}
 
 /**
  * Utility class for filtering games.
@@ -45,7 +86,7 @@ export class Filter {
     },
     friends: (params: FilterParams<'friends'>, appOverview: SteamAppOverview) => {
       const friendsWhoOwn: number[] = PluginController.getFriendsWhoOwn(appOverview.appid);
-      
+
       if (params.mode === "and") {
         return params.friends.every((friend) => friendsWhoOwn.includes(friend));
       } else {
@@ -64,9 +105,15 @@ export class Filter {
     },
     blacklist: (params: FilterParams<'whitelist'>, appOverview: SteamAppOverview) => {
       return !params.games.includes(appOverview.appid);
+    },
+    merge: (params: FilterParams<'merge'>, appOverView: SteamAppOverview) => {
+      if (params.mode === "and") {
+        return params.filters.every(filterSettings => Filter.run(filterSettings, appOverView));
+      } else {
+        return params.filters.some(filterSettings => Filter.run(filterSettings, appOverView));
+      }
     }
   }
-
   /**
    * Checks if a game passes a given filter.
    * @param filterSettings The filter to run.
