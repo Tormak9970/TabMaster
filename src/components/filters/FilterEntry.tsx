@@ -1,44 +1,36 @@
 import { Fragment, VFC } from "react";
-import { FilterType, TabFilterSettings } from "./Filters";
-import { ButtonItem, Dropdown, Focusable, SingleDropdownOption } from "decky-frontend-lib";
+import { FilterDefaultParams, FilterType, TabFilterSettings } from "./Filters";
+import { ButtonItem, Dropdown, Focusable } from "decky-frontend-lib";
 import { FaTrash } from "react-icons/fa";
-
-const FilterTypes: string[] = [
-  "collection",
-  "installed",
-  "regex",
-  "friends",
-  "tags",
-  "whitelist",
-  "blacklist"
-];
-
 
 type FilterEntryProps = {
   index: number,
   filter: TabFilterSettings<FilterType>,
-  filters: TabFilterSettings<FilterType>[],
-  setFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
+  containingGroupFilters: TabFilterSettings<FilterType>[],
+  setContainingGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
 }
 
 /**
  * An individual filter for a tab.
  */
-export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, filters, setFilters }) => {
-  const filterTypeOptions = FilterTypes.map(type => { return { label: type, data: type } });
+export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
+  const filterTypeOptions = Object.keys(FilterDefaultParams).map(type => { return { label: type, data: type } });
 
-  function onChange(data: SingleDropdownOption) {
-    const updatedFilter = {...filter};
-    updatedFilter.type = data.data;
-    const updatedFilters = [...filters];
+  //* new filter is made with default params
+  function onChange(data: {data: FilterType}) {
+    const updatedFilter = {
+      type: data.data,
+      params: {...FilterDefaultParams[data.data]}
+    }
+    const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
-    setFilters(updatedFilters);
+    setContainingGroupFilters(updatedFilters);
   }
 
   function onDelete() {
-    const updatedFilters = [...filters];
+    const updatedFilters = [...containingGroupFilters];
     updatedFilters.splice(index, 1);
-    setFilters(updatedFilters);
+    setContainingGroupFilters(updatedFilters);
   }
 
   if (filter) {

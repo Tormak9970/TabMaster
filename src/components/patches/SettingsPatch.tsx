@@ -6,7 +6,7 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
   return serverAPI.routerHook.addPatch("/settings", (props: { path: string; children: ReactElement }) => {
     //* This only runs once which is perfect
     afterPatch(props.children, 'type', (_: any, ret: any) => {
-      console.log('ret 1', ret);
+      // console.log('ret 1', ret);
 
       let firstCache: any;
       let secondCache: any;
@@ -16,14 +16,14 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
         ret.type = firstCache;
       } else {
         afterPatch(ret, 'type', (_: any, ret: any) => {
-          console.log('ret 2', ret);
+          // console.log('ret 2', ret);
           const homeElement = ret.props.children?.props?.pages?.find((obj: any) => obj.title === 'Home').content;
   
           if (secondCache) {
             homeElement.type = secondCache;
           } else {
             afterPatch(homeElement, 'type', (_: any, ret: any) => {
-              console.log('ret 3', ret);
+              // console.log('ret 3', ret);
     
               const buttonElement = ret.props.children.find((elt: React.ReactElement) => {
                 return elt.type.toString?.().includes('HomeSettings');

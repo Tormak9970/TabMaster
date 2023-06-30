@@ -6,8 +6,8 @@ import { MultiSelectProps } from "./MultiSelect";
 
 
 export interface ModeMultiSelectProps extends Omit<MultiSelectProps, 'onChange'> {
-  mode: string,
-  onChange?: (selected:DropdownOption[], mode: string) => void
+  mode: LogicalMode,
+  onChange?: (selected:DropdownOption[], mode: LogicalMode) => void
 }
 
 /**

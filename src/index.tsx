@@ -15,7 +15,7 @@ import { FaSteam } from "react-icons/fa";
 
 import { patchLibrary } from "./components/patches/LibraryPatch";
 import { TabMasterContextProvider, useTabMasterContext } from "./state/TabMasterContext";
-import { EditableTabSettings, EditTabModal } from "./components/EditTabModal";
+import { EditableTabSettings, EditTabModal } from "./components/modals/EditTabModal";
 import { PluginController } from "./lib/controllers/PluginController";
 import { PythonInterop } from "./lib/controllers/PythonInterop";
 import { TabMasterManager } from "./state/TabMasterManager";
@@ -52,14 +52,13 @@ const Content: VFC<{}> = ({ }) => {
 
   function onAddClicked() {
     showModal(
-      // @ts-ignore
-      //? This is here because showModal passes the closeModal function automatically
       <EditTabModal
         onConfirm={(_: any, tabSettings: EditableTabSettings) => {
-          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters)
+          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode)
         }}
         tabFilters={[]}
         tabMasterManager={tabMasterManager}
+        filtersMode="and"
       />
     );
   }
@@ -137,7 +136,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
   PythonInterop.setServer(serverAPI);
   const tabMasterManager = new TabMasterManager();
   PluginController.setup(serverAPI, tabMasterManager);
-
+  
   const loginUnregisterer = PluginController.initOnLogin(async () => {
     await tabMasterManager.loadTabs();
     libraryPatch = patchLibrary(serverAPI, tabMasterManager);
