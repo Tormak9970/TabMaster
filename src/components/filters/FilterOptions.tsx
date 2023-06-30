@@ -15,6 +15,7 @@ import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMa
 import { ModeMultiSelect } from "../multi-selects/ModeMultiSelect";
 import { EditMergeFilterModal } from "../modals/EditMergeFilterModal";
 import { MultiSelect } from "../multi-selects/MultiSelect";
+import { FilterPreview } from "./FilterPreview";
 
 type FilterOptionsProps<T extends FilterType> = {
   index: number,
@@ -215,10 +216,9 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
       <ButtonItem onClick={onClick}>
         {(isEditing ? "Edit" : "Create") + " Merge Group"}
       </ButtonItem>
-      {/* TODO: this needs serious styling */}
       <div className="merge-filter-entries">
         {mergeParams.filters.map((filter) => (
-          <div>{filter.type}</div>
+          <FilterPreview filter={filter} />
         ))}
       </div>
     </Focusable>
@@ -230,7 +230,6 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
  * The options for an individual filter.
  */
 export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
-
   if (filter) {
     switch (filter.type) {
       case "collection":

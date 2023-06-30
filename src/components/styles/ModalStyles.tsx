@@ -71,6 +71,11 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .filter-start-cont.start-focused .filter-label {
         color: #a9a9a9;
       }
+
+      /* merge entries */
+      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
+        margin: 5px;
+      }
     `}</style>
   );
 }

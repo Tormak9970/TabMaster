@@ -2,6 +2,7 @@ import { Button, Focusable } from "decky-frontend-lib"
 import React, { VFC, useState } from "react"
 import { FilterType, TabFilterSettings } from "../filters/Filters"
 import { capitalizeFirstLetter } from "../../lib/Utils"
+import { BiSolidDownArrow } from "react-icons/bi"
 
 type FilterSectionAccordionProps = {
   index: number,
@@ -38,7 +39,17 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
           alignItems: "center"
         }} onOKButton={onClick} onClick={onClick}>
           <div className="filter-line" />
-          <div className="filter-label">Filter {index + 1} - {capitalizeFirstLetter(filter.type)}{filter.type === "merge" ? ` - mode: ${capitalizeFirstLetter((filter as TabFilterSettings<'merge'>).params.mode)}` : ""}</div>
+          <div className="filter-label">
+            Filter {index + 1} - {capitalizeFirstLetter(filter.type)}{filter.type === "merge" ? ` - mode: ${capitalizeFirstLetter((filter as TabFilterSettings<'merge'>).params.mode)}` : ""}
+            <BiSolidDownArrow
+              style={{
+                animation: "transform 0.2s ease-in-out",
+                transform: !open ? "rotate(90deg)" : "",
+                fontSize: "0.8em",
+                marginLeft: "5px"
+              }}
+            />
+          </div>
           <div className="filter-line" />
         </Button>
       </Focusable>
