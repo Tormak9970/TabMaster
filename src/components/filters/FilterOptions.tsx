@@ -230,7 +230,7 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
  * The options for an individual filter.
  */
 export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
-  console.log('new filter type', filter)
+
   if (filter) {
     switch (filter.type) {
       case "collection":

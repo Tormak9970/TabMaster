@@ -22,10 +22,8 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
       type: data.data,
       params: {...FilterDefaultParams[data.data]}
     }
-    console.log('filter type changed', updatedFilter.params)
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
-    console.log(updatedFilters)
     setContainingGroupFilters(updatedFilters);
   }
 
