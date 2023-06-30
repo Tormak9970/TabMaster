@@ -47,10 +47,13 @@ export const FilterEditorPanel: VFC<FilterEditorPanelProps> = ({ groupFilters, g
                 <div className="filter-input">
                   <Field
                     label="Filter Type"
+                    // TODO: need a way to set this to false when accordion is closed
+                    focusable={true}
                     description={<FilterEntry index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />}
                   />
                 </div>
                 <div className="filter-input" key={`${filter.type}`}>
+                  // TODO: need a way to set all focusable props in this component to false when accordion is closed
                   <FilterOptions index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />
                 </div>
               </FilterSectionAccordion>
