@@ -1,5 +1,5 @@
 import { Fragment, VFC } from "react";
-import { FilterType, TabFilterSettings } from "./Filters";
+import { FilterType, TabFilterSettings, categoryToLabel } from "./Filters";
 
 type FilterPreviewProps<T extends FilterType> = {
   filter: TabFilterSettings<T>,
@@ -38,6 +38,14 @@ const MergeFilterPreview: VFC<FilterPreviewProps<'merge'>> = ({ filter }) => {
   return <div className="merge-filter-entry">merge - {filter.params.filters.length} grouped filters</div>
 }
 
+const PlatformFilterPreview: VFC<FilterPreviewProps<'platform'>> = ({ filter }) => {
+  return <div className="merge-filter-entry">platform - {filter.params.platform === "steam" ? "Steam" : "Non Steam"}</div>
+}
+
+const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = ({ filter }) => {
+  return <div className="merge-filter-entry">deck compat - {categoryToLabel(filter.params.category)}</div>
+}
+
 /**
  * Generates the preview data for filters in a merge group.
  */
@@ -60,6 +68,10 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <BlackListFilterPreview filter={filter as TabFilterSettings<'blacklist'>} />
       case "merge":
         return <MergeFilterPreview filter={filter as TabFilterSettings<'merge'>} />
+      case "platform":
+        return <PlatformFilterPreview filter={filter as TabFilterSettings<'platform'>} />
+      case "deck compatibility":
+        return <DeckCompatFilterPreview filter={filter as TabFilterSettings<'deck compatibility'>} />
       default:
         return <Fragment />
     }

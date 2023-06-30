@@ -42,3 +42,5 @@ type FriendEntry = {
 }
 
 type LogicalMode = 'and' | 'or'
+
+type SteamPlatform = "steam" | "nonSteam"
