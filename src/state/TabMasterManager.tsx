@@ -1,4 +1,4 @@
-import { EditableTabSettings } from "../components/EditTabModal";
+import { EditableTabSettings } from "../components/modals/EditTabModal";
 import { TabFilterSettings, FilterType } from "../components/filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { CustomTabContainer } from "../components/CustomTabContainer";

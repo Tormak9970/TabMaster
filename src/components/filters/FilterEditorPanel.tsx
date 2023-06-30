@@ -1,8 +1,9 @@
-import { PanelSection, PanelSectionRow, Field, Focusable, ButtonItem, Dropdown } from "decky-frontend-lib"
+import { PanelSection, PanelSectionRow, Field, ButtonItem, Dropdown } from "decky-frontend-lib"
 import { VFC, Fragment } from "react"
 import { FilterEntry } from "./FilterEntry"
 import { FilterOptions } from "./FilterOptions"
 import { TabFilterSettings, FilterType } from "./Filters"
+import { FilterSectionAccordion } from "../utils/Accordion"
 
 interface FilterEditorPanelProps {
   groupFilters: TabFilterSettings<FilterType>[]
@@ -14,29 +15,47 @@ interface FilterEditorPanelProps {
 }
 
 export const FilterEditorPanel: VFC<FilterEditorPanelProps> = ({ groupFilters, groupLogicMode, setGroupFilters, setGroupLogicMode, addFilter, canAddFilter }) => {
+  const modeOptions = [
+    { label: "And", data: "and" },
+    { label: "Or", data: "or" }
+  ];
 
   return (
     <PanelSection title="Filters">
       <PanelSectionRow>
+        <Field
+          label="Group Combination Logic"
+          childrenLayout="inline"
+          childrenContainerWidth="min"
+          inlineWrap="keep-inline"
+          className="filter-input"
+        >
+          <div style={{ width: "150px" }}>
+            <Dropdown rgOptions={modeOptions} selectedOption={groupLogicMode} onChange={(option) => setGroupLogicMode(option.data)} focusable={true} />
+          </div>
+        </Field>
+      </PanelSectionRow>
+      <PanelSectionRow>
         {groupFilters.map((filter, index) => {
           return (
             <>
-              <div className="filter-start-cont">
-                <div className="filter-line" />
-                <div className="filter-label">Filter {index + 1} - {filter.type[0].toUpperCase().concat(filter.type.substring(1))}</div>
-                <div className="filter-line" />
-              </div>
-              <div className="filter-params-input">
-                <Field
-                  label="Filter Type"
-                  description={<FilterEntry index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />}
-                />
-              </div>
-              <div className="filter-params-input" key={`${filter.type}`}>
-                <FilterOptions index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />
-              </div>
+              <FilterSectionAccordion
+                index={index}
+                filter={filter}
+                isOpen={true}
+              >
+                <div className="filter-input">
+                  <Field
+                    label="Filter Type"
+                    description={<FilterEntry index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />}
+                  />
+                </div>
+                <div className="filter-input" key={`${filter.type}`}>
+                  <FilterOptions index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />
+                </div>
+              </FilterSectionAccordion>
               {index == groupFilters.length - 1 ? (
-                <div className="filter-start-cont">
+                <div className="filter-start-cont" style={{ marginTop: "8px" }}>
                   <div className="filter-line" />
                 </div>
               ) : (
@@ -47,25 +66,15 @@ export const FilterEditorPanel: VFC<FilterEditorPanelProps> = ({ groupFilters, g
         })}
       </PanelSectionRow>
       <PanelSectionRow>
-        <div className="add-filter-btn">
+        <div className="styled-btn filter-input">
           {!canAddFilter ? (
-            <div style={{ marginTop: "5px" }}>Please finish the current filter before adding another</div>
+            <div style={{ marginTop: "10px" }}>Please finish the current filter before adding another</div>
           ) : (
             <Fragment />
           )}
-          <Field >
-            <div style={{ textAlign: 'right' }}>Group Combination Logic</div>
-            <Focusable style={{ width: "100%", display: "flex", flexDirection: "row", marginBottom: "5px" }}>
-              <div style={{ width: "calc(100% - 100px)" }}>
-                <ButtonItem onClick={addFilter} disabled={!canAddFilter}>
-                  Add Filter
-                </ButtonItem>
-              </div>
-              <div style={{ marginLeft: "10px", width: "90px", marginTop: '10px', marginBottom: '10px', display: 'flex' }}>
-                <Dropdown rgOptions={[{ label: "And", data: "and" }, { label: "Or", data: "or" },]} selectedOption={groupLogicMode} onChange={option => setGroupLogicMode(option.data)} focusable={true} />
-              </div>
-            </Focusable>
-          </Field>
+          <ButtonItem onClick={addFilter} disabled={!canAddFilter}>
+            Add Filter
+          </ButtonItem>
         </div>
       </PanelSectionRow>
     </PanelSection>

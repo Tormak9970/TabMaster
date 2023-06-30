@@ -1,9 +1,9 @@
 import { ConfirmModal } from "decky-frontend-lib"
 import { VFC, useState, Fragment, useEffect } from "react"
 import { ModalStyles } from "../styles/ModalStyles"
-import { FilterEditorPanel } from "./FilterEditorPanel"
-import { TabFilterSettings, FilterType } from "./Filters"
-import { isDefaultParams } from "./Filters"
+import { FilterEditorPanel } from "../filters/FilterEditorPanel"
+import { TabFilterSettings, FilterType } from "../filters/Filters"
+import { isDefaultParams } from "../filters/Filters"
 import { PythonInterop } from "../../lib/controllers/PythonInterop"
 
 interface EditMergeFilterModalProps {
@@ -12,11 +12,14 @@ interface EditMergeFilterModalProps {
   closeModal: () => void
 }
 
+/**
+ * Modal for editing a Merge Filter.
+ */
 export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModal, mergeParams, saveMerge }) => {
-  const [groupFilters, setGroupFilters] = useState<TabFilterSettings<FilterType>[]>(mergeParams.filters)
-  const [groupLogicMode, setGroupLogicMode] = useState<LogicalMode>(mergeParams.mode)
-  const [canSave, setCanSave] = useState<boolean>(false);
-  const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
+  const [ groupFilters, setGroupFilters ] = useState<TabFilterSettings<FilterType>[]>(mergeParams.filters);
+  const [ groupLogicMode, setGroupLogicMode ] = useState<LogicalMode>(mergeParams.mode);
+  const [ canSave, setCanSave ] = useState<boolean>(false);
+  const [ canAddFilter, setCanAddFilter ] = useState<boolean>(true);
 
   useEffect(() => {
     setCanSave(groupFilters.length >= 2);
@@ -32,6 +35,7 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
       type: "collection",
       params: { collection: "" }
     });
+
     setGroupFilters(updatedFilters);
   }
 
@@ -41,8 +45,9 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
         filters: [...groupFilters],
         mode: groupLogicMode
       }
-      saveMerge(mergeParams)
-      closeModal()
+
+      saveMerge(mergeParams);
+      closeModal();
     } else {
       PythonInterop.toast("Error", "A Union group should have at least 2 filters");
     }

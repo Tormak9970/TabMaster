@@ -1,5 +1,5 @@
 import { VFC } from "react"
-import { EditableTabSettings } from "./EditTabModal"
+import { EditableTabSettings } from "./modals/EditTabModal"
 import { useSortingHook } from "../hooks/useSortingHook"
 import { TabFilterSettings, FilterType, Filter } from "./filters/Filters"
 

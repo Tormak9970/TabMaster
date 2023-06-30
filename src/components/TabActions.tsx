@@ -2,7 +2,7 @@ import { MenuItem, showModal, ConfirmModal, Menu, showContextMenu, DialogButton 
 import { VFC } from "react"
 import { FaEllipsisH } from "react-icons/fa"
 import { TabMasterManager } from "../state/TabMasterManager"
-import { EditTabModal, EditableTabSettings } from "./EditTabModal"
+import { EditTabModal, EditableTabSettings } from "./modals/EditTabModal"
 
 interface TabActionsContextMenuProps {
   tabContainer: TabContainer,

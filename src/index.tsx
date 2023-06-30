@@ -15,7 +15,7 @@ import { FaSteam } from "react-icons/fa";
 
 import { patchLibrary } from "./components/patches/LibraryPatch";
 import { TabMasterContextProvider, useTabMasterContext } from "./state/TabMasterContext";
-import { EditableTabSettings, EditTabModal } from "./components/EditTabModal";
+import { EditableTabSettings, EditTabModal } from "./components/modals/EditTabModal";
 import { PluginController } from "./lib/controllers/PluginController";
 import { PythonInterop } from "./lib/controllers/PythonInterop";
 import { TabMasterManager } from "./state/TabMasterManager";

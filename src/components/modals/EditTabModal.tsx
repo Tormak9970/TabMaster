@@ -6,12 +6,12 @@ import {
   TextField
 } from "decky-frontend-lib";
 import { useState, VFC, useEffect } from "react";
-import { FilterType, TabFilterSettings, isDefaultParams } from "./filters/Filters";
-import { PythonInterop } from "../lib/controllers/PythonInterop";
-import { TabMasterContextProvider } from "../state/TabMasterContext";
-import { TabMasterManager } from "../state/TabMasterManager";
-import { ModalStyles } from "./styles/ModalStyles";
-import { FilterEditorPanel } from "./filters/FilterEditorPanel";
+import { FilterType, TabFilterSettings, isDefaultParams } from "../filters/Filters";
+import { PythonInterop } from "../../lib/controllers/PythonInterop";
+import { TabMasterContextProvider } from "../../state/TabMasterContext";
+import { TabMasterManager } from "../../state/TabMasterManager";
+import { ModalStyles } from "../styles/ModalStyles";
+import { FilterEditorPanel } from "../filters/FilterEditorPanel";
 
 export type EditableTabSettings = {
   title: string,

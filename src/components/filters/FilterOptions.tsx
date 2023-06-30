@@ -3,6 +3,7 @@ import {
   Dropdown,
   DropdownOption,
   Field,
+  Focusable,
   SingleDropdownOption,
   TextField,
   ToggleField,
@@ -12,7 +13,7 @@ import { VFC, Fragment, useState } from "react";
 import { FilterType, TabFilterSettings } from "./Filters";
 import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMasterContext";
 import { ModeMultiSelect } from "../multi-selects/ModeMultiSelect";
-import { EditMergeFilterModal } from "./EditMergeFilterModal";
+import { EditMergeFilterModal } from "../modals/EditMergeFilterModal";
 import { MultiSelect } from "../multi-selects/MultiSelect";
 
 type FilterOptionsProps<T extends FilterType> = {
@@ -209,19 +210,19 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
     );
   }
 
-  return <Field>
-    <div style={{ width: "100%", display: "flex", flexDirection: "row" }}>
-      <div style={{ width: "calc(100% - 100px)" }}>
-        <ButtonItem onClick={onClick}>
-          {(isEditing ? "Edit" : "Make") + " Merge Group"}
-        </ButtonItem>
+  return (
+    <Focusable className="styled-btn">
+      <ButtonItem onClick={onClick}>
+        {(isEditing ? "Edit" : "Create") + " Merge Group"}
+      </ButtonItem>
+      {/* TODO: this needs serious styling */}
+      <div className="merge-filter-entries">
+        {mergeParams.filters.map((filter) => (
+          <div>{filter.type}</div>
+        ))}
       </div>
-      <div style={{ marginLeft: "10px", width: "90px", marginTop: '10px', marginBottom: '10px', display: 'flex' }}>
-        {isEditing ? mergeParams.mode : ""}
-      </div>
-    </div>
-    {mergeParams.filters.map(filter => <div>{filter.type}</div>)}
-  </Field>
+    </Focusable>
+  )
 }
 
 
