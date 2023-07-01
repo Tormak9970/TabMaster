@@ -152,7 +152,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
     icon: <TbLayoutNavbarExpand />,
     onDismount: () => {
       serverAPI.routerHook.removePatch("/library", libraryPatch);
-      serverAPI.routerHook.removePatch("/library", settingsPatch);
+      serverAPI.routerHook.removePatch("/settings", settingsPatch);
       loginUnregisterer.unregister();
       PluginController.dismount();
     },
