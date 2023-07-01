@@ -1,17 +1,5 @@
-import { VFC } from "react"
 import { EditableTabSettings } from "./modals/EditTabModal"
-import { useSortingHook } from "../hooks/useSortingHook"
 import { TabFilterSettings, FilterType, Filter } from "./filters/Filters"
-
-interface TabContentWrapperProps {
-  collection: Collection,
-  TabContentTemplate: TabContentComponent
-}
-
-const TabContentWrapper: VFC<TabContentWrapperProps> = ({ TabContentTemplate, collection }) => {
-  const sortingProps = useSortingHook();
-  return <TabContentTemplate collection={collection} {...sortingProps} />;
-}
 
 /**
  * Wrapper for injecting custom tabs.
@@ -23,7 +11,6 @@ export class CustomTabContainer implements TabContainer {
   filters: TabFilterSettings<FilterType>[];
   collection: Collection;
   filtersMode: LogicalMode;
-  static TabContentTemplate: TabContentComponent;
 
   /**
    * Creates a new CustomTabContainer.
@@ -55,13 +42,14 @@ export class CustomTabContainer implements TabContainer {
     this.buildCollection();
   }
 
-  get actualTab(): SteamTab {
+  getActualTab(TabContentComponent: TabContentComponent, sortingProps: Omit<TabContentProps, 'collection'>, footer: SteamTab['footer'] ): SteamTab {
     return {
       title: this.title,
       id: this.id,
-      content: <TabContentWrapper
-        TabContentTemplate={CustomTabContainer.TabContentTemplate}
+      footer: footer,
+      content: <TabContentComponent
         collection={this.collection}
+        {...sortingProps}
       />,
       //* this is just temporary for now as it won't show correct count with native filters applied
       renderTabAddon: () => {

@@ -46,10 +46,18 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
               return realUseMemo(() => {
                 const tabs: SteamTab[] = fn();
 
-                if (CustomTabContainer.TabContentTemplate === undefined) {
-                  const tabTemplate = tabs.find((tab: SteamTab) => tab?.id === "AllGames");
-                  if (tabTemplate) CustomTabContainer.TabContentTemplate = tabTemplate.content.type as TabContentComponent;
+                const tabTemplate = tabs.find((tab: SteamTab) => tab?.id === "AllGames");
+                if (tabTemplate === undefined) {
+                  throw new Error(`Tab Master couldn't find default tab "AllGames" to copy from`)
                 }
+
+                const sortingProps = {
+                  eSortBy: tabTemplate.content.props.eSortBy,
+                  setSortBy: tabTemplate.content.props.setSortBy,
+                  showSortingContextMenu: tabTemplate.content.props.showSortingContextMenu,
+                }
+                const tabContentComponent = tabTemplate.content.type as TabContentComponent
+                const footer = tabTemplate.footer
 
                 let pacthedTabs: SteamTab[];
 
@@ -57,7 +65,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                   let tablist = tabMasterManager.getTabs().visibleTabsList;
                   pacthedTabs = tablist.flatMap((tabContainer) => {
                     if (tabContainer.filters) {
-                      return (tabContainer as CustomTabContainer).actualTab;
+                      return (tabContainer as CustomTabContainer).getActualTab(tabContentComponent, sortingProps, footer);
                     } else {
                       return tabs.find(actualTab => actualTab.id === tabContainer.id) ?? [];
                     }
@@ -65,11 +73,11 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                 } else {
                   pacthedTabs = tabs;
                 }
-                
+
                 return pacthedTabs;
               }, deps);
             }
-            
+
             hooks.useMemo = fakeUseMemo;
             const res = origMemoFn(...args);
             hooks.useMemo = realUseMemo;
