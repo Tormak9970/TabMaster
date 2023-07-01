@@ -17,18 +17,23 @@ jobs:
           sudo apt install -y git curl
           curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
           sudo DEBIAN_FRONTEND=noninteractive apt install -y nodejs
+          
+      - name: Setup Pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 6.0.2
 
       - name: Print versions
         run: |
           git --version
           node --version
-          npm --version
+          pnpm --version
           npx commitlint --version
 
       - name: Install commitlint
         run: |
-          npm install conventional-changelog-conventionalcommits
-          npm install commitlint@latest
+          pnpm install conventional-changelog-conventionalcommits
+          pnpm install commitlint@latest
 
       - name: Validate current commit (last commit) with commitlint
         if: github.event_name == 'push'
