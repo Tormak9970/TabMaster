@@ -38,6 +38,8 @@
   },
   "homepage": "https://github.com/Tormak9970/TabMaster#readme",
   "devDependencies": {
+    "@commitlint/cli": "^17.6.6",
+    "@commitlint/config-conventional": "^17.6.6",
     "@rollup/plugin-commonjs": "^21.1.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
@@ -48,6 +50,7 @@
     "@types/uuid": "^9.0.2",
     "@types/webpack": "^5.28.1",
     "deckbuild": "^1.2.1",
+    "husky": "^8.0.3",
     "rollup": "^2.79.1",
     "rollup-plugin-import-assets": "^1.1.1",
     "shx": "^0.3.4",

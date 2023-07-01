@@ -98,7 +98,7 @@ export const defaultTabsSettings: TabSettingsDictionary = {
 export function validateTabs(tabs: TabSettingsDictionary): boolean {
   return Object.values(tabs).every((tab: TabSettings) => {
     if (tab.filters) {
-      return tab.filters.every((filter: any) => {
+      return tab.filters.every((filter: TabFilterSettings<FilterType>) => {
         return (filter as TabFilterSettings<FilterType>).type !== undefined
       });
     } else {
