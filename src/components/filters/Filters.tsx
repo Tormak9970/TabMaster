@@ -98,8 +98,7 @@ export function categoryToLabel(category: number): string {
 export class Filter {
   private static filterFunctions = {
     collection: (params: FilterParams<'collection'>, appOverview: SteamAppOverview) => {
-      const collection = collectionStore.GetCollection(params.collection);
-      return collectionStore.GetCollectionListForAppID(appOverview.appid).includes(collection);
+      return collectionStore.GetCollection(params.collection).visibleApps.includes(appOverview);
     },
     installed: (params: FilterParams<'installed'>, appOverview: SteamAppOverview) => {
       return params.installed ? appOverview.installed : !appOverview.installed;
