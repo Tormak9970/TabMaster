@@ -1,5 +1,6 @@
-import { EditableTabSettings } from "./modals/EditTabModal"
-import { TabFilterSettings, FilterType, Filter } from "./filters/Filters"
+import { EditableTabSettings } from "./modals/EditTabModal";
+import { TabFilterSettings, FilterType, Filter } from "./filters/Filters";
+import { gamepadTabbedPageClasses } from "../GamepadTabbedPageClasses";
 
 /**
  * Wrapper for injecting custom tabs.
@@ -18,6 +19,7 @@ export class CustomTabContainer implements TabContainer {
    * @param title The title of the tab.
    * @param position The position of the tab.
    * @param filterSettingsList The tab's filters.
+   * @param filtersMode boolean operator for top level filters
    */
   constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode) {
     this.id = id;
@@ -30,19 +32,19 @@ export class CustomTabContainer implements TabContainer {
       AsDeletableCollection: () => null,
       AsDragDropCollection: () => null,
       AsEditableCollection: () => null,
-      GetAppCountWithToolsFilter: () => null, //this is how steam gets the count in renderTabAddon, we can't just copy it because it's a closure
+      GetAppCountWithToolsFilter: (appFilter) => this.collection.visibleApps.filter(appOverview => appFilter.Matches(appOverview)).length,
       bAllowsDragAndDrop: false,
       bIsDeletable: false,
       bIsDynamic: false,
       bIsEditable: false,
       displayName: this.title,
       id: this.id
-    }
+    };
 
     this.buildCollection();
   }
 
-  getActualTab(TabContentComponent: TabContentComponent, sortingProps: Omit<TabContentProps, 'collection'>, footer: SteamTab['footer'] ): SteamTab {
+  getActualTab(TabContentComponent: TabContentComponent, sortingProps: Omit<TabContentProps, 'collection'>, footer: SteamTab['footer'], collectionAppFilter: any): SteamTab {
     return {
       title: this.title,
       id: this.id,
@@ -51,14 +53,12 @@ export class CustomTabContainer implements TabContainer {
         collection={this.collection}
         {...sortingProps}
       />,
-      //* this is just temporary for now as it won't show correct count with native filters applied
       renderTabAddon: () => {
-        // TODO: use staticClasses here
-        return <span className='gamepadtabbedpage_TabCount_1ui4I'>
-          {this.collection.visibleApps.length}
-        </span>
+        return <span className={gamepadTabbedPageClasses.TabCount}>
+          {this.collection.GetAppCountWithToolsFilter(collectionAppFilter)}
+        </span>;
       }
-    }
+    };
   }
 
   /**
@@ -86,10 +86,10 @@ export class CustomTabContainer implements TabContainer {
   buildCollection() {
     if (this.position > -1) {
       const appsList = collectionStore.appTypeCollectionMap.get('type-games')!.visibleApps.filter(appItem => {
-        if (this.filtersMode === 'and'){
-          return this.filters.every(filterSettings => Filter.run(filterSettings, appItem))
+        if (this.filtersMode === 'and') {
+          return this.filters.every(filterSettings => Filter.run(filterSettings, appItem));
         } else {
-          return this.filters.some(filterSettings => Filter.run(filterSettings, appItem))
+          return this.filters.some(filterSettings => Filter.run(filterSettings, appItem));
         }
       });
 
