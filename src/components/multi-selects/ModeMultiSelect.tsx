@@ -1,46 +1,19 @@
-import { DialogButton, Dropdown, DropdownOption, Field, FieldProps, Focusable } from "decky-frontend-lib";
+import { Dropdown, DropdownOption, Field, Focusable } from "decky-frontend-lib";
 import { useState, VFC, useEffect } from "react";
-import { FaTimes } from "react-icons/fa";
-import { MultiSelectStyles } from "./styles/MultiSelectStyles";
+import { MultiSelectStyles } from "../styles/MultiSelectStyles";
+import { MultiSelectedOption } from "./MultiSelectOption";
+import { MultiSelectProps } from "./MultiSelect";
 
 
-type MultiSelectedOptionProps = {
-  option: DropdownOption,
-  fieldProps?: FieldProps,
-  onRemove: (option: DropdownOption) => void
+export interface ModeMultiSelectProps extends Omit<MultiSelectProps, 'onChange'> {
+  mode: LogicalMode,
+  onChange?: (selected:DropdownOption[], mode: LogicalMode) => void
 }
 
 /**
- * A component for multi select dropdown options.
+ * A component for multi select dropdown menus that supports modes.
  */
-const MultiSelectedOption:VFC<MultiSelectedOptionProps> = ({ option, fieldProps, onRemove }) => {
-  return (
-    <Field label={option.label} {...fieldProps} >
-      <Focusable style={{ display: 'flex', width: '100%', position: 'relative' }}>
-        <DialogButton style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }} onClick={() => onRemove(option)} onOKButton={() => onRemove(option)} onOKActionDescription={`Remove ${option.label}`}>
-          <FaTimes />
-        </DialogButton>
-      </Focusable>
-    </Field>
-  );
-}
-
-
-export type MultiSelectProps = {
-  options: DropdownOption[],
-  selected: DropdownOption[],
-  fieldLabel: string,
-  dropdownLabel?: string,
-  mode: string
-  onChange?: (selected:DropdownOption[], mode: string) => void,
-  maxOptions?: number,
-  fieldProps?: FieldProps,
-}
-
-/**
- * A component for multi select dropdown menus.
- */
-export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps }) => {
+export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps }) => {
   const [ sel, setSel ] = useState(selected);
   const [ available, setAvailable ] = useState(options.filter((opt) => !selected.includes(opt)));
   const [ innerMode, setInnerMode ] = useState(mode);
@@ -53,7 +26,7 @@ export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, fieldLabe
   ];
 
   useEffect(() => {
-    const avail = options.filter((opt) => !sel.includes(opt));
+    const avail = options.filter((opt) => !sel.some((selOpt) => selOpt.data === opt.data));
     setAvailable(avail);
     setDropdownSelected({
       label: avail.length == 0 ? "All selected" : (!!maxOptions && sel.length == maxOptions ? "Max selected" : dropdownLabel) as string,

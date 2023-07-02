@@ -98,11 +98,20 @@ export const defaultTabsSettings: TabSettingsDictionary = {
 export function validateTabs(tabs: TabSettingsDictionary): boolean {
   return Object.values(tabs).every((tab: TabSettings) => {
     if (tab.filters) {
-      return tab.filters.every((filter: any) => {
+      return tab.filters.every((filter: TabFilterSettings<FilterType>) => {
         return (filter as TabFilterSettings<FilterType>).type !== undefined
       });
     } else {
       return Object.keys(defaultTabsSettings).includes(tab.id);
     }
   });
+}
+
+/**
+ * Capitalizes the first letter of a word.
+ * @param word The word to capitalize.
+ * @returns The capitalized word.
+ */
+export function capitalizeFirstLetter(word: string): string {
+  return word[0].toUpperCase().concat(word.substring(1));
 }
