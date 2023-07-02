@@ -12,13 +12,13 @@ export const ModalStyles: VFC<{}> = ({}) => {
       }
       
       /* The button item */
-      .tab-master-modal-scope .add-filter-btn {
+      .tab-master-modal-scope .styled-btn {
         padding: 0 !important;
       }
-      .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.FieldLabel} {
+      .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldLabel} {
         display: none;
       }
-      .tab-master-modal-scope .add-filter-btn .${gamepadDialogClasses.FieldChildren} {
+      .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildren} {
         width: 100%;
       }
 
@@ -37,7 +37,8 @@ export const ModalStyles: VFC<{}> = ({}) => {
         min-width: 45px;
       }
 
-      .tab-master-modal-scope .filter-params-input .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
+      .tab-master-modal-scope .filter-input .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after,
+      .tab-master-modal-scope .filter-input.${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
         display: none
       }
 
@@ -46,12 +47,6 @@ export const ModalStyles: VFC<{}> = ({}) => {
         width: 114%;
         margin-left: -40px;
         padding: 0;
-
-        display: flex;
-        flex-direction: row;
-
-        justify-content: space-between;
-        align-items: center;
 
         font-size: 14px;
       }
@@ -64,6 +59,22 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .filter-start-cont .filter-label {
         margin: 0px 5px;
         color: #343945;
+      }
+      
+      /* Focused styles */
+      .tab-master-modal-scope .filter-start-cont.start-focused {
+        background-color: #3d4450;
+      }
+      .tab-master-modal-scope .filter-start-cont.start-focused .filter-line {
+        background: #a9a9a9;
+      }
+      .tab-master-modal-scope .filter-start-cont.start-focused .filter-label {
+        color: #a9a9a9;
+      }
+
+      /* merge entries */
+      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
+        margin: 5px;
       }
     `}</style>
   );

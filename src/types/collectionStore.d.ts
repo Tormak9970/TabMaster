@@ -3,7 +3,8 @@
 type CollectionStore = {
   appTypeCollectionMap: Map<'type-games', Collection>,
   userCollections: SteamCollection[],
-  deckDesktopApps: Collection,
+  allGamesCollection: Collection,
+  deckDesktopApps: Collection | null,
   userCollections: Collection[],
   localGamesCollection: Collection,
   allAppsCollection: Collection,
