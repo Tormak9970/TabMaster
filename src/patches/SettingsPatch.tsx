@@ -1,7 +1,7 @@
 import { ConfirmModal, ServerAPI, afterPatch, showModal } from "decky-frontend-lib";
 import { ReactElement } from "react";
-import { TabMasterManager } from "../../state/TabMasterManager";
-import { LogController } from "../../lib/controllers/LogController";
+import { TabMasterManager } from "../state/TabMasterManager";
+import { LogController } from "../lib/controllers/LogController";
 
 export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager) => {
   return serverAPI.routerHook.addPatch("/settings", (props: { path: string; children: ReactElement; }) => {

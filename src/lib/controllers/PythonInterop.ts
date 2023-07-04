@@ -25,7 +25,6 @@ export class PythonInterop {
    * @param message The message to log.
    */
   static async log(message: String): Promise<void> {
-    console.log(message);
     await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 2 });
   }
 
@@ -34,7 +33,6 @@ export class PythonInterop {
    * @param message The message to log.
    */
   static async warn(message: string): Promise<void> {
-    console.warn(message);
     await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 1 });
   }
 
@@ -43,7 +41,6 @@ export class PythonInterop {
    * @param message The message to log.
    */
   static async error(message: string): Promise<void> {
-    console.error(message);
     await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 2 });
   }
 
