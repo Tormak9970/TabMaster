@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Suggest an idea for TabMaster
-title: ''
+title: "[FEAT]: A Descriptive Title"
 labels: enhancement
 assignees: Tormak9970, jessebofill
 

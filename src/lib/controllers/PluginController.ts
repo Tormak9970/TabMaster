@@ -22,6 +22,10 @@ export class PluginController {
     this.server = server;
     this.tabMasterManager = tabMasterManager;
     this.steamController = new SteamController();
+
+    LogController.log("Test");
+    LogController.warn("Test");
+    LogController.error("Test");
   }
 
   /**
@@ -30,7 +34,7 @@ export class PluginController {
    */
   static initOnLogin(onMount: () => Promise<void>): Unregisterer {
     return this.steamController.registerForAuthStateChange(async (username) => {
-      PythonInterop.log(`User logged in. [DEBUG] username: ${username}.`);
+      LogController.log(`User logged in. [DEBUG] username: ${username}.`);
       if (await this.steamController.waitForServicesToInitialize()) {
         PluginController.init();
         onMount();

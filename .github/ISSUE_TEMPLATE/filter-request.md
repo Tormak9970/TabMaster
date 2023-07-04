@@ -1,8 +1,8 @@
 ---
 name: Filter request
 about: Suggest an idea for a Tab filter
-title: ''
-labels: enhancement
+title: "[FLTR]: A Descriptive Title"
+labels: enhancement, filter
 assignees: Tormak9970, jessebofill
 
 ---

@@ -7,8 +7,9 @@ import {
   wrapReactType
 } from "decky-frontend-lib";
 import { ReactElement, useEffect } from "react";
-import { TabMasterManager } from "../../state/TabMasterManager";
-import { CustomTabContainer } from "../CustomTabContainer";
+import { TabMasterManager } from "../state/TabMasterManager";
+import { CustomTabContainer } from "../components/CustomTabContainer";
+import { LogController } from "../lib/controllers/LogController";
 
 /**
  * Patches the Steam library to allow the plugin to change the tabs.
@@ -53,11 +54,11 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
 
                 const tabTemplate = tabs.find((tab: SteamTab) => tab?.id === "AllGames");
                 if (tabTemplate === undefined) {
-                  throw new Error(`Tab Master couldn't find default tab "AllGames" to copy from`);
+                  LogController.error(`Tab Master couldn't find default tab "AllGames" to copy from`);
                 }
 
-                const tabContentComponent = tabTemplate.content.type as TabContentComponent;
-                const footer = tabTemplate.footer;
+                const tabContentComponent = tabTemplate!.content.type as TabContentComponent;
+                const footer = tabTemplate!.footer;
 
                 let pacthedTabs: SteamTab[];
 
