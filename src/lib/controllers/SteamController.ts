@@ -1,5 +1,5 @@
 import { waitForCondition } from "../Utils";
-import { PythonInterop } from "./PythonInterop";
+import { LogController } from "./LogController";
 
 /**
  * Wrapper class for the SteamClient interface.
@@ -33,7 +33,7 @@ export class SteamController {
         }
       });
     } catch (error) {
-      PythonInterop.log(`error with AuthStateChange hook. [DEBUG INFO] error: ${error};`);
+      LogController.log(`error with AuthStateChange hook. [DEBUG INFO] error: ${error};`);
       // @ts-ignore
       return () => { };
     }
@@ -48,13 +48,13 @@ export class SteamController {
     const servicesFound = await waitForCondition(20, 250, () => (window as WindowEx).App?.WaitForServicesInitialized != null);
   
     if (servicesFound) {
-      PythonInterop.log(`Services found.`);
+      LogController.log(`Services found.`);
     } else {
-      PythonInterop.log(`Couldn't find services.`);
+      LogController.log(`Couldn't find services.`);
     }
   
     return (await (window as WindowEx).App?.WaitForServicesInitialized?.().then((success: boolean) => {
-      PythonInterop.log(`Services initialized. Success: ${success}`);
+      LogController.log(`Services initialized. Success: ${success}`);
       return success;
     })) ?? false;
   }

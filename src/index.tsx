@@ -13,7 +13,7 @@ import { VFC, Fragment } from "react";
 import { TbLayoutNavbarExpand } from "react-icons/tb";
 import { FaSteam } from "react-icons/fa";
 
-import { patchLibrary } from "./components/patches/LibraryPatch";
+import { patchLibrary } from "./patches/LibraryPatch";
 import { TabMasterContextProvider, useTabMasterContext } from "./state/TabMasterContext";
 import { EditableTabSettings, EditTabModal } from "./components/modals/EditTabModal";
 import { PluginController } from "./lib/controllers/PluginController";
@@ -21,7 +21,7 @@ import { PythonInterop } from "./lib/controllers/PythonInterop";
 import { TabMasterManager } from "./state/TabMasterManager";
 import { TabActionsButton } from "./components/TabActions";
 import { QamStyles } from "./components/styles/QamStyles";
-import { patchSettings } from "./components/patches/SettingsPatch";
+import { patchSettings } from "./patches/SettingsPatch";
 
 declare global {
   var SteamClient: SteamClient;
