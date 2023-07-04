@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Report any bugs/problems you encounter
-title: ''
+title: "[BUG]: A Descriptive Title"
 labels: bug
 assignees: Tormak9970, jessebofill
 
