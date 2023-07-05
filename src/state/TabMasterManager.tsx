@@ -460,6 +460,7 @@ export class TabMasterManager {
     }
 
     if (tabsNeedChanges.size > 0) {
+      LogController.warn(`There were ${tabsNeedChanges.size} tabs that failed validation!`);
       showModal(
         <ChangeTabModalRoot
           onConfirm={(editedTabSettings: TabSettingsDictionary) => {
