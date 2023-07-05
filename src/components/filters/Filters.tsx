@@ -93,6 +93,44 @@ export function categoryToLabel(category: number): string {
 }
 
 /**
+ * Validates a filter to ensure it will function properly.
+ * @param filter The filter to validate.
+ * @returns Whether or not the filter passed, and if not, any errors it produced.
+ */
+export function validateFilter(filter: TabFilterSettings<FilterType>): { passed: boolean, errors: string[] } {
+  switch (filter.type) {
+    case "collection": {
+      let passed = true;
+      const errors: string[] = [];
+      const collectionFilter = filter as TabFilterSettings<'collection'>;
+
+      //* Confirm the collection still exists
+      if (!collectionStore.GetCollection(collectionFilter.params.collection)) {
+        errors.push(`collection with id: ${collectionFilter.params.collection} no longer exists`)
+      }
+
+      return {
+        passed: passed,
+        errors: errors
+      }
+    }
+    case "regex":
+    case "friends":
+    case "tags":
+    case "installed":
+    case "whitelist":
+    case "blacklist":
+    case "merge":
+    case "platform":
+    case "deck compatibility":
+      return {
+        passed: true,
+        errors: []
+      }
+    }
+}
+
+/**
  * Utility class for filtering games.
  */
 export class Filter {

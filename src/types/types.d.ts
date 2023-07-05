@@ -41,6 +41,11 @@ type FriendEntry = {
   steamid: number
 }
 
+type FilterErrorEntry = {
+  filterIdx: number,
+  errors: string[]
+}
+
 type LogicalMode = 'and' | 'or'
 
 type SteamPlatform = "steam" | "nonSteam"

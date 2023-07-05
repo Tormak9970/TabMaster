@@ -1,10 +1,13 @@
 import { EditableTabSettings } from "../components/modals/EditTabModal";
-import { TabFilterSettings, FilterType } from "../components/filters/Filters";
+import { TabFilterSettings, FilterType, validateFilter } from "../components/filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { v4 as uuidv4 } from "uuid";
 import { IReactionDisposer, reaction } from "mobx"
 import { defaultTabsSettings, getNonBigIntUserId } from "../lib/Utils";
+import { LogController } from "../lib/controllers/LogController";
+import { showModal } from "decky-frontend-lib";
+import { ChangesNeededModalRoot } from "../components/modals/ChangesNeededModal";
 
 /**
  * Class that handles TabMaster's core state.
@@ -393,7 +396,7 @@ export class TabMasterManager {
   loadTabs = async () => {
     this.initReactions();
     const settings = await PythonInterop.getTabs();
-    //* We don't need to wait for these, as if we get the store ones, we don't care about them
+    //* We don't need to wait for these, since if we get the store ones, we don't care about them
     PythonInterop.getTags().then((res: TagResponse[] | Error) => {
       if (res instanceof Error) {
         console.log("TabMaster couldn't load tags settings");
@@ -423,11 +426,56 @@ export class TabMasterManager {
     });
 
     if (settings instanceof Error) {
-      console.log("TabMaster couldn't load tab settings");
+      LogController.log("TabMaster couldn't load tab settings");
       return;
     }
 
     const tabsSettings = Object.keys(settings).length > 0 ? settings : { ...defaultTabsSettings };
+    const tabsNeedChanges = new Map<string, FilterErrorEntry[]>();
+
+    for (const [id, tabSetting] of Object.entries(tabsSettings)) {
+      if (tabSetting.filters) {
+        const tabErroredFilters: FilterErrorEntry[] = [];
+
+        for (let i = 0; i < tabSetting.filters.length; i++) {
+          const filter = tabSetting.filters[i];
+          const filterValidated = validateFilter(filter);
+
+          if (!filterValidated.passed) {
+            tabErroredFilters.push({
+              filterIdx: i,
+              errors: filterValidated.errors
+            })
+          }
+        }
+
+        if (tabErroredFilters.length > 0) {
+          tabsNeedChanges.set(id, tabErroredFilters);
+        }
+      }
+    }
+
+    if (tabsNeedChanges.size > 0) {
+      showModal(
+        <ChangesNeededModalRoot
+          onConfirm={(editedTabSettings: TabSettingsDictionary) => {
+            this.finishLoadingTabs(editedTabSettings);
+          }}
+          tabs={tabsSettings}
+          erroredFiltersMap={tabsNeedChanges}
+          tabMasterManager={this}
+        />
+      );
+    } else {
+      this.finishLoadingTabs(tabsSettings);
+    }
+  }
+
+  /**
+   * Finishes the tab loading process.
+   * @param tabsSettings The tabsSettings to finish loading.
+   */
+  private finishLoadingTabs(tabsSettings: TabSettingsDictionary): void {
     const visibleTabContainers: TabContainer[] = [];
     const hiddenTabContainers: TabContainer[] = [];
     const favoritesCollection = collectionStore.GetCollection("favorite");
