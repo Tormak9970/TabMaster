@@ -9,9 +9,9 @@ import { PythonInterop } from "../../lib/controllers/PythonInterop";
 import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import type { TabMasterManager } from "../../state/TabMasterManager";
 import { ModalStyles } from "../styles/ModalStyles";
-import { TabPanel } from "../changes-needed/TabPanel";
+import { TabErrorsPanel } from "../changes-needed/TabErrorsPanel";
 
-type ChangeTabModalRootProps = {
+type FixTabErrorsModalRootProps = {
   closeModal?: () => void,
   onConfirm: (fixedTabSettings: TabSettingsDictionary) => void,
   tabs: TabSettingsDictionary,
@@ -22,19 +22,19 @@ type ChangeTabModalRootProps = {
 /**
  * Modal root for the Changes Needed modal.
  */
-export const ChangeTabModalRoot: VFC<ChangeTabModalRootProps> = ({ closeModal, onConfirm, tabs, erroredFiltersMap, tabMasterManager }) => {
+export const FixTabErrorsModalRoot: VFC<FixTabErrorsModalRootProps> = ({ closeModal, onConfirm, tabs, erroredFiltersMap, tabMasterManager }) => {
   return (
     <ModalRoot onCancel={closeModal} onEscKeypress={closeModal} bAllowFullSize>
       <TabMasterContextProvider tabMasterManager={tabMasterManager}>
         <ModalStyles />
-        <ChangeTabModal onConfirm={onConfirm} tabs={tabs} erroredFiltersMap={erroredFiltersMap} />
+        <FixTabErrorsModal onConfirm={onConfirm} tabs={tabs} erroredFiltersMap={erroredFiltersMap} />
       </TabMasterContextProvider>
     </ModalRoot>
   );
 }
 
 
-type ChangeTabModalProps = {
+type FixTabErrorsModalProps = {
   onConfirm: (fixedTabSettings: TabSettingsDictionary) => void,
   tabs: TabSettingsDictionary,
   erroredFiltersMap: Map<string, FilterErrorEntry[]>
@@ -43,7 +43,7 @@ type ChangeTabModalProps = {
 /**
  * The modal for editing and creating custom tabs.
  */
-const ChangeTabModal: VFC<ChangeTabModalProps> = ({ onConfirm, tabs, erroredFiltersMap }) => {
+const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, tabs, erroredFiltersMap }) => {
   const [changedTabs, setChangedTabs] = useState<TabSettingsDictionary>(Object.fromEntries(Object.entries(tabs).filter(([id]) => erroredFiltersMap.has(id))));
   const [isPassingMap, setIsPassingMap] = useState<{ [tabId: string]: boolean}>(Object.fromEntries(Object.keys(tabs).map((key) => [key, false])));
   const [canApply, setCanApply] = useState<boolean>(false);
@@ -87,7 +87,7 @@ const ChangeTabModal: VFC<ChangeTabModalProps> = ({ onConfirm, tabs, erroredFilt
       <PanelSection title="Tabs With Errors">
         <PanelSectionRow>
           {Object.values(changedTabs).map((tab: TabSettings, idx: number) => {
-            return <TabPanel index={idx} tab={tab} erroredFilters={erroredFiltersMap.get(tab.id)!} onTabStatusChange={updateTabStatus} />
+            return <TabErrorsPanel index={idx} tab={tab} erroredFilters={erroredFiltersMap.get(tab.id)!} onTabStatusChange={updateTabStatus} />
           })}
         </PanelSectionRow>
       </PanelSection>

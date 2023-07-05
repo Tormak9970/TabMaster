@@ -2,7 +2,7 @@ import { VFC, useState } from "react"
 import { TabDialogAccordion } from "../accordions/TabDialogAccordion"
 import { FilterOptions } from "../filters/FilterOptions"
 
-type TabPanelProps = {
+type TabErrorsPanelProps = {
   index: number,
   tab: TabSettings,
   erroredFilters: FilterErrorEntry[],
@@ -12,7 +12,7 @@ type TabPanelProps = {
 /**
  * Panel for tab that needs changes
  */
-export const TabPanel: VFC<TabPanelProps> = ({ index, tab, erroredFilters, onTabStatusChange }) => {
+export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, erroredFilters, onTabStatusChange }) => {
   const [errorMessages, setErrorMessages] = useState<string[][]>(erroredFilters.map((entry: FilterErrorEntry) => entry.errors));
   const [isPassing, setIsPassing] = useState(false);
 

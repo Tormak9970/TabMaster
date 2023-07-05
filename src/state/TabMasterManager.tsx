@@ -7,7 +7,7 @@ import { IReactionDisposer, reaction } from "mobx"
 import { defaultTabsSettings, getNonBigIntUserId } from "../lib/Utils";
 import { LogController } from "../lib/controllers/LogController";
 import { showModal } from "decky-frontend-lib";
-import { ChangeTabModalRoot } from "../components/modals/ChangeTabModal";
+import { FixTabErrorsModalRoot } from "../components/modals/FixTabErrorsModal";
 
 /**
  * Class that handles TabMaster's core state.
@@ -462,7 +462,7 @@ export class TabMasterManager {
     if (tabsNeedChanges.size > 0) {
       LogController.warn(`There were ${tabsNeedChanges.size} tabs that failed validation!`);
       showModal(
-        <ChangeTabModalRoot
+        <FixTabErrorsModalRoot
           onConfirm={(editedTabSettings: TabSettingsDictionary) => {
             this.finishLoadingTabs(editedTabSettings);
           }}
