@@ -66,6 +66,8 @@ export class TabMasterManager {
     //! may need to debounce this, we'll see
     this.collectionRemoveReaction = reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this));
 
+    this.handleUserCollectionRemove(collectionStore.userCollections.length); //* this loads the collection ids for the first time.
+
     //* subscribe to user's friendlist updates
     this.friendsReaction = reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
 
@@ -176,12 +178,9 @@ export class TabMasterManager {
    * @param newLength The new length of the userCollections.
    */
   private handleUserCollectionRemove(newLength: number) {
-    if (!this.hasLoaded) return;
-    console.log("we reacted to user collection length changes!");
-
     const userCollections = collectionStore.userCollections;
 
-    if (newLength < this.userCollectionIds.length) {
+    if (newLength < this.userCollectionIds.length && this.hasLoaded) {
       let showFixNeeded = false;
       const collectionsInUse = Object.keys(this.collectionReactions);
       const currentUserCollectionIds = userCollections.map((collection) => collection.id);
