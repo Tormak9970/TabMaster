@@ -25,6 +25,8 @@ export class TabMasterManager {
   private userHasVisibleFavorites: boolean = false;
   private userHasVisibleSoundtracks: boolean = false;
 
+  private userCollectionIds: string[] = [];
+
   public eventBus = new EventTarget();
 
   private favoriteReaction: IReactionDisposer | undefined;
@@ -36,6 +38,8 @@ export class TabMasterManager {
 
   private friendsReaction: IReactionDisposer | undefined;
   private tagsReaction: IReactionDisposer | undefined;
+
+  private collectionRemoveReaction: IReactionDisposer | undefined;
 
   /**
    * Creates a new TabMasterManager.
@@ -57,6 +61,10 @@ export class TabMasterManager {
 
     //* subscribe to game hide or show
     this.hiddenReaction = reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.handleGameHideOrShow.bind(this), { delay: 50 });
+
+    //* subscribe for when collections are deleted
+    //! may need to debounce this, we'll see
+    this.collectionRemoveReaction = reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this));
 
     //* subscribe to user's friendlist updates
     this.friendsReaction = reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
@@ -164,6 +172,64 @@ export class TabMasterManager {
   }
 
   /**
+   * Handles when the user deletes one of their collections.
+   * @param newLength The new length of the userCollections.
+   */
+  private handleUserCollectionRemove(newLength: number) {
+    if (!this.hasLoaded) return;
+    console.log("we reacted to user collection length changes!");
+
+    const userCollections = collectionStore.userCollections;
+
+    if (newLength < this.userCollectionIds.length) {
+      let showFixNeeded = false;
+      const collectionsInUse = Object.keys(this.collectionReactions);
+      const currentUserCollectionIds = userCollections.map((collection) => collection.id);
+
+      this.userCollectionIds = this.userCollectionIds.filter((id) => {
+        const isIncluded = currentUserCollectionIds.includes(id);
+        if (!isIncluded && collectionsInUse.includes(id)) showFixNeeded = true;
+        return isIncluded;
+      });
+
+      if (showFixNeeded) {
+        const tabsSettings = Object.fromEntries(this.tabsMap.entries());
+        const tabsToFix = this.checkForBrokenFilters(tabsSettings);
+
+        if (tabsToFix.size > 0) {
+          LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
+          showModal(
+            <FixTabErrorsModalRoot
+              onConfirm={(editedTabSettings: TabSettingsDictionary) => {
+                for (const fixedTab of Object.values(editedTabSettings)) {
+                  if (tabsToFix.has(fixedTab.id)) {
+                    const tabContainer = fixedTab as TabContainer;
+                    
+                    const asEditableSettings: EditableTabSettings = {
+                      title: tabContainer.title,
+                      filters: tabContainer.filters!,
+                      filtersMode: tabContainer.filtersMode!
+                    }
+
+                    this.updateCustomTab(fixedTab.id, asEditableSettings);
+                  }
+                }
+              }}
+              tabs={tabsSettings}
+              erroredFiltersMap={tabsToFix}
+              tabMasterManager={this}
+            />
+          );
+        }
+      }
+    } else {
+      for (const userCollection of userCollections) {
+        if (!this.userCollectionIds.includes(userCollection.id)) this.userCollectionIds.push(userCollection.id);
+      }
+    }
+  }
+
+  /**
    * Handles updating state when the store tag localization map changes.
    * @param storeTagLocalizationMap The store tag localization map.
    */
@@ -265,6 +331,8 @@ export class TabMasterManager {
 
     if (this.friendsReaction) this.friendsReaction();
     if (this.tagsReaction) this.tagsReaction();
+
+    if (this.collectionRemoveReaction) this.collectionRemoveReaction();
   }
 
   /**
@@ -391,6 +459,43 @@ export class TabMasterManager {
   }
 
   /**
+   * Checks the provided tabsSettings for broken filters.
+   * @param tabsSettings The tabsSettings to check.
+   * @returns A map of tabIds to broken filters.
+   */
+  private checkForBrokenFilters(tabsSettings: TabSettingsDictionary): Map<string, FilterErrorEntry[]> {
+    const tabsToFix = new Map<string, FilterErrorEntry[]>();
+
+    for (const [id, tabSetting] of Object.entries(tabsSettings)) {
+      if (tabSetting.filters) {
+        const tabErroredFilters: FilterErrorEntry[] = [];
+
+        for (let i = 0; i < tabSetting.filters.length; i++) {
+          const filter = tabSetting.filters[i];
+          const filterValidated = validateFilter(filter);
+
+          if (!filterValidated.passed) {
+            let entry: FilterErrorEntry = {
+              filterIdx: i,
+              errors: filterValidated.errors
+            };
+
+            if (filterValidated.mergeErrorMap) entry.mergeErrorMap = filterValidated.mergeErrorMap;
+
+            tabErroredFilters.push(entry)
+          }
+        }
+
+        if (tabErroredFilters.length > 0) {
+          tabsToFix.set(id, tabErroredFilters);
+        }
+      }
+    }
+
+    return tabsToFix;
+  }
+
+  /**
    * Loads the user's tabs from the backend.
    */
   loadTabs = async () => {
@@ -431,43 +536,17 @@ export class TabMasterManager {
     }
 
     const tabsSettings = Object.keys(settings).length > 0 ? settings : { ...defaultTabsSettings };
-    const tabsNeedChanges = new Map<string, FilterErrorEntry[]>();
+    const tabsToFix = this.checkForBrokenFilters(tabsSettings);
 
-    for (const [id, tabSetting] of Object.entries(tabsSettings)) {
-      if (tabSetting.filters) {
-        const tabErroredFilters: FilterErrorEntry[] = [];
-
-        for (let i = 0; i < tabSetting.filters.length; i++) {
-          const filter = tabSetting.filters[i];
-          const filterValidated = validateFilter(filter);
-
-          if (!filterValidated.passed) {
-            let entry: FilterErrorEntry = {
-              filterIdx: i,
-              errors: filterValidated.errors
-            };
-
-            if (filterValidated.mergeErrorMap) entry.mergeErrorMap = filterValidated.mergeErrorMap;
-
-            tabErroredFilters.push(entry)
-          }
-        }
-
-        if (tabErroredFilters.length > 0) {
-          tabsNeedChanges.set(id, tabErroredFilters);
-        }
-      }
-    }
-
-    if (tabsNeedChanges.size > 0) {
-      LogController.warn(`There were ${tabsNeedChanges.size} tabs that failed validation!`);
+    if (tabsToFix.size > 0) {
+      LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
       showModal(
         <FixTabErrorsModalRoot
           onConfirm={(editedTabSettings: TabSettingsDictionary) => {
             this.finishLoadingTabs(editedTabSettings);
           }}
           tabs={tabsSettings}
-          erroredFiltersMap={tabsNeedChanges}
+          erroredFiltersMap={tabsToFix}
           tabMasterManager={this}
         />
       );

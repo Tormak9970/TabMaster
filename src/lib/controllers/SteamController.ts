@@ -13,9 +13,10 @@ export class SteamController {
    * @param onLogin Function to run on login.
    * @param onLogout Function to run on logout.
    * @param once Whether the hook should run once.
+   * @param waitForPasscode Whether the hook should only run once the passcode has been entered.
    * @returns A function to unregister the hook.
    */
-  registerForAuthStateChange(onLogin: ((username:string) => Promise<void>) | null, onLogout: ((username:string) => Promise<void>) | null, once: boolean): Unregisterer {
+  registerForAuthStateChange(onLogin: ((username?:string, loginState?: LoginState, loginResult?: LoginResult, unkInt?: number, loginPercent?: number) => Promise<void>) | null, onLogout: ((username?:string, loginState?: LoginState, loginResult?: LoginResult, unkInt?: number, loginPercent?: number) => Promise<void>) | null, once: boolean, waitForPasscode: boolean): Unregisterer {
     try {
       let isLoggedIn: boolean | null = null;
       const currentUsername = loginStore.m_strAccountName;
@@ -27,7 +28,16 @@ export class SteamController {
           isLoggedIn = false;
         } else {
           if (isLoggedIn !== true && (once ? !this.hasLoggedIn : true)) {
-            if (onLogin) onLogin(username);
+            if (onLogin) {
+              if (waitForPasscode && securitystore.IsLockScreenActive()) {
+                waitForCondition(100, 250, () => !securitystore.IsLockScreenActive()).then(() => {
+                  //* basically, wait up to 25 minutes for the user to enter their passcode, and at that point, if they have logged in, initialize regardless.
+                  onLogin(username);
+                })
+              } else {
+                onLogin(username);
+              }
+            }
           }
           isLoggedIn = true;
         }
