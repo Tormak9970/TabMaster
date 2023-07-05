@@ -7,7 +7,6 @@ export class LogController {
    */
 	static log(...args: any[]) {
     console.log(
-      window.console,
       `%c TabMaster %c INFO %c`,
       'background: #ff6d05; color: black;',
       'background: #1abc9c; color: black;',
@@ -22,7 +21,6 @@ export class LogController {
    */
 	static warn(...args: any[]) {
     console.warn(
-      window.console,
       `%c TabMaster %c WARNING %c`,
       'background: #ff6d05; color: black;',
       'background: #e3c907; color: black;',
@@ -37,7 +35,6 @@ export class LogController {
    */
 	static error(...args: any[]) {
     console.error(
-      window.console,
       `%c TabMaster %c ERROR %c`,
       'background: #ff6d05; color: black;',
       'background: #c70808; color: black;',

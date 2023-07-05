@@ -22,10 +22,6 @@ export class PluginController {
     this.server = server;
     this.tabMasterManager = tabMasterManager;
     this.steamController = new SteamController();
-
-    LogController.log("Test");
-    LogController.warn("Test");
-    LogController.error("Test");
   }
 
   /**
