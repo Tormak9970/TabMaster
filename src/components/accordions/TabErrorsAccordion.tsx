@@ -3,7 +3,7 @@ import React, { VFC, useState } from "react"
 import { BiSolidDownArrow } from "react-icons/bi"
 import { FaCircleCheck, FaCircleExclamation } from "react-icons/fa6"
 
-type TabDialogAccordionProps = {
+type TabErrorsAccordionProps = {
   index: number,
   tab: TabSettings,
   isPassing: boolean,
@@ -14,7 +14,7 @@ type TabDialogAccordionProps = {
 /**
  * Filter Section accordion component
  */
-export const TabDialogAccordion: VFC<TabDialogAccordionProps> = ({ index, isPassing, tab, isOpen, children }) => {
+export const TabErrorsAccordion: VFC<TabErrorsAccordionProps> = ({ index, isPassing, tab, isOpen, children }) => {
   const [open, setOpen] = useState(isOpen);
 
   function onClick(e: any) {
