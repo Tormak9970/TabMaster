@@ -3,9 +3,9 @@ import { VFC, Fragment } from "react"
 import { FilterEntry } from "./FilterEntry"
 import { FilterOptions } from "./FilterOptions"
 import { TabFilterSettings, FilterType } from "./Filters"
-import { FilterSectionAccordion } from "../utils/Accordion"
+import { FilterSectionAccordion } from "../accordions/FilterSectionAccordion"
 
-interface FilterEditorPanelProps {
+interface FiltersPanelProps {
   groupFilters: TabFilterSettings<FilterType>[]
   groupLogicMode: string
   setGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
@@ -14,7 +14,7 @@ interface FilterEditorPanelProps {
   canAddFilter: boolean
 }
 
-export const FilterEditorPanel: VFC<FilterEditorPanelProps> = ({ groupFilters, groupLogicMode, setGroupFilters, setGroupLogicMode, addFilter, canAddFilter }) => {
+export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicMode, setGroupFilters, setGroupLogicMode, addFilter, canAddFilter }) => {
   const modeOptions = [
     { label: "And", data: "and" },
     { label: "Or", data: "or" }

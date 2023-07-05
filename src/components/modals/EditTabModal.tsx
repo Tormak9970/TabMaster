@@ -11,7 +11,7 @@ import { PythonInterop } from "../../lib/controllers/PythonInterop";
 import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabMasterManager } from "../../state/TabMasterManager";
 import { ModalStyles } from "../styles/ModalStyles";
-import { FilterEditorPanel } from "../filters/FilterEditorPanel";
+import { FiltersPanel } from "../filters/FiltersPanel";
 
 export type EditableTabSettings = {
   title: string,
@@ -93,7 +93,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
               />
             </PanelSectionRow>
           </PanelSection>
-          <FilterEditorPanel
+          <FiltersPanel
             groupFilters={topLevelFilters}
             setGroupFilters={setTopLevelFilters}
             addFilter={addFilter}

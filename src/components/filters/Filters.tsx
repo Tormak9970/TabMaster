@@ -2,7 +2,17 @@ import { PluginController } from "../../lib/controllers/PluginController"
 
 export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility';
 
-type CollectionFilterParams = { collection: SteamCollection['id'] };
+type CollectionFilterParams = {
+  id: SteamCollection['id'],
+  /**
+   * Always present as of v1.2.2 onward
+   */
+  name?: string,
+  /**
+   * @deprecated Replaced by id. Used pre v1.2.2
+   */
+  collection?: SteamCollection['id']
+};
 type InstalledFilterParams = { installed: boolean };
 type RegexFilterParams = { regex: string };
 type FriendsFilterParams = { friends: number[], mode: LogicalMode };
@@ -38,7 +48,7 @@ type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOv
  * Checking and settings defaults in component is unnecessary
  */
 export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
-  "collection": { collection: "" },
+  "collection": { id: "", name: "" },
   "installed": { installed: false },
   "regex": { regex: "" },
   "friends": { friends: [], mode: 'and' },
@@ -60,7 +70,7 @@ export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean 
     case "regex":
       return (filter as TabFilterSettings<'regex'>).params.regex === "";
     case "collection":
-      return (filter as TabFilterSettings<'collection'>).params.collection === "";
+      return (filter as TabFilterSettings<'collection'>).params.id === "" || (filter as TabFilterSettings<'collection'>).params.name === "";
     case "friends":
       return (filter as TabFilterSettings<'friends'>).params.friends.length === 0;
     case "tags":
@@ -97,16 +107,48 @@ export function categoryToLabel(category: number): string {
  * @param filter The filter to validate.
  * @returns Whether or not the filter passed, and if not, any errors it produced.
  */
-export function validateFilter(filter: TabFilterSettings<FilterType>): { passed: boolean, errors: string[] } {
+export function validateFilter(filter: TabFilterSettings<FilterType>): ValidationResponse {
   switch (filter.type) {
     case "collection": {
       let passed = true;
       const errors: string[] = [];
       const collectionFilter = filter as TabFilterSettings<'collection'>;
 
+      if (collectionFilter.params.collection) {
+        collectionFilter.params.id = collectionFilter.params.collection;
+        delete collectionFilter.params.collection;
+      }
+
       //* Confirm the collection still exists
-      if (!collectionStore.GetCollection(collectionFilter.params.collection)) {
-        errors.push(`collection with id: ${collectionFilter.params.collection} no longer exists`)
+      const collectionFromStores = collectionStore.GetCollection(collectionFilter.params.id);
+      if (!collectionFromStores) {
+        errors.push(`collection with id: ${collectionFilter.params.id} no longer exists`)
+      } else if (!collectionFilter.params.name) {
+        collectionFilter.params.name = collectionFromStores.displayName;
+      }
+
+      return {
+        passed: passed,
+        errors: errors
+      }
+    }
+    case "merge": {
+      let passed = true;
+      const errors: string[] = [];
+      const mergeErrorMap: MergeErrorMap = {}
+
+      const mergeFilter = filter as TabFilterSettings<'merge'>;
+
+      for (let i = 0; i < mergeFilter.params.filters.length; i++) {
+        const filter = mergeFilter.params.filters[i];
+
+        const validated = validateFilter(filter);
+
+        if (!validated.passed) {
+          passed = false;
+          errors.push(`Filter ${i+1} - ${validated.errors.length} ${validated.errors.length === 1 ? "error" : "errors"}`);
+          mergeErrorMap[i] = validated;
+        }
       }
 
       return {
@@ -120,7 +162,6 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): { passed:
     case "installed":
     case "whitelist":
     case "blacklist":
-    case "merge":
     case "platform":
     case "deck compatibility":
       return {
@@ -136,7 +177,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): { passed:
 export class Filter {
   private static filterFunctions = {
     collection: (params: FilterParams<'collection'>, appOverview: SteamAppOverview) => {
-      return collectionStore.GetCollection(params.collection).visibleApps.includes(appOverview);
+      return collectionStore.GetCollection(params.id).visibleApps.includes(appOverview);
     },
     installed: (params: FilterParams<'installed'>, appOverview: SteamAppOverview) => {
       return params.installed ? appOverview.installed : !appOverview.installed;

@@ -7,7 +7,7 @@ import { IReactionDisposer, reaction } from "mobx"
 import { defaultTabsSettings, getNonBigIntUserId } from "../lib/Utils";
 import { LogController } from "../lib/controllers/LogController";
 import { showModal } from "decky-frontend-lib";
-import { ChangesNeededModalRoot } from "../components/modals/ChangesNeededModal";
+import { ChangeTabModalRoot } from "../components/modals/ChangeTabModal";
 
 /**
  * Class that handles TabMaster's core state.
@@ -378,7 +378,7 @@ export class TabMasterManager {
 
     if (collectionFilters.length > 0) {
       for (const collectionFilter of collectionFilters) {
-        const collectionId: string = (collectionFilter as TabFilterSettings<"collection">).params.collection;
+        const collectionId: string = (collectionFilter as TabFilterSettings<"collection">).params.id;
 
         if (!this.collectionReactions[collectionId]) {
           //* subscribe to user collection updates
@@ -442,10 +442,14 @@ export class TabMasterManager {
           const filterValidated = validateFilter(filter);
 
           if (!filterValidated.passed) {
-            tabErroredFilters.push({
+            let entry: FilterErrorEntry = {
               filterIdx: i,
               errors: filterValidated.errors
-            })
+            };
+
+            if (filterValidated.mergeErrorMap) entry.mergeErrorMap = filterValidated.mergeErrorMap;
+
+            tabErroredFilters.push(entry)
           }
         }
 
@@ -457,7 +461,7 @@ export class TabMasterManager {
 
     if (tabsNeedChanges.size > 0) {
       showModal(
-        <ChangesNeededModalRoot
+        <ChangeTabModalRoot
           onConfirm={(editedTabSettings: TabSettingsDictionary) => {
             this.finishLoadingTabs(editedTabSettings);
           }}

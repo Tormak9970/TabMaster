@@ -25,12 +25,16 @@ type FilterOptionsProps<T extends FilterType> = {
 }
 
 
-const CollectionFilterOptions: VFC<FilterOptionsProps<'collection'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+/**
+ * The options for a collection filter.
+ */
+export const CollectionFilterOptions: VFC<FilterOptionsProps<'collection'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map((collection: { displayName: string; id: string; }) => { return { label: collection.displayName, data: collection.id } });
 
   function onChange(data: SingleDropdownOption) {
     const updatedFilter = { ...filter };
-    updatedFilter.params.collection = data.data;
+    updatedFilter.params.id = data.data;
+    updatedFilter.params.name = data.label as string;
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
     setContainingGroupFilters(updatedFilters);
@@ -39,12 +43,15 @@ const CollectionFilterOptions: VFC<FilterOptionsProps<'collection'>> = ({ index,
   return (
     <Field
       label="Selected Collection"
-      description={<Dropdown rgOptions={collectionDropdownOptions} selectedOption={(filter as TabFilterSettings<'collection'>).params.collection} onChange={onChange} />}
+      description={<Dropdown rgOptions={collectionDropdownOptions} selectedOption={(filter as TabFilterSettings<'collection'>).params.id} onChange={onChange} />}
     />
   );
 }
 
-const InstalledFilterOptions: VFC<FilterOptionsProps<'installed'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+/**
+ * The options for an installed filter.
+ */
+export const InstalledFilterOptions: VFC<FilterOptionsProps<'installed'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   function onChange(checked: boolean) {
     const updatedFilter = { ...filter };
     updatedFilter.params.installed = checked ?? false;
@@ -58,7 +65,10 @@ const InstalledFilterOptions: VFC<FilterOptionsProps<'installed'>> = ({ index, s
   );
 }
 
-const RegexFilterOptions: VFC<FilterOptionsProps<'regex'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+/**
+ * The options for a regex filter.
+ */
+export const RegexFilterOptions: VFC<FilterOptionsProps<'regex'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     const updatedFilter = { ...filter };
     updatedFilter.params.regex = e?.target.value;
@@ -75,7 +85,10 @@ const RegexFilterOptions: VFC<FilterOptionsProps<'regex'>> = ({ index, setContai
   );
 }
 
-const FriendsFilterOptions: VFC<FilterOptionsProps<'friends'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+/**
+ * The options for a friends filter.
+ */
+export const FriendsFilterOptions: VFC<FilterOptionsProps<'friends'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const { currentUsersFriends } = useTabMasterContext();
 
   const dropdownOptions: DropdownOption[] = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid } });
@@ -101,7 +114,10 @@ const FriendsFilterOptions: VFC<FilterOptionsProps<'friends'>> = ({ index, setCo
   );
 }
 
-const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+/**
+ * The options for a tags filter.
+ */
+export const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const { allStoreTags } = useTabMasterContext();
 
   const dropdownOptions: DropdownOption[] = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag } });
@@ -127,7 +143,10 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContaini
   );
 }
 
-const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+/**
+ * The options for a whitelist filter.
+ */
+export const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const usersGames: SteamAppOverview[] = collectionStore.appTypeCollectionMap.get('type-games')!.allApps;
   const selected: DropdownOption[] = [];
 
@@ -152,7 +171,10 @@ const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, s
   );
 }
 
-const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+/**
+ * The options for a blacklist filter.
+ */
+export const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const usersGames: SteamAppOverview[] = collectionStore.appTypeCollectionMap.get('type-games')!.allApps;
   const selected: DropdownOption[] = [];
 
@@ -177,7 +199,10 @@ const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, s
   );
 }
 
-const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
+/**
+ * The options for a merge filter.
+ */
+export const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
   const tabMasterManager = useTabMasterContext().tabMasterManager
   const initialParams = {
     filters: [...filter.params.filters],
@@ -225,7 +250,10 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
   )
 }
 
-const PlatformFilterOptions: VFC<FilterOptionsProps<'platform'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+/**
+ * The options for a platform filter.
+ */
+export const PlatformFilterOptions: VFC<FilterOptionsProps<'platform'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const dropdownOptions: DropdownOption[] = [
     { label: "Steam", data: "steam" },
     { label: "Non Steam", data: "nonSteam" }
@@ -247,7 +275,10 @@ const PlatformFilterOptions: VFC<FilterOptionsProps<'platform'>> = ({ index, set
   );
 }
 
-const DeckCompatFilterOptions: VFC<FilterOptionsProps<'deck compatibility'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+/**
+ * The options for a deck compatibility filter.
+ */
+export const DeckCompatFilterOptions: VFC<FilterOptionsProps<'deck compatibility'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const dropdownOptions: DropdownOption[] = [0, 1, 2, 3].map((level) => {
     return { label: categoryToLabel(level), data: level };
   });
