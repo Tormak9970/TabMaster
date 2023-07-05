@@ -1,5 +1,5 @@
 import { VFC, useState } from "react"
-import { TabDialogAccordion } from "../accordions/TabDialogAccordion"
+import { TabErrorsAccordion } from "../accordions/TabErrorsAccordion"
 import { FilterOptions } from "../filters/FilterOptions"
 
 type TabErrorsPanelProps = {
@@ -17,7 +17,7 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, erroredFi
   const [isPassing, setIsPassing] = useState(false);
 
   return (
-    <TabDialogAccordion index={index} tab={tab} isPassing={isPassing} isOpen={true}>
+    <TabErrorsAccordion index={index} tab={tab} isPassing={isPassing} isOpen={true}>
       {erroredFilters.map((erroredFilter: FilterErrorEntry, errorIdx: number) => {
         const filter = tab.filters![erroredFilter.filterIdx];
 
@@ -33,6 +33,6 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, erroredFi
           </div>
         );
       })}
-    </TabDialogAccordion>
+    </TabErrorsAccordion>
   )
 }
