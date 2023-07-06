@@ -665,8 +665,6 @@ export class TabMasterManager {
         { id: tabContainer.id, title: tabContainer.title, position: tabContainer.position, filters: tabContainer.filters, filtersMode: (tabContainer as CustomTabContainer).filtersMode }
         : tabContainer;
 
-      // console.log('saving with settings :', tabSettings)
-
       allTabsSettings[tabContainer.id] = tabSettings;
     });
     PythonInterop.setTabs(allTabsSettings);
