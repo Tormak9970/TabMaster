@@ -122,8 +122,20 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       //* Confirm the collection still exists
       const collectionFromStores = collectionStore.GetCollection(collectionFilter.params.id);
       if (!collectionFromStores) {
-        errors.push(`collection with id: ${collectionFilter.params.id} no longer exists`);
-        passed = false;
+        //* try to find collection by name
+        if(collectionFilter.params.name){
+          const updatedIdCollection = collectionStore.userCollections.find(collection => collection.displayName === collectionFilter.params.name)
+          if (updatedIdCollection) {
+            collectionFilter.params.id = updatedIdCollection.id
+          } else {
+            errors.push(`Collection: ${collectionFilter.params.name} no longer exists`)
+            passed = false;
+          }
+        //* fallback to error on id if user has old config without name
+        } else {
+          errors.push(`Collection with id: ${collectionFilter.params.id} no longer exists`);
+          passed = false;
+        }
       } else if (!collectionFilter.params.name) {
         collectionFilter.params.name = collectionFromStores.displayName;
       }
