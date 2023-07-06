@@ -10,9 +10,11 @@ import {
 import { VFC, Fragment, useState } from "react";
 import { FilterType, TabFilterSettings } from "../filters/Filters";
 import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMasterContext";
+import { FixMergeFilterModal } from "../modals/FixMergeFilterModal";
 
 type FilterErrorOptionsProps<T extends FilterType> = {
   filter: TabFilterSettings<T>,
+  mergeErrorEntries?: FilterErrorEntry[] | undefined,
   onFilterUpdate: (filter: TabFilterSettings<FilterType>) => void
 }
 
@@ -41,7 +43,7 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
 /**
  * The error options for a merge filter.
  */
-const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ filter, onFilterUpdate }) => {
+const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ filter, mergeErrorEntries, onFilterUpdate }) => {
   const tabMasterManager = useTabMasterContext().tabMasterManager
   const initialParams = {
     filters: [...filter.params.filters],
@@ -63,12 +65,12 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ filter
     const modal: { instance: any } = { instance: null }
     modal.instance = showModal(
       <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-        {/* TODO: implement this */}
-        {/* <EditMergeFilterModal
+        <FixMergeFilterModal
           mergeParams={mergeParams}
+          mergeErrorEntries={mergeErrorEntries!}
           saveMerge={saveMerge}
           closeModal={() => modal.instance.Close()}
-        /> */}
+        />
       </TabMasterContextProvider>
     );
   }
@@ -86,7 +88,7 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ filter
 /**
  * The error options for an individual filter.
  */
-export const FilterErrorOptions: VFC<FilterErrorOptionsProps<FilterType>> = ({ filter, onFilterUpdate }) => {
+export const FilterErrorOptions: VFC<FilterErrorOptionsProps<FilterType>> = ({ filter, mergeErrorEntries, onFilterUpdate }) => {
   if (filter) {
     switch (filter.type) {
       case "collection":
@@ -104,7 +106,7 @@ export const FilterErrorOptions: VFC<FilterErrorOptionsProps<FilterType>> = ({ f
       case "blacklist":
         throw new Error("FilterErrorOption for blacklist not implemented!");
       case "merge":
-        return <MergeFilterErrorOptions filter={filter as TabFilterSettings<'merge'>} onFilterUpdate={onFilterUpdate} />
+        return <MergeFilterErrorOptions filter={filter as TabFilterSettings<'merge'>} mergeErrorEntries={mergeErrorEntries} onFilterUpdate={onFilterUpdate} />
       case "platform":
         throw new Error("FilterErrorOption for platform not implemented!");
       case "deck compatibility":

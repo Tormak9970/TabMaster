@@ -41,20 +41,16 @@ type FriendEntry = {
   steamid: number
 }
 
-type MergeErrorMap = {
-  [filterIdx: number]: ValidationResponse
-}
-
 type FilterErrorEntry = {
   filterIdx: number,
   errors: string[],
-  mergeErrorMap?: MergeErrorMap
+  mergeErrorEntries?: FilterErrorEntry[]
 }
 
 type ValidationResponse = {
   passed: boolean,
   errors: string[],
-  mergeErrorMap?: MergeErrorMap
+  mergeErrorEntries?: FilterErrorEntry[]
 }
 
 type LogicalMode = 'and' | 'or'

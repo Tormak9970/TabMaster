@@ -148,7 +148,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "merge": {
       let passed = true;
       const errors: string[] = [];
-      const mergeErrorMap: MergeErrorMap = {}
+      const mergeErrorEntries: FilterErrorEntry[] = []
 
       const mergeFilter = filter as TabFilterSettings<'merge'>;
 
@@ -160,7 +160,15 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
         if (!validated.passed) {
           passed = false;
           errors.push(`Filter ${i+1} - ${validated.errors.length} ${validated.errors.length === 1 ? "error" : "errors"}`);
-          mergeErrorMap[i] = validated;
+          
+          let entry: FilterErrorEntry = {
+            filterIdx: i,
+            errors: validated.errors,
+          }
+
+          if (validated.mergeErrorEntries) entry.mergeErrorEntries = validated.mergeErrorEntries;
+          
+          mergeErrorEntries.push(entry);
         }
       }
 

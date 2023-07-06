@@ -1,5 +1,5 @@
 import {
-  Button,
+  DialogButton,
   ModalRoot,
   PanelSection,
   PanelSectionRow,
@@ -23,8 +23,10 @@ type FixTabErrorsModalRootProps = {
  * Modal root for the Changes Needed modal.
  */
 export const FixTabErrorsModalRoot: VFC<FixTabErrorsModalRootProps> = ({ closeModal, onConfirm, tabs, erroredFiltersMap, tabMasterManager }) => {
+  // ? add these back when working on styling as they make itteration easier, but in the final version we don't want them, will allow users to back out of the modal
+  // onCancel={closeModal} onEscKeypress={closeModal}
   return (
-    <ModalRoot onCancel={closeModal} onEscKeypress={closeModal} bAllowFullSize>
+    <ModalRoot bAllowFullSize>
       <TabMasterContextProvider tabMasterManager={tabMasterManager}>
         <ModalStyles />
         <FixTabErrorsModal onConfirm={onConfirm} closeModal={closeModal!} tabs={tabs} erroredFiltersMap={erroredFiltersMap} />
@@ -77,24 +79,29 @@ const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal,
 
   return (
     <div className="tab-master-modal-scope">
-      <h1>Changes Needed for One or More Tabs</h1>
       <PanelSection>
+        <h1>Fixes Needed for One or More Tabs</h1>
         <PanelSectionRow>
-          TabMaster has found an issue with one or more of your tabs. Please take a moment to review the issue below, and correct it. Not doing so may result in TabMaster not functioning properly.
+          TabMaster has found an issue with one or more of your tabs. Please take a moment to review the issue{erroredFiltersMap.size > 1 ? "s" : ""} below, and correct {erroredFiltersMap.size > 1 ? "them" : "it"}.
         </PanelSectionRow>
       </PanelSection>
       <PanelSection title="Tabs With Errors">
         <PanelSectionRow>
           {Object.values(changedTabs).map((tab: TabSettings, idx: number) => {
-            return <TabErrorsPanel index={idx} tab={tab} erroredFilters={erroredFiltersMap.get(tab.id)!} onTabStatusChange={updateTabStatus} />;
+            return <TabErrorsPanel index={idx} tab={tab} errorEntries={erroredFiltersMap.get(tab.id)!} onTabStatusChange={updateTabStatus} />;
           })}
         </PanelSectionRow>
       </PanelSection>
       <PanelSection>
         <PanelSectionRow>
-          <Button onClick={onApply} disabled={!canApply} >
+          <DialogButton
+            onOKButton={onApply}
+            onOKActionDescription="Apply Your Fixes"
+            onClick={onApply}
+            disabled={!canApply}
+          >
             Apply Fixes
-          </Button>
+          </DialogButton>
         </PanelSectionRow>
       </PanelSection>
     </div>
