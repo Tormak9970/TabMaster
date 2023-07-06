@@ -1,6 +1,7 @@
 import { VFC, useState } from "react"
 import { TabErrorsAccordion } from "../accordions/TabErrorsAccordion"
-import { FilterOptions } from "../filters/FilterOptions"
+import { FilterErrorOptions } from "./FilterErrorOptions"
+import { FilterType, TabFilterSettings } from "../filters/Filters"
 
 type TabErrorsPanelProps = {
   index: number,
@@ -16,6 +17,20 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, erroredFi
   const [errorMessages, setErrorMessages] = useState<string[][]>(erroredFilters.map((entry: FilterErrorEntry) => entry.errors));
   const [isPassing, setIsPassing] = useState(false);
 
+  function handleFilterUpdate(filterListIdx: number, errorMessageIdx: number, filter: TabFilterSettings<FilterType>) {
+    const messages = [...errorMessages];
+    messages[errorMessageIdx] = [];
+    setErrorMessages(messages);
+
+    const filters = [...tab.filters!];
+    filters[filterListIdx] = filter;
+    tab.filters = filters;
+
+    const passing = messages.every((entry) => entry.length === 0);
+    setIsPassing(passing);
+    onTabStatusChange(tab, passing);
+  }
+
   return (
     <TabErrorsAccordion index={index} tab={tab} isPassing={isPassing} isOpen={true}>
       {erroredFilters.map((erroredFilter: FilterErrorEntry, errorIdx: number) => {
@@ -29,7 +44,7 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, erroredFi
               ))}
             </div>
             <div className="filter-type">Filter Type - {filter.type}</div>
-            {/* TODO: we need something like FilterOptions, but for when there's errors. we can reuse all of them except the merge one */}
+            <FilterErrorOptions filter={filter} onFilterUpdate={(filter) => handleFilterUpdate(erroredFilter.filterIdx, errorIdx, filter)} />
           </div>
         );
       })}
