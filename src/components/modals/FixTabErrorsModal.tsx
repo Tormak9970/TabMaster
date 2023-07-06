@@ -12,7 +12,7 @@ import { ModalStyles } from "../styles/ModalStyles";
 import { TabErrorsPanel } from "../changes-needed/TabErrorsPanel";
 
 type FixTabErrorsModalRootProps = {
-  closeModal?: () => void,
+  closeModal: () => void,
   onConfirm: (fixedTabSettings: TabSettingsDictionary) => void,
   tabs: TabSettingsDictionary,
   erroredFiltersMap: Map<string, FilterErrorEntry[]>
@@ -27,7 +27,7 @@ export const FixTabErrorsModalRoot: VFC<FixTabErrorsModalRootProps> = ({ closeMo
     <ModalRoot onCancel={closeModal} onEscKeypress={closeModal} bAllowFullSize>
       <TabMasterContextProvider tabMasterManager={tabMasterManager}>
         <ModalStyles />
-        <FixTabErrorsModal onConfirm={onConfirm} tabs={tabs} erroredFiltersMap={erroredFiltersMap} />
+        <FixTabErrorsModal onConfirm={onConfirm} closeModal={closeModal} tabs={tabs} erroredFiltersMap={erroredFiltersMap} />
       </TabMasterContextProvider>
     </ModalRoot>
   );
@@ -36,6 +36,7 @@ export const FixTabErrorsModalRoot: VFC<FixTabErrorsModalRootProps> = ({ closeMo
 
 type FixTabErrorsModalProps = {
   onConfirm: (fixedTabSettings: TabSettingsDictionary) => void,
+  closeModal: () => void,
   tabs: TabSettingsDictionary,
   erroredFiltersMap: Map<string, FilterErrorEntry[]>
 }
@@ -43,7 +44,7 @@ type FixTabErrorsModalProps = {
 /**
  * The modal for editing and creating custom tabs.
  */
-const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, tabs, erroredFiltersMap }) => {
+const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal, tabs, erroredFiltersMap }) => {
   const [changedTabs, setChangedTabs] = useState<TabSettingsDictionary>(Object.fromEntries(Object.entries(tabs).filter(([id]) => erroredFiltersMap.has(id))));
   const [isPassingMap, setIsPassingMap] = useState<{ [tabId: string]: boolean}>(Object.fromEntries(Object.keys(tabs).map((key) => [key, false])));
   const [canApply, setCanApply] = useState<boolean>(false);
@@ -71,6 +72,7 @@ const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, tabs, error
       }
 
       onConfirm(changedTabs);
+      closeModal();
     } else {
       PythonInterop.toast("Error", "Please fix all tabs before saving");
     }
