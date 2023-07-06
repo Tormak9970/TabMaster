@@ -68,6 +68,7 @@ const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal,
   function onApply() {
     if (canApply) {
       for (const changedTab of Object.values(changedTabs)) {
+        changedTab.filters = changedTab.filters!.flatMap(filter => filter)
         tabs[changedTab.id] = changedTab;
       }
       onConfirm(tabs);

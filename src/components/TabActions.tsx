@@ -44,6 +44,7 @@ export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabCont
         if (tabContainer.filters) {
           showModal(
             <ConfirmModal
+              className={'destructive-modal'}
               onOK={() => {
                 tabMasterManager.deleteTab(tabContainer.id);
               }}

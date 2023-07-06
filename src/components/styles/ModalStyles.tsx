@@ -76,6 +76,13 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
         margin: 5px;
       }
+
+      /* red buttons on destructive modals, matches steams */
+      .destructive-modal button.${gamepadDialogClasses.Button}.DialogButton.gpfocus.Primary {
+        background: #de3618;
+        color: #fff
+      }
+    
     `}</style>
   );
 }
