@@ -3,7 +3,6 @@ import { TabErrorsAccordion } from "../accordions/TabErrorsAccordion";
 import { FilterErrorOptions } from "./FilterErrorOptions";
 import { FilterType, TabFilterSettings } from "../filters/Filters";
 import { ButtonItem } from "decky-frontend-lib";
-import { LogController } from "../../lib/controllers/LogController";
 
 type TabErrorsPanelProps = {
   index: number,
@@ -16,6 +15,7 @@ type TabErrorsPanelProps = {
  * Panel for tab that needs changes
  */
 export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, erroredFilters, onTabStatusChange }) => {
+  const [errFilters, setErrFilters] = useState(erroredFilters);
   const [errorMessages, setErrorMessages] = useState<string[][]>(erroredFilters.map((entry: FilterErrorEntry) => entry.errors));
   const [isPassing, setIsPassing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -35,15 +35,25 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, erroredFi
     onTabStatusChange(tab, passing);
   }
 
-  //*this does not work, indexes will get off
-  function deleteFilter(filterListIdx: number, errorMessageIdx: number) {
+  // //this does not work, indexes will get off
+  //* should now update the indices properly, need to test
+  function deleteFilter(filterListIdx: number, errorIdx: number) {
     const messages = [...errorMessages];
-    messages[errorMessageIdx] = [];
+    messages.splice(errorIdx, 1);
     setErrorMessages(messages);
 
     const filters = [...tab.filters!];
     filters.splice(filterListIdx, 1);
     tab.filters = filters;
+
+    const newErrFilters = [...errFilters];
+    newErrFilters.splice(errorIdx, 1);
+
+    for (const erroredFilter of newErrFilters) {
+      if (erroredFilter.filterIdx > errorIdx) erroredFilter.filterIdx--;
+    }
+    
+    setErrFilters(newErrFilters);
 
     const passing = messages.every((entry) => entry.length === 0);
     setIsPassing(passing);
@@ -53,7 +63,7 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, erroredFi
 
   return (
     <TabErrorsAccordion index={index} tab={tab} isPassing={isPassing} isOpen={true} isDeleted={isDeleting}>
-      {erroredFilters.map((erroredFilter: FilterErrorEntry, errorIdx: number) => {
+      {errFilters.map((erroredFilter: FilterErrorEntry, errorIdx: number) => {
         const filter = tab.filters![erroredFilter.filterIdx];
 
         return (
