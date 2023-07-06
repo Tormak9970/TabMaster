@@ -9,13 +9,12 @@ import {
 } from "decky-frontend-lib";
 import { VFC, Fragment, useState } from "react";
 import { FilterType, TabFilterSettings } from "../filters/Filters";
-import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMasterContext";
 import { FixMergeFilterModal } from "../modals/FixMergeFilterModal";
 
 type FilterErrorOptionsProps<T extends FilterType> = {
   filter: TabFilterSettings<T>,
   mergeErrorEntries?: FilterErrorEntry[] | undefined,
-  onFilterUpdate: (filter: TabFilterSettings<FilterType>) => void
+  onFilterUpdate: (filter: TabFilterSettings<FilterType> | []) => void
 }
 
 
@@ -44,7 +43,6 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
  * The error options for a merge filter.
  */
 const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ filter, mergeErrorEntries, onFilterUpdate }) => {
-  const tabMasterManager = useTabMasterContext().tabMasterManager
   const initialParams = {
     filters: [...filter.params.filters],
     mode: filter.params.mode
@@ -56,7 +54,9 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ filter
     updatedFilter.params.filters = mergeParams.filters;
     updatedFilter.params.mode = mergeParams.mode;
 
-    onFilterUpdate(updatedFilter);
+
+
+    onFilterUpdate(mergeParams.filters.length === 0 ? [] : updatedFilter);
     setMergeParams({ ...mergeParams });
   }
 
@@ -64,21 +64,19 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ filter
     //*this is necessary to close the modal
     const modal: { instance: any } = { instance: null }
     modal.instance = showModal(
-      <TabMasterContextProvider tabMasterManager={tabMasterManager}>
         <FixMergeFilterModal
           mergeParams={mergeParams}
           mergeErrorEntries={mergeErrorEntries!}
           saveMerge={saveMerge}
           closeModal={() => modal.instance.Close()}
         />
-      </TabMasterContextProvider>
     );
   }
 
   return (
     <Focusable className="styled-btn">
       <ButtonItem onClick={onClick}>
-        {"Open Merge Group"}
+        {"Fix Merge Group"}
       </ButtonItem>
     </Focusable>
   )

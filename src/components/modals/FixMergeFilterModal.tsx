@@ -16,10 +16,10 @@ interface FixMergeFilterModalProps {
  * Modal for fixing a Merge Filter.
  */
 export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({ mergeParams, mergeErrorEntries, saveMerge, closeModal }) => {
-  const [filters, setFilters] = useState(mergeParams.filters);
+  const [filters, setFilters] = useState<(TabFilterSettings<FilterType> | [])[]>(mergeParams.filters);
   const [isPassing, setIsPassing] = useState(false);
 
-  function onChange(filters: TabFilterSettings<FilterType>[], messages: string[][]) {
+  function onChange(filters: (TabFilterSettings<FilterType> | [])[], messages: string[][]) {
     setFilters(filters);
 
     const passing = messages.every((entry) => entry.length === 0);
@@ -29,14 +29,14 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({ mergeParams
   function onOkButton() {
     if (isPassing) {
       const newMergeParams = {
-        filters: [...filters],
+        filters: filters.flatMap(filter => filter),
         mode: mergeParams.mode
       }
 
       saveMerge(newMergeParams);
       closeModal();
     } else {
-      PythonInterop.toast("Error", "A Merge group should have at least 2 filters");
+      PythonInterop.toast("Error", "All errors must be resolved before saving");
     }
   }
 
@@ -46,6 +46,7 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({ mergeParams
       <div className="tab-master-modal-scope">
         <ConfirmModal onOK={onOkButton} strOKButtonText={"Apply"} onCancel={closeModal} strCancelButtonText={"Close"} strTitle="Merge Group">
           <ErroredFiltersPanel
+            isMergeGroup={true}
             filters={filters}
             errorEntries={mergeErrorEntries}
             onChange={onChange}

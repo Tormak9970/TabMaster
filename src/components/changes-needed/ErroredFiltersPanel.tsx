@@ -7,12 +7,13 @@ type ErroredFiltersPanelProps = {
   filters: (TabFilterSettings<FilterType> | [])[],
   errorEntries: FilterErrorEntry[],
   onChange: (filters: (TabFilterSettings<FilterType> | [])[], messages: string[][]) => void;
+  isMergeGroup?: boolean;
 };
 
 /**
  * Renders all errored filters.
  */
-export const ErroredFiltersPanel: VFC<ErroredFiltersPanelProps> = ({ filters, errorEntries, onChange }) => {
+export const ErroredFiltersPanel: VFC<ErroredFiltersPanelProps> = ({ filters, errorEntries, onChange, isMergeGroup }) => {
   const [errorMessages, setErrorMessages] = useState<string[][]>(errorEntries.map((entry: FilterErrorEntry) => entry.errors));
 
   function handleFilterUpdate(filterListIdx: number, errorMessageIdx: number, filter: TabFilterSettings<FilterType> | []) {
@@ -50,7 +51,7 @@ export const ErroredFiltersPanel: VFC<ErroredFiltersPanelProps> = ({ filters, er
                     bDestructiveWarning={true}
                     strTitle="WARNING!"
                   >
-                    {'Are you sure you want to delete this filter? ' + (filters.flatMap(filter => filter).length === 1 ? `There are no other filters in this tab. Deleting it will automatically delete the tab as well. ` : '') + `This can't be undone.`}
+                    {'Are you sure you want to delete this filter? ' + (filters.flatMap(filter => filter).length === 1 ? `There are no other filters in this ${isMergeGroup ? 'merge group' : 'tab'}. Deleting it will automatically delete the ${isMergeGroup ? 'merge filter' : 'tab'} as well. ` : '') + `This can't be undone.`}
                   </ConfirmModal>
                 );
               }}
