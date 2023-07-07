@@ -1,7 +1,7 @@
 import { ConfirmModal } from "decky-frontend-lib"
 import { VFC, useState, Fragment, useEffect } from "react"
 import { ModalStyles } from "../styles/ModalStyles"
-import { FilterEditorPanel } from "../filters/FilterEditorPanel"
+import { FiltersPanel } from "../filters/FiltersPanel"
 import { TabFilterSettings, FilterType } from "../filters/Filters"
 import { isDefaultParams } from "../filters/Filters"
 import { PythonInterop } from "../../lib/controllers/PythonInterop"
@@ -33,7 +33,7 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
     const updatedFilters = [...groupFilters];
     updatedFilters.push({
       type: "collection",
-      params: { collection: "" }
+      params: { id: "", name: "" }
     });
 
     setGroupFilters(updatedFilters);
@@ -49,7 +49,7 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
       saveMerge(mergeParams);
       closeModal();
     } else {
-      PythonInterop.toast("Error", "A Union group should have at least 2 filters");
+      PythonInterop.toast("Error", "A Merge group should have at least 2 filters");
     }
   }
 
@@ -57,8 +57,8 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
     <>
       <ModalStyles />
       <div className="tab-master-modal-scope">
-        <ConfirmModal onOK={onOkButton} onCancel={closeModal} strTitle="Union Group">
-          <FilterEditorPanel
+        <ConfirmModal onOK={onOkButton} onCancel={closeModal} strTitle="Merge Group">
+          <FiltersPanel
             groupFilters={groupFilters}
             setGroupFilters={setGroupFilters}
             addFilter={addFilterToGroup}

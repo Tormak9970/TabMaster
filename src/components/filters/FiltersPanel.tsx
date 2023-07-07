@@ -3,9 +3,9 @@ import { VFC, Fragment } from "react"
 import { FilterEntry } from "./FilterEntry"
 import { FilterOptions } from "./FilterOptions"
 import { TabFilterSettings, FilterType } from "./Filters"
-import { FilterSectionAccordion } from "../utils/Accordion"
+import { FilterSectionAccordion } from "../accordions/FilterSectionAccordion"
 
-interface FilterEditorPanelProps {
+interface FiltersPanelProps {
   groupFilters: TabFilterSettings<FilterType>[]
   groupLogicMode: string
   setGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
@@ -14,7 +14,7 @@ interface FilterEditorPanelProps {
   canAddFilter: boolean
 }
 
-export const FilterEditorPanel: VFC<FilterEditorPanelProps> = ({ groupFilters, groupLogicMode, setGroupFilters, setGroupLogicMode, addFilter, canAddFilter }) => {
+export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicMode, setGroupFilters, setGroupLogicMode, addFilter, canAddFilter }) => {
   const modeOptions = [
     { label: "And", data: "and" },
     { label: "Or", data: "or" }
@@ -28,7 +28,7 @@ export const FilterEditorPanel: VFC<FilterEditorPanelProps> = ({ groupFilters, g
           childrenLayout="inline"
           childrenContainerWidth="min"
           inlineWrap="keep-inline"
-          className="filter-input"
+          className="no-sep"
         >
           <div style={{ width: "150px" }}>
             <Dropdown rgOptions={modeOptions} selectedOption={groupLogicMode} onChange={(option) => setGroupLogicMode(option.data)} focusable={true} />
@@ -44,13 +44,13 @@ export const FilterEditorPanel: VFC<FilterEditorPanelProps> = ({ groupFilters, g
                 filter={filter}
                 isOpen={true}
               >
-                <div className="filter-input">
+                <div className="no-sep">
                   <Field
                     label="Filter Type"
                     description={<FilterEntry index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />}
                   />
                 </div>
-                <div className="filter-input" key={`${filter.type}`}>
+                <div className="no-sep" key={`${filter.type}`}>
                   <FilterOptions index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />
                 </div>
               </FilterSectionAccordion>
@@ -66,7 +66,7 @@ export const FilterEditorPanel: VFC<FilterEditorPanelProps> = ({ groupFilters, g
         })}
       </PanelSectionRow>
       <PanelSectionRow>
-        <div className="styled-btn filter-input">
+        <div className="styled-btn no-sep">
           {!canAddFilter ? (
             <div style={{ marginTop: "10px" }}>Please finish the current filter before adding another</div>
           ) : (

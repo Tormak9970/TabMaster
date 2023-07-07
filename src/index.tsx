@@ -22,6 +22,7 @@ import { TabMasterManager } from "./state/TabMasterManager";
 import { TabActionsButton } from "./components/TabActions";
 import { QamStyles } from "./components/styles/QamStyles";
 import { patchSettings } from "./patches/SettingsPatch";
+import { CustomTabContainer } from "./components/CustomTabContainer";
 
 declare global {
   var SteamClient: SteamClient;
@@ -29,14 +30,16 @@ declare global {
   let appStore: AppStore;
   let loginStore: LoginStore;
   let friendStore: FriendStore;
+  //* This casing is correct, idk why it doesn't match the others.
+  let securitystore: SecurityStore;
 }
 
 type TabIdEntryType = {
-  id: string
-}
+  id: string;
+};
 
 interface TabEntryInteractablesProps {
-  entry: ReorderableEntry<TabIdEntryType>
+  entry: ReorderableEntry<TabIdEntryType>;
 }
 
 /**
@@ -54,7 +57,7 @@ const Content: VFC<{}> = ({ }) => {
     showModal(
       <EditTabModal
         onConfirm={(_: any, tabSettings: EditableTabSettings) => {
-          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode)
+          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode);
         }}
         tabFilters={[]}
         tabMasterManager={tabMasterManager}
@@ -65,14 +68,14 @@ const Content: VFC<{}> = ({ }) => {
 
   const entries = visibleTabsList.map((tabContainer) => {
     return {
-      label: 
-      <div className="tab-label-cont">
-        <div className="tab-label">{tabContainer.title}</div>
-        {tabContainer.filters ? <Fragment/> : <FaSteam />}
-      </div>,
+      label:
+        <div className="tab-label-cont">
+          <div className="tab-label">{tabContainer.title}</div>
+          {tabContainer.filters ? <Fragment /> : <FaSteam />}
+        </div>,
       position: tabContainer.position,
       data: { id: tabContainer.id }
-    }
+    };
   });
 
   return (
@@ -87,6 +90,18 @@ const Content: VFC<{}> = ({ }) => {
             Add Tab
           </ButtonItem>
         </div>
+        {tabMasterManager.hasSettingsLoaded &&
+          <div className="add-tab-btn">
+            <ButtonItem onClick={() => {
+              tabMasterManager.getTabs().visibleTabsList.forEach((tabContainer) => {
+                if (tabContainer.filters && tabContainer.filters.length !== 0) {
+                  (tabContainer as CustomTabContainer).buildCollection();
+                }
+              });
+            }}>
+              Refresh Tabs
+            </ButtonItem>
+          </div>}
         <PanelSection title="Tabs">
           <div className="seperator"></div>
           {tabMasterManager.hasSettingsLoaded ? (
@@ -94,7 +109,7 @@ const Content: VFC<{}> = ({ }) => {
               entries={entries}
               interactables={TabEntryInteractables}
               onSave={(entries: ReorderableEntry<TabIdEntryType>[]) => {
-                tabMasterManager.reorderTabs(entries.map(entry => entry.data!.id))
+                tabMasterManager.reorderTabs(entries.map(entry => entry.data!.id));
               }}
             />
           ) : (
@@ -112,7 +127,7 @@ const Content: VFC<{}> = ({ }) => {
                   label={
                     <div className="tab-label-cont">
                       <div className="tab-label">{tabContainer.title}</div>
-                      {tabContainer.filters ? <Fragment/> : <FaSteam />}
+                      {tabContainer.filters ? <Fragment /> : <FaSteam />}
                     </div>
                   }
                   onClick={() => tabMasterManager.showTab(tabContainer.id)}
@@ -136,7 +151,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
   PythonInterop.setServer(serverAPI);
   const tabMasterManager = new TabMasterManager();
   PluginController.setup(serverAPI, tabMasterManager);
-  
+
   const loginUnregisterer = PluginController.initOnLogin(async () => {
     await tabMasterManager.loadTabs();
     libraryPatch = patchLibrary(serverAPI, tabMasterManager);

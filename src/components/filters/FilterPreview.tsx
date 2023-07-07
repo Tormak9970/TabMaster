@@ -7,7 +7,7 @@ type FilterPreviewProps<T extends FilterType> = {
 
 
 const CollectionFilterPreview: VFC<FilterPreviewProps<'collection'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">collection - {filter.params.collection}</div>
+  return <div className="merge-filter-entry">collection - {filter.params.name ?? filter.params.id}</div>
 }
 
 const InstalledFilterPreview: VFC<FilterPreviewProps<'installed'>> = ({filter }) => {
