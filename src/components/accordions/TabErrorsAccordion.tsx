@@ -3,6 +3,45 @@ import React, { VFC, useState, Fragment } from "react";
 import { BiSolidDownArrow } from "react-icons/bi";
 import { FaCircleCheck, FaCircleExclamation, FaCircleXmark } from "react-icons/fa6";
 
+type TabAccordionIconProps = {
+  index: number,
+  tab: TabSettings
+  isDeleted: boolean,
+  isPassing: boolean
+}
+
+const TabAccordionIcon: VFC<TabAccordionIconProps> = ({ index, tab, isDeleted, isPassing }) => {
+  if (isDeleted) {
+    return (
+      <div className="check-cont">
+        <FaCircleXmark fill="red" />
+        Deleting Tab {index + 1} - {tab.title}
+      </div>
+    );
+  } else {
+    return (
+      <>
+        <div className="check-cont">
+          {isPassing ? (
+            <FaCircleCheck fill="#00f500" />
+          ) : (
+            <FaCircleExclamation fill="yellow" />
+          )}
+          Tab {index + 1} - {tab.title}
+        </div>
+        <BiSolidDownArrow
+          style={{
+            animation: "transform 0.2s ease-in-out",
+            transform: !open ? "rotate(90deg)" : "",
+            fontSize: "0.8em",
+            marginLeft: "5px"
+          }}
+        />
+      </>
+    );
+  }
+}
+
 type TabErrorsAccordionProps = {
   index: number,
   tab: TabSettings,
@@ -28,7 +67,7 @@ export const TabErrorsAccordion: VFC<TabErrorsAccordionProps> = ({ index, isPass
       <Focusable className="filter-start-cont" focusClassName="start-focused" focusWithinClassName="start-focused">
         <Button style={{
           width: "100%",
-          padding: "0",
+          padding: "5px 20px",
           margin: "0",
           background: "transparent",
           outline: "none",
@@ -37,34 +76,10 @@ export const TabErrorsAccordion: VFC<TabErrorsAccordionProps> = ({ index, isPass
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          alignItems: "center"
+          alignItems: "center",
+          fontSize: "16px"
         }} onOKButton={onClick} onClick={onClick}>
-          {isDeleted ?
-            <div className="check-cont">
-              <FaCircleXmark fill="red" />
-              Deleting Tab {index + 1} - {tab.title}
-            </div> :
-            <>
-              <div className="check-cont">
-                {isPassing ? (
-                  // TODO: better green
-                  <FaCircleCheck fill="green" />
-                ) : (
-                  // TODO: better yellow
-                  <FaCircleExclamation fill="yellow" />
-                )}
-                Tab {index + 1} - {tab.title}
-              </div>
-              <BiSolidDownArrow
-                style={{
-                  animation: "transform 0.2s ease-in-out",
-                  transform: !open ? "rotate(90deg)" : "",
-                  fontSize: "0.8em",
-                  marginLeft: "5px"
-                }}
-              />
-            </>
-          }
+          <TabAccordionIcon index={index} tab={tab} isDeleted={isDeleted} isPassing={isPassing} />
         </Button>
       </Focusable>
       {open && !isDeleted && children}

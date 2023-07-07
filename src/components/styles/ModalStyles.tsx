@@ -78,11 +78,41 @@ export const ModalStyles: VFC<{}> = ({}) => {
       }
 
       /* red buttons on destructive modals, matches steams */
-      .destructive-modal button.${gamepadDialogClasses.Button}.DialogButton.gpfocus.Primary {
+      .tab-master-destructive-modal button.${gamepadDialogClasses.Button}.DialogButton.gpfocus.Primary {
         background: #de3618;
         color: #fff
       }
+
+      /* Error Accordion styles */
+      .tab-master-modal-scope .filter-start-cont .check-cont {
+        color: #a9a9a9;
+      }
+      .tab-master-modal-scope .filter-start-cont > button > svg {
+        fill: #a9a9a9;
+      }
+      
+      /* Focused styles */
+      .tab-master-modal-scope .filter-start-cont.start-focused .check-cont {
+        color: #f5f5f5;
+      }
+      .tab-master-modal-scope .filter-start-cont.start-focused > button > svg {
+        fill: #f5f5f5;
+      }
+
+      /* merge entries */
+      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
+        margin: 5px;
+      }
+
+      .tab-master-modal-scope .check-cont {
+        display: flex;
+        align-items: center;
+      }
     
+      .tab-master-modal-scope .check-cont svg {
+        margin-left: -6px;
+        margin-right: 10px;
+      }
     `}</style>
   );
 }

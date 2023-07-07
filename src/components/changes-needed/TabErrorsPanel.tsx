@@ -35,7 +35,7 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, errorEntr
         onClick={() => {
           showModal(
             <ConfirmModal
-              className={'destructive-modal'}
+              className={'tab-master-destructive-modal'}
               onOK={() => onChange([], [[]])}
               bDestructiveWarning={true}
               strTitle="WARNING!"

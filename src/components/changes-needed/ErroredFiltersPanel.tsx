@@ -46,7 +46,7 @@ export const ErroredFiltersPanel: VFC<ErroredFiltersPanelProps> = ({ filters, er
               onClick={() => {
                 showModal(
                   <ConfirmModal
-                    className={'destructive-modal'}
+                    className={'tab-master-destructive-modal'}
                     onOK={() => handleFilterUpdate(erroredFilter.filterIdx, errorIdx, [])}
                     bDestructiveWarning={true}
                     strTitle="WARNING!"
