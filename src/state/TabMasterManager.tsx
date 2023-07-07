@@ -10,6 +10,26 @@ import { showModal } from "decky-frontend-lib";
 import { FixTabErrorsModalRoot } from "../components/modals/FixTabErrorsModal";
 
 /**
+ * Converts a list of filters into a 1D array.
+ * @param filters The filters array to flatten.
+ * @returns A 1D array of tab filters.
+ */
+function flattenFilters(filters: TabFilterSettings<FilterType>[]): TabFilterSettings<FilterType>[] {
+  const res: TabFilterSettings<FilterType>[] = [];
+
+  for (const filter of filters) {
+    if (filter.type === "merge") {
+      const mergeFilters = flattenFilters((filter as TabFilterSettings<"merge">).params.filters);
+      res.push(...mergeFilters);
+    } else {
+      res.push(filter);
+    }
+  }
+
+  return res;
+}
+
+/**
  * Class that handles TabMaster's core state.
  */
 export class TabMasterManager {
@@ -63,7 +83,6 @@ export class TabMasterManager {
     this.hiddenReaction = reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.handleGameHideOrShow.bind(this), { delay: 50 });
 
     //* subscribe for when collections are deleted
-    //! may need to debounce this, we'll see
     this.collectionRemoveReaction = reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this));
 
     this.handleUserCollectionRemove(collectionStore.userCollections.length); //* this loads the collection ids for the first time.
@@ -131,9 +150,11 @@ export class TabMasterManager {
 
     this.visibleTabsList.forEach((tabContainer) => {
       if (tabContainer.filters && tabContainer.filters.length !== 0) {
-        const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
+        const flatFilters = flattenFilters(tabContainer.filters);
+        const installedFilters = flatFilters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed") as TabFilterSettings<"installed">[];
+        const collectionFilters = flatFilters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "collection" && (filter as TabFilterSettings<"collection">).params.id === "local-install");
 
-        if (collectionFilters.some((filter: TabFilterSettings<"installed">) => filter.params.installed)) {
+        if (installedFilters.some((filter) => filter.params.installed) || collectionFilters.length > 0) {
           (tabContainer as CustomTabContainer).buildCollection();
         }
       }
@@ -164,7 +185,8 @@ export class TabMasterManager {
 
     this.visibleTabsList.forEach((tabContainer) => {
       if (tabContainer.filters && tabContainer.filters.length !== 0) {
-        const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "collection").map((collectionFilter) => collectionFilter.params.collection);
+        const flatFilters = flattenFilters(tabContainer.filters);
+        const collectionFilters = flatFilters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "collection").map((collectionFilter) => (collectionFilter as TabFilterSettings<"collection">).params.id);
 
         if (collectionFilters.includes(collectionId)) {
           (tabContainer as CustomTabContainer).buildCollection();
