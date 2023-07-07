@@ -23,16 +23,11 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({ mergeParams
   const [filters, setFilters] = useState<(TabFilterSettings<FilterType> | [])[]>(mergeParams.filters);
   const [isPassing, setIsPassing] = useState(isPassingOuter);
 
-  function setPassing(passing: boolean) {
-    setIsPassing(passing);
-    setIsPassingOuter(passing);
-  }
-
   function onChange(filters: (TabFilterSettings<FilterType> | [])[], messages: string[][]) {
     setFilters(filters);
 
     const passing = messages.every((entry) => entry.length === 0);
-    setPassing(passing);
+    setIsPassing(passing);
   }
 
   function onOkButton() {
@@ -42,6 +37,7 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({ mergeParams
         mode: mergeParams.mode
       }
 
+      setIsPassingOuter(true);
       saveMerge(newMergeParams);
       closeModal();
     } else {
