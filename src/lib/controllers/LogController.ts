@@ -43,4 +43,12 @@ export class LogController {
     );
     PythonInterop.error(args.join(" "));
   }
+
+  /**
+   * Throws a new error and logs it to the plugin's log file.
+   */
+	static throw(...args: any[]) {
+    PythonInterop.error(args.join(" "));
+    throw new Error([`%c TabMaster %c ERROR %c`, 'background: #ff6d05; color: black;', 'background: #c70808; color: black;', 'background: transparent;', ...args].join(' '));
+  }
 }
