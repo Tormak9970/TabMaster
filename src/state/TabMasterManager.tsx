@@ -187,7 +187,11 @@ export class TabMasterManager {
 
       this.userCollectionIds = this.userCollectionIds.filter((id) => {
         const isIncluded = currentUserCollectionIds.includes(id);
-        if (!isIncluded && collectionsInUse.includes(id)) showFixNeeded = true;
+        if (!isIncluded && collectionsInUse.includes(id)) {
+          showFixNeeded = true;
+          this.collectionReactions[id]();
+          delete this.collectionReactions[id];
+        }
         return isIncluded;
       });
 
@@ -484,7 +488,7 @@ export class TabMasterManager {
               errors: filterValidated.errors
             };
 
-            if (filterValidated.mergeErrorMap) entry.mergeErrorMap = filterValidated.mergeErrorMap;
+            if (filterValidated.mergeErrorEntries) entry.mergeErrorEntries = filterValidated.mergeErrorEntries;
 
             tabErroredFilters.push(entry);
           }

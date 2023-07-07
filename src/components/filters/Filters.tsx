@@ -174,7 +174,8 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
 
       return {
         passed: passed,
-        errors: errors
+        errors: errors,
+        mergeErrorEntries: mergeErrorEntries
       }
     }
     case "regex":
