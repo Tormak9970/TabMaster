@@ -18,9 +18,9 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
       } else {
         afterPatch(ret, 'type', (_: any, ret: any) => {
           // console.log('ret 2', ret);
-          const homeElement = ret.props?.children?.props?.pages?.find((obj: any) => obj.route === '/settings/home')?.content;
+          const homeElement = ret?.props?.children?.props?.pages?.find((obj: any) => obj.route === '/settings/home')?.content;
           if (homeElement === undefined) {
-            LogController.error('Tab Master could not find home element to patch');
+            LogController.throw('Tab Master could not find home element to patch');
           }
 
           if (secondCache) {
@@ -29,17 +29,18 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
             afterPatch(homeElement, 'type', (_: any, ret: any) => {
               // console.log('ret 3', ret);
 
-              const buttonElement = ret.props?.children?.find((elt: React.ReactElement) => {
+              const buttonElement = ret?.props?.children?.find((elt: React.ReactElement) => {
                 return elt?.type?.toString?.().includes('HomeSettings');
               });
               if (buttonElement === undefined) {
-                LogController.error('Tab Master could not find button element to patch');
+                LogController.throw('Tab Master could not find button element to patch');
               }
 
               // console.log('button', buttonElement);
 
               afterPatch(buttonElement, 'type', (_: any, ret: any) => {
                 // console.log('ret 4', ret);
+                if (!ret) return ret
 
                 const origOnClick = ret.props.onClick;
 
