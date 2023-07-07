@@ -241,6 +241,9 @@ export class TabMasterManager {
                       };
 
                       this.updateCustomTab(tabContainer.id, asEditableSettings);
+
+                      const flatFilters = flattenFilters(tabContainer.filters);
+                      this.addCollectionReactionsForFilters(flatFilters);
                     }
                   }
                 }
@@ -629,7 +632,8 @@ export class TabMasterManager {
       tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer);
 
       if (filters) {
-        this.addCollectionReactionsForFilters(filters);
+        const flatFilters = flattenFilters(filters);
+        this.addCollectionReactionsForFilters(flatFilters);
       }
     }
 
