@@ -7,7 +7,6 @@ export class LogController {
    */
 	static log(...args: any[]) {
     console.log(
-      window.console,
       `%c TabMaster %c INFO %c`,
       'background: #ff6d05; color: black;',
       'background: #1abc9c; color: black;',
@@ -22,7 +21,6 @@ export class LogController {
    */
 	static warn(...args: any[]) {
     console.warn(
-      window.console,
       `%c TabMaster %c WARNING %c`,
       'background: #ff6d05; color: black;',
       'background: #e3c907; color: black;',
@@ -37,7 +35,6 @@ export class LogController {
    */
 	static error(...args: any[]) {
     console.error(
-      window.console,
       `%c TabMaster %c ERROR %c`,
       'background: #ff6d05; color: black;',
       'background: #c70808; color: black;',
@@ -45,5 +42,13 @@ export class LogController {
       ...args
     );
     PythonInterop.error(args.join(" "));
+  }
+
+  /**
+   * Throws a new error and logs it to the plugin's log file.
+   */
+	static throw(...args: any[]) {
+    PythonInterop.error(args.join(" "));
+    throw new Error([`%c TabMaster %c ERROR %c`, 'background: #ff6d05; color: black;', 'background: #c70808; color: black;', 'background: transparent;', ...args].join(' '));
   }
 }

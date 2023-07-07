@@ -32,13 +32,13 @@ export const ModalStyles: VFC<{}> = ({}) => {
         display: none;
       }
       /* The button item */
-      .tab-master-modal-scope .filter-entry button.${gamepadDialogClasses.Button}.DialogButton {
+      .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.FieldChildren} > button.${gamepadDialogClasses.Button}.DialogButton {
         padding: 10px;
         min-width: 45px;
       }
 
-      .tab-master-modal-scope .filter-input .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after,
-      .tab-master-modal-scope .filter-input.${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
+      .tab-master-modal-scope .no-sep .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after,
+      .tab-master-modal-scope .no-sep.${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
         display: none
       }
 
@@ -62,8 +62,9 @@ export const ModalStyles: VFC<{}> = ({}) => {
       }
       
       /* Focused styles */
-      .tab-master-modal-scope .filter-start-cont.start-focused {
-        background-color: #3d4450;
+      .tab-master-modal-scope .filter-start-cont.start-focused,
+      .tab-master-modal-scope .filter-start-cont.tab-errors.start-focused {
+        background-color: #3d4450 !important;
       }
       .tab-master-modal-scope .filter-start-cont.start-focused .filter-line {
         background: #a9a9a9;
@@ -75,6 +76,46 @@ export const ModalStyles: VFC<{}> = ({}) => {
       /* merge entries */
       .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
         margin: 5px;
+      }
+
+      /* red buttons on destructive modals, matches steams */
+      .tab-master-destructive-modal button.${gamepadDialogClasses.Button}.DialogButton.gpfocus.Primary {
+        background: #de3618;
+        color: #fff
+      }
+
+      /* Error Accordion styles */
+      .tab-master-modal-scope .filter-start-cont.tab-errors {
+        background-color: #23262e;
+      }
+      .tab-master-modal-scope .filter-start-cont .check-cont {
+        color: #a9a9a9;
+      }
+      .tab-master-modal-scope .filter-start-cont > button > svg {
+        fill: #a9a9a9;
+      }
+      
+      /* Focused styles */
+      .tab-master-modal-scope .filter-start-cont.start-focused .check-cont {
+        color: #f5f5f5;
+      }
+      .tab-master-modal-scope .filter-start-cont.start-focused > button > svg {
+        fill: #f5f5f5;
+      }
+
+      /* merge entries */
+      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
+        margin: 5px;
+      }
+
+      .tab-master-modal-scope .check-cont {
+        display: flex;
+        align-items: center;
+      }
+    
+      .tab-master-modal-scope .check-cont svg {
+        margin-left: -6px;
+        margin-right: 10px;
       }
     `}</style>
   );
