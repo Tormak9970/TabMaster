@@ -150,13 +150,7 @@ export class TabMasterManager {
 
     this.visibleTabsList.forEach((tabContainer) => {
       if (tabContainer.filters && tabContainer.filters.length !== 0) {
-        const flatFilters = flattenFilters(tabContainer.filters);
-        const installedFilters = flatFilters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed") as TabFilterSettings<"installed">[];
-        const collectionFilters = flatFilters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "collection" && (filter as TabFilterSettings<"collection">).params.id === "local-install");
-
-        if (installedFilters.some((filter) => filter.params.installed) || collectionFilters.length > 0) {
-          (tabContainer as CustomTabContainer).buildCollection();
-        }
+        (tabContainer as CustomTabContainer).buildCollection();
       }
     });
   }
@@ -178,19 +172,12 @@ export class TabMasterManager {
    * Handles a general userCollection reaction.
    * @param collectionId The id of the collection.
    */
-  private handleUserCollectionLengthChange(collectionId: string) {
+  private handleUserCollectionLengthChange() {
     if (!this.hasLoaded) return;
-
-    // console.log("We reacted to user collection changes!");
 
     this.visibleTabsList.forEach((tabContainer) => {
       if (tabContainer.filters && tabContainer.filters.length !== 0) {
-        const flatFilters = flattenFilters(tabContainer.filters);
-        const collectionFilters = flatFilters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "collection").map((collectionFilter) => (collectionFilter as TabFilterSettings<"collection">).params.id);
-
-        if (collectionFilters.includes(collectionId)) {
-          (tabContainer as CustomTabContainer).buildCollection();
-        }
+        (tabContainer as CustomTabContainer).buildCollection();
       }
     });
   }
@@ -209,11 +196,13 @@ export class TabMasterManager {
 
       this.userCollectionIds = this.userCollectionIds.filter((id) => {
         const isIncluded = currentUserCollectionIds.includes(id);
+
         if (!isIncluded && collectionsInUse.includes(id)) {
           showFixNeeded = true;
           this.collectionReactions[id]();
           delete this.collectionReactions[id];
         }
+
         return isIncluded;
       });
 
@@ -377,7 +366,7 @@ export class TabMasterManager {
     (this.tabsMap.get(customTabId) as CustomTabContainer).update(updatedTabSettings);
 
     const filters = updatedTabSettings.filters;
-    if (filters) this.addCollectionReactionsForFilters(filters);
+    if (filters) this.addCollectionReactionsForFilters(flattenFilters(filters));
 
     this.updateAndSave();
   }
@@ -466,6 +455,7 @@ export class TabMasterManager {
    */
   createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode) {
     const id = uuidv4();
+    this.addCollectionReactionsForFilters(flattenFilters(filterSettingsList));
     this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode));
     this.updateAndSave();
   }
@@ -484,7 +474,7 @@ export class TabMasterManager {
         if (!this.collectionReactions[collectionId]) {
           //* subscribe to user collection updates
           this.collectionReactions[collectionId] = reaction(() => collectionStore.GetCollection(collectionId).allApps.length, () => {
-            this.handleUserCollectionLengthChange(collectionId);
+            this.handleUserCollectionLengthChange();
           });
         }
       }
