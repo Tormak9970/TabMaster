@@ -65,7 +65,7 @@ export const TabErrorsAccordion: VFC<TabErrorsAccordionProps> = ({ index, isPass
 
   return (
     <Focusable style={{ width: "100%", padding: "0" }}>
-      <Focusable className="filter-start-cont" focusClassName="start-focused" focusWithinClassName="start-focused">
+      <Focusable className="filter-start-cont tab-errors" focusClassName="start-focused" focusWithinClassName="start-focused">
         <Button style={{
           width: "100%",
           padding: "5px 20px",

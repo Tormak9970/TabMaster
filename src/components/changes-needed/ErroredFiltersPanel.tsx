@@ -1,6 +1,5 @@
 import { VFC, Fragment, useState } from "react";
 import { FilterErrorOptions } from "./FilterErrorOptions";
-import { ButtonItem, ConfirmModal, showModal } from "decky-frontend-lib";
 import { FilterType, TabFilterSettings } from "../filters/Filters";
 
 type ErroredFiltersPanelProps = {
@@ -34,31 +33,22 @@ export const ErroredFiltersPanel: VFC<ErroredFiltersPanelProps> = ({ filters, er
 
         return Array.isArray(filter) ? [] :
           (<div className="filter-error-entry">
+            <div style={{
+              color: "#8b929a",
+              fontWeight: "600",
+              marginTop: "10px"
+            }}>Errors</div>
             <div className="filter-error-messages">
-              {errorMessages[errorIdx].map((errorMsg: string, idx: number) => (
-                <div className="filter-error-msg">Error {idx + 1} - {errorMsg}</div>
+              {errorMessages[errorIdx].map((errorMsg: string) => (
+                <div className="filter-error-msg">{errorMsg}</div>
               ))}
             </div>
-            <div className="filter-type">Filter Type - {filter.type}</div>
-            <FilterErrorOptions filter={filter} onFilterUpdate={(filter) => handleFilterUpdate(erroredFilter.filterIdx, errorIdx, filter)} mergeErrorEntries={errorEntries[errorIdx].mergeErrorEntries} />
-          //* probably should be trash icon next to filter options, and show modal
-            <ButtonItem
-              onClick={() => {
-                showModal(
-                  <ConfirmModal
-                    className={'tab-master-destructive-modal'}
-                    onOK={() => handleFilterUpdate(erroredFilter.filterIdx, errorIdx, [])}
-                    bDestructiveWarning={true}
-                    strTitle="WARNING!"
-                  >
-                    {'Are you sure you want to delete this filter? ' + (filters.flatMap(filter => filter).length === 1 ? `There are no other filters in this ${isMergeGroup ? 'merge group' : 'tab'}. Deleting it will automatically delete the ${isMergeGroup ? 'merge filter' : 'tab'} as well. ` : '') + `This can't be undone.`}
-                  </ConfirmModal>
-                );
-              }}
-
-            >
-              Delete Filter
-            </ButtonItem>
+            <div style={{
+              color: "#8b929a",
+              fontWeight: "600",
+              marginTop: "10px"
+            }}>Filter Type - {filter.type}</div>
+            <FilterErrorOptions isMergeGroup={isMergeGroup} numFilters={filters.flatMap(filter => filter).length} filter={filter} onFilterUpdate={(filter) => handleFilterUpdate(erroredFilter.filterIdx, errorIdx, filter)} onFilterDelete={() => handleFilterUpdate(erroredFilter.filterIdx, errorIdx, [])} mergeErrorEntries={errorEntries[errorIdx].mergeErrorEntries} />
           </div>);
       })}
     </>

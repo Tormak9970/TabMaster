@@ -1,5 +1,7 @@
 import {
   ButtonItem,
+  ConfirmModal,
+  DialogButton,
   Dropdown,
   DropdownOption,
   Field,
@@ -10,19 +12,23 @@ import {
 import { VFC, Fragment, useState, useContext } from "react";
 import { FilterType, TabFilterSettings } from "../filters/Filters";
 import { FixMergeFilterModal } from "../modals/FixMergeFilterModal";
-import { ErrorPanelTabNameContext } from "./TabErrorsPanel";
+import { ErrorPanelTabNameContext } from "../../state/ErrorPanelNameContext";
+import { FaTrash } from "react-icons/fa";
 
 type FilterErrorOptionsProps<T extends FilterType> = {
+  isMergeGroup: boolean | undefined,
+  numFilters: number,
   filter: TabFilterSettings<T>,
   mergeErrorEntries?: FilterErrorEntry[] | undefined,
   onFilterUpdate: (filter: TabFilterSettings<FilterType> | []) => void
+  onFilterDelete: () => void
 }
 
 
 /**
  * The error options for a collection filter.
  */
-const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> = ({ filter, onFilterUpdate }) => {
+const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> = ({ isMergeGroup, numFilters, filter, onFilterUpdate, onFilterDelete }) => {
   const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map((collection: { displayName: string; id: string; }) => { return { label: collection.displayName, data: collection.id } });
 
   function onChange(data: SingleDropdownOption) {
@@ -35,7 +41,43 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
   return (
     <Field
       label="Selected Collection"
-      description={<Dropdown rgOptions={collectionDropdownOptions} selectedOption={(filter as TabFilterSettings<'collection'>).params.id} onChange={onChange} />}
+      description={
+        <div className="filter-entry">
+          <Focusable style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "row"
+          }}>
+            <Focusable style={{
+              width: "calc(100% - 55px)"
+            }}>
+              <Dropdown rgOptions={collectionDropdownOptions} selectedOption={(filter as TabFilterSettings<'collection'>).params.id} onChange={onChange} />
+            </Focusable>
+            <Focusable style={{
+              marginLeft: "10px",
+              width: "45px"
+            }}>
+              <ButtonItem
+                onClick={() => {
+                  showModal(
+                    <ConfirmModal
+                      className={'tab-master-destructive-modal'}
+                      onOK={onFilterDelete}
+                      bDestructiveWarning={true}
+                      strTitle="WARNING!"
+                    >
+                      {'Are you sure you want to delete this filter? ' + (numFilters === 1 ? `There are no other filters in this ${isMergeGroup ? 'merge group' : 'tab'}. Deleting it will automatically delete the ${isMergeGroup ? 'merge filter' : 'tab'} as well. ` : '') + `This can't be undone.`}
+                    </ConfirmModal>
+                  );
+                }}
+
+              >
+                <FaTrash />
+              </ButtonItem>
+            </Focusable>
+          </Focusable>
+        </div>
+      }
     />
   );
 }
@@ -43,7 +85,7 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
 /**
  * The error options for a merge filter.
  */
-const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ filter, mergeErrorEntries, onFilterUpdate }) => {
+const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ isMergeGroup, numFilters, filter, mergeErrorEntries, onFilterUpdate, onFilterDelete }) => {
   const tabName = useContext(ErrorPanelTabNameContext);
   const [isPassing, setIsPassing] = useState(mergeErrorEntries!.length === 0);
 
@@ -80,11 +122,46 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ filter
   }
 
   return (
-    <Focusable className="styled-btn">
-      <ButtonItem onClick={onClick} disabled={isPassing}>
-        {isPassing ? "Resolved" : "Fix Merge Group"}
-      </ButtonItem>
-    </Focusable>
+    <Field description={
+      <div className="filter-entry">
+        <Focusable className="styled-btn" style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "row"
+        }}>
+          <Focusable style={{
+            width: "calc(100% - 55px)"
+          }}>
+            <DialogButton onClick={onClick} disabled={isPassing} style={{
+              width: "100%"
+            }}>
+              {isPassing ? "Resolved" : "Fix Merge Group"}
+            </DialogButton>
+          </Focusable>
+          <Focusable style={{
+            marginLeft: "10px",
+            width: "45px"
+          }}>
+            <ButtonItem
+              onClick={() => {
+                showModal(
+                  <ConfirmModal
+                    className={'tab-master-destructive-modal'}
+                    onOK={onFilterDelete}
+                    bDestructiveWarning={true}
+                    strTitle="WARNING!"
+                  >
+                    {'Are you sure you want to delete this filter? ' + (numFilters === 1 ? `There are no other filters in this ${isMergeGroup ? 'merge group' : 'tab'}. Deleting it will automatically delete the ${isMergeGroup ? 'merge filter' : 'tab'} as well. ` : '') + `This can't be undone.`}
+                  </ConfirmModal>
+                );
+              }}
+            >
+              <FaTrash />
+            </ButtonItem>
+          </Focusable>
+        </Focusable>
+      </div>
+    } />
   )
 }
 
@@ -92,11 +169,11 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ filter
 /**
  * The error options for an individual filter.
  */
-export const FilterErrorOptions: VFC<FilterErrorOptionsProps<FilterType>> = ({ filter, mergeErrorEntries, onFilterUpdate }) => {
+export const FilterErrorOptions: VFC<FilterErrorOptionsProps<FilterType>> = ({ isMergeGroup, numFilters, filter, mergeErrorEntries, onFilterUpdate, onFilterDelete }) => {
   if (filter) {
     switch (filter.type) {
       case "collection":
-        return <CollectionFilterErrorOptions filter={filter as TabFilterSettings<'collection'>} onFilterUpdate={onFilterUpdate} />
+        return <CollectionFilterErrorOptions isMergeGroup={isMergeGroup} numFilters={numFilters} filter={filter as TabFilterSettings<'collection'>} onFilterUpdate={onFilterUpdate} onFilterDelete={onFilterDelete} />
       case "installed":
         throw new Error("FilterErrorOption for installed not implemented!");
       case "regex":
@@ -110,7 +187,7 @@ export const FilterErrorOptions: VFC<FilterErrorOptionsProps<FilterType>> = ({ f
       case "blacklist":
         throw new Error("FilterErrorOption for blacklist not implemented!");
       case "merge":
-        return <MergeFilterErrorOptions filter={filter as TabFilterSettings<'merge'>} mergeErrorEntries={mergeErrorEntries} onFilterUpdate={onFilterUpdate} />
+        return <MergeFilterErrorOptions isMergeGroup={isMergeGroup} numFilters={numFilters} filter={filter as TabFilterSettings<'merge'>} mergeErrorEntries={mergeErrorEntries} onFilterUpdate={onFilterUpdate} onFilterDelete={onFilterDelete} />
       case "platform":
         throw new Error("FilterErrorOption for platform not implemented!");
       case "deck compatibility":

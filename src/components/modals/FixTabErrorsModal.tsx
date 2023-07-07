@@ -23,10 +23,9 @@ type FixTabErrorsModalRootProps = {
  * Modal root for the Changes Needed modal.
  */
 export const FixTabErrorsModalRoot: VFC<FixTabErrorsModalRootProps> = ({ closeModal, onConfirm, tabs, erroredFiltersMap, tabMasterManager }) => {
-  // ? add these back when working on styling as they make itteration easier, but in the final version we don't want them, will allow users to back out of the modal
-  // onCancel={closeModal} onEscKeypress={closeModal}
   return (
-    <ModalRoot bAllowFullSize>
+    // Steam throws a fit if onCancel isn't present, so we made it do nothing
+    <ModalRoot bAllowFullSize onCancel={() => {}}>
       <TabMasterContextProvider tabMasterManager={tabMasterManager}>
         <ModalStyles />
         <FixTabErrorsModal onConfirm={onConfirm} closeModal={closeModal!} tabs={tabs} erroredFiltersMap={erroredFiltersMap} />

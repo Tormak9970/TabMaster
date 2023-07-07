@@ -1,8 +1,9 @@
-import { VFC, createContext, useState } from "react";
+import { VFC, useState } from "react";
 import { TabErrorsAccordion } from "../accordions/TabErrorsAccordion";
 import { FilterType, TabFilterSettings } from "../filters/Filters";
 import { ErroredFiltersPanel } from "./ErroredFiltersPanel";
 import { ButtonItem, ConfirmModal, showModal } from "decky-frontend-lib";
+import { ErrorPanelTabNameContext } from "../../state/ErrorPanelNameContext";
 
 type TabErrorsPanelProps = {
   index: number,
@@ -10,11 +11,6 @@ type TabErrorsPanelProps = {
   errorEntries: FilterErrorEntry[],
   onTabStatusChange: (tab: TabSettings, isPassing: boolean) => void;
 };
-
-/**
- * Context for tab name in error panel
- */
-export const ErrorPanelTabNameContext = createContext<string | null>(null);
 
 /**
  * Panel for tab that needs changes
@@ -36,22 +32,6 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, errorEntr
 
   return (
     <TabErrorsAccordion index={index} tab={tab} isPassing={isPassing} isOpen={true} isDeleted={isDeleting}>
-      <ButtonItem
-        onClick={() => {
-          showModal(
-            <ConfirmModal
-              className={'tab-master-destructive-modal'}
-              onOK={() => onChange([], [[]])}
-              bDestructiveWarning={true}
-              strTitle="WARNING!"
-            >
-              Are you sure you want to delete this Tab? This can't be undone.
-            </ConfirmModal>
-          );
-        }}
-      >
-        Delete Tab
-      </ButtonItem>
       <ErrorPanelTabNameContext.Provider value={tab.title}>
         <ErroredFiltersPanel
           filters={filters}
@@ -59,6 +39,24 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, errorEntr
           onChange={onChange}
         />
       </ErrorPanelTabNameContext.Provider>
+      <div className="styled-btn no-sep">
+        <ButtonItem
+          onClick={() => {
+            showModal(
+              <ConfirmModal
+                className={'tab-master-destructive-modal'}
+                onOK={() => onChange([], [[]])}
+                bDestructiveWarning={true}
+                strTitle="WARNING!"
+              >
+                Are you sure you want to delete this Tab? This can't be undone.
+              </ConfirmModal>
+            );
+          }}
+        >
+          Delete Tab
+        </ButtonItem>
+      </div>
     </TabErrorsAccordion>
   );
 };

@@ -28,7 +28,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
           childrenLayout="inline"
           childrenContainerWidth="min"
           inlineWrap="keep-inline"
-          className="filter-input"
+          className="no-sep"
         >
           <div style={{ width: "150px" }}>
             <Dropdown rgOptions={modeOptions} selectedOption={groupLogicMode} onChange={(option) => setGroupLogicMode(option.data)} focusable={true} />
@@ -44,13 +44,13 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
                 filter={filter}
                 isOpen={true}
               >
-                <div className="filter-input">
+                <div className="no-sep">
                   <Field
                     label="Filter Type"
                     description={<FilterEntry index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />}
                   />
                 </div>
-                <div className="filter-input" key={`${filter.type}`}>
+                <div className="no-sep" key={`${filter.type}`}>
                   <FilterOptions index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />
                 </div>
               </FilterSectionAccordion>
@@ -66,7 +66,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
         })}
       </PanelSectionRow>
       <PanelSectionRow>
-        <div className="styled-btn filter-input">
+        <div className="styled-btn no-sep">
           {!canAddFilter ? (
             <div style={{ marginTop: "10px" }}>Please finish the current filter before adding another</div>
           ) : (
