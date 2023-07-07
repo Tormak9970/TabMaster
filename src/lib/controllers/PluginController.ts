@@ -37,7 +37,7 @@ export class PluginController {
       } else {
         PythonInterop.toast("Error", "Failed to initialize, try restarting.");
       }
-    }, null, true);
+    }, null, true, true);
   }
 
   /**
