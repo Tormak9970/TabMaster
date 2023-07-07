@@ -44,7 +44,7 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({ mergeParams
     <>
       <ModalStyles />
       <div className="tab-master-modal-scope">
-        <ConfirmModal onOK={onOkButton} strOKButtonText={"Apply"} onCancel={closeModal} strCancelButtonText={"Close"} strTitle="Merge Group">
+        <ConfirmModal onOK={onOkButton} strOKButtonText={"Apply"} onCancel={closeModal} strCancelButtonText={"Close"} strTitle="Fix Merge Group">
           <ErroredFiltersPanel
             isMergeGroup={true}
             filters={filters}
