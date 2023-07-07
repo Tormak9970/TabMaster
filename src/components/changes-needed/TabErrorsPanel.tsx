@@ -1,4 +1,4 @@
-import { VFC, useState } from "react";
+import { VFC, createContext, useState } from "react";
 import { TabErrorsAccordion } from "../accordions/TabErrorsAccordion";
 import { FilterType, TabFilterSettings } from "../filters/Filters";
 import { ErroredFiltersPanel } from "./ErroredFiltersPanel";
@@ -10,6 +10,11 @@ type TabErrorsPanelProps = {
   errorEntries: FilterErrorEntry[],
   onTabStatusChange: (tab: TabSettings, isPassing: boolean) => void;
 };
+
+/**
+ * Context for tab name in error panel
+ */
+export const ErrorPanelTabNameContext = createContext<string | null>(null);
 
 /**
  * Panel for tab that needs changes
@@ -47,11 +52,13 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, errorEntr
       >
         Delete Tab
       </ButtonItem>
-      <ErroredFiltersPanel
-        filters={filters}
-        errorEntries={errorEntries}
-        onChange={onChange}
-      />
+      <ErrorPanelTabNameContext.Provider value={tab.title}>
+        <ErroredFiltersPanel
+          filters={filters}
+          errorEntries={errorEntries}
+          onChange={onChange}
+        />
+      </ErrorPanelTabNameContext.Provider>
     </TabErrorsAccordion>
   );
 };

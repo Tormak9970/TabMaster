@@ -7,9 +7,10 @@ import {
   SingleDropdownOption,
   showModal
 } from "decky-frontend-lib";
-import { VFC, Fragment, useState } from "react";
+import { VFC, Fragment, useState, useContext } from "react";
 import { FilterType, TabFilterSettings } from "../filters/Filters";
 import { FixMergeFilterModal } from "../modals/FixMergeFilterModal";
+import { ErrorPanelTabNameContext } from "./TabErrorsPanel";
 
 type FilterErrorOptionsProps<T extends FilterType> = {
   filter: TabFilterSettings<T>,
@@ -43,6 +44,9 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
  * The error options for a merge filter.
  */
 const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ filter, mergeErrorEntries, onFilterUpdate }) => {
+  const tabName = useContext(ErrorPanelTabNameContext);
+  const [isPassing, setIsPassing] = useState(mergeErrorEntries!.length === 0);
+
   const initialParams = {
     filters: [...filter.params.filters],
     mode: filter.params.mode
@@ -54,29 +58,31 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ filter
     updatedFilter.params.filters = mergeParams.filters;
     updatedFilter.params.mode = mergeParams.mode;
 
-
-
     onFilterUpdate(mergeParams.filters.length === 0 ? [] : updatedFilter);
     setMergeParams({ ...mergeParams });
+    //* this is necessary so that if the accordian remounts the merge filter it will rememember it's state
+    mergeErrorEntries!.length = 0;
   }
 
   function onClick() {
-    //*this is necessary to close the modal
-    const modal: { instance: any } = { instance: null }
+    const modal: { instance: any } = { instance: null };
     modal.instance = showModal(
-        <FixMergeFilterModal
-          mergeParams={mergeParams}
-          mergeErrorEntries={mergeErrorEntries!}
-          saveMerge={saveMerge}
-          closeModal={() => modal.instance.Close()}
-        />
+      <FixMergeFilterModal
+        isPassingOuter={isPassing}
+        setIsPassingOuter={setIsPassing}
+        mergeParams={mergeParams}
+        mergeErrorEntries={mergeErrorEntries!}
+        saveMerge={saveMerge}
+        closeModal={() => modal.instance.Close()}
+        tabName={tabName!}
+      />
     );
   }
 
   return (
     <Focusable className="styled-btn">
-      <ButtonItem onClick={onClick}>
-        {"Fix Merge Group"}
+      <ButtonItem onClick={onClick} disabled={isPassing}>
+        {isPassing ? "Resolved" : "Fix Merge Group"}
       </ButtonItem>
     </Focusable>
   )
