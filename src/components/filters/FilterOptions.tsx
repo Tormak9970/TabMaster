@@ -263,7 +263,7 @@ const DeckCompatFilterOptions: VFC<FilterOptionsProps<'deck compatibility'>> = (
   return (
     <Field
       label="Selected Compatibility"
-      description={<Dropdown rgOptions={dropdownOptions} selectedOption={categoryToLabel((filter as TabFilterSettings<'deck compatibility'>).params.category)} onChange={onChange} />}
+      description={<Dropdown rgOptions={dropdownOptions} selectedOption={(filter as TabFilterSettings<'deck compatibility'>).params.category} onChange={onChange} />}
     />
   );
 }
