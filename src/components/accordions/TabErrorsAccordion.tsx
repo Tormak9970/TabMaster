@@ -6,11 +6,12 @@ import { FaCircleCheck, FaCircleExclamation, FaCircleXmark } from "react-icons/f
 type TabAccordionIconProps = {
   index: number,
   tab: TabSettings
+  open: boolean,
   isDeleted: boolean,
   isPassing: boolean
 }
 
-const TabAccordionIcon: VFC<TabAccordionIconProps> = ({ index, tab, isDeleted, isPassing }) => {
+const TabAccordionIcon: VFC<TabAccordionIconProps> = ({ index, tab, open, isDeleted, isPassing }) => {
   if (isDeleted) {
     return (
       <div className="check-cont">
@@ -79,7 +80,7 @@ export const TabErrorsAccordion: VFC<TabErrorsAccordionProps> = ({ index, isPass
           alignItems: "center",
           fontSize: "16px"
         }} onOKButton={onClick} onClick={onClick}>
-          <TabAccordionIcon index={index} tab={tab} isDeleted={isDeleted} isPassing={isPassing} />
+          <TabAccordionIcon index={index} tab={tab} open={open} isDeleted={isDeleted} isPassing={isPassing} />
         </Button>
       </Focusable>
       {open && !isDeleted && children}
