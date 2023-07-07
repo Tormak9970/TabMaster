@@ -80,13 +80,13 @@ export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean 
 export function categoryToLabel(category: number): string {
   switch (category) {
     case 0:
-      return "Unkown";
+      return "Unknown";
     case 1:
-      return "Unplayable";
+      return "Unsupported";
     case 2:
       return "Playable";
     case 3:
-      return "Great on Deck";
+      return "Verified";
     default:
       return "";
   }
