@@ -38,6 +38,7 @@ export type FilterParams<T extends FilterType> =
 
 export type TabFilterSettings<T extends FilterType> = {
   type: T,
+  inverted: boolean,
   params: FilterParams<T>
 }
 
@@ -59,6 +60,28 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "platform": { platform: "steam" },
   "deck compatibility": { category: 3 }
 };
+
+/**
+ * Whether the filter should have an invert option.
+ * @param filter The filter to check.
+ * @returns True if the filter can be inverted, false if not.
+ */
+export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
+  switch (filter.type) {
+    case "regex":
+    case "collection":
+    case "friends":
+    case "tags":
+    case "merge":
+    case "deck compatibility":
+      return true;
+    case "platform":
+    case "installed":
+    case "whitelist":
+    case "blacklist":
+      return false;
+  }
+}
 
 /**
  * Checks if the user has made any changes to a filter.
@@ -87,6 +110,11 @@ export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean 
   }
 }
 
+/**
+ * Gets the label for a provided deck verified category.
+ * @param category The category to get the label for.
+ * @returns The label of the provided category.
+ */
 export function categoryToLabel(category: number): string {
   switch (category) {
     case 0:
@@ -108,6 +136,8 @@ export function categoryToLabel(category: number): string {
  * @returns Whether or not the filter passed, and if not, any errors it produced.
  */
 export function validateFilter(filter: TabFilterSettings<FilterType>): ValidationResponse {
+  if (!Object.keys(filter).includes("inverted")) filter.inverted = false;
+
   switch (filter.type) {
     case "collection": {
       let passed = true;
@@ -260,6 +290,7 @@ export class Filter {
    * @returns True if the app meets the filter criteria.
    */
   static run(filterSettings: TabFilterSettings<FilterType>, appOverview: SteamAppOverview): boolean {
-    return (this.filterFunctions[filterSettings.type] as FilterFunction)(filterSettings.params, appOverview);
+    const shouldInclude = (this.filterFunctions[filterSettings.type] as FilterFunction)(filterSettings.params, appOverview);
+    return filterSettings.inverted ? !shouldInclude : shouldInclude;
   }
 }
