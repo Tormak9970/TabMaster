@@ -49,7 +49,6 @@
     "@types/react": "16.14.0",
     "@types/uuid": "^9.0.2",
     "@types/webpack": "^5.28.1",
-    "deckbuild": "^1.2.1",
     "husky": "^8.0.3",
     "rollup": "^2.79.1",
     "rollup-plugin-import-assets": "^1.1.1",
