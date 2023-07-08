@@ -49,6 +49,7 @@ export class TabMasterManager {
 
   public eventBus = new EventTarget();
 
+  private allGamesReaction: IReactionDisposer | undefined;
   private favoriteReaction: IReactionDisposer | undefined;
   private soundtrackReaction: IReactionDisposer | undefined;
   private installedReaction: IReactionDisposer | undefined;
@@ -71,6 +72,9 @@ export class TabMasterManager {
   }
 
   private initReactions(): void {
+    //* subscribe to changes to all games
+    this.allGamesReaction = reaction(() => collectionStore.GetCollection("type-games").allApps, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 600 });
+
     //* subscribe to when visible favorites change
     this.favoriteReaction = reaction(() => collectionStore.GetCollection('favorite').visibleApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this));
 
@@ -319,6 +323,7 @@ export class TabMasterManager {
    * Handles cleaning up all reactions.
    */
   disposeReactions(): void {
+    if (this.allGamesReaction) this.allGamesReaction();
     if (this.favoriteReaction) this.favoriteReaction();
     if (this.soundtrackReaction) this.soundtrackReaction();
     if (this.installedReaction) this.installedReaction();
