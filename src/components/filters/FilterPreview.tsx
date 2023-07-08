@@ -7,7 +7,7 @@ type FilterPreviewProps<T extends FilterType> = {
 
 
 const CollectionFilterPreview: VFC<FilterPreviewProps<'collection'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">collection - {filter.params.name ?? filter.params.id}</div>
+  return <div className="merge-filter-entry">collection - {filter.params.name ?? filter.params.id}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 const InstalledFilterPreview: VFC<FilterPreviewProps<'installed'>> = ({filter }) => {
@@ -15,15 +15,15 @@ const InstalledFilterPreview: VFC<FilterPreviewProps<'installed'>> = ({filter })
 }
 
 const RegexFilterPreview: VFC<FilterPreviewProps<'regex'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">regex - {filter.params.regex}</div>
+  return <div className="merge-filter-entry">regex - {filter.params.regex}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 const FriendsFilterPreview: VFC<FilterPreviewProps<'friends'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">friends - {filter.params.friends.length} {filter.params.friends.length == 1 ? "friend" : "friends"}</div>
+  return <div className="merge-filter-entry">friends - {filter.params.friends.length} {filter.params.friends.length == 1 ? "friend" : "friends"}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 const TagsFilterPreview: VFC<FilterPreviewProps<'tags'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">tags - {filter.params.tags.length} {filter.params.tags.length == 1 ? "tag" : "tags"}</div>
+  return <div className="merge-filter-entry">tags - {filter.params.tags.length} {filter.params.tags.length == 1 ? "tag" : "tags"}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 const WhitelistFilterPreview: VFC<FilterPreviewProps<'whitelist'>> = ({ filter }) => {
@@ -35,7 +35,7 @@ const BlackListFilterPreview: VFC<FilterPreviewProps<'blacklist'>> = ({ filter }
 }
 
 const MergeFilterPreview: VFC<FilterPreviewProps<'merge'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">merge - {filter.params.filters.length} grouped filters</div>
+  return <div className="merge-filter-entry">merge - {filter.params.filters.length} grouped filters{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 const PlatformFilterPreview: VFC<FilterPreviewProps<'platform'>> = ({ filter }) => {
@@ -43,7 +43,7 @@ const PlatformFilterPreview: VFC<FilterPreviewProps<'platform'>> = ({ filter }) 
 }
 
 const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">deck compat - {categoryToLabel(filter.params.category)}</div>
+  return <div className="merge-filter-entry">deck compat - {categoryToLabel(filter.params.category)}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 /**

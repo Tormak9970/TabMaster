@@ -33,6 +33,7 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
     const updatedFilters = [...groupFilters];
     updatedFilters.push({
       type: "collection",
+      inverted: false,
       params: { id: "", name: "" }
     });
 
