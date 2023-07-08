@@ -53,6 +53,7 @@ export class TabMasterManager {
   private soundtrackReaction: IReactionDisposer | undefined;
   private installedReaction: IReactionDisposer | undefined;
   private hiddenReaction: IReactionDisposer | undefined;
+  private nonSteamReaction: IReactionDisposer | undefined;
 
   private collectionReactions: { [collectionId: string]: IReactionDisposer; } = {};
 
@@ -77,10 +78,15 @@ export class TabMasterManager {
     this.soundtrackReaction = reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged.bind(this));
 
     //*subscribe to when installed games change
-    this.installedReaction = reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.handleNumOfInstalledChanged.bind(this));
+    this.installedReaction = reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this));
 
     //* subscribe to game hide or show
-    this.hiddenReaction = reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.handleGameHideOrShow.bind(this), { delay: 50 });
+    this.hiddenReaction = reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 50 });
+
+    //* subscribe to non-steam games if they exist
+    if (collectionStore.GetCollection('desk-desktop-apps')) {
+      this.nonSteamReaction = reaction(() => collectionStore.GetCollection('desk-desktop-apps').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this));
+    }
 
     //* subscribe for when collections are deleted
     this.collectionRemoveReaction = reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this));
@@ -143,36 +149,9 @@ export class TabMasterManager {
   }
 
   /**
-   * Handles the installed/uninstalled reaction.
+   * Handles rebuilding tabs when a collection changes.
    */
-  private handleNumOfInstalledChanged() {
-    if (!this.hasLoaded) return;
-
-    this.visibleTabsList.forEach((tabContainer) => {
-      if (tabContainer.filters && tabContainer.filters.length !== 0) {
-        (tabContainer as CustomTabContainer).buildCollection();
-      }
-    });
-  }
-
-  /**
-   * Handles the hidden collection reaction.
-   */
-  private handleGameHideOrShow() {
-    if (!this.hasLoaded) return;
-
-    this.visibleTabsList.forEach((tabContainer) => {
-      if (tabContainer.filters && tabContainer.filters.length !== 0) {
-        (tabContainer as CustomTabContainer).buildCollection();
-      }
-    });
-  }
-
-  /**
-   * Handles a general userCollection reaction.
-   * @param collectionId The id of the collection.
-   */
-  private handleUserCollectionLengthChange() {
+  private rebuildCustomTabsOnCollectionChange() {
     if (!this.hasLoaded) return;
 
     this.visibleTabsList.forEach((tabContainer) => {
@@ -344,6 +323,7 @@ export class TabMasterManager {
     if (this.soundtrackReaction) this.soundtrackReaction();
     if (this.installedReaction) this.installedReaction();
     if (this.hiddenReaction) this.hiddenReaction();
+    if (this.nonSteamReaction) this.nonSteamReaction();
 
     if (this.collectionReactions) {
       for (const reaction of Object.values(this.collectionReactions)) {
@@ -474,7 +454,7 @@ export class TabMasterManager {
         if (!this.collectionReactions[collectionId]) {
           //* subscribe to user collection updates
           this.collectionReactions[collectionId] = reaction(() => collectionStore.GetCollection(collectionId).allApps.length, () => {
-            this.handleUserCollectionLengthChange();
+            this.rebuildCustomTabsOnCollectionChange();
           });
         }
       }
