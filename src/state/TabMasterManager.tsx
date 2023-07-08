@@ -507,7 +507,7 @@ export class TabMasterManager {
     //* We don't need to wait for these, since if we get the store ones, we don't care about them
     PythonInterop.getTags().then((res: TagResponse[] | Error) => {
       if (res instanceof Error) {
-        console.log("TabMaster couldn't load tags settings");
+        LogController.log("TabMaster couldn't load tags settings");
       } else {
         if (this.allStoreTags.length === 0) {
           this.allStoreTags = res;
@@ -516,7 +516,7 @@ export class TabMasterManager {
     });
     PythonInterop.getFriends().then((res: FriendEntry[] | Error) => {
       if (res instanceof Error) {
-        console.log("TabMaster couldn't load friends settings");
+        LogController.log("TabMaster couldn't load friends settings");
       } else {
         if (this.currentUsersFriends.length === 0) {
           this.currentUsersFriends = res;
@@ -525,7 +525,7 @@ export class TabMasterManager {
     });
     PythonInterop.getFriendsGames().then((res: Map<number, number[]> | Error) => {
       if (res instanceof Error) {
-        console.log("TabMaster couldn't load friends games settings");
+        LogController.log("TabMaster couldn't load friends games settings");
       } else {
         if (this.friendsGameMap.size === 0) {
           this.friendsGameMap = res;
@@ -656,7 +656,7 @@ export class TabMasterManager {
    * Saves the tabs to the backend.
    */
   private saveTabs() {
-    console.log('saving tabs');
+    LogController.log('Saving Tabs...');
 
     const allTabsSettings: TabSettingsDictionary = {};
 
