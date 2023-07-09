@@ -1,28 +1,37 @@
 import {
   ButtonItem,
   definePlugin,
+  Navigation,
   PanelSection,
   ReorderableEntry,
   ReorderableList,
   RoutePatch,
   ServerAPI,
   showModal,
+  SidebarNavigation,
   staticClasses,
 } from "decky-frontend-lib";
-import { VFC, Fragment } from "react";
+import { VFC, Fragment, ReactNode } from "react";
+
 import { TbLayoutNavbarExpand } from "react-icons/tb";
 import { FaSteam } from "react-icons/fa";
+import { MdNumbers } from "react-icons/md";
 
-import { patchLibrary } from "./patches/LibraryPatch";
-import { TabMasterContextProvider, useTabMasterContext } from "./state/TabMasterContext";
-import { EditableTabSettings, EditTabModal } from "./components/modals/EditTabModal";
 import { PluginController } from "./lib/controllers/PluginController";
 import { PythonInterop } from "./lib/controllers/PythonInterop";
+
+import { TabMasterContextProvider, useTabMasterContext } from "./state/TabMasterContext";
 import { TabMasterManager } from "./state/TabMasterManager";
-import { TabActionsButton } from "./components/TabActions";
-import { QamStyles } from "./components/styles/QamStyles";
+
+import { patchLibrary } from "./patches/LibraryPatch";
 import { patchSettings } from "./patches/SettingsPatch";
+
+import { QamStyles } from "./components/styles/QamStyles";
+import { EditableTabSettings, EditTabModal } from "./components/modals/EditTabModal";
 import { CustomTabContainer } from "./components/CustomTabContainer";
+import { TabActionsButton } from "./components/TabActions";
+import { LogController } from "./lib/controllers/LogController";
+import { DocPage } from "./components/docs/DocsPage";
 
 declare global {
   var SteamClient: SteamClient;
@@ -89,6 +98,9 @@ const Content: VFC<{}> = ({ }) => {
           <ButtonItem onClick={onAddClicked}>
             Add Tab
           </ButtonItem>
+          <ButtonItem layout="below" onClick={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }} >
+            Plugin Config
+          </ButtonItem>
         </div>
         {tabMasterManager.hasSettingsLoaded &&
           <div className="add-tab-btn">
@@ -144,6 +156,51 @@ const Content: VFC<{}> = ({ }) => {
   );
 };
 
+type DocRouteEntry = {
+  title: string,
+  content: ReactNode,
+  route: string,
+  icon: ReactNode,
+  hideTitle: boolean
+}
+
+type DocRoutes = {
+  [pageName: string]: DocRouteEntry
+}
+
+type TabMasterDocsRouterProps = {
+  docs: DocPages
+}
+
+/**
+ * The documentation pages router for TabMaster.
+ */
+const TabMasterDocsRouter: VFC<TabMasterDocsRouterProps> = ({ docs }) => {
+  const docPages: DocRoutes = {};
+  Object.entries(docs).map(([ pageName, doc ]) => {
+    docPages[pageName] = {
+      title: pageName,
+      content: <DocPage content={doc} />,
+      route: `/tab-master-docs/${pageName.toLowerCase().replace(/ /g, "-")}`,
+      icon: <MdNumbers />,
+      hideTitle: true
+    }
+  });
+
+  return (
+    <SidebarNavigation
+      title="TabMaster Docs"
+      showTitle
+      pages={[
+        docPages["Overview"],
+        docPages["Tabs"],
+        docPages["Filters"]
+      ]}
+    />
+  );
+};
+
+
 export default definePlugin((serverAPI: ServerAPI) => {
   let libraryPatch: RoutePatch;
   let settingsPatch: RoutePatch;
@@ -158,6 +215,18 @@ export default definePlugin((serverAPI: ServerAPI) => {
     settingsPatch = patchSettings(serverAPI, tabMasterManager);
   });
 
+  PythonInterop.getDocs().then((pages: DocPages | Error) => {
+    if (pages instanceof Error) {
+      LogController.error(pages);
+    } else {
+      serverAPI.routerHook.addRoute("/tab-master-docs", () => (
+        <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+          <TabMasterDocsRouter docs={pages} />
+        </TabMasterContextProvider>
+      ));
+    }
+  });
+
   return {
     title: <div className={staticClasses.Title}>TabMaster</div>,
     content:
@@ -168,6 +237,8 @@ export default definePlugin((serverAPI: ServerAPI) => {
     onDismount: () => {
       serverAPI.routerHook.removePatch("/library", libraryPatch);
       serverAPI.routerHook.removePatch("/settings", settingsPatch);
+      serverAPI.routerHook.removeRoute("/tab-master-docs");
+
       loginUnregisterer.unregister();
       PluginController.dismount();
     },

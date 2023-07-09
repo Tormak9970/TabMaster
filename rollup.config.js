@@ -15,7 +15,7 @@ export default defineConfig({
   input: './src/index.tsx',
   plugins: [
     commonjs(),
-    nodeResolve({ browser: true }),
+    nodeResolve({ preferBuiltins: false, browser: true }),
     typescript({ sourceMap: !production, inlineSources: !production }),
     json(),
     replace({
