@@ -20,4 +20,4 @@ These docs serve as a reference for questions you may have, and a guide for help
 
 <br/>
 
-###### © Travis Lane (Tormak), Jessebofile
+###### © Travis Lane (Tormak), Jessebofill

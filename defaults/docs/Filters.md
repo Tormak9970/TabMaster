@@ -1,4 +1,4 @@
-<!-- Temp -->
+<!-- Temp for testing scroll -->
 ## Managing Shortcuts
 
 ### Table of Contents
@@ -57,3 +57,19 @@ In order to remove a shortcut, simply go to the **Manage Shortcuts** section, cl
 <br/>
 
 ###### © Travis Lane (Tormak)
+<!-- end temp content -->
+
+
+# Actual content begins here:
+
+## Filters
+
+### Table of Contents
+ - Overview
+ - Available Filters
+ - Examples
+
+### Available Filters
+
+
+### Examples
