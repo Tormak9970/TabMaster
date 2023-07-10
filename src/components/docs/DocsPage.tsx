@@ -1,8 +1,7 @@
 import { VFC, Fragment } from "react";
 
 import MarkDownIt from "markdown-it";
-import { Focusable } from "decky-frontend-lib";
-import { ScrollPanel } from "./Scrollable";
+import { ModalPosition, Panel, ScrollPanelGroup } from "./Scrollable";
 
 const mdIt = new MarkDownIt({ //try "commonmark"
   html: true
@@ -30,16 +29,27 @@ export const DocPage: VFC<{ content: string }> = ({ content }) => {
         .tab-master-docs tr:nth-child(odd) {
           background-color: #1B2838;
         }
+
+        .tab-master-docs .gamepaddialog_ModalPosition_30VHl {
+          padding: 0;
+        }
+
+        .tab-master-docs > .Panel.Focusable.gpfocuswithin {
+          background-color: #868da117;
+        }
+
       `}</style>
       <div className="tab-master-docs">
-        <Focusable>
-          <ScrollPanel>
-            <Focusable>
-              <div dangerouslySetInnerHTML={{ __html: mdIt.render(content) }} />
-            </Focusable>
-          </ScrollPanel>
-        </Focusable>
+        <ModalPosition >
+          <Panel style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
+            <ScrollPanelGroup focusable={false} style={{ flex: 1, minHeight: 0, padding: "12px" }} scrollPaddingTop={32}>
+              <Panel focusable={true} noFocusRing={true} >
+                <div dangerouslySetInnerHTML={{ __html: mdIt.render(content) }} />
+              </Panel>
+            </ScrollPanelGroup>
+          </Panel>
+        </ModalPosition>
       </div>
     </>
   );
-}
+};
