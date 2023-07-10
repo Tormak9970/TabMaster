@@ -2,8 +2,9 @@ import { VFC, Fragment } from "react";
 
 import MarkDownIt from "markdown-it";
 import { ModalPosition, Panel, ScrollPanelGroup } from "./Scrollable";
+import { gamepadDialogClasses } from "decky-frontend-lib";
 
-const mdIt = new MarkDownIt({ //try "commonmark"
+const mdIt = new MarkDownIt({
   html: true
 });
 
@@ -30,7 +31,7 @@ export const DocPage: VFC<{ content: string }> = ({ content }) => {
           background-color: #1B2838;
         }
 
-        .tab-master-docs .gamepaddialog_ModalPosition_30VHl {
+        .tab-master-docs .${gamepadDialogClasses.ModalPosition} {
           padding: 0;
         }
 
