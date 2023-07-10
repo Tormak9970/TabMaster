@@ -3,10 +3,6 @@
 ### Table of Contents
  - Overview
  - Inverting Filters
- - Grouping Filters
-   - Purpose
-   - How it Works
-   - Example
  - Available Filters
    - Collection
    - Installed
@@ -17,6 +13,7 @@
    - Platform
    - Deck Compatibility
    - Regex
+   - Merge
 
 <br/>
 
@@ -34,26 +31,6 @@ Example: Inverting a `Collection` filter would cause it to include any games **n
 
 <br/>
 
-### Grouping Filters
-
-#### Purpose
-
-Now why would we want to group filters? Well, the main use case for this is to change the `logic mode`. By grouping filters you are able to specify the mode for filters in the group seperately, significantly increasing the utility of TabMaster!
-
-<br/>
-
-#### How it Works
-
-In order to do this, add a filter and change the type to `merge`. This will change the options to a single button that will open a new dialog for you to edit the group's contents. In here you can add filters and set the logic mode just like a tab, and even add more groups.
-
-<br/>
-
-#### Example
-
-If that sounded a little confusing, don't worry. Here's an example of a filter group in action.
-<!-- TODO: Image -->
-
-<br/>
 
 ### Available Filters
 
@@ -176,6 +153,23 @@ Filters games by testing if their title matches a regular expression .
 **Tip:**<br/>
 Regular expressions can seem daunting and confusing. You can test yours before hand by looking up a "Regex Tester" website.<br/>
 Also, by typing a phrase like "Zelda" into the regex field, it will include any game with that phrase in its title.
+
+**Example:**<br/>
+<!-- TODO: Image -->
+
+<br/>
+
+#### Merge
+
+**Options:**<br/>
+`filters` - The filters for this group.
+`logic mode` - Specifies whether to use `and` vs. `or` mode.
+
+**Behavior:**<br/>
+Groups a set of filters, allowing you to change the logic mode for smaller sets of filters.
+
+**Tip:**<br/>
+By grouping filters you are able to specify the mode for filters in the group seperately, significantly increasing the utility of TabMaster
 
 **Example:**<br/>
 <!-- TODO: Image -->
