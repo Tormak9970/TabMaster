@@ -5,10 +5,12 @@ The purpose of TabMaster is to provide a robust sytem for custom library tabs, w
 
 <br/>
 
+
 ### Docs
 These docs serve as a reference for questions you may have, and a guide for helping you understand the full extend of TabMaster's features. Below you will find the table of contents listing each doc page and providing a short description of each. Simply select the page from the menu to the left to view it.
 
 <br/>
+
 
 ### Table of Contents
 * Overview
@@ -19,5 +21,6 @@ These docs serve as a reference for questions you may have, and a guide for help
   * What are filters, descriptions/tips for each, and examples.
 
 <br/>
+
 
 ###### © Travis Lane (Tormak), Jessebofill
