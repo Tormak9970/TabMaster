@@ -194,7 +194,8 @@ const TabMasterDocsRouter: VFC<TabMasterDocsRouterProps> = ({ docs }) => {
       pages={[
         docPages["Overview"],
         docPages["Tabs"],
-        docPages["Filters"]
+        docPages["Filters"],
+        docPages["The Fix System"]
       ]}
     />
   );

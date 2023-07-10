@@ -87,6 +87,7 @@ Filters games based on their install state.
 
 **Options:**<br/>
 `friends` - A list of your users in your Steam Friends list.
+`logic mode` - Specifies whether to use `and` vs. `or` mode.
 
 **Behavior:**<br/>
 - `and`: Filters games based on if they are owned by all listed friends.
@@ -101,6 +102,7 @@ Filters games based on their install state.
 
 **Options:**<br/>
 `tags` - A list of community tags.
+`logic mode` - Specifies whether to use `and` vs. `or` mode.
 
 **Behavior:**<br/>
 - `and`: Filters games based on if they have all listed tags.

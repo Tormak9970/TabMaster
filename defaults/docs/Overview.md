@@ -19,6 +19,8 @@ These docs serve as a reference for questions you may have, and a guide for help
   * What is a tab, parts of a tab, and default vs custom.
 * Filters
   * What are filters, descriptions/tips for each, and examples.
+* The Fix System
+  * TabMaster's system for handling changes that could potentially break it.
 
 <br/>
 
