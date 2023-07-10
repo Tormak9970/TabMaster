@@ -19,13 +19,11 @@
 
 
 ### Overview
-
 Below you will find information on the options and behavior of each filter, as well as an example of how to use it. Keep in mind that while most of the examples simply show how the filter is used on its own, each filter can be combined together to create very complexed selections. The `merge filter` example demonstrates this
 
 <br/>
 
 ### Inverting Filters
-
 Most filters have an option to invert them. This can be used to do the exact opposite of what the filter would normally do!<br/>
 Example: Inverting a `Collection` filter would cause it to include any games **not in** that collection, instead of **in** it.
 
@@ -35,7 +33,6 @@ Example: Inverting a `Collection` filter would cause it to include any games **n
 ### Available Filters
 
 #### Collection
-
 **Options:**<br/>
 `collection` - The collection to use.
 
@@ -48,7 +45,6 @@ Filters games based on if they are included in the collection.
 <br/>
 
 #### Installed
-
 **Options:**<br/>
 `installed` - A toggle. On is `installed`, off is `uninstalled`.
 
@@ -61,7 +57,6 @@ Filters games based on their install state.
 <br/>
 
 #### Friends
-
 **Options:**<br/>
 `friends` - A list of your users in your Steam Friends list.
 `logic mode` - Specifies whether to use `and` vs. `or` mode.
@@ -76,7 +71,6 @@ Filters games based on their install state.
 <br/>
 
 #### Community Tags
-
 **Options:**<br/>
 `tags` - A list of community tags.
 `logic mode` - Specifies whether to use `and` vs. `or` mode.
@@ -91,7 +85,6 @@ Filters games based on their install state.
 <br/>
 
 #### Whitelist
-
 **Options:**<br/>
 `games` - A list of games to whitelist.
 
@@ -104,7 +97,6 @@ Filters games by if they are in the list.
 <br/>
 
 #### Blacklist
-
 **Options:**<br/>
 `games` - A list of games to blacklist.
 
@@ -117,7 +109,6 @@ Filters games by if they are not in the list.
 <br/>
 
 #### Platform
-
 **Options:**<br/>
 `platform` - The platform to use.
 
@@ -130,7 +121,6 @@ Filters games based on if they are from the platform.
 <br/>
 
 #### Deck Compatibility
-
 **Options:**<br/>
 `level` - The level of playability on the Steam Deck.
 
@@ -143,7 +133,6 @@ Filters games based on their level of playability on the Steam Deck.
 <br/>
 
 #### Regex
-
 **Options:**<br/>
 `regex` - The regular expression to use.
 
@@ -160,7 +149,6 @@ Also, by typing a phrase like "Zelda" into the regex field, it will include any 
 <br/>
 
 #### Merge
-
 **Options:**<br/>
 `filters` - The filters for this group.
 `logic mode` - Specifies whether to use `and` vs. `or` mode.

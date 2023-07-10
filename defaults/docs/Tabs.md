@@ -76,7 +76,6 @@ Tabs can be hidden from the library as well. This means they won't appear in you
 
 
 ### Removing Tabs (Custom Tabs Only)
-
 If you decide your custom tab just isn't cutting it, you can completely remove it too. To do this, navigate to the tab's menu (the same one where you edit and hide tabs), and click delete. You will be prompted to confirm (as this can't be undone!), and once you do, the tab will be perminantly removed from TabMaster.
 
 <br/>

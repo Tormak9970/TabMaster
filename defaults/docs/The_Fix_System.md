@@ -11,32 +11,27 @@
 
 
 ### What is the Fix System?
-
 Placeholder.
 
 <br/>
 
 
 ### When Does it Get Used?
-
 Placeholder.
 
 <br/>
 
 
 ### How to use the Fix System
-
 Placeholder.
 
 #### Fixing a Filter
-
 Placeholder.
 <!-- TODO: images of this process -->
 
 <br/>
 
 #### Fixing a Filter in a Group
-
 Placeholder.
 <!-- TODO: images of this process -->
 

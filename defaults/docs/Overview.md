@@ -25,4 +25,8 @@ These docs serve as a reference for questions you may have, and a guide for help
 <br/>
 
 
+### Notes:
+A few articles mention needing to close the library to see changes you make to tabs while in the library. This isn't true. You can just refresh the tabs in the TabMaster QAM menu, or simply switch tabs.
+
+
 ###### © Travis Lane (Tormak), Jessebofill
