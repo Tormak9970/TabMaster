@@ -39,6 +39,15 @@ export const DocPage: VFC<{ content: string }> = ({ content }) => {
           background-color: #868da117;
         }
 
+        .tab-master-docs img {
+          max-width: 588px;
+        }
+
+        .tab-master-docs code {
+          color: #f1ac4f;
+          padding: 2px 4px;
+          border-radius: 4px;
+        }
       `}</style>
       <div className="tab-master-docs">
         <ModalPosition >
