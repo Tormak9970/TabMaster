@@ -9,13 +9,13 @@ interface FilterDescModalProps {
 export const FitlerDescModal: VFC<FilterDescModalProps> = ({ closeModal }) => {
   return <>
     <style>{`
-        .filter-desc-modal .${gamepadDialogClasses.ModalPosition} {
+        .tab-master-filter-desc-modal .${gamepadDialogClasses.ModalPosition} {
           padding: 0;
           margin: 0 150px;
         }
       `}</style>
     <SimpleModal active={true}>
-      <div className="filter-desc-modal">
+      <div className="tab-master-filter-desc-modal">
         <ModalPosition>
           <div>
             <h2 style={{ margin: '45px 0 5px' }}>Filter Descriptions</h2>
