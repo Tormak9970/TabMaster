@@ -18,7 +18,7 @@ import { VFC, Fragment, ReactNode } from "react";
 
 import { TbLayoutNavbarExpand } from "react-icons/tb";
 import { FaSteam, FaArrowRotateRight } from "react-icons/fa6";
-import { MdNumbers, MdQuestionMark } from "react-icons/md";
+import { MdNumbers } from "react-icons/md";
 
 import { PluginController } from "./lib/controllers/PluginController";
 import { PythonInterop } from "./lib/controllers/PythonInterop";
@@ -102,65 +102,67 @@ const Content: VFC<{}> = ({ }) => {
     <>
       <QamStyles />
       <div className="tab-master-scope">
-        <div style={{ margin: "5px", marginTop: "0px" }}>
-          Here you can add, re-order, or remove tabs from the library.
-        </div>
-        <Field className="no-sep">
-          <Focusable style={{ width: "100%", display: "flex" }}>
-            <Focusable className="add-tab-btn" style={{ width: "calc(100% - 50px)" }}>
-              <DialogButton onClick={onAddClicked} onOKActionDescription={'Add Tab'}>
-                Add Tab
-              </DialogButton>
-            </Focusable>
-            {tabMasterManager.hasSettingsLoaded &&
-              <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
-                <DialogButton
-                  style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center" }}
-                  onOKActionDescription={'Refresh Tabs'}
-                  onClick={refreshTabs}
-                >
-                  <FaArrowRotateRight />
+        <Focusable onMenuActionDescription='Open Docs' onMenuButton={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }}>
+          <div style={{ margin: "5px", marginTop: "0px" }}>
+            Here you can add, re-order, or remove tabs from the library.
+          </div>
+          <Field className="no-sep">
+            <Focusable style={{ width: "100%", display: "flex" }}>
+              <Focusable className="add-tab-btn" style={{ width: "calc(100% - 50px)" }}>
+                <DialogButton onClick={onAddClicked} onOKActionDescription={'Add Tab'}>
+                  Add Tab
                 </DialogButton>
-              </Focusable>}
-          </Focusable>
-        </Field>
-        <PanelSection title="Tabs">
-          <div className="seperator"></div>
-          {tabMasterManager.hasSettingsLoaded ? (
-            <ReorderableList<TabIdEntryType>
-              entries={entries}
-              interactables={TabEntryInteractables}
-              onSave={(entries: ReorderableEntry<TabIdEntryType>[]) => {
-                tabMasterManager.reorderTabs(entries.map(entry => entry.data!.id));
-              }}
-            />
-          ) : (
-            <div style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", padding: "5px" }}>
-              Loading...
-            </div>
-          )}
-        </PanelSection>
-        <PanelSection title="Hidden Tabs">
-          <div className="seperator"></div>
-          {
-            hiddenTabsList.map(tabContainer =>
-              <div className="hidden-tab-btn">
-                <ButtonItem
-                  label={
-                    <div className="tab-label-cont">
-                      <div className="tab-label">{tabContainer.title}</div>
-                      {tabContainer.filters ? <Fragment /> : <FaSteam />}
-                    </div>
-                  }
-                  onClick={() => tabMasterManager.showTab(tabContainer.id)}
-                  onOKActionDescription="Unhide tab"
-                >
-                  Show
-                </ButtonItem>
+              </Focusable>
+              {tabMasterManager.hasSettingsLoaded &&
+                <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
+                  <DialogButton
+                    style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center" }}
+                    onOKActionDescription={'Refresh Tab Games'}
+                    onClick={refreshTabs}
+                  >
+                    <FaArrowRotateRight />
+                  </DialogButton>
+                </Focusable>}
+            </Focusable>
+          </Field>
+          <PanelSection title="Tabs">
+            <div className="seperator"></div>
+            {tabMasterManager.hasSettingsLoaded ? (
+              <ReorderableList<TabIdEntryType>
+                entries={entries}
+                interactables={TabEntryInteractables}
+                onSave={(entries: ReorderableEntry<TabIdEntryType>[]) => {
+                  tabMasterManager.reorderTabs(entries.map(entry => entry.data!.id));
+                }}
+              />
+            ) : (
+              <div style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", padding: "5px" }}>
+                Loading...
               </div>
-            )
-          }
-        </PanelSection>
+            )}
+          </PanelSection>
+          <PanelSection title="Hidden Tabs">
+            <div className="seperator"></div>
+            {
+              hiddenTabsList.map(tabContainer =>
+                <div className="hidden-tab-btn">
+                  <ButtonItem
+                    label={
+                      <div className="tab-label-cont">
+                        <div className="tab-label">{tabContainer.title}</div>
+                        {tabContainer.filters ? <Fragment /> : <FaSteam />}
+                      </div>
+                    }
+                    onClick={() => tabMasterManager.showTab(tabContainer.id)}
+                    onOKActionDescription="Unhide tab"
+                  >
+                    Show
+                  </ButtonItem>
+                </div>
+              )
+            }
+          </PanelSection>
+        </Focusable>
       </div>
     </>
   );
@@ -171,30 +173,30 @@ type DocRouteEntry = {
   content: ReactNode,
   route: string,
   icon: ReactNode,
-  hideTitle: boolean
-}
+  hideTitle: boolean;
+};
 
 type DocRoutes = {
-  [pageName: string]: DocRouteEntry
-}
+  [pageName: string]: DocRouteEntry;
+};
 
 type TabMasterDocsRouterProps = {
-  docs: DocPages
-}
+  docs: DocPages;
+};
 
 /**
  * The documentation pages router for TabMaster.
  */
 const TabMasterDocsRouter: VFC<TabMasterDocsRouterProps> = ({ docs }) => {
   const docPages: DocRoutes = {};
-  Object.entries(docs).map(([ pageName, doc ]) => {
+  Object.entries(docs).map(([pageName, doc]) => {
     docPages[pageName] = {
       title: pageName,
       content: <DocPage content={doc} />,
       route: `/tab-master-docs/${pageName.toLowerCase().replace(/ /g, "-")}`,
       icon: <MdNumbers />,
       hideTitle: true
-    }
+    };
   });
 
   return (
@@ -239,18 +241,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
   });
 
   return {
-    title: (
-      <div className={staticClasses.Title}>
-        TabMaster
-        <DialogButton
-          style={{ height: '28px', width: '30px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto' }}
-          onOKActionDescription={'Documentation'}
-          onClick={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }}
-        >
-          <MdQuestionMark style={{ marginTop: '-4px', marginLeft: '-5px', display: 'block' }} />
-        </DialogButton>
-      </div>
-    ),
+    title: <div className={staticClasses.Title}>TabMaster</div>,
     content:
       <TabMasterContextProvider tabMasterManager={tabMasterManager}>
         <Content />
