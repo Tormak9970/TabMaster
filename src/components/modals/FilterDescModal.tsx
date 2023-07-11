@@ -39,9 +39,11 @@ export const FitlerDescModal: VFC<FilterDescModalProps> = ({ closeModal }) => {
                 <p>
                   <small>
                     <p>"Default" includes games that are selected by a filter, "invert" inlcudes games that are not selected by a filter.</p>
-                    <p>"And" mode includes games that pass all filters, "or" mode includes games that pass any filter</p>
+                    <p>"And" mode includes games that pass all filters, "or" mode includes games that pass any filter.</p>
                   </small>
                 </p>
+                <br/>
+                <p><small><em>See full documentation for detailed usage of filters</em></small></p>
               </Panel>
             </ScrollPanelGroup>
           </Panel>
