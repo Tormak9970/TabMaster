@@ -22,14 +22,16 @@ We've tried to make this system as simple and easy to use as possible. When an i
 **Note!**: You need to fix the issue! If you don't TabMaster will not work, and will show the fix system each time you log in until you fix it!
 
 #### Fixing a Filter
-To fix a filter, simply set its options to new values, or remove it completely. TabMaster will update the filter according to your changes when you save.
-<!-- TODO: images of this process -->
+To fix a filter, simply set its options to new values, or remove it completely. TabMaster will update the filter according to your changes when you save.<br/>
+<img title="Fix UI" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_fix-ui.png" />
+(initial popup)<br/>
+<img title="Fix Applied" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_filter-fixed.png" />
+
 
 <br/>
 
 #### Fixing a Filter in a Group
 In order to fix a filter in a merge group, you need to open the group. Once done, you can fix it just like a regular filter.
-<!-- TODO: images of this process -->
 
 <br/>
 
