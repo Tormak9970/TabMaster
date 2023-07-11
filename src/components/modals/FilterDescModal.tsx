@@ -1,5 +1,6 @@
 import { Fragment, VFC } from "react";
 import { SimpleModal, ModalPosition, Panel, ScrollPanelGroup } from "../docs/Scrollable";
+import { gamepadDialogClasses } from "decky-frontend-lib";
 
 interface FilterDescModalProps {
   closeModal?: () => void;
@@ -8,7 +9,7 @@ interface FilterDescModalProps {
 export const FitlerDescModal: VFC<FilterDescModalProps> = ({ closeModal }) => {
   return <>
     <style>{`
-        .filter-desc-modal .gamepaddialog_ModalPosition_30VHl {
+        .filter-desc-modal .${gamepadDialogClasses.ModalPosition} {
           padding: 0;
           margin: 0 150px;
         }
@@ -23,16 +24,16 @@ export const FitlerDescModal: VFC<FilterDescModalProps> = ({ closeModal }) => {
             <ScrollPanelGroup focusable={false} style={{ flex: 1, minHeight: 0, padding: "12px 0" }} >
               <Panel focusable={true} noFocusRing={true} onActivate={closeModal} onCancel={closeModal}>
                 <div>
-                  <p><b>Collection: </b><small>Select games that are in a certain Steam Collection.</small></p>
-                  <p><b>Installed: </b><small>Select games that are installed or not installed.</small></p>
-                  <p><b>Regex: </b><small>Select games whose titles match a regular expression.</small></p>
-                  <p><b>Friends: </b><small>Select games that are also owned by any/ all friends.</small></p>
-                  <p><b>Tags: </b><small>Select games that have any/ all specific tags.</small></p>
-                  <p><b>Whitelist: </b><small>Select games that are added to the list.</small></p>
-                  <p><b>Blacklist: </b><small>Select games that are not added to the list.</small></p>
-                  <p><b>Merge: </b><small>Select games that pass a subgroup of combined filters. Multiple filters are combined into one in the same way they are at the top level and can be set to include games that pass any/ all filters in subgroup.</small></p>
-                  <p><b>Platform: </b><small>Select Steam or non-Steam games.</small></p>
-                  <p><b>Deck Compatibility: </b><small>Select games that have a specific Steam Deck compatibilty status.</small></p>
+                  <p><b>Collection: </b><small>Selects games that are in a certain Steam Collection.</small></p>
+                  <p><b>Installed: </b><small>Selects games that are installed or not installed.</small></p>
+                  <p><b>Regex: </b><small>Selects games whose titles match a regular expression.</small></p>
+                  <p><b>Friends: </b><small>Selects games that are also owned by any/ all friends.</small></p>
+                  <p><b>Tags: </b><small>Selects games that have any/ all specific tags.</small></p>
+                  <p><b>Whitelist: </b><small>Selects games that are added to the list.</small></p>
+                  <p><b>Blacklist: </b><small>Selects games that are not added to the list.</small></p>
+                  <p><b>Merge: </b><small>Selects games that pass a subgroup of combined filters. Multiple filters are combined into one in the same way they are at the top level and can be set to include games that pass any/ all filters in subgroup.</small></p>
+                  <p><b>Platform: </b><small>Selects Steam or non-Steam games.</small></p>
+                  <p><b>Deck Compatibility: </b><small>Selects games that have a specific Steam Deck compatibilty status.</small></p>
                 </div>
                 <hr style={{ border: 'none', height: '1px', background: '#5e696f' }} />
                 <p>
