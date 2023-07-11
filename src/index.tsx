@@ -1,6 +1,9 @@
 import {
   ButtonItem,
   definePlugin,
+  DialogButton,
+  Field,
+  Focusable,
   Navigation,
   PanelSection,
   ReorderableEntry,
@@ -14,8 +17,8 @@ import {
 import { VFC, Fragment, ReactNode } from "react";
 
 import { TbLayoutNavbarExpand } from "react-icons/tb";
-import { FaSteam } from "react-icons/fa";
-import { MdNumbers } from "react-icons/md";
+import { FaSteam, FaArrowRotateRight } from "react-icons/fa6";
+import { MdNumbers, MdQuestionMark } from "react-icons/md";
 
 import { PluginController } from "./lib/controllers/PluginController";
 import { PythonInterop } from "./lib/controllers/PythonInterop";
@@ -75,6 +78,14 @@ const Content: VFC<{}> = ({ }) => {
     );
   }
 
+  function refreshTabs() {
+    tabMasterManager.getTabs().visibleTabsList.forEach((tabContainer) => {
+      if (tabContainer.filters && tabContainer.filters.length !== 0) {
+        (tabContainer as CustomTabContainer).buildCollection();
+      }
+    });
+  }
+
   const entries = visibleTabsList.map((tabContainer) => {
     return {
       label:
@@ -94,26 +105,25 @@ const Content: VFC<{}> = ({ }) => {
         <div style={{ margin: "5px", marginTop: "0px" }}>
           Here you can add, re-order, or remove tabs from the library.
         </div>
-        <div className="add-tab-btn">
-          <ButtonItem onClick={onAddClicked}>
-            Add Tab
-          </ButtonItem>
-          <ButtonItem layout="below" onClick={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }} >
-            Plugin Config
-          </ButtonItem>
-        </div>
-        {tabMasterManager.hasSettingsLoaded &&
-          <div className="add-tab-btn">
-            <ButtonItem onClick={() => {
-              tabMasterManager.getTabs().visibleTabsList.forEach((tabContainer) => {
-                if (tabContainer.filters && tabContainer.filters.length !== 0) {
-                  (tabContainer as CustomTabContainer).buildCollection();
-                }
-              });
-            }}>
-              Refresh Tabs
-            </ButtonItem>
-          </div>}
+        <Field className="no-sep">
+          <Focusable style={{ width: "100%", display: "flex" }}>
+            <Focusable className="add-tab-btn" style={{ width: "calc(100% - 50px)" }}>
+              <DialogButton onClick={onAddClicked} onOKActionDescription={'Add Tab'}>
+                Add Tab
+              </DialogButton>
+            </Focusable>
+            {tabMasterManager.hasSettingsLoaded &&
+              <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
+                <DialogButton
+                  style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center" }}
+                  onOKActionDescription={'Refresh Tabs'}
+                  onClick={refreshTabs}
+                >
+                  <FaArrowRotateRight />
+                </DialogButton>
+              </Focusable>}
+          </Focusable>
+        </Field>
         <PanelSection title="Tabs">
           <div className="seperator"></div>
           {tabMasterManager.hasSettingsLoaded ? (
@@ -229,7 +239,18 @@ export default definePlugin((serverAPI: ServerAPI) => {
   });
 
   return {
-    title: <div className={staticClasses.Title}>TabMaster</div>,
+    title: (
+      <div className={staticClasses.Title}>
+        TabMaster
+        <DialogButton
+          style={{ height: '28px', width: '30px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto' }}
+          onOKActionDescription={'Documentation'}
+          onClick={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }}
+        >
+          <MdQuestionMark style={{ marginTop: '-4px', marginLeft: '-5px', display: 'block' }} />
+        </DialogButton>
+      </div>
+    ),
     content:
       <TabMasterContextProvider tabMasterManager={tabMasterManager}>
         <Content />
