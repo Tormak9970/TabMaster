@@ -31,7 +31,7 @@ export const FitlerDescModal: VFC<FilterDescModalProps> = ({ closeModal }) => {
                   <p><b>Tags: </b><small>Selects games that have any/ all specific tags.</small></p>
                   <p><b>Whitelist: </b><small>Selects games that are added to the list.</small></p>
                   <p><b>Blacklist: </b><small>Selects games that are not added to the list.</small></p>
-                  <p><b>Merge: </b><small>Selects games that pass a subgroup of combined filters. Multiple filters are combined into one in the same way they are at the top level and can be set to include games that pass any/ all filters in subgroup.</small></p>
+                  <p><b>Merge: </b><small>Selects games that pass a subgroup of filters. They behave like filters grouped in a tab, allowing you to set whether a game needs to pass all, or any of the filters in the subgroup.</small></p>
                   <p><b>Platform: </b><small>Selects Steam or non-Steam games.</small></p>
                   <p><b>Deck Compatibility: </b><small>Selects games that have a specific Steam Deck compatibilty status.</small></p>
                 </div>
