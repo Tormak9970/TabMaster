@@ -1,5 +1,5 @@
-import { Fragment, VFC } from "react";
-import { FilterDefaultParams, FilterType, TabFilterSettings } from "./Filters";
+import { Fragment, VFC, useState } from "react";
+import { FilterDefaultParams, FilterType, TabFilterSettings, canBeInverted } from "./Filters";
 import { ButtonItem, Dropdown, Focusable } from "decky-frontend-lib";
 import { FaTrash } from "react-icons/fa";
 
@@ -15,15 +15,39 @@ type FilterEntryProps = {
  */
 export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
   const filterTypeOptions = Object.keys(FilterDefaultParams).map(type => { return { label: type, data: type } });
+  const invertOptions = [
+    {
+      label: "default",
+      data: false
+    },
+    {
+      label: "invert",
+      data: true
+    }
+  ];
+
+  const [ isInverted, setIsInverted ] = useState(filter.inverted);
 
   //* new filter is made with default params
   function onChange(data: {data: FilterType}) {
     const updatedFilter = {
       type: data.data,
+      inverted: isInverted,
       params: {...FilterDefaultParams[data.data]}
     }
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  function onInvertedChange(data: { data: boolean }) {
+    const updatedFilter = { ...filter }
+    updatedFilter.inverted = data.data;
+
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+
+    setIsInverted(data.data);
     setContainingGroupFilters(updatedFilters);
   }
 
@@ -41,11 +65,27 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
           display: "flex",
           flexDirection: "row"
         }}>
-          <Focusable style={{
-            width: "calc(100% - 55px)"
-          }}>
-            <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
-          </Focusable>
+          {!canBeInverted(filter) ? (
+            <Focusable style={{
+              width: "calc(100% - 55px)"
+            }}>
+              <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
+            </Focusable>
+          ) : (
+            <>
+              <Focusable style={{
+                width: "calc(100% - 185px)"
+              }}>
+                <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
+              </Focusable>
+              <Focusable style={{
+                marginLeft: "10px",
+                width: "120px"
+              }}>
+                <Dropdown rgOptions={invertOptions} selectedOption={filter.inverted} onChange={onInvertedChange} />
+              </Focusable>
+            </>
+          )}
           <Focusable style={{
             marginLeft: "10px",
             width: "45px"

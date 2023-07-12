@@ -1,9 +1,11 @@
 import {
   ConfirmModal,
+  DialogButton,
   Field,
   PanelSection,
   PanelSectionRow,
-  TextField
+  TextField,
+  showModal
 } from "decky-frontend-lib";
 import { useState, VFC, useEffect } from "react";
 import { FilterType, TabFilterSettings, isDefaultParams } from "../filters/Filters";
@@ -12,12 +14,15 @@ import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabMasterManager } from "../../state/TabMasterManager";
 import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";
+import { MdQuestionMark } from "react-icons/md";
+import { FitlerDescModal } from "./FilterDescModal";
 
 export type EditableTabSettings = {
   title: string,
-  filters: TabFilterSettings<any>[]
-  filtersMode: LogicalMode
-}
+  filters: TabFilterSettings<any>[];
+  filtersMode: LogicalMode;
+  includesHidden: boolean;
+};
 
 type EditTabModalProps = {
   closeModal?: () => void,
@@ -26,16 +31,18 @@ type EditTabModalProps = {
   tabTitle?: string,
   tabFilters: TabFilterSettings<FilterType>[],
   tabMasterManager: TabMasterManager,
-  filtersMode: LogicalMode
-}
+  filtersMode: LogicalMode;
+  includesHidden: boolean
+};
 
 /**
  * The modal for editing and creating custom tabs.
  */
-export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager, filtersMode }) => {
+export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager, filtersMode, includesHidden }) => {
   const [name, setName] = useState<string>(tabTitle ?? '');
   const [topLevelFilters, setTopLevelFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
   const [topLevelLogicMode, setTopLevelLogicMode] = useState<LogicalMode>(filtersMode);
+  const [topLevelIncludesHidden, setTopLevelIncludesHidden] = useState<boolean>(includesHidden);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
 
@@ -56,7 +63,8 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
       const updated: EditableTabSettings = {
         title: name,
         filters: topLevelFilters,
-        filtersMode: topLevelLogicMode
+        filtersMode: topLevelLogicMode,
+        includesHidden: topLevelIncludesHidden
       };
       onConfirm(tabId, updated);
       closeModal!();
@@ -69,6 +77,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
     const updatedFilters = [...topLevelFilters];
     updatedFilters.push({
       type: "collection",
+      inverted: false,
       params: { id: "", name: "" }
     });
     setTopLevelFilters(updatedFilters);
@@ -82,7 +91,20 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
           bAllowFullSize
           onCancel={closeModal}
           onEscKeypress={closeModal}
-          strTitle={tabTitle ? `Modifying: ${tabTitle}` : 'Create New Tab'}
+          strTitle={
+            <div style={{ display: 'flex', marginRight: '15px', width: '100%' }}>
+              <div>
+                {tabTitle ? `Modifying: ${tabTitle}` : 'Create New Tab'}
+              </div>
+              <DialogButton
+                style={{ height: '28px', width: '30px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto' }}
+                onOKActionDescription={'Filter Descriptions'}
+                onClick={() => {showModal(<FitlerDescModal/>)}}
+              >
+                <MdQuestionMark style={{ marginTop: '-4px', marginLeft: '-5px', display: 'block' }} />
+              </DialogButton>
+            </div>
+          }
           onOK={onSave}
         >
           <PanelSection>
@@ -99,10 +121,12 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
             addFilter={addFilter}
             groupLogicMode={topLevelLogicMode}
             setGroupLogicMode={setTopLevelLogicMode}
+            groupIncludesHidden={topLevelIncludesHidden}
+            setGroupIncludesHidden={setTopLevelIncludesHidden}
             canAddFilter={canAddFilter}
           />
         </ConfirmModal>
       </div>
     </TabMasterContextProvider>
   );
-}
+};

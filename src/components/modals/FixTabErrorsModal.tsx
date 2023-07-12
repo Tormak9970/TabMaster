@@ -8,8 +8,8 @@ import { useState, VFC, useEffect } from "react";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
 import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import type { TabMasterManager } from "../../state/TabMasterManager";
-import { ModalStyles } from "../styles/ModalStyles";
 import { TabErrorsPanel } from "../changes-needed/TabErrorsPanel";
+import { FixModalStyles } from "../styles/FixModalStyles";
 
 type FixTabErrorsModalRootProps = {
   closeModal?: () => void,
@@ -27,7 +27,7 @@ export const FixTabErrorsModalRoot: VFC<FixTabErrorsModalRootProps> = ({ closeMo
     // Steam throws a fit if onCancel isn't present, so we made it do nothing
     <ModalRoot bAllowFullSize onCancel={() => {}}>
       <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-        <ModalStyles />
+        <FixModalStyles />
         <FixTabErrorsModal onConfirm={onConfirm} closeModal={closeModal!} tabs={tabs} erroredFiltersMap={erroredFiltersMap} />
       </TabMasterContextProvider>
     </ModalRoot>
@@ -78,7 +78,7 @@ const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal,
   }
 
   return (
-    <div className="tab-master-modal-scope">
+    <div className="tab-master-fix-modal-scope">
       <PanelSection>
         <h1>Fixes Needed for One or More Tabs</h1>
         <PanelSectionRow>

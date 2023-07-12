@@ -49,10 +49,12 @@ export class TabMasterManager {
 
   public eventBus = new EventTarget();
 
+  private allGamesReaction: IReactionDisposer | undefined;
   private favoriteReaction: IReactionDisposer | undefined;
   private soundtrackReaction: IReactionDisposer | undefined;
   private installedReaction: IReactionDisposer | undefined;
   private hiddenReaction: IReactionDisposer | undefined;
+  private nonSteamReaction: IReactionDisposer | undefined;
 
   private collectionReactions: { [collectionId: string]: IReactionDisposer; } = {};
 
@@ -70,17 +72,25 @@ export class TabMasterManager {
   }
 
   private initReactions(): void {
+    //* subscribe to changes to all games
+    this.allGamesReaction = reaction(() => collectionStore.GetCollection("type-games").allApps, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 600 });
+
     //* subscribe to when visible favorites change
-    this.favoriteReaction = reaction(() => collectionStore.GetCollection('favorite').visibleApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this));
+    this.favoriteReaction = reaction(() => collectionStore.GetCollection('favorite').allApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this));
 
     //*subscribe to when visible soundtracks change
     this.soundtrackReaction = reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged.bind(this));
 
     //*subscribe to when installed games change
-    this.installedReaction = reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.handleNumOfInstalledChanged.bind(this));
+    this.installedReaction = reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this));
 
     //* subscribe to game hide or show
-    this.hiddenReaction = reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.handleGameHideOrShow.bind(this), { delay: 50 });
+    this.hiddenReaction = reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 50 });
+
+    //* subscribe to non-steam games if they exist
+    if (collectionStore.GetCollection('desk-desktop-apps')) {
+      this.nonSteamReaction = reaction(() => collectionStore.GetCollection('desk-desktop-apps').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this));
+    }
 
     //* subscribe for when collections are deleted
     this.collectionRemoveReaction = reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this));
@@ -143,36 +153,9 @@ export class TabMasterManager {
   }
 
   /**
-   * Handles the installed/uninstalled reaction.
+   * Handles rebuilding tabs when a collection changes.
    */
-  private handleNumOfInstalledChanged() {
-    if (!this.hasLoaded) return;
-
-    this.visibleTabsList.forEach((tabContainer) => {
-      if (tabContainer.filters && tabContainer.filters.length !== 0) {
-        (tabContainer as CustomTabContainer).buildCollection();
-      }
-    });
-  }
-
-  /**
-   * Handles the hidden collection reaction.
-   */
-  private handleGameHideOrShow() {
-    if (!this.hasLoaded) return;
-
-    this.visibleTabsList.forEach((tabContainer) => {
-      if (tabContainer.filters && tabContainer.filters.length !== 0) {
-        (tabContainer as CustomTabContainer).buildCollection();
-      }
-    });
-  }
-
-  /**
-   * Handles a general userCollection reaction.
-   * @param collectionId The id of the collection.
-   */
-  private handleUserCollectionLengthChange() {
+  private rebuildCustomTabsOnCollectionChange() {
     if (!this.hasLoaded) return;
 
     this.visibleTabsList.forEach((tabContainer) => {
@@ -226,7 +209,8 @@ export class TabMasterManager {
                       const asEditableSettings: EditableTabSettings = {
                         title: tabContainer.title,
                         filters: tabContainer.filters,
-                        filtersMode: tabContainer.filtersMode
+                        filtersMode: tabContainer.filtersMode,
+                        includesHidden: tabContainer.includesHidden
                       };
 
                       this.updateCustomTab(tabContainer.id, asEditableSettings);
@@ -340,10 +324,12 @@ export class TabMasterManager {
    * Handles cleaning up all reactions.
    */
   disposeReactions(): void {
+    if (this.allGamesReaction) this.allGamesReaction();
     if (this.favoriteReaction) this.favoriteReaction();
     if (this.soundtrackReaction) this.soundtrackReaction();
     if (this.installedReaction) this.installedReaction();
     if (this.hiddenReaction) this.hiddenReaction();
+    if (this.nonSteamReaction) this.nonSteamReaction();
 
     if (this.collectionReactions) {
       for (const reaction of Object.values(this.collectionReactions)) {
@@ -452,11 +438,13 @@ export class TabMasterManager {
    * @param title The title of the tab.
    * @param position The position of the tab.
    * @param filterSettingsList The list of filters for the tab.
+   * @param filtersMode The logic mode for these filters.
+   * @param includesHidden Whether or not this tab includes hidden games.
    */
-  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode) {
+  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, includesHidden: boolean) {
     const id = uuidv4();
     this.addCollectionReactionsForFilters(flattenFilters(filterSettingsList));
-    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode));
+    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode, includesHidden));
     this.updateAndSave();
   }
 
@@ -474,7 +462,7 @@ export class TabMasterManager {
         if (!this.collectionReactions[collectionId]) {
           //* subscribe to user collection updates
           this.collectionReactions[collectionId] = reaction(() => collectionStore.GetCollection(collectionId).allApps.length, () => {
-            this.handleUserCollectionLengthChange();
+            this.rebuildCustomTabsOnCollectionChange();
           });
         }
       }
@@ -527,7 +515,7 @@ export class TabMasterManager {
     //* We don't need to wait for these, since if we get the store ones, we don't care about them
     PythonInterop.getTags().then((res: TagResponse[] | Error) => {
       if (res instanceof Error) {
-        console.log("TabMaster couldn't load tags settings");
+        LogController.log("TabMaster couldn't load tags settings");
       } else {
         if (this.allStoreTags.length === 0) {
           this.allStoreTags = res;
@@ -536,7 +524,7 @@ export class TabMasterManager {
     });
     PythonInterop.getFriends().then((res: FriendEntry[] | Error) => {
       if (res instanceof Error) {
-        console.log("TabMaster couldn't load friends settings");
+        LogController.log("TabMaster couldn't load friends settings");
       } else {
         if (this.currentUsersFriends.length === 0) {
           this.currentUsersFriends = res;
@@ -545,7 +533,7 @@ export class TabMasterManager {
     });
     PythonInterop.getFriendsGames().then((res: Map<number, number[]> | Error) => {
       if (res instanceof Error) {
-        console.log("TabMaster couldn't load friends games settings");
+        LogController.log("TabMaster couldn't load friends games settings");
       } else {
         if (this.friendsGameMap.size === 0) {
           this.friendsGameMap = res;
@@ -610,8 +598,8 @@ export class TabMasterManager {
     }
 
     for (const keyId in tabsSettings) {
-      const { id, title, filters, position, filtersMode } = tabsSettings[keyId];
-      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!) : this.addDefaultTabContainer(tabsSettings[keyId]);
+      const { id, title, filters, position, filtersMode, includesHidden } = tabsSettings[keyId];
+      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!, includesHidden!) : this.addDefaultTabContainer(tabsSettings[keyId]);
 
       if (favoritesOriginalIndex !== null && favoritesOriginalIndex > -1 && tabContainer.position > favoritesOriginalIndex) {
         tabContainer.position--;
@@ -676,13 +664,13 @@ export class TabMasterManager {
    * Saves the tabs to the backend.
    */
   private saveTabs() {
-    console.log('saving tabs');
+    LogController.log('Saving Tabs...');
 
     const allTabsSettings: TabSettingsDictionary = {};
 
     this.tabsMap.forEach(tabContainer => {
       const tabSettings = tabContainer.filters ?
-        { id: tabContainer.id, title: tabContainer.title, position: tabContainer.position, filters: tabContainer.filters, filtersMode: (tabContainer as CustomTabContainer).filtersMode }
+        { id: tabContainer.id, title: tabContainer.title, position: tabContainer.position, filters: tabContainer.filters, filtersMode: (tabContainer as CustomTabContainer).filtersMode, includesHidden: (tabContainer as CustomTabContainer).includesHidden }
         : tabContainer;
 
       allTabsSettings[tabContainer.id] = tabSettings;
@@ -696,10 +684,11 @@ export class TabMasterManager {
    * @param title The title of the tab.
    * @param position The position of the tab.
    * @param filterSettingsList The tab's filters.
+   * @param includesHidden Whether this tab should include hidden games.
    * @returns A tab container for this tab.
    */
-  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode) {
-    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode);
+  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, includesHidden: boolean) {
+    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode, includesHidden);
     this.tabsMap.set(tabId, tabContainer);
     return tabContainer;
   }

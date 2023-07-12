@@ -1,6 +1,6 @@
 {
   "name": "tabmaster",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Gives you full control over your Steam library! Support for customizing, adding, and hiding Library Tabs.",
   "scripts": {
     "build": "shx rm -rf dist && rollup -c",
@@ -46,11 +46,12 @@
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.5.0",
     "@types/lodash": "^4.14.195",
+    "@types/markdown-it": "^12.2.3",
     "@types/react": "16.14.0",
     "@types/uuid": "^9.0.2",
     "@types/webpack": "^5.28.1",
-    "deckbuild": "^1.2.1",
     "husky": "^8.0.3",
+    "markdown-it": "^13.0.1",
     "rollup": "^2.79.1",
     "rollup-plugin-import-assets": "^1.1.1",
     "shx": "^0.3.4",

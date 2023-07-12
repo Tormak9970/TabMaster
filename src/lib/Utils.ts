@@ -98,8 +98,10 @@ export const defaultTabsSettings: TabSettingsDictionary = {
 export function validateTabs(tabs: TabSettingsDictionary): boolean {
   return Object.values(tabs).every((tab: TabSettings) => {
     if (tab.filters) {
+      if (!Object.keys(tab).includes("includesHidden")) tab.includesHidden = false;
+      if (!Object.keys(tab).includes("filtersMode")) tab.filtersMode = "and";
       return tab.filters.every((filter: TabFilterSettings<FilterType>) => {
-        return (filter as TabFilterSettings<FilterType>).type !== undefined
+        return (filter as TabFilterSettings<FilterType>).type !== undefined;
       });
     } else {
       return Object.keys(defaultTabsSettings).includes(tab.id);

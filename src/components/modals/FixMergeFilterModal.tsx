@@ -1,10 +1,10 @@
 import { ConfirmModal, showModal } from "decky-frontend-lib"
 import { VFC, useState } from "react"
-import { ModalStyles } from "../styles/ModalStyles"
 import { TabFilterSettings, FilterType } from "../filters/Filters"
 import { PythonInterop } from "../../lib/controllers/PythonInterop"
 import { ErroredFiltersPanel } from "../changes-needed/ErroredFiltersPanel"
 import { ErrorPanelTabNameContext } from "../../state/ErrorPanelNameContext"
+import { FixModalStyles } from "../styles/FixModalStyles"
 
 interface FixMergeFilterModalProps {
   mergeParams: TabFilterSettings<'merge'>['params'],
@@ -34,7 +34,8 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({ mergeParams
     if (isPassing) {
       const newMergeParams = {
         filters: filters.flatMap(filter => filter),
-        mode: mergeParams.mode
+        mode: mergeParams.mode,
+        includesHidden: mergeParams.includesHidden
       }
 
       setIsPassingOuter(true);
@@ -65,8 +66,8 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({ mergeParams
       strCancelButtonText={"Discard Changes"}
       strTitle={`Fix Merge Group in Tab ${tabName}`}
     >
-      <ModalStyles />
-      <div className="tab-master-modal-scope">
+      <FixModalStyles />
+      <div className="tab-master-fix-modal-scope">
         {isPassing && <div>All errors have been resolved.</div>}
         <ErrorPanelTabNameContext.Provider value={tabName}>
           <ErroredFiltersPanel
