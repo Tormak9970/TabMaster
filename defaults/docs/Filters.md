@@ -40,7 +40,7 @@ Example: Inverting a `Collection` filter would cause it to include any games **n
 Filters games based on if they are included in the collection.
 
 **Example:**<br/>
-<img title="Collection Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_collection-example.png" />
+<img title="Collection Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_collection-example.png" />
 
 <br/>
 
@@ -52,7 +52,7 @@ Filters games based on if they are included in the collection.
 Filters games based on their install state.
 
 **Example:**<br/>
-<img title="Installed Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_installed-example.png" />
+<img title="Installed Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_installed-example.png" />
 
 <br/>
 
@@ -66,7 +66,7 @@ Filters games based on their install state.
 - `or`: Filters games based on if they are owned by any listed friend.
 
 **Example:**<br/>
-<img title="Friends Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_friends-example.png" />
+<img title="Friends Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_friends-example.png" />
 
 <br/>
 
@@ -80,7 +80,7 @@ Filters games based on their install state.
 - `or`: Filters games based on if they have any listed tag.
 
 **Example:**<br/>
-<img title="Tags Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_tags-example.png" />
+<img title="Tags Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_tags-example.png" />
 
 <br/>
 
@@ -92,7 +92,7 @@ Filters games based on their install state.
 Filters games by if they are in the list.
 
 **Example:**<br/>
-<img title="Whitelist Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_whitelist-example.png" />
+<img title="Whitelist Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_whitelist-example.png" />
 
 <br/>
 
@@ -104,7 +104,7 @@ Filters games by if they are in the list.
 Filters games by if they are not in the list.
 
 **Example:**<br/>
-<img title="Blacklist Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_blacklist-example.png" />
+<img title="Blacklist Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_blacklist-example.png" />
 
 <br/>
 
@@ -116,7 +116,7 @@ Filters games by if they are not in the list.
 Filters games based on if they are from the platform.
 
 **Example:**<br/>
-<img title="Platform Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_platform-example.png" />
+<img title="Platform Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_platform-example.png" />
 
 <br/>
 
@@ -128,7 +128,7 @@ Filters games based on if they are from the platform.
 Filters games based on their level of playability on the Steam Deck.
 
 **Example:**<br/>
-<img title="Compat Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_compat-example.png" />
+<img title="Compat Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_compat-example.png" />
 
 <br/>
 
@@ -144,7 +144,7 @@ Regular expressions can seem daunting and confusing. You can test yours before h
 Also, by typing a phrase like "Zelda" into the regex field, it will include any game with that phrase in its title.
 
 **Example:**<br/>
-<img title="Regex Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_regex-example.png" />
+<img title="Regex Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_regex-example.png" />
 
 <br/>
 
@@ -160,7 +160,7 @@ Groups a set of filters, allowing you to change the logic mode for smaller sets 
 By grouping filters you are able to specify the mode for filters in the group seperately, significantly increasing the utility of TabMaster
 
 **Example:**<br/>
-<img title="Merge Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_merge-example.png" />
+<img title="Merge Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_merge-example.png" />
 
 <br/>
 

@@ -27,7 +27,7 @@ Before you continue, it is important to understand that there are two types of t
 
 
 ### Adding Tabs
-<img title="Add UI" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_create-tab.png" />
+<img title="Add UI" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_create-tab.png" />
 <br/>
 This is where you can add new tabs to your library. You can find the various options explained below.
 
@@ -45,14 +45,14 @@ This is where you can add new tabs to your library. You can find the various opt
 ### Editing Tabs
 
 #### Changing Tabs (Custom Tabs Only)
-<img title="Edit UI" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_edit-ui.png" />
+<img title="Edit UI" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_edit-ui.png" />
 <br/>
 To get to this menu, focus the tab you want to reorder in the QAM (Quick Access Menu), and hit `A` to open the tab's options. If the tab is a custom tab, you will see an `Edit` option, select that. You will see the same options as when you add a tab. You can edit any of these and the tab will update once you save.
 
 <br/>
 
 #### Reordering Tabs
-<img title="Reorder UI" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_reorder-ui.png" />
+<img title="Reorder UI" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_reorder-ui.png" />
 <br/>
 Reordering a tab is just as straightforward. Simply focus the tab you want to reorder in the QAM. Hit `X`, and use the left joystick to move the tab up/down in the order. Once you are satisfied, hit `X` again to save.
 

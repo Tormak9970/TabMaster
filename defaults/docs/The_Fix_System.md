@@ -23,9 +23,9 @@ We've tried to make this system as simple and easy to use as possible. When an i
 
 #### Fixing a Filter
 To fix a filter, simply set its options to new values, or remove it completely. TabMaster will update the filter according to your changes when you save.<br/>
-<img title="Fix UI" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_fix-ui.png" />
+<img title="Fix UI" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_fix-ui.png" />
 (initial popup)<br/>
-<img title="Fix Applied" src="https://raw.githubusercontent.com/tormak9970/TabMaster/dev-plugin-docs/assets/docs_filter-fixed.png" />
+<img title="Fix Applied" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_filter-fixed.png" />
 
 
 <br/>
