@@ -1,5 +1,5 @@
 import { waitForCondition } from "../Utils";
-import { PythonInterop } from "./PythonInterop";
+import { LogController } from "./LogController";
 
 /**
  * Wrapper class for the SteamClient interface.
@@ -13,9 +13,10 @@ export class SteamController {
    * @param onLogin Function to run on login.
    * @param onLogout Function to run on logout.
    * @param once Whether the hook should run once.
+   * @param waitForPasscode Whether the hook should only run once the passcode has been entered.
    * @returns A function to unregister the hook.
    */
-  registerForAuthStateChange(onLogin: ((username:string) => Promise<void>) | null, onLogout: ((username:string) => Promise<void>) | null, once: boolean): Unregisterer {
+  registerForAuthStateChange(onLogin: ((username?:string, loginState?: LoginState, loginResult?: LoginResult, unkInt?: number, loginPercent?: number) => Promise<void>) | null, onLogout: ((username?:string, loginState?: LoginState, loginResult?: LoginResult, unkInt?: number, loginPercent?: number) => Promise<void>) | null, once: boolean, waitForPasscode: boolean): Unregisterer {
     try {
       let isLoggedIn: boolean | null = null;
       const currentUsername = loginStore.m_strAccountName;
@@ -27,13 +28,22 @@ export class SteamController {
           isLoggedIn = false;
         } else {
           if (isLoggedIn !== true && (once ? !this.hasLoggedIn : true)) {
-            if (onLogin) onLogin(username);
+            if (onLogin) {
+              if (waitForPasscode && securitystore.IsLockScreenActive()) {
+                waitForCondition(100, 250, () => !securitystore.IsLockScreenActive()).then(() => {
+                  //* basically, wait up to 25 minutes for the user to enter their passcode, and at that point, if they have logged in, initialize regardless.
+                  onLogin(username);
+                })
+              } else {
+                onLogin(username);
+              }
+            }
           }
           isLoggedIn = true;
         }
       });
     } catch (error) {
-      PythonInterop.log(`error with AuthStateChange hook. [DEBUG INFO] error: ${error};`);
+      LogController.log(`error with AuthStateChange hook. [DEBUG INFO] error: ${error};`);
       // @ts-ignore
       return () => { };
     }
@@ -48,13 +58,13 @@ export class SteamController {
     const servicesFound = await waitForCondition(20, 250, () => (window as WindowEx).App?.WaitForServicesInitialized != null);
   
     if (servicesFound) {
-      PythonInterop.log(`Services found.`);
+      LogController.log(`Services found.`);
     } else {
-      PythonInterop.log(`Couldn't find services.`);
+      LogController.log(`Couldn't find services.`);
     }
   
     return (await (window as WindowEx).App?.WaitForServicesInitialized?.().then((success: boolean) => {
-      PythonInterop.log(`Services initialized. Success: ${success}`);
+      LogController.log(`Services initialized. Success: ${success}`);
       return success;
     })) ?? false;
   }

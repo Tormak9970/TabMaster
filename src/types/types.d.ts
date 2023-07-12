@@ -13,29 +13,10 @@ declare module "*.jpg" {
   export default content;
 }
 
-type TabContainer = {
-    id: string
-    title: string
-    position: number    //-1 position is a hidden tab
-    filters?: TabFilterSettings<FilterType>[] //undefined filters is a default tab else it's a CustomTabContainer
-}
-
-interface TabSettings extends TabContainer { }
-
-type TabSettingsDictionary = {
-    [tabId: string]: TabSettings
-}
-
 type Unregisterer = {
   unregister: () => void;
 }
 
-type TagResponse = {
-  tag: number,
-  string: string | undefined
-}
-
-type FriendEntry = {
-  name: string,
-  steamid: number
+type DocPages = {
+  [key: string]: string
 }

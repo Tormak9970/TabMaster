@@ -30,14 +30,14 @@ export class PluginController {
    */
   static initOnLogin(onMount: () => Promise<void>): Unregisterer {
     return this.steamController.registerForAuthStateChange(async (username) => {
-      PythonInterop.log(`User logged in. [DEBUG] username: ${username}.`);
+      LogController.log(`User logged in. [DEBUG] username: ${username}.`);
       if (await this.steamController.waitForServicesToInitialize()) {
         PluginController.init();
         onMount();
       } else {
         PythonInterop.toast("Error", "Failed to initialize, try restarting.");
       }
-    }, null, true);
+    }, null, true, true);
   }
 
   /**
@@ -60,6 +60,7 @@ export class PluginController {
    * Function to run when the plugin dismounts.
    */
   static dismount(): void {
+    this.tabMasterManager.disposeReactions();
     LogController.log("PluginController dismounted.");
   }
 }

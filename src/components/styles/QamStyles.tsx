@@ -53,6 +53,26 @@ export const QamStyles: VFC<{}> = ({}) => {
       .tab-master-scope .hidden-tab-btn button.${gamepadDialogClasses.Button}.DialogButton {
         min-width: 50px;
       }
+
+
+      .tab-master-scope .tab-label-cont {
+        display: flex;
+        align-items: center;
+      }
+
+      .tab-master-scope .tab-label-cont .tab-label {
+        margin-right: 5px;
+      }
+
+      .tab-master-scope .no-sep .${gamepadDialogClasses.FieldLabel},
+      .tab-master-scope .no-sep .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after,
+      .tab-master-scope .no-sep.${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
+        display: none
+      }
+
+      .tab-master-scope .no-sep .${gamepadDialogClasses.FieldChildren} {
+        width: 100%;
+      }
     `}</style>
   );
 }

@@ -1,47 +1,32 @@
-import { EditableTabSettings } from "../components/EditTabModal";
-import { TabFilterSettings, FilterType } from "../components/filters/Filters";
+import { EditableTabSettings } from "../components/modals/EditTabModal";
+import { TabFilterSettings, FilterType, validateFilter } from "../components/filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { v4 as uuidv4 } from "uuid";
-import { reaction } from "mobx"
-import { getNonBigIntUserId } from "../lib/Utils";
+import { IReactionDisposer, reaction } from "mobx";
+import { defaultTabsSettings, getNonBigIntUserId } from "../lib/Utils";
+import { LogController } from "../lib/controllers/LogController";
+import { showModal } from "decky-frontend-lib";
+import { FixTabErrorsModalRoot } from "../components/modals/FixTabErrorsModal";
 
-export const defaultTabsSettings: TabSettingsDictionary = {
-  DeckGames: {
-    id: "DeckGames",
-    title: "Great On Deck",
-    position: 0,
-  },
-  AllGames: {
-    id: "AllGames",
-    title: "All Games",
-    position: 1,
-  },
-  Installed: {
-    id: "Installed",
-    title: "Installed",
-    position: 2,
-  },
-  Favorites: {
-    id: "Favorites",
-    title: "Favorites",
-    position: 3,
-  },
-  Collections: {
-    id: "Collections",
-    title: "Collections",
-    position: 4,
-  },
-  DesktopApps: {
-    id: "DesktopApps",
-    title: "Non-Steam",
-    position: 5,
-  },
-  Soundtracks: {
-    id: "Soundtracks",
-    title: "Soundtracks",
-    position: 6,
+/**
+ * Converts a list of filters into a 1D array.
+ * @param filters The filters array to flatten.
+ * @returns A 1D array of tab filters.
+ */
+function flattenFilters(filters: TabFilterSettings<FilterType>[]): TabFilterSettings<FilterType>[] {
+  const res: TabFilterSettings<FilterType>[] = [];
+
+  for (const filter of filters) {
+    if (filter.type === "merge") {
+      const mergeFilters = flattenFilters((filter as TabFilterSettings<"merge">).params.filters);
+      res.push(...mergeFilters);
+    } else {
+      res.push(filter);
+    }
   }
+
+  return res;
 }
 
 /**
@@ -57,10 +42,26 @@ export class TabMasterManager {
   private currentUsersFriends: FriendEntry[] = [];
   private friendsGameMap: Map<number, number[]> = new Map();
   private allStoreTags: TagResponse[] = [];
-  private userHasFavorites: boolean = false;
+  private userHasVisibleFavorites: boolean = false;
+  private userHasVisibleSoundtracks: boolean = false;
+
+  private userCollectionIds: string[] = [];
 
   public eventBus = new EventTarget();
-  private collectionLengths: { [collectionId: string]: number } = {}
+
+  private allGamesReaction: IReactionDisposer | undefined;
+  private favoriteReaction: IReactionDisposer | undefined;
+  private soundtrackReaction: IReactionDisposer | undefined;
+  private installedReaction: IReactionDisposer | undefined;
+  private hiddenReaction: IReactionDisposer | undefined;
+  private nonSteamReaction: IReactionDisposer | undefined;
+
+  private collectionReactions: { [collectionId: string]: IReactionDisposer; } = {};
+
+  private friendsReaction: IReactionDisposer | undefined;
+  private tagsReaction: IReactionDisposer | undefined;
+
+  private collectionRemoveReaction: IReactionDisposer | undefined;
 
   /**
    * Creates a new TabMasterManager.
@@ -68,128 +69,170 @@ export class TabMasterManager {
   constructor() {
     this.hasLoaded = false;
     this.tabsMap = new Map<string, TabContainer>();
+  }
 
-    //* subscribe to user collection updates
-    reaction(() => collectionStore.userCollections, (userCollections: SteamCollection[]) => {
-      if (!this.hasLoaded) return;
+  private initReactions(): void {
+    //* subscribe to changes to all games
+    this.allGamesReaction = reaction(() => collectionStore.GetCollection("type-games").allApps, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 600 });
 
-      // console.log("We reacted to user collection changes!");
-      const userHadFavorites = this.userHasFavorites;
-      const favoritesCollection = collectionStore.GetCollection("favorite");
-      const installedCollection = userCollections.find((collection) => collection.id === "local-install");
+    //* subscribe to when visible favorites change
+    this.favoriteReaction = reaction(() => collectionStore.GetCollection('favorite').allApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this));
 
-      let depsToRebuild: string[] = [];
+    //*subscribe to when visible soundtracks change
+    this.soundtrackReaction = reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged.bind(this));
 
-      if (!userHadFavorites && favoritesCollection && favoritesCollection.allApps.length !== 0) {
-        this.userHasFavorites = true;
-        const favoriteTabContainer = { ...defaultTabsSettings.Favorites, position: this.visibleTabsList.length };
-        this.visibleTabsList.push(this.addDefaultTabContainer(favoriteTabContainer));
-        this.updateAndSave();
-      }
-      if (userHadFavorites && (!favoritesCollection || favoritesCollection.allApps.length === 0)) {
-        this.userHasFavorites = false;
-        this.deleteTab('Favorites');
-      }
+    //*subscribe to when installed games change
+    this.installedReaction = reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this));
 
-      //* check if contents of any collection changed
-      for (const collection of userCollections) {
-        if (collection && this.collectionLengths[collection.id] != collection.allApps.length) {
-          this.collectionLengths[collection.id] = collection.allApps.length;
-          depsToRebuild.push(collection.id);
-        }
-      }
+    //* subscribe to game hide or show
+    this.hiddenReaction = reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 50 });
 
-      let shouldRebuildUninstalled = false;
-      let shouldRebuildInstalled = false;
+    //* subscribe to non-steam games if they exist
+    if (collectionStore.GetCollection('desk-desktop-apps')) {
+      this.nonSteamReaction = reaction(() => collectionStore.GetCollection('desk-desktop-apps').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this));
+    }
 
-      if (installedCollection) {
-        if (this.collectionLengths["installed"] > installedCollection.allApps.length) {
-          this.collectionLengths["installed"] = installedCollection.allApps.length;
-          shouldRebuildUninstalled = true;
-        } else if (this.collectionLengths["installed"] < installedCollection.allApps.length) {
-          this.collectionLengths["installed"] = installedCollection.allApps.length;
-          shouldRebuildInstalled = true;
-        }
-      } else {
-        //? This is here for when valve inevitably changes the collection's id.
-        console.error("Installed collection should always exists!!");
-      }
+    //* subscribe for when collections are deleted
+    this.collectionRemoveReaction = reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this));
 
-      const tabsAlreadyBuilt: string[] = [];
-
-      if (shouldRebuildInstalled) {
-        this.visibleTabsList.forEach((tabContainer) => {
-          if (tabContainer.filters && tabContainer.filters.length !== 0) {
-            const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
-
-            if (collectionFilters.some((filter: TabFilterSettings<"installed">) => filter.params.installed)) {
-              (tabContainer as CustomTabContainer).buildCollection();
-              tabsAlreadyBuilt.push(tabContainer.id);
-            }
-          }
-        });
-      } else if (shouldRebuildUninstalled) {
-        this.visibleTabsList.forEach((tabContainer) => {
-          if (tabContainer.filters && tabContainer.filters.length !== 0) {
-            const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "installed");
-
-            if (collectionFilters.some((filter: TabFilterSettings<"installed">) => !filter.params.installed)) {
-              (tabContainer as CustomTabContainer).buildCollection();
-              tabsAlreadyBuilt.push(tabContainer.id);
-            }
-          }
-        });
-      }
-
-      if (depsToRebuild.length !== 0) {
-        this.visibleTabsList.forEach((tabContainer) => {
-          if (tabContainer.filters && tabContainer.filters.length !== 0 && !tabsAlreadyBuilt.includes(tabContainer.id)) {
-            const collectionFilters = tabContainer.filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "collection").map((collectionFilter) => collectionFilter.params.collection);
-
-            for (const collectionUpdated of depsToRebuild) {
-              if (collectionFilters.includes(collectionUpdated)) {
-                (tabContainer as CustomTabContainer).buildCollection();
-                break;
-              }
-            }
-          }
-        });
-      }
-    }, { delay: 50 });
-
-    //* subscribe to hidden collection updates
-    reaction(() => collectionStore.GetCollection("hidden").allApps, (allApps: SteamAppOverview[]) => {
-      if (!this.hasLoaded) return;
-
-      // console.log("We reacted to hidden collection changes!");
-      let shouldRebuildCollections = false;
-
-      if (!allApps && this.collectionLengths["hidden"] !== 0) {
-        this.collectionLengths["hidden"] = 0;
-        shouldRebuildCollections = true;
-      } else if (this.collectionLengths["hidden"] != allApps.length) {
-        this.collectionLengths["hidden"] = allApps.length;
-        shouldRebuildCollections = true;
-      }
-
-      if (shouldRebuildCollections) {
-        this.visibleTabsList.forEach((tabContainer) => {
-          if (tabContainer.filters && tabContainer.filters.length !== 0) {
-            (tabContainer as CustomTabContainer).buildCollection();
-          }
-        });
-      }
-    }, { delay: 50 });
+    this.handleUserCollectionRemove(collectionStore.userCollections.length); //* this loads the collection ids for the first time.
 
     //* subscribe to user's friendlist updates
-    reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
+    this.friendsReaction = reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
 
     this.handleFriendsReaction(friendStore.allFriends);
 
     //* subscribe to store tag list changes
-    reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 });
+    this.tagsReaction = reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 });
 
     this.storeTagReaction(appStore.m_mapStoreTagLocalization);
+  }
+
+  /**
+   * Handles the favorites reaction.
+   * @param numOfVisibleFavorites The number of visible favorites.
+   */
+  private handleNumOfVisibleFavoritesChanged(numOfVisibleFavorites: number) {
+    if (!this.hasLoaded) return;
+
+    const userHadVisibleFavorites = this.userHasVisibleFavorites;
+
+    if (!userHadVisibleFavorites && numOfVisibleFavorites !== 0) {
+      this.userHasVisibleFavorites = true;
+      const favoriteTabContainer = { ...defaultTabsSettings.Favorites, position: this.visibleTabsList.length };
+      this.visibleTabsList.push(this.addDefaultTabContainer(favoriteTabContainer));
+      this.updateAndSave();
+    }
+
+    if (userHadVisibleFavorites && numOfVisibleFavorites === 0) {
+      this.userHasVisibleFavorites = false;
+      this.deleteTab('Favorites');
+    }
+  }
+
+  /**
+   * Handles the soundtrack reaction.
+   * @param numOfVisibleSoundtracks The number of visible soundtracks.
+   */
+  private handleNumOfVisibleSoundtracksChanged(numOfVisibleSoundtracks: number) {
+    if (!this.hasLoaded) return;
+
+    const userHadVisibleSoundtracks = this.userHasVisibleSoundtracks;
+
+    if (!userHadVisibleSoundtracks && numOfVisibleSoundtracks !== 0) {
+      this.userHasVisibleSoundtracks = true;
+      const soundtrackTabContainer = { ...defaultTabsSettings.Soundtracks, position: this.visibleTabsList.length };
+      this.visibleTabsList.push(this.addDefaultTabContainer(soundtrackTabContainer));
+      this.updateAndSave();
+    }
+
+    if (userHadVisibleSoundtracks && numOfVisibleSoundtracks === 0) {
+      this.userHasVisibleSoundtracks = false;
+      this.deleteTab('Soundtracks');
+    }
+  }
+
+  /**
+   * Handles rebuilding tabs when a collection changes.
+   */
+  private rebuildCustomTabsOnCollectionChange() {
+    if (!this.hasLoaded) return;
+
+    this.visibleTabsList.forEach((tabContainer) => {
+      if (tabContainer.filters && tabContainer.filters.length !== 0) {
+        (tabContainer as CustomTabContainer).buildCollection();
+      }
+    });
+  }
+
+  /**
+   * Handles when the user deletes one of their collections.
+   * @param newLength The new length of the userCollections.
+   */
+  private handleUserCollectionRemove(newLength: number) {
+    const userCollections = collectionStore.userCollections;
+
+    if (newLength < this.userCollectionIds.length && this.hasLoaded) {
+      let showFixNeeded = false;
+      const collectionsInUse = Object.keys(this.collectionReactions);
+      const currentUserCollectionIds = userCollections.map((collection) => collection.id);
+
+      this.userCollectionIds = this.userCollectionIds.filter((id) => {
+        const isIncluded = currentUserCollectionIds.includes(id);
+
+        if (!isIncluded && collectionsInUse.includes(id)) {
+          showFixNeeded = true;
+          this.collectionReactions[id]();
+          delete this.collectionReactions[id];
+        }
+
+        return isIncluded;
+      });
+
+      if (showFixNeeded) {
+        const tabsSettings = Object.fromEntries(this.tabsMap.entries());
+        const tabsToFix = this.checkForBrokenFilters(tabsSettings);
+
+        if (tabsToFix.size > 0) {
+          LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
+          showModal(
+            <FixTabErrorsModalRoot
+              onConfirm={(editedTabSettings: TabSettingsDictionary) => {
+                for (const fixedTab of Object.values(editedTabSettings)) {
+                  if (tabsToFix.has(fixedTab.id)) {
+                    const tabContainer = fixedTab as CustomTabContainer;
+
+                    if (tabContainer.filters.length === 0) {
+                      this.deleteTab(tabContainer.id);
+                    } else {
+
+                      const asEditableSettings: EditableTabSettings = {
+                        title: tabContainer.title,
+                        filters: tabContainer.filters,
+                        filtersMode: tabContainer.filtersMode,
+                        includesHidden: tabContainer.includesHidden
+                      };
+
+                      this.updateCustomTab(tabContainer.id, asEditableSettings);
+
+                      const flatFilters = flattenFilters(tabContainer.filters);
+                      this.addCollectionReactionsForFilters(flatFilters);
+                    }
+                  }
+                }
+              }}
+              tabs={tabsSettings}
+              erroredFiltersMap={tabsToFix}
+              tabMasterManager={this}
+            />
+          );
+        }
+      }
+    } else {
+      for (const userCollection of userCollections) {
+        if (!this.userCollectionIds.includes(userCollection.id)) this.userCollectionIds.push(userCollection.id);
+      }
+    }
   }
 
   /**
@@ -201,8 +244,10 @@ export class TabMasterManager {
       return {
         tag: tag,
         string: entry.value
-      }
+      };
     });
+
+    PythonInterop.setTags(this.allStoreTags);
   }
 
   /**
@@ -217,18 +262,22 @@ export class TabMasterManager {
       return {
         steamid: userid,
         name: (entry.m_strNickname && entry.m_strNickname !== "") ? entry.m_strNickname : entry.m_persona.m_strPlayerName,
-      }
+      };
     });
+
+    PythonInterop.setFriends(this.currentUsersFriends);
 
     Promise.all(this.currentUsersFriends.map((friend: FriendEntry) => {
       friendStore.FetchOwnedGames(friend.steamid).then((res) => {
         this.friendsGameMap.set(friend.steamid, Array.from(res.m_apps));
       });
     })).then(() => {
+      PythonInterop.setFriendGames(this.friendsGameMap);
+
       if (!this.hasLoaded) return;
 
       const listOfBadFriends: Set<number> = new Set();
-      const customTabsList = this.visibleTabsList.filter((tabContainer) => tabContainer.filters && tabContainer.filters.length !== 0)
+      const customTabsList = this.visibleTabsList.filter((tabContainer) => tabContainer.filters && tabContainer.filters.length !== 0);
 
       //* splitting these loops up is technically more efficient, otherwise we end up with 3 or 4 nested loops
       customTabsList.forEach((tabContainer: TabContainer) => {
@@ -272,12 +321,39 @@ export class TabMasterManager {
   }
 
   /**
+   * Handles cleaning up all reactions.
+   */
+  disposeReactions(): void {
+    if (this.allGamesReaction) this.allGamesReaction();
+    if (this.favoriteReaction) this.favoriteReaction();
+    if (this.soundtrackReaction) this.soundtrackReaction();
+    if (this.installedReaction) this.installedReaction();
+    if (this.hiddenReaction) this.hiddenReaction();
+    if (this.nonSteamReaction) this.nonSteamReaction();
+
+    if (this.collectionReactions) {
+      for (const reaction of Object.values(this.collectionReactions)) {
+        reaction();
+      }
+    }
+
+    if (this.friendsReaction) this.friendsReaction();
+    if (this.tagsReaction) this.tagsReaction();
+
+    if (this.collectionRemoveReaction) this.collectionRemoveReaction();
+  }
+
+  /**
    * Updates the settings for a custom tab.
    * @param customTabId The id of the custom tab.
    * @param updatedTabSettings The new settings for the tab.
    */
   updateCustomTab(customTabId: string, updatedTabSettings: EditableTabSettings) {
     (this.tabsMap.get(customTabId) as CustomTabContainer).update(updatedTabSettings);
+
+    const filters = updatedTabSettings.filters;
+    if (filters) this.addCollectionReactionsForFilters(flattenFilters(filters));
+
     this.updateAndSave();
   }
 
@@ -315,6 +391,7 @@ export class TabMasterManager {
    */
   showTab(tabId: string) {
     const tabContainer = this.tabsMap.get(tabId)!;
+    if (tabContainer.position > -1) return;
     const hiddenIndex = this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer);
 
     tabContainer.position = this.visibleTabsList.length;
@@ -332,13 +409,26 @@ export class TabMasterManager {
    * @param tabId The id of the tab to delete.
    */
   deleteTab(tabId: string) {
-    let tabContainer = this.tabsMap.get(tabId)!;
+    const tabContainer = this.tabsMap.get(tabId)!;
 
-    const tabsArrayToRemoveFrom = tabContainer.position > -1 ? this.visibleTabsList : this.hiddenTabsList;
-    const index = tabContainer.position > -1 ? tabContainer.position : this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer);
+    let tabsArrayToRemoveFrom: TabContainer[];
+    let updateIndexes = false;
+    let index: number;
 
+    if (tabContainer.position > -1) {
+      tabsArrayToRemoveFrom = this.visibleTabsList;
+      index = tabContainer.position;
+      updateIndexes = true;
+    } else {
+      tabsArrayToRemoveFrom = this.hiddenTabsList;
+      index = this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer);
+    }
     tabsArrayToRemoveFrom.splice(index, 1);
-
+    if (updateIndexes) {
+      for (let i = index; i < this.visibleTabsList.length; i++) {
+        this.visibleTabsList[i].position--;
+      }
+    }
     this.tabsMap.delete(tabId);
     this.updateAndSave();
   }
@@ -348,51 +438,188 @@ export class TabMasterManager {
    * @param title The title of the tab.
    * @param position The position of the tab.
    * @param filterSettingsList The list of filters for the tab.
+   * @param filtersMode The logic mode for these filters.
+   * @param includesHidden Whether or not this tab includes hidden games.
    */
-  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[]) {
+  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, includesHidden: boolean) {
     const id = uuidv4();
-    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList));
+    this.addCollectionReactionsForFilters(flattenFilters(filterSettingsList));
+    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode, includesHidden));
     this.updateAndSave();
+  }
+
+  /**
+   * Adds a reaction to collection lengths if they are not already registered.
+   * @param filters The array of filters to check.
+   */
+  private addCollectionReactionsForFilters(filters: TabFilterSettings<FilterType>[]): void {
+    const collectionFilters = filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "collection");
+
+    if (collectionFilters.length > 0) {
+      for (const collectionFilter of collectionFilters) {
+        const collectionId: string = (collectionFilter as TabFilterSettings<"collection">).params.id;
+
+        if (!this.collectionReactions[collectionId]) {
+          //* subscribe to user collection updates
+          this.collectionReactions[collectionId] = reaction(() => collectionStore.GetCollection(collectionId).allApps.length, () => {
+            this.rebuildCustomTabsOnCollectionChange();
+          });
+        }
+      }
+    }
+  }
+
+  /**
+   * Checks the provided tabsSettings for broken filters.
+   * @param tabsSettings The tabsSettings to check.
+   * @returns A map of tabIds to broken filters.
+   */
+  private checkForBrokenFilters(tabsSettings: TabSettingsDictionary): Map<string, FilterErrorEntry[]> {
+    const tabsToFix = new Map<string, FilterErrorEntry[]>();
+
+    for (const [id, tabSetting] of Object.entries(tabsSettings)) {
+      if (tabSetting.filters) {
+        const tabErroredFilters: FilterErrorEntry[] = [];
+
+        for (let i = 0; i < tabSetting.filters.length; i++) {
+          const filter = tabSetting.filters[i];
+          const filterValidated = validateFilter(filter);
+
+          if (!filterValidated.passed) {
+            let entry: FilterErrorEntry = {
+              filterIdx: i,
+              errors: filterValidated.errors
+            };
+
+            if (filterValidated.mergeErrorEntries) entry.mergeErrorEntries = filterValidated.mergeErrorEntries;
+
+            tabErroredFilters.push(entry);
+          }
+        }
+
+        if (tabErroredFilters.length > 0) {
+          tabsToFix.set(id, tabErroredFilters);
+        }
+      }
+    }
+
+    return tabsToFix;
   }
 
   /**
    * Loads the user's tabs from the backend.
    */
   loadTabs = async () => {
+    this.initReactions();
     const settings = await PythonInterop.getTabs();
+    //* We don't need to wait for these, since if we get the store ones, we don't care about them
+    PythonInterop.getTags().then((res: TagResponse[] | Error) => {
+      if (res instanceof Error) {
+        LogController.log("TabMaster couldn't load tags settings");
+      } else {
+        if (this.allStoreTags.length === 0) {
+          this.allStoreTags = res;
+        }
+      }
+    });
+    PythonInterop.getFriends().then((res: FriendEntry[] | Error) => {
+      if (res instanceof Error) {
+        LogController.log("TabMaster couldn't load friends settings");
+      } else {
+        if (this.currentUsersFriends.length === 0) {
+          this.currentUsersFriends = res;
+        }
+      }
+    });
+    PythonInterop.getFriendsGames().then((res: Map<number, number[]> | Error) => {
+      if (res instanceof Error) {
+        LogController.log("TabMaster couldn't load friends games settings");
+      } else {
+        if (this.friendsGameMap.size === 0) {
+          this.friendsGameMap = res;
+        }
+      }
+    });
 
     if (settings instanceof Error) {
-      console.log("Tab Master couldn't load tab settings");
+      LogController.log("TabMaster couldn't load tab settings");
       return;
     }
 
     const tabsSettings = Object.keys(settings).length > 0 ? settings : { ...defaultTabsSettings };
+    const tabsToFix = this.checkForBrokenFilters(tabsSettings);
+
+    if (tabsToFix.size > 0) {
+      LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
+      showModal(
+        <FixTabErrorsModalRoot
+          onConfirm={(editedTabSettings: TabSettingsDictionary) => {
+            const tabsToDelete: string[] = [];
+            for (const fixedTab of Object.values(editedTabSettings)) {
+              if (tabsToFix.has(fixedTab.id) && fixedTab.filters!.length === 0) {
+                tabsToDelete.push(fixedTab.id);
+              }
+            }
+
+            this.finishLoadingTabs(editedTabSettings);
+            tabsToDelete.forEach(tabId => this.deleteTab(tabId));
+          }}
+          tabs={tabsSettings}
+          erroredFiltersMap={tabsToFix}
+          tabMasterManager={this}
+        />
+      );
+    } else {
+      this.finishLoadingTabs(tabsSettings);
+    }
+  };
+
+  /**
+   * Finishes the tab loading process.
+   * @param tabsSettings The tabsSettings to finish loading.
+   */
+  private finishLoadingTabs(tabsSettings: TabSettingsDictionary): void {
     const visibleTabContainers: TabContainer[] = [];
     const hiddenTabContainers: TabContainer[] = [];
     const favoritesCollection = collectionStore.GetCollection("favorite");
-    this.userHasFavorites = favoritesCollection && favoritesCollection.allApps.length > 0
-    let favortitesOriginalIndex = null
+    const soundtracksCollection = collectionStore.GetCollection('type-music');
+    this.userHasVisibleFavorites = favoritesCollection && favoritesCollection.visibleApps.length > 0;
+    this.userHasVisibleSoundtracks = soundtracksCollection && soundtracksCollection.visibleApps.length > 0;
+    let favoritesOriginalIndex = null;
+    let soundtracksOriginalIndex = null;
 
-    if (tabsSettings.Favorites && !this.userHasFavorites) {
-      favortitesOriginalIndex = tabsSettings.Favorites.position
-      delete tabsSettings['Favorites']
+    if (tabsSettings.Favorites && !this.userHasVisibleFavorites) {
+      favoritesOriginalIndex = tabsSettings.Favorites.position;
+      delete tabsSettings['Favorites'];
+    }
+    if (tabsSettings.Soundtracks && !this.userHasVisibleSoundtracks) {
+      soundtracksOriginalIndex = tabsSettings.Soundtracks.position;
+      delete tabsSettings['Soundtracks'];
     }
 
     for (const keyId in tabsSettings) {
-      const { id, title, filters, position } = tabsSettings[keyId];
-      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters) : this.addDefaultTabContainer(tabsSettings[keyId]);
+      const { id, title, filters, position, filtersMode, includesHidden } = tabsSettings[keyId];
+      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!, includesHidden!) : this.addDefaultTabContainer(tabsSettings[keyId]);
 
-      if (favortitesOriginalIndex !== null && favortitesOriginalIndex > -1 && tabContainer.position > favortitesOriginalIndex) {
-        tabContainer.position--
+      if (favoritesOriginalIndex !== null && favoritesOriginalIndex > -1 && tabContainer.position > favoritesOriginalIndex) {
+        tabContainer.position--;
+      }
+      if (soundtracksOriginalIndex !== null && soundtracksOriginalIndex > -1 && tabContainer.position > soundtracksOriginalIndex) {
+        tabContainer.position--;
       }
       tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer);
+
+      if (filters) {
+        const flatFilters = flattenFilters(filters);
+        this.addCollectionReactionsForFilters(flatFilters);
+      }
     }
 
     this.visibleTabsList = visibleTabContainers;
     this.hiddenTabsList = hiddenTabContainers;
     this.hasLoaded = true;
 
-    this.update();
+    this.updateAndSave();
   }
 
   /**
@@ -404,7 +631,7 @@ export class TabMasterManager {
       visibleTabsList: this.visibleTabsList,
       hiddenTabsList: this.hiddenTabsList,
       tabsMap: this.tabsMap
-    }
+    };
   }
 
   /**
@@ -415,7 +642,7 @@ export class TabMasterManager {
     return {
       currentUsersFriends: this.currentUsersFriends,
       allStoreTags: this.allStoreTags
-    }
+    };
   }
 
   get hasSettingsLoaded() {
@@ -437,16 +664,14 @@ export class TabMasterManager {
    * Saves the tabs to the backend.
    */
   private saveTabs() {
-    console.log('saving tabs');
+    LogController.log('Saving Tabs...');
 
     const allTabsSettings: TabSettingsDictionary = {};
 
     this.tabsMap.forEach(tabContainer => {
       const tabSettings = tabContainer.filters ?
-        { id: tabContainer.id, title: tabContainer.title, position: tabContainer.position, filters: tabContainer.filters }
+        { id: tabContainer.id, title: tabContainer.title, position: tabContainer.position, filters: tabContainer.filters, filtersMode: (tabContainer as CustomTabContainer).filtersMode, includesHidden: (tabContainer as CustomTabContainer).includesHidden }
         : tabContainer;
-
-      // console.log('saving with settings :', tabSettings)
 
       allTabsSettings[tabContainer.id] = tabSettings;
     });
@@ -459,10 +684,11 @@ export class TabMasterManager {
    * @param title The title of the tab.
    * @param position The position of the tab.
    * @param filterSettingsList The tab's filters.
+   * @param includesHidden Whether this tab should include hidden games.
    * @returns A tab container for this tab.
    */
-  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[]) {
-    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList);
+  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, includesHidden: boolean) {
+    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode, includesHidden);
     this.tabsMap.set(tabId, tabContainer);
     return tabContainer;
   }
@@ -481,13 +707,13 @@ export class TabMasterManager {
    * Rebuilds the library tab list.
    */
   private rebuildTabLists() {
-    const visibleTabContainers: TabContainer[] = []
-    const hiddenTabContainers: TabContainer[] = []
+    const visibleTabContainers: TabContainer[] = [];
+    const hiddenTabContainers: TabContainer[] = [];
     this.tabsMap.forEach(tabContainer => {
-      tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer)
-    })
-    this.visibleTabsList = visibleTabContainers
-    this.hiddenTabsList = hiddenTabContainers
+      tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer);
+    });
+    this.visibleTabsList = visibleTabContainers;
+    this.hiddenTabsList = hiddenTabContainers;
   }
 
   /**
@@ -495,7 +721,7 @@ export class TabMasterManager {
    */
   private updateAndSave() {
     this.saveTabs();
-    this.update()
+    this.update();
   }
 
   /**

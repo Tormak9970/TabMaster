@@ -7,7 +7,6 @@ import { defineConfig } from 'rollup';
 import importAssets from 'rollup-plugin-import-assets';
 
 import { name } from "./plugin.json";
-import { createPathTransform } from "rollup-sourcemap-path-transform";
 
 
 const production = process.env.NODE_ENV !== 'development';
@@ -16,7 +15,7 @@ export default defineConfig({
   input: './src/index.tsx',
   plugins: [
     commonjs(),
-    nodeResolve({ browser: true }),
+    nodeResolve({ preferBuiltins: false, browser: true }),
     typescript({ sourceMap: !production, inlineSources: !production }),
     json(),
     replace({

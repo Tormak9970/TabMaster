@@ -2,7 +2,7 @@ import { MenuItem, showModal, ConfirmModal, Menu, showContextMenu, DialogButton 
 import { VFC } from "react"
 import { FaEllipsisH } from "react-icons/fa"
 import { TabMasterManager } from "../state/TabMasterManager"
-import { EditTabModal, EditableTabSettings } from "./EditTabModal"
+import { EditTabModal, EditableTabSettings } from "./modals/EditTabModal"
 
 interface TabActionsContextMenuProps {
   tabContainer: TabContainer,
@@ -23,8 +23,6 @@ export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabCont
     menuItems.unshift(
       <MenuItem onSelected={() => {
         showModal(
-          // @ts-ignore
-          //? This is here because showModal passes the closeModal function automatically
           <EditTabModal
             onConfirm={(tabId: string | undefined, updatedTabSettings: EditableTabSettings) => {
               tabMasterManager.updateCustomTab(tabId!, updatedTabSettings);
@@ -33,6 +31,8 @@ export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabCont
             tabTitle={tabContainer.title}
             tabFilters={tabContainer.filters!}
             tabMasterManager={tabMasterManager}
+            filtersMode={tabContainer.filtersMode!}
+            includesHidden={tabContainer.includesHidden!}
           />
         )
       }}>
@@ -45,6 +45,7 @@ export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabCont
         if (tabContainer.filters) {
           showModal(
             <ConfirmModal
+              className={'tab-master-destructive-modal'}
               onOK={() => {
                 tabMasterManager.deleteTab(tabContainer.id);
               }}

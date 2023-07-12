@@ -4,54 +4,51 @@ export class LogController {
   /**
    * Logs a message to the plugin's log file and the frontend console.
    * @param message The message to log.
-   * @param name Optional name for the log file.
    */
-	static log(message: string, name="Core") {
-		if (process.env.NODE_ENV === 'development') {
-      console.log(
-        `%c TabMaster %c ${name} %c`,
-        'background: #16a085; color: black;',
-        'background: #1abc9c; color: black;',
-        'background: transparent;',
-        message
-      );
-    }
-    PythonInterop.log(message);
-	}
+	static log(...args: any[]) {
+    console.log(
+      `%c TabMaster %c INFO %c`,
+      'background: #ff6d05; color: black;',
+      'background: #1abc9c; color: black;',
+      'background: transparent;',
+      ...args
+    );
+    PythonInterop.log(args.join(" "));
+  }
 
   /**
    * Logs a warning to the plugin's log file and the frontend console.
-   * @param message The message to log.
-   * @param name Optional name for the log file.
    */
-	static warn(message: string, name="Core") {
-		if (process.env.NODE_ENV === 'development') {
-      console.warn(
-        `%c TabMaster %c ${name} %c`,
-        'background: #16a085; color: black;',
-        'background: #1abc9c; color: black;',
-        'color: blue;',
-        message
-      );
-    }
-    PythonInterop.warn(message);
-	}
+	static warn(...args: any[]) {
+    console.warn(
+      `%c TabMaster %c WARNING %c`,
+      'background: #ff6d05; color: black;',
+      'background: #e3c907; color: black;',
+      'background: transparent;',
+      ...args
+    );
+    PythonInterop.warn(args.join(" "));
+  }
 
   /**
    * Logs an error to the plugin's log file and the frontend console.
-   * @param message The message to log.
-   * @param name Optional name for the log file.
    */
-	static error(message: string, name="Core") {
-		if (process.env.NODE_ENV === 'development') {
-      console.error(
-        `%c TabMaster %c ${name} %c`,
-        'background: #16a085; color: black;',
-        'background: #FF0000;',
-        'background: transparent;',
-        message
-      );
-    }
-    PythonInterop.error(message);
-	}
+	static error(...args: any[]) {
+    console.error(
+      `%c TabMaster %c ERROR %c`,
+      'background: #ff6d05; color: black;',
+      'background: #c70808; color: black;',
+      'background: transparent;',
+      ...args
+    );
+    PythonInterop.error(args.join(" "));
+  }
+
+  /**
+   * Throws a new error and logs it to the plugin's log file.
+   */
+	static throw(...args: any[]) {
+    PythonInterop.error(args.join(" "));
+    throw new Error([`%c TabMaster %c ERROR %c`, 'background: #ff6d05; color: black;', 'background: #c70808; color: black;', 'background: transparent;', ...args].join(' '));
+  }
 }
