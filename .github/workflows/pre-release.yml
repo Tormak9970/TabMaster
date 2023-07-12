@@ -112,7 +112,9 @@ jobs:
 
                 if (fs.lstatSync(srcPath).isDirectory()) {
                   const dirContents = fs.readdirSync(srcPath, { withFileTypes: true });
-                  copyDirRecursive(path.join(parentPath, fileName), dirContents, path.join(dest, fileName));
+                  const dirDestPath = path.join(dest, fileName);
+                  fs.mkdirSync(dirDestPath, { recursive: true });
+                  copyDirRecursive(path.join(parentPath, fileName), dirContents, dirDestPath);
                 } else {
                   fs.copyFileSync(srcPath, destPath);
                 }
