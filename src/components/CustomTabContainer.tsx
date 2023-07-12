@@ -12,6 +12,7 @@ export class CustomTabContainer implements TabContainer {
   filters: TabFilterSettings<FilterType>[];
   collection: Collection;
   filtersMode: LogicalMode;
+  includesHidden: boolean;
 
   /**
    * Creates a new CustomTabContainer.
@@ -21,12 +22,13 @@ export class CustomTabContainer implements TabContainer {
    * @param filterSettingsList The tab's filters.
    * @param filtersMode boolean operator for top level filters
    */
-  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode) {
+  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, includesHidden: boolean) {
     this.id = id;
     this.title = title;
     this.position = position;
     this.filters = filterSettingsList;
     this.filtersMode = filtersMode;
+    this.includesHidden = includesHidden;
     //@ts-ignore
     this.collection = {
       AsDeletableCollection: () => null,
@@ -85,11 +87,11 @@ export class CustomTabContainer implements TabContainer {
    */
   buildCollection() {
     if (this.position > -1) {
-      const appsList = collectionStore.appTypeCollectionMap.get('type-games')!.visibleApps.filter(appItem => {
+      const appsList = collectionStore.appTypeCollectionMap.get('type-games')![this.includesHidden ? "allApps" : "visibleApps"].filter(appItem => {
         if (this.filtersMode === 'and') {
-          return this.filters.every(filterSettings => Filter.run(filterSettings, appItem));
+          return this.filters.every(filterSettings => Filter.run(filterSettings, appItem, this.includesHidden));
         } else {
-          return this.filters.some(filterSettings => Filter.run(filterSettings, appItem));
+          return this.filters.some(filterSettings => Filter.run(filterSettings, appItem, this.includesHidden));
         }
       });
 
@@ -109,9 +111,10 @@ export class CustomTabContainer implements TabContainer {
    * @param updatedTabInfo The updated tab settings.
    */
   update(updatedTabInfo: EditableTabSettings) {
-    const { filters, title, filtersMode } = updatedTabInfo;
+    const { filters, title, filtersMode, includesHidden } = updatedTabInfo;
     this.title = title;
     this.filtersMode = filtersMode;
+    this.includesHidden = includesHidden;
     this.filters = filters;
     this.buildCollection();
   }

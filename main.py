@@ -17,10 +17,14 @@ def error(txt):
 Initialized = False
 
 class Plugin:
+
   tabs: Dict[str, dict] = None
   tags: List[dict] = None
   friends: List[dict] = None
   friends_games: Dict[str, List[int]] = None
+
+  docsDirPath = f"/home/{decky_plugin.DECKY_USER}/homebrew/plugins/TabMaster/docs"
+  docs = {}
 
   settings: SettingsManager
 
@@ -97,6 +101,14 @@ class Plugin:
   async def set_friends_games(self, friends_games: Dict[str, List[int]]):
     Plugin.friends_games = friends_games
     await Plugin.set_setting(self, "friendsGames", Plugin.friends_games)
+
+  async def get_docs(self):
+    for docsFileName in os.listdir(self.docsDirPath):
+      with open(os.path.join(self.docsDirPath, docsFileName), 'r') as docFile:
+        docName = docsFileName.replace("_", " ").replace(".md", "")
+        self.docs[docName] = "".join(docFile.readlines())
+
+    return self.docs
 
   async def read(self) -> None:
     """
