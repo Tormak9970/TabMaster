@@ -76,7 +76,7 @@ export class TabMasterManager {
     this.allGamesReaction = reaction(() => collectionStore.GetCollection("type-games").allApps, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 600 });
 
     //* subscribe to when visible favorites change
-    this.favoriteReaction = reaction(() => collectionStore.GetCollection('favorite').visibleApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this));
+    this.favoriteReaction = reaction(() => collectionStore.GetCollection('favorite').allApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this));
 
     //*subscribe to when visible soundtracks change
     this.soundtrackReaction = reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged.bind(this));
@@ -209,7 +209,8 @@ export class TabMasterManager {
                       const asEditableSettings: EditableTabSettings = {
                         title: tabContainer.title,
                         filters: tabContainer.filters,
-                        filtersMode: tabContainer.filtersMode
+                        filtersMode: tabContainer.filtersMode,
+                        includesHidden: tabContainer.includesHidden
                       };
 
                       this.updateCustomTab(tabContainer.id, asEditableSettings);
@@ -437,11 +438,13 @@ export class TabMasterManager {
    * @param title The title of the tab.
    * @param position The position of the tab.
    * @param filterSettingsList The list of filters for the tab.
+   * @param filtersMode The logic mode for these filters.
+   * @param includesHidden Whether or not this tab includes hidden games.
    */
-  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode) {
+  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, includesHidden: boolean) {
     const id = uuidv4();
     this.addCollectionReactionsForFilters(flattenFilters(filterSettingsList));
-    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode));
+    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode, includesHidden));
     this.updateAndSave();
   }
 
@@ -595,8 +598,8 @@ export class TabMasterManager {
     }
 
     for (const keyId in tabsSettings) {
-      const { id, title, filters, position, filtersMode } = tabsSettings[keyId];
-      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!) : this.addDefaultTabContainer(tabsSettings[keyId]);
+      const { id, title, filters, position, filtersMode, includesHidden } = tabsSettings[keyId];
+      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!, includesHidden!) : this.addDefaultTabContainer(tabsSettings[keyId]);
 
       if (favoritesOriginalIndex !== null && favoritesOriginalIndex > -1 && tabContainer.position > favoritesOriginalIndex) {
         tabContainer.position--;
@@ -667,7 +670,7 @@ export class TabMasterManager {
 
     this.tabsMap.forEach(tabContainer => {
       const tabSettings = tabContainer.filters ?
-        { id: tabContainer.id, title: tabContainer.title, position: tabContainer.position, filters: tabContainer.filters, filtersMode: (tabContainer as CustomTabContainer).filtersMode }
+        { id: tabContainer.id, title: tabContainer.title, position: tabContainer.position, filters: tabContainer.filters, filtersMode: (tabContainer as CustomTabContainer).filtersMode, includesHidden: (tabContainer as CustomTabContainer).includesHidden }
         : tabContainer;
 
       allTabsSettings[tabContainer.id] = tabSettings;
@@ -681,10 +684,11 @@ export class TabMasterManager {
    * @param title The title of the tab.
    * @param position The position of the tab.
    * @param filterSettingsList The tab's filters.
+   * @param includesHidden Whether this tab should include hidden games.
    * @returns A tab container for this tab.
    */
-  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode) {
-    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode);
+  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, includesHidden: boolean) {
+    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode, includesHidden);
     this.tabsMap.set(tabId, tabContainer);
     return tabContainer;
   }

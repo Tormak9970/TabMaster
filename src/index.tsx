@@ -69,11 +69,12 @@ const Content: VFC<{}> = ({ }) => {
     showModal(
       <EditTabModal
         onConfirm={(_: any, tabSettings: EditableTabSettings) => {
-          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode);
+          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode, tabSettings.includesHidden);
         }}
         tabFilters={[]}
         tabMasterManager={tabMasterManager}
         filtersMode="and"
+        includesHidden={false}
       />
     );
   }

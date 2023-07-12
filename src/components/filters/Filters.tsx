@@ -19,7 +19,7 @@ type FriendsFilterParams = { friends: number[], mode: LogicalMode };
 type TagsFilterParams = { tags: number[], mode: LogicalMode };
 type WhitelistFilterParams = { games: number[] }
 type BlacklistFilterParams = { games: number[] }
-type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode }
+type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode, includesHidden: boolean }
 type PlatformFilterParams = { platform: SteamPlatform }
 type DeckCompatFilterParams = { category: number }
 
@@ -42,7 +42,7 @@ export type TabFilterSettings<T extends FilterType> = {
   params: FilterParams<T>
 }
 
-type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview) => boolean;
+type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview, includesHidden?: boolean) => boolean;
 
 /**
  * Define the deafult params for a filter type here
@@ -56,7 +56,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "tags": { tags: [], mode: 'and' },
   "whitelist": { games: [] },
   "blacklist": { games: [] },
-  "merge": { filters: [], mode: 'and' },
+  "merge": { filters: [], mode: 'and', includesHidden: false },
   "platform": { platform: "steam" },
   "deck compatibility": { category: 3 }
 };
@@ -180,6 +180,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       const errors: string[] = [];
       const mergeErrorEntries: FilterErrorEntry[] = []
 
+      if (!Object.keys(filter.params).includes("includesHidden")) (filter as TabFilterSettings<'merge'>).params.includesHidden = false;
       const mergeFilter = filter as TabFilterSettings<'merge'>;
 
       for (let i = 0; i < mergeFilter.params.filters.length; i++) {
@@ -228,8 +229,8 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
  */
 export class Filter {
   private static filterFunctions = {
-    collection: (params: FilterParams<'collection'>, appOverview: SteamAppOverview) => {
-      return collectionStore.GetCollection(params.id).visibleApps.includes(appOverview);
+    collection: (params: FilterParams<'collection'>, appOverview: SteamAppOverview, includesHidden: boolean) => {
+      return collectionStore.GetCollection(params.id)[includesHidden ? "allApps" : "visibleApps"].includes(appOverview);
     },
     installed: (params: FilterParams<'installed'>, appOverview: SteamAppOverview) => {
       return params.installed ? appOverview.installed : !appOverview.installed;
@@ -262,18 +263,18 @@ export class Filter {
     },
     merge: (params: FilterParams<'merge'>, appOverview: SteamAppOverview) => {
       if (params.mode === "and") {
-        return params.filters.every(filterSettings => Filter.run(filterSettings, appOverview));
+        return params.filters.every(filterSettings => Filter.run(filterSettings, appOverview, params.includesHidden));
       } else {
-        return params.filters.some(filterSettings => Filter.run(filterSettings, appOverview));
+        return params.filters.some(filterSettings => Filter.run(filterSettings, appOverview, params.includesHidden));
       }
     },
-    platform: (params: FilterParams<'platform'>, appOverview: SteamAppOverview) => {
+    platform: (params: FilterParams<'platform'>, appOverview: SteamAppOverview, includesHidden: boolean) => {
       let collection = null;
 
       if (params.platform === "steam") {
-        collection = collectionStore.allGamesCollection.visibleApps;
+        collection = collectionStore.allGamesCollection[includesHidden ? "allApps" : "visibleApps"];
       } else if (params.platform === "nonSteam") {
-        collection = collectionStore.deckDesktopApps?.visibleApps ?? collectionStore.localGamesCollection.visibleApps.filter((overview) => overview.app_type === 1073741824);
+        collection = collectionStore.deckDesktopApps?.[includesHidden ? "allApps" : "visibleApps"] ?? collectionStore.localGamesCollection[includesHidden ? "allApps" : "visibleApps"].filter((overview) => overview.app_type === 1073741824);
       }
 
       return collection ? collection.includes(appOverview) : false;
@@ -287,10 +288,11 @@ export class Filter {
    * Checks if a game passes a given filter.
    * @param filterSettings The filter to run.
    * @param appOverview The app to check
+   * @param includesHideen Whether this filter should include hidden games
    * @returns True if the app meets the filter criteria.
    */
-  static run(filterSettings: TabFilterSettings<FilterType>, appOverview: SteamAppOverview): boolean {
-    const shouldInclude = (this.filterFunctions[filterSettings.type] as FilterFunction)(filterSettings.params, appOverview);
+  static run(filterSettings: TabFilterSettings<FilterType>, appOverview: SteamAppOverview, includesHidden: boolean): boolean {
+    const shouldInclude = (this.filterFunctions[filterSettings.type] as FilterFunction)(filterSettings.params, appOverview, includesHidden);
     return filterSettings.inverted ? !shouldInclude : shouldInclude;
   }
 }

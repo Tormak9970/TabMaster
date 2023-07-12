@@ -20,6 +20,7 @@ interface EditMergeFilterModalProps {
 export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModal, mergeParams, saveMerge }) => {
   const [groupFilters, setGroupFilters] = useState<TabFilterSettings<FilterType>[]>(mergeParams.filters);
   const [groupLogicMode, setGroupLogicMode] = useState<LogicalMode>(mergeParams.mode);
+  const [groupIncludesHidden, setGroupIncludesHidden] = useState<boolean>(!!mergeParams.includesHidden);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
 
@@ -46,7 +47,8 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
     if (canSave && canAddFilter) {
       const mergeParams = {
         filters: [...groupFilters],
-        mode: groupLogicMode
+        mode: groupLogicMode,
+        includesHidden: groupIncludesHidden
       };
 
       saveMerge(mergeParams);
@@ -80,6 +82,8 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
             addFilter={addFilterToGroup}
             groupLogicMode={groupLogicMode}
             setGroupLogicMode={setGroupLogicMode}
+            groupIncludesHidden={groupIncludesHidden}
+            setGroupIncludesHidden={setGroupIncludesHidden}
             canAddFilter={canAddFilter}
           />
         </ConfirmModal>
