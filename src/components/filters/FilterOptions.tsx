@@ -206,7 +206,8 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
   const tabMasterManager = useTabMasterContext().tabMasterManager
   const initialParams = {
     filters: [...filter.params.filters],
-    mode: filter.params.mode
+    mode: filter.params.mode,
+    includesHidden: filter.params.includesHidden
   }
   
   const [isEditing, setIsEditing] = useState<boolean>(filter.params.filters.length !== 0);
@@ -216,6 +217,7 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
     const updatedFilter = { ...filter };
     updatedFilter.params.filters = mergeParams.filters;
     updatedFilter.params.mode = mergeParams.mode;
+    updatedFilter.params.includesHidden = mergeParams.includesHidden;
 
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;

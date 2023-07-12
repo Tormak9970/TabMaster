@@ -34,7 +34,8 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({ mergeParams
     if (isPassing) {
       const newMergeParams = {
         filters: filters.flatMap(filter => filter),
-        mode: mergeParams.mode
+        mode: mergeParams.mode,
+        includesHidden: mergeParams.includesHidden
       }
 
       setIsPassingOuter(true);
