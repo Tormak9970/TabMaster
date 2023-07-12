@@ -23,7 +23,7 @@ class Plugin:
   friends: List[dict] = None
   friends_games: Dict[str, List[int]] = None
 
-  docsDirPath = f"/home/{decky_plugin.DECKY_USER}/homebrew/plugins/TabMaster/docs"
+  docsDirPath = f"/{decky_plugin.DECKY_PLUGIN_DIR}/docs"
   docs = {}
 
   settings: SettingsManager
@@ -58,7 +58,7 @@ class Plugin:
     while Plugin.tags is None:
       await asyncio.sleep(0.1)
       
-    log(f"Got tags {Plugin.tags}")
+    log(f"Got {len(Plugin.tags)} tags")
     return Plugin.tags
 
   async def get_friends(self) -> List[dict] | None:
