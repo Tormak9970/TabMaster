@@ -43,10 +43,24 @@ export class PythonInterop {
   static async error(message: string): Promise<void> {
     await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 2 });
   }
+  
+  /**
+   * Gets the plugin's docs.
+   * @returns A promise resolving to the plugin's docs.
+   */
+  static async getDocs(): Promise<DocPages | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, DocPages>("get_docs", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
 
   /**
    * Gets the plugin's tabs.
-   * @returns The plugin's tabs.
+   * @returns A promise resolving to the plugin's tabs.
    */
   static async getTabs(): Promise<TabSettingsDictionary | Error> {
     let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabSettingsDictionary>("get_tabs", {});
@@ -68,7 +82,7 @@ export class PythonInterop {
 
   /**
    * Gets the store tabs.
-   * @returns The store tabs.
+   * @returns A promise resolving to the store tabs.
    */
   static async getTags(): Promise<TagResponse[] | Error> {
     let result = await PythonInterop.serverAPI.callPluginMethod<{}, TagResponse[]>("get_tags", {});
@@ -82,7 +96,7 @@ export class PythonInterop {
 
   /**
    * Gets the cached user friends.
-   * @returns The cached user friends.
+   * @returns A promise resolving to the cached user friends.
    */
   static async getFriends(): Promise<FriendEntry[] | Error> {
     let result = await PythonInterop.serverAPI.callPluginMethod<{}, FriendEntry[]>("get_friends", []);
@@ -96,7 +110,7 @@ export class PythonInterop {
 
   /**
    * Gets the cached friends games.
-   * @returns The cached friends games.
+   * @returns A promise resolving to the cached friends games.
    */
   static async getFriendsGames(): Promise<Map<number, number[]> | Error> {
     let result = await PythonInterop.serverAPI.callPluginMethod<{}, { [id: string]: number[] }>("get_friends_games", {});
