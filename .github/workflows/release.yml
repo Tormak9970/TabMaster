@@ -108,8 +108,9 @@ jobs:
 
             function copyDirRecursive(parentPath, contents, dest) {
               for (const file of contents) {
-                const srcPath = path.join(cwdPath, parentPath, file);
-                const destPath = path.join(cwdPath, dest, file);
+                const fileName = file.name;
+                const srcPath = path.join(cwdPath, parentPath, fileName);
+                const destPath = path.join(cwdPath, dest, fileName);
 
                 if (fs.lstatSync(srcPath).isDirectory()) {
                   const dirContents = fs.readdirSync(srcPath, { withFileTypes: true });
