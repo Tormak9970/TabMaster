@@ -23,7 +23,7 @@ class Plugin:
   friends: List[dict] = None
   friends_games: Dict[str, List[int]] = None
 
-  docsDirPath = f"/{decky_plugin.DECKY_PLUGIN_DIR}/docs"
+  docsDirPath = f"{decky_plugin.DECKY_PLUGIN_DIR}/docs"
   docs = {}
 
   settings: SettingsManager
