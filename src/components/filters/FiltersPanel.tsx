@@ -1,9 +1,9 @@
-import { PanelSection, PanelSectionRow, Field, ButtonItem, Dropdown, Toggle } from "decky-frontend-lib"
-import { VFC, Fragment } from "react"
-import { FilterEntry } from "./FilterEntry"
-import { FilterOptions } from "./FilterOptions"
-import { TabFilterSettings, FilterType } from "./Filters"
-import { FilterSectionAccordion } from "../accordions/FilterSectionAccordion"
+import { PanelSection, PanelSectionRow, Field, ButtonItem, Dropdown, Toggle } from "decky-frontend-lib";
+import { VFC, Fragment, useMemo } from "react";
+import { FilterEntry } from "./FilterEntry";
+import { FilterOptions } from "./FilterOptions";
+import { TabFilterSettings, FilterType } from "./Filters";
+import { FilterSectionAccordion } from "../accordions/FilterSectionAccordion";
 
 interface FiltersPanelProps {
   groupFilters: TabFilterSettings<FilterType>[],
@@ -21,6 +21,12 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
     { label: "And", data: "and" },
     { label: "Or", data: "or" }
   ];
+
+  //this sets whether filter entry type dropdown should take focus when being rendered, ie when a filter is added 
+  let shouldFocusFilter = false;
+  useMemo(() => {
+    shouldFocusFilter = true;
+  }, [groupFilters.length]);
 
   return (
     <PanelSection title="Filters">
@@ -60,7 +66,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
                 <div className="no-sep">
                   <Field
                     label="Filter Type"
-                    description={<FilterEntry index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />}
+                    description={<FilterEntry index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} shouldFocus={shouldFocusFilter && index === groupFilters.length - 1} />}
                   />
                 </div>
                 <div className="no-sep" key={`${filter.type}`}>
@@ -91,5 +97,5 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
         </div>
       </PanelSectionRow>
     </PanelSection>
-  )
-}
+  );
+};
