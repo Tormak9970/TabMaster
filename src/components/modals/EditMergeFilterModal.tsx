@@ -23,6 +23,11 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
   const [groupIncludesHidden, setGroupIncludesHidden] = useState<boolean>(!!mergeParams.includesHidden);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
+  const [shouldFocusAddButton, setShouldFocusAddButton] = useState(true);
+
+  useEffect(() => {
+    setShouldFocusAddButton(false);
+  }, []);
 
   useEffect(() => {
     setCanSave(groupFilters.length >= 2);
@@ -85,6 +90,7 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
             groupIncludesHidden={groupIncludesHidden}
             setGroupIncludesHidden={setGroupIncludesHidden}
             canAddFilter={canAddFilter}
+            shouldFocusAddButton={shouldFocusAddButton}
           />
         </ConfirmModal>
       </div>
