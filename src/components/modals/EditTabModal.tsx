@@ -31,8 +31,8 @@ type EditTabModalProps = {
   tabTitle?: string,
   tabFilters: TabFilterSettings<FilterType>[],
   tabMasterManager: TabMasterManager,
-  filtersMode: LogicalMode;
-  includesHidden: boolean;
+  filtersMode: LogicalMode,
+  includesHidden: boolean
 };
 
 /**
@@ -143,6 +143,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
             groupIncludesHidden={topLevelIncludesHidden}
             setGroupIncludesHidden={setTopLevelIncludesHidden}
             canAddFilter={canAddFilter}
+            collapseFilters={!!tabTitle}
           />
         </ConfirmModal>
       </div>

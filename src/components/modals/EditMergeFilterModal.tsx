@@ -9,15 +9,16 @@ import { MdQuestionMark } from "react-icons/md";
 import { FitlerDescModal } from "./FilterDescModal";
 
 interface EditMergeFilterModalProps {
-  mergeParams: TabFilterSettings<'merge'>['params'];
-  saveMerge: (groupParams: TabFilterSettings<'merge'>['params']) => void;
-  closeModal: () => void;
+  mergeParams: TabFilterSettings<'merge'>['params'],
+  saveMerge: (groupParams: TabFilterSettings<'merge'>['params']) => void,
+  closeModal: () => void,
+  isEditing: boolean
 }
 
 /**
  * Modal for editing a Merge Filter.
  */
-export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModal, mergeParams, saveMerge }) => {
+export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModal, mergeParams, saveMerge, isEditing }) => {
   const [groupFilters, setGroupFilters] = useState<TabFilterSettings<FilterType>[]>(mergeParams.filters);
   const [groupLogicMode, setGroupLogicMode] = useState<LogicalMode>(mergeParams.mode);
   const [groupIncludesHidden, setGroupIncludesHidden] = useState<boolean>(!!mergeParams.includesHidden);
@@ -91,6 +92,7 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
             setGroupIncludesHidden={setGroupIncludesHidden}
             canAddFilter={canAddFilter}
             shouldFocusAddButton={shouldFocusAddButton}
+            collapseFilters={isEditing}
           />
         </ConfirmModal>
       </div>

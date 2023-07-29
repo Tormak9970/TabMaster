@@ -1,5 +1,5 @@
 import { PanelSection, PanelSectionRow, Field, ButtonItem, Dropdown, Toggle, afterPatch, Focusable } from "decky-frontend-lib";
-import { VFC, Fragment, useMemo } from "react";
+import { VFC, Fragment, useMemo, useCallback } from "react";
 import { FilterEntry } from "./FilterEntry";
 import { FilterOptions } from "./FilterOptions";
 import { TabFilterSettings, FilterType } from "./Filters";
@@ -14,10 +14,11 @@ interface FiltersPanelProps {
   setGroupIncludesHidden: React.Dispatch<React.SetStateAction<boolean>>,
   addFilter: () => void,
   canAddFilter: boolean,
-  shouldFocusAddButton?: boolean
+  shouldFocusAddButton?: boolean,
+  collapseFilters?: boolean
 }
 
-export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicMode, groupIncludesHidden, setGroupFilters, setGroupLogicMode, setGroupIncludesHidden, addFilter, canAddFilter, shouldFocusAddButton }) => {
+export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicMode, groupIncludesHidden, setGroupFilters, setGroupLogicMode, setGroupIncludesHidden, addFilter, canAddFilter, shouldFocusAddButton, collapseFilters }) => {
   const modeOptions = [
     { label: "And", data: "and" },
     { label: "Or", data: "or" }
@@ -25,9 +26,11 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
 
   //this sets whether filter entry type dropdown should take focus when being rendered, ie when a filter is added 
   let shouldFocusFilterDropdown = false;
-  useMemo(() => {
-    shouldFocusFilterDropdown = true;
-  }, [groupFilters.length]);
+  const cb = useCallback((() => {
+    let firstCall = true;
+    return () => firstCall ? firstCall = false : true;
+  })(), []);
+  useMemo(() => shouldFocusFilterDropdown = cb(), [groupFilters.length]);
 
   const element = (
     <Focusable>
@@ -63,7 +66,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
                 <FilterSectionAccordion
                   index={index}
                   filter={filter}
-                  isOpen={true}
+                  isOpen={shouldFocusFilterDropdown ? index === groupFilters.length - 1 : !collapseFilters}
                 >
                   <div className="no-sep">
                     <Field

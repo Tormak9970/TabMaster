@@ -236,6 +236,7 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
           mergeParams={mergeParams}
           saveMerge={saveMerge}
           closeModal={() => modal.instance.Close()}
+          isEditing={isEditing}
         />
       </TabMasterContextProvider>
     );
