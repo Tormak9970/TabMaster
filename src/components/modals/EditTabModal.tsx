@@ -5,8 +5,8 @@ import {
   PanelSection,
   PanelSectionRow,
   TextField,
-  showModal
-} from "decky-frontend-lib";
+  afterPatch,
+  showModal} from "decky-frontend-lib";
 import { useState, VFC, useEffect } from "react";
 import { FilterType, TabFilterSettings, isDefaultParams } from "../filters/Filters";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
@@ -31,7 +31,7 @@ type EditTabModalProps = {
   tabTitle?: string,
   tabFilters: TabFilterSettings<FilterType>[],
   tabMasterManager: TabMasterManager,
-  filtersMode: LogicalMode;
+  filtersMode: LogicalMode,
   includesHidden: boolean
 };
 
@@ -45,6 +45,25 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   const [topLevelIncludesHidden, setTopLevelIncludesHidden] = useState<boolean>(includesHidden);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
+  const [patchInput, setPatchInput] = useState(true);
+
+  const nameInputElt = <TextField value={name} onChange={onNameChange} />;
+
+  //reference to input field class component instance, which has a focus method
+  let inputComponentInstance: any;
+
+  if (patchInput) {
+    afterPatch(nameInputElt.type.prototype, 'render', function (_: any, ret: any) {
+      //@ts-ignore     get reference to instance
+      inputComponentInstance = this;
+      return ret;
+    }, { singleShot: true });
+  }
+
+  useEffect(() => {
+    inputComponentInstance.Focus();
+    setPatchInput(false);
+  }, []);
 
   useEffect(() => {
     setCanSave(name != "" && topLevelFilters.length > 0);
@@ -99,7 +118,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
               <DialogButton
                 style={{ height: '28px', width: '30px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto' }}
                 onOKActionDescription={'Filter Descriptions'}
-                onClick={() => {showModal(<FitlerDescModal/>)}}
+                onClick={() => { showModal(<FitlerDescModal />); }}
               >
                 <MdQuestionMark style={{ marginTop: '-4px', marginLeft: '-5px', display: 'block' }} />
               </DialogButton>
@@ -111,7 +130,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
             <PanelSectionRow>
               <Field
                 label="Name"
-                description={<TextField value={name} onChange={onNameChange} />}
+                description={nameInputElt}
               />
             </PanelSectionRow>
           </PanelSection>
@@ -124,6 +143,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
             groupIncludesHidden={topLevelIncludesHidden}
             setGroupIncludesHidden={setTopLevelIncludesHidden}
             canAddFilter={canAddFilter}
+            collapseFilters={!!tabTitle}
           />
         </ConfirmModal>
       </div>

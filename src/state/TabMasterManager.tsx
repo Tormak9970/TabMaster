@@ -729,7 +729,7 @@ export class TabMasterManager {
    */
   private update() {
     this.eventBus.dispatchEvent(new Event("stateUpdate"));
-    this.rerenderLibrary()
+    this.rerenderLibrary();
   }
 
   /**
@@ -744,6 +744,6 @@ export class TabMasterManager {
    * @param handler The callback that will cause the library to rerender.
    */
   registerRerenderLibraryHandler(handler: () => void) {
-    this.rerenderLibrary = handler
+    this.rerenderLibrary = handler;
   }
 }
