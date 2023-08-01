@@ -26,7 +26,6 @@ specifiers:
   uuid: ^9.0.0
 
 dependencies:
-  decky-frontend-lib: 3.21.8
   mobx: 5.15.7
   react-icons: 4.10.1
   uuid: 9.0.0
@@ -44,6 +43,7 @@ devDependencies:
   '@types/react': 16.14.0
   '@types/uuid': 9.0.2
   '@types/webpack': 5.28.1
+  decky-frontend-lib: 3.21.8
   husky: 8.0.3
   markdown-it: 13.0.1
   rollup: 2.79.1
@@ -905,7 +905,7 @@ packages:
 
   /decky-frontend-lib/3.21.8:
     resolution: {integrity: sha512-I45KWzoTSakUcsN7drHhiOc+rYKYygIsuYTHqc8DbpPDJvUx6xlU4t7D2TMrj9o/xS/V3WY9N/pX8eF6AcGT1g==}
-    dev: false
+    dev: true
 
   /deepmerge/4.3.1:
     resolution: {integrity: sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==}

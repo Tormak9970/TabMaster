@@ -6,7 +6,7 @@ import {
   ServerAPI,
   wrapReactType
 } from "decky-frontend-lib";
-import { ReactElement, useEffect } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { LogController } from "../lib/controllers/LogController";
@@ -21,10 +21,13 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
   //* This only runs 1 time, which is perfect
   return serverAPI.routerHook.addPatch("/library", (props: { path: string; children: ReactElement; }) => {
     afterPatch(props.children, "type", (_: Record<string, unknown>[], ret1: ReactElement) => {
+      const [refresh, setRefresh] = useState(false);
+
       let innerPatch: Patch;
       let memoCache: any;
-
+      
       useEffect(() => {
+        tabMasterManager.registerRerenderLibraryHandler(() => setRefresh(!refresh));
         return innerPatch.unpatch();
       });
 
@@ -47,7 +50,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
             const fakeUseMemo = (fn: () => any, deps: any[]) => {
               return realUseMemo(() => {
                 const tabs: SteamTab[] = fn();
-                
+
                 const [eSortBy, setSortBy, showSortingContextMenu] = deps;
                 const sortingProps = { eSortBy, setSortBy, showSortingContextMenu };
                 const collectionsAppFilterGamepad = deps[6];
