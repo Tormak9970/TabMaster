@@ -725,9 +725,25 @@ export class TabMasterManager {
   }
 
   /**
-   * Dispatches event to update context provider
+   * Dispatches event to update context provider and rerenders library component.
    */
   private update() {
     this.eventBus.dispatchEvent(new Event("stateUpdate"));
+    this.rerenderLibrary();
+  }
+
+  /**
+   * Method that will be used to force library to rerender. Assigned later in the library patch.
+   */
+  private rerenderLibrary() {
+
+  }
+
+  /**
+   * Assigns the callback that will be used to rerender the library.
+   * @param handler The callback that will cause the library to rerender.
+   */
+  registerRerenderLibraryHandler(handler: () => void) {
+    this.rerenderLibrary = handler;
   }
 }
