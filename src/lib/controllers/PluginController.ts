@@ -3,6 +3,7 @@ import { PythonInterop } from "./PythonInterop";
 import { SteamController } from "./SteamController";
 import { LogController } from "./LogController";
 import { TabMasterManager } from "../../state/TabMasterManager";
+import { getCurrentUserId } from "../Utils";
 
 /**
  * Main controller class for the plugin.
@@ -45,6 +46,7 @@ export class PluginController {
    */
   static async init(): Promise<void> {
     LogController.log("PluginController initialized.");
+    PythonInterop.setActiveSteamId(getCurrentUserId());
   }
 
   /**

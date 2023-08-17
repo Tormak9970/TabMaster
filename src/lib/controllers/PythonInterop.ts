@@ -45,6 +45,35 @@ export class PythonInterop {
   }
   
   /**
+   * Gets the plugin's users dictionary.
+   * @returns A promise resolving to the plugin's users dictionary.
+   */
+  static async getUsersDict(): Promise<UsersDict | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, UsersDict>("get_users_dict", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+  
+  /**
+   * Sends the active user's steamID to the backend.
+   * @returns A promise resolving to the plugin's users dictionary.
+   */
+  static async setActiveSteamId(userId: string): Promise<void | Error> {
+    const result = await this.serverAPI.callPluginMethod<{ user_id: string }, void>("set_active_user_id", { user_id: userId});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+
+  
+  /**
    * Gets the plugin's docs.
    * @returns A promise resolving to the plugin's docs.
    */
