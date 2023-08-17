@@ -72,6 +72,31 @@ export class PythonInterop {
     }
   }
 
+  /**
+   * Removes any legacy settings fields that may be present in the settings file.
+   */
+  static async removeLegacySettings(): Promise<void | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, void>("remove_legacy_settings", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+
+  /**
+   * Migrates a legacy user to use the new settings system.
+   */
+  static async migrateLegacySettings(): Promise<void | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, void>("migrate_legacy_settings", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
   
   /**
    * Gets the plugin's docs.

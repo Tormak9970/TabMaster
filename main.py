@@ -46,6 +46,32 @@ class Plugin:
     # log(f"Got users_dict {Plugin.settings_dict}")
     return Plugin.users_dict
   
+  async def remove_legacy_settings(self):
+    Plugin.settings.settings.pop("tabs")
+    Plugin.settings.settings.pop("tags")
+    Plugin.settings.settings.pop("friends")
+    Plugin.settings.settings.pop("friendsGames")
+
+    Plugin.settings.commit()
+    pass
+
+  async def migrate_legacy_settings(self):
+    tabs = await Plugin.get_setting(self, "tabs", {})
+    tags = await Plugin.get_setting(self, "tags", [])
+    friends = await Plugin.get_setting(self, "friends", [])
+    friends_games = await Plugin.get_setting(self, "friendsGames", {})
+
+    Plugin.remove_legacy_fields(self)
+
+    Plugin.users_dict[Plugin.user_id] = {
+      "tabs": tabs,
+      "tags": tags,
+      "friends": friends,
+      "friendsGames": friends_games
+    }
+    
+    await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
+  
   async def set_active_user_id(self, user_id: str) -> bool:
     log(f"active user id: {user_id}")
     Plugin.user_id = user_id
