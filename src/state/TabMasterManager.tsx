@@ -516,6 +516,7 @@ export class TabMasterManager {
     PythonInterop.getTags().then((res: TagResponse[] | Error) => {
       if (res instanceof Error) {
         LogController.log("TabMaster couldn't load tags settings");
+        LogController.error(res.message);
       } else {
         if (this.allStoreTags.length === 0) {
           this.allStoreTags = res;
@@ -525,6 +526,7 @@ export class TabMasterManager {
     PythonInterop.getFriends().then((res: FriendEntry[] | Error) => {
       if (res instanceof Error) {
         LogController.log("TabMaster couldn't load friends settings");
+        LogController.error(res.message);
       } else {
         if (this.currentUsersFriends.length === 0) {
           this.currentUsersFriends = res;
@@ -534,6 +536,7 @@ export class TabMasterManager {
     PythonInterop.getFriendsGames().then((res: Map<number, number[]> | Error) => {
       if (res instanceof Error) {
         LogController.log("TabMaster couldn't load friends games settings");
+        LogController.error(res.message);
       } else {
         if (this.friendsGameMap.size === 0) {
           this.friendsGameMap = res;
@@ -543,6 +546,7 @@ export class TabMasterManager {
 
     if (settings instanceof Error) {
       LogController.log("TabMaster couldn't load tab settings");
+      LogController.error(settings.message);
       return;
     }
 

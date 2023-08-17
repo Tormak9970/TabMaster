@@ -62,8 +62,8 @@ export class PythonInterop {
    * Sends the active user's steamID to the backend.
    * @returns A promise resolving to the plugin's users dictionary.
    */
-  static async setActiveSteamId(userId: string): Promise<void | Error> {
-    const result = await this.serverAPI.callPluginMethod<{ user_id: string }, void>("set_active_user_id", { user_id: userId});
+  static async setActiveSteamId(userId: string): Promise<boolean | Error> {
+    const result = await this.serverAPI.callPluginMethod<{ user_id: string }, boolean>("set_active_user_id", { user_id: userId});
 
     if (result.success) {
       return result.result;
@@ -128,7 +128,7 @@ export class PythonInterop {
    * @returns A promise resolving to the cached user friends.
    */
   static async getFriends(): Promise<FriendEntry[] | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{}, FriendEntry[]>("get_friends", []);
+    let result = await PythonInterop.serverAPI.callPluginMethod<{}, FriendEntry[]>("get_friends", {});
 
     if (result.success) {
       return result.result;

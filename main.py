@@ -17,7 +17,7 @@ def error(txt):
 Initialized = False
 
 class Plugin:
-  user_id: int = None
+  user_id: str = None
   users_dict: Dict[str, dict] = None
 
   docsDirPath = f"{decky_plugin.DECKY_PLUGIN_DIR}/docs"
@@ -46,8 +46,27 @@ class Plugin:
     # log(f"Got users_dict {Plugin.settings_dict}")
     return Plugin.users_dict
   
-  async def set_active_user_id(self, user_id: str):
+  async def set_active_user_id(self, user_id: str) -> bool:
+    log(f"active user id: {user_id}")
     Plugin.user_id = user_id
+    
+    while Plugin.users_dict is None:
+      await asyncio.sleep(0.1)
+
+    if not user_id in Plugin.users_dict.keys():
+      log(f"User {user_id} had no settings.")
+
+      Plugin.users_dict[user_id] = {
+        "tabs": {},
+        "tags": [],
+        "friends": [],
+        "friendsGames": {}
+      }
+      await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
+
+      return True
+    else:
+      return False
   
   async def get_tabs(self) -> Dict[str, dict] | None:
     """
@@ -55,12 +74,12 @@ class Plugin:
 
     :return: The tabs
     """
-    while Plugin.users_dict is None or Plugin.user_id is None:
+    while Plugin.users_dict is None:
       await asyncio.sleep(0.1)
     
-    tabs = Plugin.users_dict[Plugin.user_id].tabs
+    tabs = Plugin.users_dict[Plugin.user_id]["tabs"]
     log(f"Got tabs {tabs}")
-    return tabs
+    return tabs or {}
 
   async def get_tags(self) -> List[dict] | None:
     """
@@ -68,12 +87,12 @@ class Plugin:
 
     :return: The tags
     """
-    while Plugin.users_dict is None or Plugin.user_id is None:
+    while Plugin.users_dict is None:
       await asyncio.sleep(0.1)
     
-    tags = Plugin.users_dict[Plugin.user_id].tags
+    tags = Plugin.users_dict[Plugin.user_id]["tags"]
     log(f"Got {len(tags)} tags")
-    return tags
+    return tags or []
 
   async def get_friends(self) -> List[dict] | None:
     """
@@ -81,12 +100,12 @@ class Plugin:
 
     :return: The friends
     """
-    while Plugin.users_dict is None or Plugin.user_id is None:
+    while Plugin.users_dict is None:
       await asyncio.sleep(0.1)
       
-    friends = Plugin.users_dict[Plugin.user_id].friends
+    friends = Plugin.users_dict[Plugin.user_id]["friends"]
     log(f"Got {len(friends)} friends")
-    return friends
+    return friends or []
 
   async def get_friends_games(self) -> Dict[int, List[int]] | None:
     """
@@ -94,12 +113,12 @@ class Plugin:
 
     :return: The friends_games
     """
-    while Plugin.users_dict is None or Plugin.user_id is None:
+    while Plugin.users_dict is None:
       await asyncio.sleep(0.1)
 
-    friends_games = Plugin.users_dict[Plugin.user_id].friendsGames  
+    friends_games = Plugin.users_dict[Plugin.user_id]["friendsGames"]  
     log(f"Got {len(friends_games)} friendsGames")
-    return friends_games
+    return friends_games or {}
 
   # Plugin settings setters
   async def set_tabs(self, tabs: Dict[str, dict]):

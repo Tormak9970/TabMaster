@@ -33,12 +33,14 @@ export class PluginController {
     return this.steamController.registerForAuthStateChange(async (username) => {
       LogController.log(`User logged in. [DEBUG] username: ${username}.`);
       if (await this.steamController.waitForServicesToInitialize()) {
-        PluginController.init();
+        await PluginController.init();
         onMount();
       } else {
         PythonInterop.toast("Error", "Failed to initialize, try restarting.");
       }
-    }, null, true, true);
+    }, async (username) => {
+      LogController.log(`User logged out. [DEBUG] username: ${username}.`);
+    }, true, true);
   }
 
   /**
@@ -46,7 +48,7 @@ export class PluginController {
    */
   static async init(): Promise<void> {
     LogController.log("PluginController initialized.");
-    PythonInterop.setActiveSteamId(getCurrentUserId());
+    const userHadSettings = await PythonInterop.setActiveSteamId(getCurrentUserId());
   }
 
   /**
