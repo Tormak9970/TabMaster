@@ -96,6 +96,8 @@ export class PluginController {
           await PythonInterop.removeLegacySettings();
           resolve();
         });
+      } else {
+        resolve();
       }
     });
   }
