@@ -1,9 +1,41 @@
-import { ServerAPI } from "decky-frontend-lib";
+import { ConfirmModal, ServerAPI, showModal } from "decky-frontend-lib";
 import { PythonInterop } from "./PythonInterop";
 import { SteamController } from "./SteamController";
 import { LogController } from "./LogController";
 import { TabMasterManager } from "../../state/TabMasterManager";
 import { getCurrentUserId } from "../Utils";
+
+function showMigrationModal(okCallback: () => Promise<void>, cancelCallback: () => Promise<void>) {
+  showModal(
+    <ConfirmModal
+      strOKButtonText={"Transfer"}
+      onOK={okCallback}
+      strCancelButtonText={"Discard"}
+      onCancel={async () => {
+        showDiscardConfirm(cancelCallback, async () => showMigrationModal(okCallback, cancelCallback));
+      }}
+      strTitle="Legacy Settings Detected"
+    >
+      TabMaster now saves settings and tabs for each user of the device. Would you like to transfer this device's previous settings to your account?
+    </ConfirmModal>
+  );
+}
+
+function showDiscardConfirm(okCallback: () => Promise<void>, onCancel: () => Promise<void>) {
+  showModal(
+    <ConfirmModal
+      className={'tab-master-destructive-modal'}
+      strOKButtonText={"Confirm"}
+      onOK={okCallback}
+      strCancelButtonText={"Back"}
+      onCancel={onCancel}
+      bDestructiveWarning={true}
+      strTitle="Are You Sure?"
+    >
+      Are you sure you want to discard the previous settings? This can't be undone.
+    </ConfirmModal>
+  )
+}
 
 /**
  * Main controller class for the plugin.
@@ -48,7 +80,24 @@ export class PluginController {
    */
   static async init(): Promise<void> {
     LogController.log("PluginController initialized.");
-    const userHadSettings = await PythonInterop.setActiveSteamId(getCurrentUserId());
+    
+    // @ts-ignore
+    return new Promise(async (resolve, reject) => {
+      const hadLegacySettings = await PythonInterop.setActiveSteamId(getCurrentUserId());
+      LogController.log(hadLegacySettings ? "Detected Legacy Settings." : "No Legacy Settings found.");
+
+      if (hadLegacySettings) {
+        showMigrationModal(async () => {
+          LogController.log("Transfering Legacy Settings...");
+          await PythonInterop.migrateLegacySettings();
+          resolve();
+        }, async () => {
+          LogController.log("Removing Legacy Settings...");
+          await PythonInterop.removeLegacySettings();
+          resolve();
+        });
+      }
+    });
   }
 
   /**
