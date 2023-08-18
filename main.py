@@ -84,7 +84,6 @@ class Plugin:
 
       Plugin.users_dict[user_id] = {
         "tabs": {},
-        "tags": [],
         "friends": [],
         "friendsGames": {}
       }
