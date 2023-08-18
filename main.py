@@ -20,6 +20,7 @@ Initialized = False
 class Plugin:
   user_id: str = None
   users_dict: dict[str, dict] = None
+  tags: list[dict] = None
 
   docsDirPath = f"{decky_plugin.DECKY_PLUGIN_DIR}/docs"
   docs = {}
@@ -49,7 +50,6 @@ class Plugin:
   
   async def remove_legacy_settings(self):
     Plugin.del_setting(self, "tabs")
-    Plugin.del_setting(self, "tags")
     Plugin.del_setting(self, "friends")
     Plugin.del_setting(self, "friendsGames")
     
@@ -58,13 +58,11 @@ class Plugin:
 
   async def migrate_legacy_settings(self):
     tabs = await Plugin.get_setting(self, "tabs", {})
-    tags = await Plugin.get_setting(self, "tags", [])
     friends = await Plugin.get_setting(self, "friends", [])
     friends_games = await Plugin.get_setting(self, "friendsGames", {})
 
     Plugin.users_dict[Plugin.user_id] = {
       "tabs": tabs,
-      "tags": tags,
       "friends": friends,
       "friendsGames": friends_games
     }
@@ -113,12 +111,11 @@ class Plugin:
 
     :return: The tags
     """
-    while Plugin.users_dict is None:
+    while Plugin.tags is None:
       await asyncio.sleep(0.1)
     
-    tags = Plugin.users_dict[Plugin.user_id]["tags"]
-    log(f"Got {len(tags)} tags")
-    return tags or []
+    log(f"Got {len(Plugin.tags)} tags")
+    return Plugin.tags
 
   async def get_friends(self) -> list[dict] | None:
     """
@@ -152,8 +149,8 @@ class Plugin:
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
   async def set_tags(self, tags: list[dict]):
-    Plugin.users_dict[Plugin.user_id]["tags"] = tags
-    await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
+    Plugin.tags= tags
+    await Plugin.set_setting(self, "tags", Plugin.tags)
 
   async def set_friends(self, friends: list[dict]):
     Plugin.users_dict[Plugin.user_id]["friends"] = friends
@@ -177,6 +174,7 @@ class Plugin:
     """
     Plugin.settings.read()
     Plugin.users_dict = await Plugin.get_setting(self, "usersDict", {})
+    Plugin.tags = await Plugin.get_setting(self, "tags", [])
 
   T = TypeVar("T")
 

@@ -24,7 +24,6 @@ type DocPages = {
 type UsersDict = {
   [userId: string]: {
     tabs: TabSettingsDictionary,
-    tags: TagResponse[],
     friends: FriendEntry[],
     friendsGames: Map<number, number[]>
   }
