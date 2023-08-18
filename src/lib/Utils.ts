@@ -117,3 +117,13 @@ export function validateTabs(tabs: TabSettingsDictionary): boolean {
 export function capitalizeFirstLetter(word: string): string {
   return word[0].toUpperCase().concat(word.substring(1));
 }
+
+/**
+ * Gets the current user's steam id.
+ * @param useU64 Whether or not the id should be a u64.
+ * @returns The user's steam id.
+ */
+export function getCurrentUserId(useU64 = false): string {
+  if (useU64) return window.App.m_CurrentUser.strSteamID;
+  return BigInt.asUintN(32, BigInt(window.App.m_CurrentUser.strSteamID)).toString();
+};

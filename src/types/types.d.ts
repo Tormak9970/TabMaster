@@ -20,3 +20,11 @@ type Unregisterer = {
 type DocPages = {
   [key: string]: string
 }
+
+type UsersDict = {
+  [userId: string]: {
+    tabs: TabSettingsDictionary,
+    friends: FriendEntry[],
+    friendsGames: Map<number, number[]>
+  }
+}
