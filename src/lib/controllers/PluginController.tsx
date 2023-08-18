@@ -14,7 +14,7 @@ function showMigrationModal(okCallback: () => Promise<void>, cancelCallback: () 
       onCancel={async () => {
         showDiscardConfirm(cancelCallback, async () => showMigrationModal(okCallback, cancelCallback));
       }}
-      strTitle="Legacy Settings Detected"
+      strTitle="TabMaster: Legacy Settings Found"
     >
       TabMaster now saves settings and tabs for each user of the device. Would you like to transfer this device's previous settings to your account?
     </ConfirmModal>
