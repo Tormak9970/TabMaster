@@ -25,7 +25,7 @@ export class PythonInterop {
    * @param message The message to log.
    */
   static async log(message: String): Promise<void> {
-    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 2 });
+    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 0 });
   }
 
   /**
