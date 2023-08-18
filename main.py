@@ -148,19 +148,19 @@ class Plugin:
 
   # Plugin settings setters
   async def set_tabs(self, tabs: dict[str, dict]):
-    Plugin.users_dict[Plugin.user_id].tabs = tabs
+    Plugin.users_dict[Plugin.user_id]["tabs"] = tabs
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
   async def set_tags(self, tags: list[dict]):
-    Plugin.users_dict[Plugin.user_id].tags = tags
+    Plugin.users_dict[Plugin.user_id]["tags"] = tags
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
   async def set_friends(self, friends: list[dict]):
-    Plugin.users_dict[Plugin.user_id].friends = friends
+    Plugin.users_dict[Plugin.user_id]["friends"] = friends
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
   async def set_friends_games(self, friends_games: dict[str, list[int]]):
-    Plugin.users_dict[Plugin.user_id].friendsGames = friends_games
+    Plugin.users_dict[Plugin.user_id]["friendsGames"] = friends_games
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
   async def get_docs(self):
