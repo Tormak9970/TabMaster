@@ -163,16 +163,28 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
 
   const catsToIncludeObj = getIncludedCategoriesFromBitField(categoriesToInclude);
 
+  const getCatLabel = (category: string) => category === 'music' ? 'Soundtracks' : capitalizeFirstLetter(category)
+
+  let catStrings = []
+  for (const cat in catsToIncludeObj) {
+    catsToIncludeObj[cat as keyof typeof catsToIncludeObj] && catStrings.push(getCatLabel(cat))
+  }
+
   return (
     <>
       <div className="tab-master-scope" style={{ marginBottom: "24px" }}>
         <Focusable style={{ margin: "0 calc(-12px - 1.4vw)" }} onActivate={() => setIsOpen(isOpen => !isOpen)} noFocusRing={true} focusClassName="start-focused" >
           <div style={{ margin: "0 calc(12px + 1.4vw)", padding: "0 16px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <div style={{ padding: "12px 0", float: "left" }} className={quickAccessControlsClasses.PanelSectionTitle}>
                 Include in tab
               </div>
-              <div style={{ paddingRight: "10px" }}>
+              <div style={{padding: "12px 40px", flex: "1"}}>
+                {!isOpen && <span style={{ fontSize: "12px", lineHeight: "12px", color: "#8b929a"}}> 
+                  {catStrings.join(', ')}
+                </span>}
+              </div>
+              <div style={{ paddingRight: "10px", display: "flex", alignItems: "center" }}>
                 <BiSolidDownArrow style={{ transform: !isOpen ? "rotate(90deg)" : "" }} />
               </div>
             </div>
@@ -181,7 +193,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
         {isOpen && (
           <div style={{ padding: "10px 18px" }}>
             {Object.entries(catsToIncludeObj).map(([category, shouldInclude]) => {
-              const label = category === 'music' ? 'Soundtracks' : capitalizeFirstLetter(category);
+              const label = getCatLabel(category)
 
               const onChange = (checked: boolean) => {
                 setCategoriesToInclude(currentCatsBitField => updateCategoriesToIncludeBitField(currentCatsBitField, { [category]: checked }));

@@ -170,10 +170,10 @@ export function updateCategoriesToIncludeBitField(bitField: number, categoriesTo
 export function getIncludedCategoriesFromBitField(bitField: number) {
   const includes = {
     games: false,
-    software: false,
-    tools: false,
-    videos: false,
     music: false,
+    software: false,
+    videos: false,
+    tools: false,
     hidden: false
   };
 
