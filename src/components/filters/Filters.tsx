@@ -271,15 +271,12 @@ export class Filter {
       }
     },
     platform: (params: FilterParams<'platform'>, appOverview: SteamAppOverview) => {
-      let collection = null;
-
       if (params.platform === "steam") {
-        collection = collectionStore.allGamesCollection.allApps;
+        return appOverview.app_type === 1;
       } else if (params.platform === "nonSteam") {
-        collection = collectionStore.deckDesktopApps?.allApps ?? collectionStore.localGamesCollection.allApps.filter((overview) => overview.app_type === 1073741824);
+        return appOverview.app_type === 1073741824;
       }
-
-      return collection ? collection.includes(appOverview) : false;
+      return false
     },
     "deck compatibility": (params: FilterParams<'deck compatibility'>, appOverview: SteamAppOverview) => {
       return appOverview.steam_deck_compat_category === params.category;
