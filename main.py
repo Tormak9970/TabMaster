@@ -57,10 +57,15 @@ class Plugin:
     pass
 
   async def migrate_legacy_settings(self):
-    #todo: convert includesHidden property of tabs to categoriesToInclude
     tabs = await Plugin.get_setting(self, "tabs", {})
     friends = await Plugin.get_setting(self, "friends", [])
     friends_games = await Plugin.get_setting(self, "friendsGames", {})
+
+    for tabId in tabs:
+      tab = tabs[tabId]
+      if "includesHidden" in tab:
+        tab["categoriesToInclude"] = 17 if tab["includesHidden"] == True else 1
+        del tab["includesHidden"]
 
     Plugin.users_dict[Plugin.user_id] = {
       "tabs": tabs,
