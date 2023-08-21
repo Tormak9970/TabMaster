@@ -35,6 +35,7 @@ import { CustomTabContainer } from "./components/CustomTabContainer";
 import { TabActionsButton } from "./components/TabActions";
 import { LogController } from "./lib/controllers/LogController";
 import { DocPage } from "./components/docs/DocsPage";
+import { IncludeCategories } from "./lib/Utils";
 
 declare global {
   var SteamClient: SteamClient;
@@ -69,12 +70,12 @@ const Content: VFC<{}> = ({ }) => {
     showModal(
       <EditTabModal
         onConfirm={(_: any, tabSettings: EditableTabSettings) => {
-          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode, tabSettings.includesHidden);
+          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode, tabSettings.categoriesToInclude);
         }}
         tabFilters={[]}
         tabMasterManager={tabMasterManager}
         filtersMode="and"
-        includesHidden={false}
+        categoriesToInclude={IncludeCategories.games}
       />
     );
   }

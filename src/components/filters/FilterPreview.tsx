@@ -1,5 +1,5 @@
 import { Fragment, VFC } from "react";
-import { FilterType, TabFilterSettings, categoryToLabel } from "./Filters";
+import { FilterType, TabFilterSettings, compatCategoryToLabel } from "./Filters";
 
 type FilterPreviewProps<T extends FilterType> = {
   filter: TabFilterSettings<T>,
@@ -43,7 +43,7 @@ const PlatformFilterPreview: VFC<FilterPreviewProps<'platform'>> = ({ filter }) 
 }
 
 const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">deck compat - {categoryToLabel(filter.params.category)}{filter.inverted ? " (inverted)" : ""}</div>
+  return <div className="merge-filter-entry">deck compat - {compatCategoryToLabel(filter.params.category)}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 /**

@@ -36,6 +36,14 @@ export const ModalStyles: VFC<{}> = ({}) => {
         padding: 10px;
         min-width: 45px;
       }
+      .tab-master-modal-scope .name-field .${gamepadDialogClasses.Field} {
+        padding-bottom: 16px;
+        padding-top: 0px;
+      }
+      .tab-master-modal-scope .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
+        left: 1vw;
+        right: 1vw;
+      }
 
       .tab-master-modal-scope .no-sep .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after,
       .tab-master-modal-scope .no-sep.${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
@@ -62,6 +70,9 @@ export const ModalStyles: VFC<{}> = ({}) => {
       }
       
       /* Focused styles */
+      .tab-master-modal-scope .start-focused {
+        background-color: #3d4450 !important;
+      }
       .tab-master-modal-scope .filter-start-cont.start-focused {
         background-color: #3d4450 !important;
       }

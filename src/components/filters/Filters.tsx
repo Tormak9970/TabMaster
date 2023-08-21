@@ -1,4 +1,4 @@
-import { PluginController } from "../../lib/controllers/PluginController"
+import { PluginController } from "../../lib/controllers/PluginController";
 
 export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility';
 
@@ -17,11 +17,11 @@ type InstalledFilterParams = { installed: boolean };
 type RegexFilterParams = { regex: string };
 type FriendsFilterParams = { friends: number[], mode: LogicalMode };
 type TagsFilterParams = { tags: number[], mode: LogicalMode };
-type WhitelistFilterParams = { games: number[] }
-type BlacklistFilterParams = { games: number[] }
-type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode, includesHidden: boolean }
-type PlatformFilterParams = { platform: SteamPlatform }
-type DeckCompatFilterParams = { category: number }
+type WhitelistFilterParams = { games: number[] };
+type BlacklistFilterParams = { games: number[] };
+type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode };
+type PlatformFilterParams = { platform: SteamPlatform };
+type DeckCompatFilterParams = { category: number };
 
 export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -34,15 +34,15 @@ export type FilterParams<T extends FilterType> =
   T extends 'merge' ? MergeFilterParams :
   T extends 'platform' ? PlatformFilterParams :
   T extends 'deck compatibility' ? DeckCompatFilterParams :
-  never
+  never;
 
 export type TabFilterSettings<T extends FilterType> = {
   type: T,
   inverted: boolean,
   params: FilterParams<T>
-}
+};
 
-type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview, includesHidden?: boolean) => boolean;
+type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview) => boolean;
 
 /**
  * Define the deafult params for a filter type here
@@ -56,7 +56,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "tags": { tags: [], mode: 'and' },
   "whitelist": { games: [] },
   "blacklist": { games: [] },
-  "merge": { filters: [], mode: 'and', includesHidden: false },
+  "merge": { filters: [], mode: 'and' },
   "platform": { platform: "steam" },
   "deck compatibility": { category: 3 }
 };
@@ -101,12 +101,12 @@ export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean 
     case "installed":
     case "whitelist":
     case "blacklist":
-      return false
+      return false;
     case "merge":
-      return (filter as TabFilterSettings<'merge'>).params.filters.length === 0
+      return (filter as TabFilterSettings<'merge'>).params.filters.length === 0;
     case "platform":
     case "deck compatibility":
-      return false
+      return false;
   }
 }
 
@@ -115,7 +115,7 @@ export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean 
  * @param category The category to get the label for.
  * @returns The label of the provided category.
  */
-export function categoryToLabel(category: number): string {
+export function compatCategoryToLabel(category: number): string {
   switch (category) {
     case 0:
       return "Unknown";
@@ -153,7 +153,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       const collectionFromStores = collectionStore.GetCollection(collectionFilter.params.id);
       if (!collectionFromStores) {
         //* try to find collection by name
-        if(collectionFilter.params.name){
+        if (collectionFilter.params.name) {
           const updatedIdCollection = collectionStore.userCollections.find(collection => collection.displayName === collectionFilter.params.name);
           if (updatedIdCollection) {
             collectionFilter.params.id = updatedIdCollection.id;
@@ -161,7 +161,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
             errors.push(`Collection: ${collectionFilter.params.name} no longer exists`);
             passed = false;
           }
-        //* fallback to error on id if user has old config without name
+          //* fallback to error on id if user has old config without name
         } else {
           errors.push(`Collection with id: ${collectionFilter.params.id} no longer exists`);
           passed = false;
@@ -173,14 +173,16 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       return {
         passed: passed,
         errors: errors
-      }
+      };
     }
     case "merge": {
       let passed = true;
       const errors: string[] = [];
-      const mergeErrorEntries: FilterErrorEntry[] = []
+      const mergeErrorEntries: FilterErrorEntry[] = [];
 
-      if (!Object.keys(filter.params).includes("includesHidden")) (filter as TabFilterSettings<'merge'>).params.includesHidden = false;
+      //@ts-ignore delete property from old settings version
+      if (Object.keys(filter.params).includes("includesHidden")) delete (filter as TabFilterSettings<'merge'>).params.includesHidden;
+
       const mergeFilter = filter as TabFilterSettings<'merge'>;
 
       for (let i = 0; i < mergeFilter.params.filters.length; i++) {
@@ -190,15 +192,15 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
 
         if (!validated.passed) {
           passed = false;
-          errors.push(`Filter ${i+1} - ${validated.errors.length} ${validated.errors.length === 1 ? "error" : "errors"}`);
-          
+          errors.push(`Filter ${i + 1} - ${validated.errors.length} ${validated.errors.length === 1 ? "error" : "errors"}`);
+
           let entry: FilterErrorEntry = {
             filterIdx: i,
             errors: validated.errors,
-          }
+          };
 
           if (validated.mergeErrorEntries) entry.mergeErrorEntries = validated.mergeErrorEntries;
-          
+
           mergeErrorEntries.push(entry);
         }
       }
@@ -207,7 +209,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
         passed: passed,
         errors: errors,
         mergeErrorEntries: mergeErrorEntries
-      }
+      };
     }
     case "regex":
     case "friends":
@@ -220,8 +222,8 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       return {
         passed: true,
         errors: []
-      }
-    }
+      };
+  }
 }
 
 /**
@@ -229,8 +231,8 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
  */
 export class Filter {
   private static filterFunctions = {
-    collection: (params: FilterParams<'collection'>, appOverview: SteamAppOverview, includesHidden: boolean) => {
-      return collectionStore.GetCollection(params.id)[includesHidden ? "allApps" : "visibleApps"].includes(appOverview);
+    collection: (params: FilterParams<'collection'>, appOverview: SteamAppOverview) => {
+      return collectionStore.GetCollection(params.id).allApps.includes(appOverview);
     },
     installed: (params: FilterParams<'installed'>, appOverview: SteamAppOverview) => {
       return params.installed ? appOverview.installed : !appOverview.installed;
@@ -263,18 +265,18 @@ export class Filter {
     },
     merge: (params: FilterParams<'merge'>, appOverview: SteamAppOverview) => {
       if (params.mode === "and") {
-        return params.filters.every(filterSettings => Filter.run(filterSettings, appOverview, params.includesHidden));
+        return params.filters.every(filterSettings => Filter.run(filterSettings, appOverview));
       } else {
-        return params.filters.some(filterSettings => Filter.run(filterSettings, appOverview, params.includesHidden));
+        return params.filters.some(filterSettings => Filter.run(filterSettings, appOverview));
       }
     },
-    platform: (params: FilterParams<'platform'>, appOverview: SteamAppOverview, includesHidden: boolean) => {
+    platform: (params: FilterParams<'platform'>, appOverview: SteamAppOverview) => {
       let collection = null;
 
       if (params.platform === "steam") {
-        collection = collectionStore.allGamesCollection[includesHidden ? "allApps" : "visibleApps"];
+        collection = collectionStore.allGamesCollection.allApps;
       } else if (params.platform === "nonSteam") {
-        collection = collectionStore.deckDesktopApps?.[includesHidden ? "allApps" : "visibleApps"] ?? collectionStore.localGamesCollection[includesHidden ? "allApps" : "visibleApps"].filter((overview) => overview.app_type === 1073741824);
+        collection = collectionStore.deckDesktopApps?.allApps ?? collectionStore.localGamesCollection.allApps.filter((overview) => overview.app_type === 1073741824);
       }
 
       return collection ? collection.includes(appOverview) : false;
@@ -282,17 +284,16 @@ export class Filter {
     "deck compatibility": (params: FilterParams<'deck compatibility'>, appOverview: SteamAppOverview) => {
       return appOverview.steam_deck_compat_category === params.category;
     }
-  }
+  };
 
   /**
    * Checks if a game passes a given filter.
    * @param filterSettings The filter to run.
    * @param appOverview The app to check
-   * @param includesHideen Whether this filter should include hidden games
    * @returns True if the app meets the filter criteria.
    */
-  static run(filterSettings: TabFilterSettings<FilterType>, appOverview: SteamAppOverview, includesHidden: boolean): boolean {
-    const shouldInclude = (this.filterFunctions[filterSettings.type] as FilterFunction)(filterSettings.params, appOverview, includesHidden);
+  static run(filterSettings: TabFilterSettings<FilterType>, appOverview: SteamAppOverview): boolean {
+    const shouldInclude = (this.filterFunctions[filterSettings.type] as FilterFunction)(filterSettings.params, appOverview);
     return filterSettings.inverted ? !shouldInclude : shouldInclude;
   }
 }

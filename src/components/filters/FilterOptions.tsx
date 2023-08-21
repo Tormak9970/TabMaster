@@ -10,7 +10,7 @@ import {
   showModal
 } from "decky-frontend-lib";
 import { VFC, Fragment, useState } from "react";
-import { FilterType, TabFilterSettings, categoryToLabel } from "./Filters";
+import { FilterType, TabFilterSettings, compatCategoryToLabel } from "./Filters";
 import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMasterContext";
 import { ModeMultiSelect } from "../multi-selects/ModeMultiSelect";
 import { EditMergeFilterModal } from "../modals/EditMergeFilterModal";
@@ -207,7 +207,6 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
   const initialParams = {
     filters: [...filter.params.filters],
     mode: filter.params.mode,
-    includesHidden: filter.params.includesHidden
   }
   
   const [isEditing, setIsEditing] = useState<boolean>(filter.params.filters.length !== 0);
@@ -217,7 +216,6 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
     const updatedFilter = { ...filter };
     updatedFilter.params.filters = mergeParams.filters;
     updatedFilter.params.mode = mergeParams.mode;
-    updatedFilter.params.includesHidden = mergeParams.includesHidden;
 
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
@@ -286,7 +284,7 @@ const PlatformFilterOptions: VFC<FilterOptionsProps<'platform'>> = ({ index, set
  */
 const DeckCompatFilterOptions: VFC<FilterOptionsProps<'deck compatibility'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const dropdownOptions: DropdownOption[] = [0, 1, 2, 3].map((level) => {
-    return { label: categoryToLabel(level), data: level };
+    return { label: compatCategoryToLabel(level), data: level };
   });
 
   function onChange(selected: DropdownOption) {

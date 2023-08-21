@@ -1,13 +1,15 @@
 import {
   ConfirmModal,
   DialogButton,
+  DialogCheckbox,
   Field,
-  PanelSection,
-  PanelSectionRow,
+  Focusable,
   TextField,
   afterPatch,
-  showModal} from "decky-frontend-lib";
-import { useState, VFC, useEffect } from "react";
+  quickAccessControlsClasses,
+  showModal
+} from "decky-frontend-lib";
+import { useState, VFC, useEffect, Fragment } from "react";
 import { FilterType, TabFilterSettings, isDefaultParams } from "../filters/Filters";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
 import { TabMasterContextProvider } from "../../state/TabMasterContext";
@@ -16,13 +18,10 @@ import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";
 import { MdQuestionMark } from "react-icons/md";
 import { FitlerDescModal } from "./FilterDescModal";
+import { capitalizeFirstLetter, getIncludedCategoriesFromBitField, updateCategoriesToIncludeBitField } from "../../lib/Utils";
+import { BiSolidDownArrow } from "react-icons/bi";
 
-export type EditableTabSettings = {
-  title: string,
-  filters: TabFilterSettings<any>[];
-  filtersMode: LogicalMode;
-  includesHidden: boolean;
-};
+export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>;
 
 type EditTabModalProps = {
   closeModal?: () => void,
@@ -32,17 +31,17 @@ type EditTabModalProps = {
   tabFilters: TabFilterSettings<FilterType>[],
   tabMasterManager: TabMasterManager,
   filtersMode: LogicalMode,
-  includesHidden: boolean
+  categoriesToInclude: number; //bit field
 };
 
 /**
  * The modal for editing and creating custom tabs.
  */
-export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager, filtersMode, includesHidden }) => {
+export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager, filtersMode, categoriesToInclude }) => {
   const [name, setName] = useState<string>(tabTitle ?? '');
   const [topLevelFilters, setTopLevelFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
   const [topLevelLogicMode, setTopLevelLogicMode] = useState<LogicalMode>(filtersMode);
-  const [topLevelIncludesHidden, setTopLevelIncludesHidden] = useState<boolean>(includesHidden);
+  const [catsToInclude, setCatsToInclude] = useState<number>(categoriesToInclude);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
   const [patchInput, setPatchInput] = useState(true);
@@ -83,7 +82,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
         title: name,
         filters: topLevelFilters,
         filtersMode: topLevelLogicMode,
-        includesHidden: topLevelIncludesHidden
+        categoriesToInclude: catsToInclude
       };
       onConfirm(tabId, updated);
       closeModal!();
@@ -126,27 +125,79 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
           }
           onOK={onSave}
         >
-          <PanelSection>
-            <PanelSectionRow>
-              <Field
-                label="Name"
-                description={nameInputElt}
-              />
-            </PanelSectionRow>
-          </PanelSection>
+          <div style={{ padding: "4px 16px 16px" }} className="name-field">
+            <Field description={
+            <>
+              <div style={{ paddingBottom: "6px" }} className={quickAccessControlsClasses.PanelSectionTitle}>
+                Name
+              </div>
+              {nameInputElt}
+            </>
+            } />
+          </div>
+          <IncludeCategoriesPanel categoriesToInclude={catsToInclude} setCategoriesToInclude={setCatsToInclude} />
           <FiltersPanel
             groupFilters={topLevelFilters}
             setGroupFilters={setTopLevelFilters}
             addFilter={addFilter}
             groupLogicMode={topLevelLogicMode}
             setGroupLogicMode={setTopLevelLogicMode}
-            groupIncludesHidden={topLevelIncludesHidden}
-            setGroupIncludesHidden={setTopLevelIncludesHidden}
             canAddFilter={canAddFilter}
             collapseFilters={!!tabTitle}
           />
         </ConfirmModal>
       </div>
     </TabMasterContextProvider>
+  );
+};
+
+type IncludeCategoriesPanelProps = {
+  categoriesToInclude: number,
+  setCategoriesToInclude: React.Dispatch<React.SetStateAction<number>>;
+};
+/**
+ * Section for selecting categories to include in tab
+ */
+const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesToInclude, setCategoriesToInclude }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const catsToIncludeObj = getIncludedCategoriesFromBitField(categoriesToInclude);
+
+  return (
+    <>
+      <div className="tab-master-scope" style={{ marginBottom: "24px" }}>
+        <Focusable style={{ margin: "0 calc(-12px - 1.4vw)" }} onActivate={() => setIsOpen(isOpen => !isOpen)} noFocusRing={true} focusClassName="start-focused" >
+          <div style={{ margin: "0 calc(12px + 1.4vw)", padding: "0 16px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ padding: "12px 0", float: "left" }} className={quickAccessControlsClasses.PanelSectionTitle}>
+                Include in tab
+              </div>
+              <div style={{ paddingRight: "10px" }}>
+                <BiSolidDownArrow style={{ transform: !isOpen ? "rotate(90deg)" : "" }} />
+              </div>
+            </div>
+          </div>
+        </Focusable>
+        {isOpen && (
+          <div style={{ padding: "10px 18px" }}>
+            {Object.entries(catsToIncludeObj).map(([category, shouldInclude]) => {
+              const label = category === 'music' ? 'Soundtracks' : capitalizeFirstLetter(category);
+
+              const onChange = (checked: boolean) => {
+                setCategoriesToInclude(currentCatsBitField => updateCategoriesToIncludeBitField(currentCatsBitField, { [category]: checked }));
+              }; 
+              return <DialogCheckbox checked={shouldInclude} onChange={onChange} label={label} />;
+            })}
+          </div>)}
+      </div>
+      <div style={{
+        position: "relative",
+        top: "-24px",
+        left: "calc(16px - 1.8vw)",
+        right: "calc(16px - 1.8vw)",
+        height: "1.5px",
+        background: "#23262e" }}
+      />
+    </>
   );
 };
