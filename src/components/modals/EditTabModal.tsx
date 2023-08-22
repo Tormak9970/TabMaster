@@ -125,7 +125,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
           }
           onOK={onSave}
         >
-          <div style={{ padding: "4px 16px 16px" }} className="name-field">
+          <div style={{ padding: "4px 16px 1px" }} className="name-field">
             <Field description={
             <>
               <div style={{ paddingBottom: "6px" }} className={quickAccessControlsClasses.PanelSectionTitle}>
@@ -163,13 +163,15 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
 
   const catsToIncludeObj = getIncludedCategoriesFromBitField(categoriesToInclude);
 
+  const showHiddenCat = Object.entries(catsToIncludeObj).filter(([cat]) => cat !== 'hidden').some(([cat, checked]) => checked);
+
   return (
     <>
       <div className="tab-master-scope" style={{ marginBottom: "24px" }}>
         <Focusable style={{ margin: "0 calc(-12px - 1.4vw)" }} onActivate={() => setIsOpen(isOpen => !isOpen)} noFocusRing={true} focusClassName="start-focused" >
           <div style={{ margin: "0 calc(12px + 1.4vw)", padding: "0 16px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ padding: "12px 0", float: "left" }} className={quickAccessControlsClasses.PanelSectionTitle}>
+              <div style={{ padding: "15px 0", float: "left" }} className={quickAccessControlsClasses.PanelSectionTitle}>
                 Include in tab
               </div>
               <div style={{ paddingRight: "10px", display: "flex", alignItems: "center" }}>
@@ -186,7 +188,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
               const onChange = (checked: boolean) => {
                 setCategoriesToInclude(currentCatsBitField => updateCategoriesToIncludeBitField(currentCatsBitField, { [category]: checked }));
               }; 
-              return <DialogCheckbox checked={shouldInclude} onChange={onChange} label={label} />;
+              return category === 'hidden' && !showHiddenCat ? null : <DialogCheckbox checked={shouldInclude} onChange={onChange} label={label} />;
             })}
           </div>)}
       </div>
@@ -195,7 +197,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
         top: "-24px",
         left: "calc(16px - 1.8vw)",
         right: "calc(16px - 1.8vw)",
-        height: "1.5px",
+        height: "1px",
         background: "#23262e" }}
       />
     </>
