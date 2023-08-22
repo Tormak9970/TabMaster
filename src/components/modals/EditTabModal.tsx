@@ -163,11 +163,15 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
 
   const catsToIncludeObj = getIncludedCategoriesFromBitField(categoriesToInclude);
 
+  const showHiddenCat = Object.entries(catsToIncludeObj).filter(([cat]) => cat !== 'hidden').some(([cat, checked]) => checked);
+
   const getCatLabel = (category: string) => category === 'music' ? 'Soundtracks' : capitalizeFirstLetter(category)
 
   let catStrings = []
   for (const cat in catsToIncludeObj) {
-    catsToIncludeObj[cat as keyof typeof catsToIncludeObj] && catStrings.push(getCatLabel(cat))
+    const include = catsToIncludeObj[cat as keyof typeof catsToIncludeObj];
+
+    (include && (cat !== 'hidden' || showHiddenCat)) && catStrings.push(getCatLabel(cat));
   }
 
   return (
@@ -198,7 +202,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
               const onChange = (checked: boolean) => {
                 setCategoriesToInclude(currentCatsBitField => updateCategoriesToIncludeBitField(currentCatsBitField, { [category]: checked }));
               }; 
-              return <DialogCheckbox checked={shouldInclude} onChange={onChange} label={label} />;
+              return category === 'hidden' && !showHiddenCat ? null : <DialogCheckbox checked={shouldInclude} onChange={onChange} label={label} />;
             })}
           </div>)}
       </div>
