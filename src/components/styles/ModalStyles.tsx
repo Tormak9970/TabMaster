@@ -87,6 +87,17 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
         margin: 5px;
       }
+
+      .tab-master-modal-scope .slider-with-dropdown-container .${gamepadDialogClasses.Field} {
+        padding-right: 154px;
+        width: 100%;
+      }
+      .tab-master-modal-scope .slider-with-2dropdown-container .${gamepadDialogClasses.Field} {
+        padding-right: 154px;
+        padding-top: 38px;
+        padding-bottom: 17px;
+        width: 100%;
+      }
     `}</style>
   );
 }
