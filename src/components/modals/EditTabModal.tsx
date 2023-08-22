@@ -172,7 +172,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
               <div style={{ padding: "12px 0", float: "left" }} className={quickAccessControlsClasses.PanelSectionTitle}>
                 Include in tab
               </div>
-              <div style={{ paddingRight: "10px" }}>
+              <div style={{ paddingRight: "10px", display: "flex", alignItems: "center" }}>
                 <BiSolidDownArrow style={{ transform: !isOpen ? "rotate(90deg)" : "" }} />
               </div>
             </div>
