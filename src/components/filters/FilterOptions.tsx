@@ -11,7 +11,7 @@ import {
   showModal
 } from "decky-frontend-lib";
 import React, { VFC, Fragment, useState } from "react";
-import { FilterType, TabFilterSettings, ThresholdCondition, TimeUnit, categoryToLabel } from "./Filters";
+import { FilterType, ReviewScoreType, TabFilterSettings, ThresholdCondition, TimeUnit, categoryToLabel } from "./Filters";
 import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMasterContext";
 import { ModeMultiSelect } from "../multi-selects/ModeMultiSelect";
 import { EditMergeFilterModal } from "../modals/EditMergeFilterModal";
@@ -307,72 +307,48 @@ const DeckCompatFilterOptions: VFC<FilterOptionsProps<'deck compatibility'>> = (
 }
 
 /**
- * The options for a metacritic filter.
+ * The options for a review score filter.
  */
-const MetacriticFilterOptions: VFC<FilterOptionsProps<'metacritic'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+const ReviewScoreFilter: VFC<FilterOptionsProps<'review score'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const [value, setValue] = useState<number>(filter.params.scoreThreshold);
   const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
+  const [reviewType, setReviewType] = useState<ReviewScoreType>(filter.params.type);
 
-  function updateFilter(threshold: number, threshType: ThresholdCondition) {
+  function updateFilter(threshold: number, threshType: ThresholdCondition, scoreType: ReviewScoreType) {
     const updatedFilter = { ...filter };
     updatedFilter.params.scoreThreshold = threshold;
     updatedFilter.params.condition = threshType;
+    updatedFilter.params.type = scoreType;
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
     setContainingGroupFilters(updatedFilters);
   }
 
   function onSliderChange(value: number) {
-    updateFilter(value, thresholdType);
+    updateFilter(value, thresholdType, reviewType);
     setValue(value);
   }
 
   function onThreshTypeChange({ data: threshType }: {data: ThresholdCondition} ) {
-    updateFilter(value, threshType);
+    updateFilter(value, threshType, reviewType);
     setThresholdType(threshType);
   }
 
-  return (
-    <Focusable className="slider-with-dropdown-container" style={{ display: 'flex', flexDirection: 'row'}}>
-      <SliderField value={value} label={`Metacritic score of ${value} or ${thresholdType === 'above' ? 'higher' : 'lower'}`}  min={0} max={100} onChange={onSliderChange} />
-      <div style={{ right: '40px', position: 'absolute', zIndex: 1, transform: 'translate(0px, 18px)' }}>
-        <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange}/>
-      </div>
-    </Focusable>
-  );
-}
-
-/**
- * The options for a steam score filter.
- */
-const SteamScoreFilterOptions: VFC<FilterOptionsProps<'steam score'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
-  const [value, setValue] = useState<number>(filter.params.scoreThreshold);
-  const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
-
-  function updateFilter(threshold: number, threshType: ThresholdCondition) {
-    const updatedFilter = { ...filter };
-    updatedFilter.params.scoreThreshold = threshold;
-    updatedFilter.params.condition = threshType;
-    const updatedFilters = [...containingGroupFilters];
-    updatedFilters[index] = updatedFilter;
-    setContainingGroupFilters(updatedFilters);
-  }
-
-  function onSliderChange(value: number) {
-    updateFilter(value, thresholdType);
-    setValue(value);
-  }
-
-  function onThreshTypeChange({ data: threshType }: {data: ThresholdCondition} ) {
-    updateFilter(value, threshType);
-    setThresholdType(threshType);
+  function onReviewTypeChange({ data: type }: {data: ReviewScoreType}) {
+    updateFilter(value, thresholdType, type);
+    setReviewType(type);
   }
 
   return (
-    <Focusable className="slider-with-dropdown-container" style={{ display: 'flex', flexDirection: 'row'}}>
-      <SliderField value={value} label={`At ${thresholdType === 'above' ? 'least' : 'most'} ${value}% positive`}  min={0} max={100} onChange={onSliderChange} />
-      <div style={{ right: '40px', position: 'absolute', zIndex: 1, transform: 'translate(0px, 18px)' }}>
-        <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange}/>
+    <Focusable className="slider-with-2dropdown-container wide-dropdown"  style={{ display: 'flex', flexDirection: 'row'}}>
+      <SliderField value={value} label={reviewType === 'metacritic' ? `Metacritic score of ${value} or ${thresholdType === 'above' ? 'higher' : 'lower'}` : `At ${thresholdType === 'above' ? 'least' : 'most'} ${value}% positive Steam reviews`}  min={0} max={100} onChange={onSliderChange} />
+      <div style={{ right: '40px', position: 'absolute', zIndex: 1, transform: 'translate(0px, 10px)', minWidth: '130px' }}>
+        <Focusable>
+          <Dropdown rgOptions={[{ label: 'Metacritic', data: 'metacritic' }, { label: 'Steam ', data: 'steampercent' }]} selectedOption={reviewType} onChange={onReviewTypeChange} />
+          <div style={{ paddingTop: '8px' }}>
+            <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
+          </div>
+        </Focusable>
       </div>
     </Focusable>
   );
@@ -496,10 +472,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <PlatformFilterOptions index={index} filter={filter as TabFilterSettings<'platform'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
       case "deck compatibility":
         return <DeckCompatFilterOptions index={index} filter={filter as TabFilterSettings<'deck compatibility'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
-      case "metacritic":
-        return <MetacriticFilterOptions index={index} filter={filter as TabFilterSettings<'metacritic'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
-      case "steam score":
-        return <SteamScoreFilterOptions index={index} filter={filter as TabFilterSettings<'steam score'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
+      case "review score":
+        return <ReviewScoreFilter index={index} filter={filter as TabFilterSettings<'review score'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
       case "time played":
         return <TimePlayedFilterOptions index={index} filter={filter as TabFilterSettings<'time played'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />
       case "size on disk":
