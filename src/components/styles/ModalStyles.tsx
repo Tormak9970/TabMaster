@@ -73,8 +73,10 @@ export const ModalStyles: VFC<{}> = ({}) => {
       }
 
       /* merge entries */
-      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
+      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry-container {
         margin: 5px;
+        display: flex; 
+        justify-content: space-between;
       }
 
       /* red buttons on destructive modals, matches steams */

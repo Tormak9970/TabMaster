@@ -249,8 +249,13 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
         {(isEditing ? "Edit" : "Create") + " Merge Group"}
       </ButtonItem>
       <div className="merge-filter-entries">
-        {mergeParams.filters.map((filter) => (
-          <FilterPreview filter={filter} />
+        {mergeParams.filters.map((filter, index) => (
+          <div className="merge-filter-entry-container">
+            <FilterPreview filter={filter} />
+            <div>
+              {index !== mergeParams.filters.length - 1 && mergeParams.mode}
+            </div>
+          </div>
         ))}
       </div>
     </Focusable>
