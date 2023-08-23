@@ -10,7 +10,7 @@ import {
   ToggleField,
   showModal
 } from "decky-frontend-lib";
-import React, { VFC, Fragment, useState, FC } from "react";
+import React, { VFC, Fragment, useState } from "react";
 import { FilterType, TabFilterSettings, ThresholdCondition, TimeUnit, categoryToLabel } from "./Filters";
 import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMasterContext";
 import { ModeMultiSelect } from "../multi-selects/ModeMultiSelect";
