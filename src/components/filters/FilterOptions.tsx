@@ -370,7 +370,7 @@ const SteamScoreFilterOptions: VFC<FilterOptionsProps<'steam score'>> = ({ index
 
   return (
     <Focusable className="slider-with-dropdown-container" style={{ display: 'flex', flexDirection: 'row'}}>
-      <SliderField value={value} label={`Steam review score of ${value} or ${thresholdType === 'above' ? 'higher' : 'lower'}`}  min={0} max={100} onChange={onSliderChange} />
+      <SliderField value={value} label={`At ${thresholdType === 'above' ? 'least' : 'most'} ${value}% positive`}  min={0} max={100} onChange={onSliderChange} />
       <div style={{ right: '40px', position: 'absolute', zIndex: 1, transform: 'translate(0px, 18px)' }}>
         <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange}/>
       </div>
