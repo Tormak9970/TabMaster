@@ -133,8 +133,8 @@ export function getCurrentUserId(useU64 = false): string {
 export enum IncludeCategories {
   games = 1,
   software = 2,
-  tools = 4,
-  videos = 2048,
+  // tools = 4,   
+  // videos = 2048,
   music = 8192,
   hidden = 16
 };
@@ -145,7 +145,7 @@ export enum IncludeCategories {
  * @param categoriesToInclude Object of categories whose bits are to be set
  * @returns A bit field of categories to include with desired bits updated
  */
-export function updateCategoriesToIncludeBitField(bitField: number, categoriesToInclude: { games?: boolean, software?: boolean, tools?: boolean, videos?: boolean, music?: boolean, hidden?: boolean }) {
+export function updateCategoriesToIncludeBitField(bitField: number, categoriesToInclude: { games?: boolean, software?: boolean, music?: boolean, hidden?: boolean }) {
   let onMask = 0;
   let offMask = 0;
 
@@ -172,8 +172,8 @@ export function getIncludedCategoriesFromBitField(bitField: number) {
     games: false,
     music: false,
     software: false,
-    videos: false,
-    tools: false,
+    // videos: false,
+    // tools: false,
     hidden: false
   };
 
