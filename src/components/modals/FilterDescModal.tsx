@@ -6,7 +6,7 @@ interface FilterDescModalProps {
   closeModal?: () => void;
 }
 
-export const FitlerDescModal: VFC<FilterDescModalProps> = ({ closeModal }) => {
+export const FilterDescModal: VFC<FilterDescModalProps> = ({ closeModal }) => {
   return <>
     <style>{`
         .tab-master-filter-desc-modal .${gamepadDialogClasses.ModalPosition} {

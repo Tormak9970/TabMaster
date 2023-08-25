@@ -15,7 +15,7 @@ import { TabMasterManager } from "../../state/TabMasterManager";
 import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";
 import { MdQuestionMark } from "react-icons/md";
-import { FitlerDescModal } from "./FilterDescModal";
+import { FilterDescModal } from "./FilterDescModal";
 
 export type EditableTabSettings = {
   title: string,
@@ -118,7 +118,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
               <DialogButton
                 style={{ height: '28px', width: '30px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto' }}
                 onOKActionDescription={'Filter Descriptions'}
-                onClick={() => { showModal(<FitlerDescModal />); }}
+                onClick={() => { showModal(<FilterDescModal />); }}
               >
                 <MdQuestionMark style={{ marginTop: '-4px', marginLeft: '-5px', display: 'block' }} />
               </DialogButton>

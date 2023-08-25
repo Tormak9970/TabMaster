@@ -6,7 +6,7 @@ import { TabFilterSettings, FilterType } from "../filters/Filters";
 import { isDefaultParams } from "../filters/Filters";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
 import { MdQuestionMark } from "react-icons/md";
-import { FitlerDescModal } from "./FilterDescModal";
+import { FilterDescModal } from "./FilterDescModal";
 
 interface EditMergeFilterModalProps {
   mergeParams: TabFilterSettings<'merge'>['params'],
@@ -76,7 +76,7 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
               <DialogButton
                 style={{ height: '28px', width: '30px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto' }}
                 onOKActionDescription={'Filter Descriptions'}
-                onClick={() => { showModal(<FitlerDescModal />); }}
+                onClick={() => { showModal(<FilterDescModal />); }}
               >
                 <MdQuestionMark style={{ marginTop: '-4px', marginLeft: '-5px', display: 'block' }} />
               </DialogButton>
