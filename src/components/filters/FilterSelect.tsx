@@ -1,7 +1,7 @@
 import { Fragment, VFC, useState } from "react";
-// import { SimpleModal, ModalPosition, Panel, ScrollPanelGroup } from "../docs/Scrollable";
 import { DialogButton, Focusable, ModalRoot, showModal } from "decky-frontend-lib";
 import { FilterDefaultParams, FilterType } from "./Filters";
+import { capitalizeFirstLetter } from "../../lib/Utils";
 
 interface FilterSelectModalProps {
   selectedOption: FilterType,
@@ -49,6 +49,10 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
           background-color: #23262e;
         } */
 
+        .tab-master-filter-select .gpfocuswithin .achievementslist_AchievementListItemBase_2Kmn7 {
+          background: #767a8773;
+        }
+
         .tab-master-filter-select .entry-label {
           font-size: 24px;
           text-align: initial;
@@ -73,14 +77,22 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
         </h1>
         <div className="tab-master-filter-select">
           {filterTypeOptions.map((filterType: FilterType) => {
-            console.log("filterType:", filterType);
             // TODO: this needs to be a static class. hard coded for testing
-            // TODO: use focus ring and Focusable instead of button
             return (
-              <DialogButton className={"achievementslist_AchievementListItemBase_2Kmn7"} style={{ width: "100%", marginBottom: "10px", alignItems: "flex-start" }} onClick={() => handleSelect(filterType)}>
-                <div className="entry-label">{filterType}</div>
-                <div className="entry-desc">{filterDescriptions[filterType]}</div>
-              </DialogButton>
+              <Focusable
+                focusWithinClassName="gpfocuswithin"
+                onActivate={() => {}}
+                style={{ width: "100%", margin: 0, marginBottom: "10px", padding: 0 }}
+                onOKButton={() => handleSelect(filterType)}
+              >
+                <div
+                  className="achievementslist_AchievementListItemBase_2Kmn7"
+                  style={{ display: "flex", flexDirection: "column", padding: "0.5em"  }}
+                >
+                  <div className="entry-label">{filterType.split(" ").map((word: string) => capitalizeFirstLetter(word)).join(" ")}</div>
+                  <div className="entry-desc">{filterDescriptions[filterType]}</div>
+                </div>
+              </Focusable>
             );
           })}
         </div>
