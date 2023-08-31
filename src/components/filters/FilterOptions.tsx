@@ -262,7 +262,7 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
 const PlatformFilterOptions: VFC<FilterOptionsProps<'platform'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const dropdownOptions: DropdownOption[] = [
     { label: "Steam", data: "steam" },
-    { label: "Non Steam", data: "nonSteam" }
+    { label: "Non-Steam", data: "nonSteam" }
   ];
 
   function onChange(selected: DropdownOption) {
