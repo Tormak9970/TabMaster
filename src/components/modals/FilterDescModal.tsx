@@ -27,8 +27,8 @@ export const FitlerDescModal: VFC<FilterDescModalProps> = ({ closeModal }) => {
                   <p><b>Collection: </b><small>Selects games that are in a certain Steam Collection.</small></p>
                   <p><b>Installed: </b><small>Selects games that are installed or not installed.</small></p>
                   <p><b>Regex: </b><small>Selects games whose titles match a regular expression.</small></p>
-                  <p><b>Friends: </b><small>Selects games that are also owned by friends.</small></p>
-                  <p><b>Tags: </b><small>Selects games that have specific tags.</small></p>
+                  <p><b>Friends: </b><small>Selects games that are also owned by any/all friends.</small></p>
+                  <p><b>Tags: </b><small>Selects games that have any/all specific tags.</small></p>
                   <p><b>Whitelist: </b><small>Selects games that are added to the list.</small></p>
                   <p><b>Blacklist: </b><small>Selects games that are not added to the list.</small></p>
                   <p><b>Merge: </b><small>Selects games that pass a subgroup of filters. They behave like filters grouped in a tab, allowing you to set whether a game needs to pass all, or any of the filters in the subgroup.</small></p>
