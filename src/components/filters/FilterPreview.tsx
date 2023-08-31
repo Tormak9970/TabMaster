@@ -39,7 +39,7 @@ const MergeFilterPreview: VFC<FilterPreviewProps<'merge'>> = ({ filter }) => {
 }
 
 const PlatformFilterPreview: VFC<FilterPreviewProps<'platform'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">platform - {filter.params.platform === "steam" ? "Steam" : "Non Steam"}</div>
+  return <div className="merge-filter-entry">platform - {filter.params.platform === "steam" ? "Steam" : "Non-Steam"}</div>
 }
 
 const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = ({ filter }) => {
