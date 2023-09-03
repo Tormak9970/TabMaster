@@ -84,8 +84,10 @@ export const ModalStyles: VFC<{}> = ({}) => {
       }
 
       /* merge entries */
-      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
+      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry-container {
         margin: 5px;
+        display: flex; 
+        justify-content: space-between;
       }
 
       /* red buttons on destructive modals, matches steams */
@@ -94,9 +96,18 @@ export const ModalStyles: VFC<{}> = ({}) => {
         color: #fff
       }
 
-      /* merge entries */
-      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
-        margin: 5px;
+      .tab-master-modal-scope .slider-with-dropdown-container .${gamepadDialogClasses.Field} {
+        padding-right: 154px;
+        width: 100%;
+      }
+      .tab-master-modal-scope .slider-with-2dropdown-container .${gamepadDialogClasses.Field} {
+        padding-right: 154px;
+        padding-top: 38px;
+        padding-bottom: 17px;
+        width: 100%;
+      }
+      .tab-master-modal-scope .slider-with-2dropdown-container.wide-dropdown .${gamepadDialogClasses.Field} {
+        padding-right: 169px;
       }
     `}</style>
   );

@@ -1,6 +1,9 @@
 import { PluginController } from "../../lib/controllers/PluginController";
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk';
+export type TimeUnit = 'minutes' | 'hours' | 'days';
+export type ThresholdCondition = 'above' | 'below';
+export type ReviewScoreType = 'metacritic' | 'steampercent';
 
 type CollectionFilterParams = {
   id: SteamCollection['id'],
@@ -22,6 +25,9 @@ type BlacklistFilterParams = { games: number[] };
 type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode };
 type PlatformFilterParams = { platform: SteamPlatform };
 type DeckCompatFilterParams = { category: number };
+type ReviewScoreFilterParams = { scoreThreshold: number , condition: ThresholdCondition, type: ReviewScoreType };
+type TimePlayedFilterParams = { timeThreshold: number , condition: ThresholdCondition, units: TimeUnit };
+type SizeOnDiskFilterParams = { gbThreshold: number , condition: ThresholdCondition };
 
 export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -58,7 +64,10 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "blacklist": { games: [] },
   "merge": { filters: [], mode: 'and' },
   "platform": { platform: "steam" },
-  "deck compatibility": { category: 3 }
+  "deck compatibility": { category: 3 },
+  "review score": { scoreThreshold: 50, condition: 'above', type: 'metacritic' },
+  "time played": { timeThreshold: 60, condition: 'above', units: 'minutes' },
+  "size on disk": { gbThreshold: 10, condition: 'above' }
 };
 
 /**
@@ -79,6 +88,9 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "installed":
     case "whitelist":
     case "blacklist":
+    case "review score":
+    case "time played":
+    case "size on disk":
       return false;
   }
 }
@@ -106,7 +118,10 @@ export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean 
       return (filter as TabFilterSettings<'merge'>).params.filters.length === 0;
     case "platform":
     case "deck compatibility":
-      return false;
+    case "review score":
+    case "time played":
+    case "size on disk":
+      return false
   }
 }
 
@@ -219,6 +234,9 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "blacklist":
     case "platform":
     case "deck compatibility":
+    case "review score":
+    case "time played":
+    case "size on disk":
       return {
         passed: true,
         errors: []
@@ -280,6 +298,17 @@ export class Filter {
     },
     "deck compatibility": (params: FilterParams<'deck compatibility'>, appOverview: SteamAppOverview) => {
       return appOverview.steam_deck_compat_category === params.category;
+    },
+    'review score': (params: FilterParams<'review score'>, appOverview: SteamAppOverview) => {
+      const score = params.type === 'metacritic' ? appOverview.metacritic_score : appOverview.review_percentage;
+      return params.condition === 'above' ? score >= params.scoreThreshold : score <= params.scoreThreshold;
+    },
+    'time played': (params: FilterParams<'time played'>, appOverview: SteamAppOverview) => {
+      const minutesThreshold = params.units === 'minutes' ? params.timeThreshold : params.units === 'hours' ? params.timeThreshold * 60 : params.timeThreshold * 1440;
+      return params.condition === 'above' ?  appOverview.minutes_playtime_forever >= minutesThreshold : appOverview.minutes_playtime_forever <= minutesThreshold;
+    },
+    'size on disk': (params: FilterParams<'size on disk'>, appOverview: SteamAppOverview) => {
+      return params.condition === 'above' ? Number(appOverview.size_on_disk) / 1024 ** 3 >= params.gbThreshold : Number(appOverview.size_on_disk) / 1024 ** 3 <= params.gbThreshold;
     }
   };
 
