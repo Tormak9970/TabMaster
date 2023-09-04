@@ -57,7 +57,7 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
               marginLeft: "10px",
               width: "45px"
             }}>
-              <ButtonItem
+              <DialogButton 
                 onClick={() => {
                   showModal(
                     <ConfirmModal
@@ -70,10 +70,12 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
                     </ConfirmModal>
                   );
                 }}
-
-              >
+                style={{
+                  minWidth: "45px",
+                  padding: "10px"
+                }}>
                 <FaTrash />
-              </ButtonItem>
+              </DialogButton>
             </Focusable>
           </Focusable>
         </div>

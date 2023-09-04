@@ -117,7 +117,7 @@ const Content: VFC<{}> = ({ }) => {
               {tabMasterManager.hasSettingsLoaded &&
                 <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
                   <DialogButton
-                    style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center" }}
+                    style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center", marginRight: "8px" }}
                     onOKActionDescription={'Refresh Tab Games'}
                     onClick={refreshTabs}
                   >
