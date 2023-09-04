@@ -16,7 +16,6 @@ type FilterEntryProps = {
  * An individual filter for a tab.
  */
 export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGroupFilters, setContainingGroupFilters, shouldFocus }) => {
-  // const filterTypeOptions = Object.keys(FilterDefaultParams).map(type => { return { label: type, data: type }; });
   const invertOptions = [
     {
       label: "default",
@@ -30,17 +29,6 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
 
   const [isInverted, setIsInverted] = useState(filter.inverted);
 
-  //* new filter is made with default params
-  // function onChange(data: { data: FilterType; }) {
-  //   const updatedFilter = {
-  //     type: data.data,
-  //     inverted: isInverted,
-  //     params: {...FilterDefaultParams[data.data]}
-  //   };
-  //   const updatedFilters = [...containingGroupFilters];
-  //   updatedFilters[index] = updatedFilter;
-  //   setContainingGroupFilters(updatedFilters);
-  // }
   function onChange(selectedType: FilterType) {
     const updatedFilter = {
       type: selectedType,
@@ -73,7 +61,6 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
 
     const filterTypeDropdownElt = (
       <Focusable style={!canBeInverted(filter) ? { width: "calc(100% - 55px)" } : { width: "calc(100% - 185px)" }}>
-        {/* <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} /> */}
         <FilterSelect selectedOption={filter.type} onChange={onChange} />
       </Focusable>
     );
