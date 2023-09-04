@@ -1,6 +1,6 @@
 import { Fragment, VFC, useState } from "react";
 import { FilterDefaultParams, FilterType, TabFilterSettings, canBeInverted } from "./Filters";
-import { ButtonItem, Dropdown, Focusable, afterPatch } from "decky-frontend-lib";
+import { DialogButton, Dropdown, Focusable, afterPatch } from "decky-frontend-lib";
 import { FaTrash } from "react-icons/fa";
 import { FilterSelect } from "./FilterSelect";
 
@@ -95,9 +95,9 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
             marginLeft: "10px",
             width: "45px"
           }}>
-            <ButtonItem onClick={onDelete}>
+            <DialogButton onClick={onDelete} style={{ minWidth: "45px", padding: "10px" }}>
               <FaTrash />
-            </ButtonItem>
+            </DialogButton>
           </Focusable>
         </Focusable>
       </div>
