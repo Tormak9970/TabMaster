@@ -1,12 +1,11 @@
 import {
   ConfirmModal,
-  DialogButton,
   Field,
   PanelSection,
   PanelSectionRow,
   TextField,
   afterPatch,
-  showModal} from "decky-frontend-lib";
+} from "decky-frontend-lib";
 import { useState, VFC, useEffect } from "react";
 import { FilterType, TabFilterSettings, isDefaultParams } from "../filters/Filters";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
@@ -14,8 +13,6 @@ import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabMasterManager } from "../../state/TabMasterManager";
 import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";
-import { MdQuestionMark } from "react-icons/md";
-import { FilterDescModal } from "./FilterDescModal";
 
 export type EditableTabSettings = {
   title: string,
@@ -110,20 +107,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
           bAllowFullSize
           onCancel={closeModal}
           onEscKeypress={closeModal}
-          strTitle={
-            <div style={{ display: 'flex', marginRight: '15px', width: '100%' }}>
-              <div>
-                {tabTitle ? `Modifying: ${tabTitle}` : 'Create New Tab'}
-              </div>
-              <DialogButton
-                style={{ height: '28px', width: '30px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto' }}
-                onOKActionDescription={'Filter Descriptions'}
-                onClick={() => { showModal(<FilterDescModal />); }}
-              >
-                <MdQuestionMark style={{ marginTop: '-4px', marginLeft: '-5px', display: 'block' }} />
-              </DialogButton>
-            </div>
-          }
+          strTitle={tabTitle ? `Modifying: ${tabTitle}` : 'Create New Tab'}
           onOK={onSave}
         >
           <PanelSection>

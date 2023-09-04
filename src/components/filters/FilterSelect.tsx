@@ -15,13 +15,13 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
   const filterTypeOptions = Object.keys(FilterDefaultParams) as FilterType[];
   const filterDescriptions: { [filterType in FilterType]: string } = {
     collection: "Selects games that are in a certain Steam Collection.",
-    installed: "Selects games that are installed or not installed.",
+    installed: "Selects games that are installed/uninstalled.",
     regex: "Selects games whose titles match a regular expression.",
-    friends: "Selects games that are also owned by any/ all friends.",
-    tags: "Selects games that have any/ all specific tags.",
+    friends: "Selects games that are also owned by any/all listed friends.",
+    tags: "Selects games that have any/all specific tags.",
     whitelist: "Selects games that are added to the list.",
     blacklist: "Selects games that are not added to the list.",
-    merge: "Selects games that pass a subgroup of filters. They behave like filters grouped in a tab, allowing you to set whether a game needs to pass all, or any of the filters in the subgroup.",
+    merge: "Selects games that pass a subgroup of filters.",
     platform: "Selects Steam or non-Steam games.",
     "deck compatibility": "Selects games that have a specific Steam Deck compatibilty status.",
     metacritic: "",
