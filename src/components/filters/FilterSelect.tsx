@@ -2,6 +2,7 @@ import { Fragment, VFC, useState } from "react";
 import { DialogButton, Focusable, ModalRoot, showModal } from "decky-frontend-lib";
 import { FilterDefaultParams, FilterType } from "./Filters";
 import { capitalizeFirstLetter } from "../../lib/Utils";
+import { FilterSelectStyles, achievementClasses } from "../styles/FilterSelectionStyles";
 
 interface FilterSelectModalProps {
   selectedOption: FilterType,
@@ -37,32 +38,7 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
 
   return (
     <>
-      {/* TODO: abstract this styling to its own component later. */}
-      {/* TODO: use static classes */}
-      <style>{`
-        .tab-master-filter-select {
-          width: 100%;
-          height: auto;
-        }
-
-        /* .tab-master-filter-select button.gamepaddialog_Button_1kn70.DialogButton.gpfocus {
-          background-color: #23262e;
-        } */
-
-        .tab-master-filter-select .gpfocuswithin .achievementslist_AchievementListItemBase_2Kmn7 {
-          background: #767a8773;
-        }
-
-        .tab-master-filter-select .entry-label {
-          font-size: 24px;
-          text-align: initial;
-        }
-
-        .tab-master-filter-select .entry-desc {
-          font-size: 16px;
-          text-align: initial;
-        }
-      `}</style>
+      <FilterSelectStyles />
       <ModalRoot onCancel={() => handleSelect(selected)} onEscKeypress={() => handleSelect(selected)}>
         <h1
           style={{
@@ -77,7 +53,6 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
         </h1>
         <div className="tab-master-filter-select">
           {filterTypeOptions.map((filterType: FilterType) => {
-            // TODO: this needs to be a static class. hard coded for testing
             return (
               <Focusable
                 focusWithinClassName="gpfocuswithin"
@@ -86,8 +61,8 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
                 onOKButton={() => handleSelect(filterType)}
               >
                 <div
-                  className="achievementslist_AchievementListItemBase_2Kmn7"
-                  style={{ display: "flex", flexDirection: "column", padding: "0.5em"  }}
+                  className={achievementClasses.AchievementListItemBase}
+                  style={{ display: "flex", flexDirection: "column", padding: "0.5em", height: "60px" }}
                 >
                   <div className="entry-label">{filterType.split(" ").map((word: string) => capitalizeFirstLetter(word)).join(" ")}</div>
                   <div className="entry-desc">{filterDescriptions[filterType]}</div>
