@@ -458,8 +458,6 @@ const SizeOnDiskFilterOptions: VFC<FilterOptionsProps<'size on disk'>> = ({ inde
  */
 const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const [date, setDate] = useState<DateObj | undefined>(filter.params.date);
-  // const {day, month, year} = filter.params.dateThreshold;
-
   const [dateIncludes, setDateIncludes] = useState<DateIncludes>(filter.params.date ? (filter.params.date.day === undefined ? (filter.params.date.month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear) : DateIncludes.dayMonthYear);
   const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
 
@@ -469,7 +467,7 @@ const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ ind
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
     setContainingGroupFilters(updatedFilters);
-    setDate(dateSelection.data)
+    setDate(dateSelection.data);
   }
 
   function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition; }) {
@@ -482,16 +480,17 @@ const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ ind
   }
 
   return (
-    <Field label={'temp'}
+    <Field label={`Released ${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}
       description={
-
         <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
           <DatePicker
-            buttonContainerStyle={{flex: 1}}
+            focusDropdowns={true}
+            modalType='simple'
+            buttonContainerStyle={{ flex: 1 }}
             onChange={onDateChange}
             dateIncludes={dateIncludes}
             selectedDate={date}
-            toLocaleStringOptions={{dateStyle: 'long'}}
+            toLocaleStringOptions={{ dateStyle: 'long' }}
             animate={true}
             transparencyMode={EnhancedSelectorTransparencyMode.selection}
             focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
@@ -510,9 +509,68 @@ const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ ind
           <div>
             <Dropdown rgOptions={[{ label: 'Earliest', data: 'above' }, { label: 'Latest', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
           </div>
-
         </Focusable>}
+    />
+  );
+};
 
+/**
+ * The options for a time played filter.
+ */
+const LastPlayedFilterOptions: VFC<FilterOptionsProps<'last played'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const [date, setDate] = useState<DateObj | undefined>(filter.params.date);
+  const [dateIncludes, setDateIncludes] = useState<DateIncludes>(filter.params.date ? (filter.params.date.day === undefined ? (filter.params.date.month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear) : DateIncludes.dayMonthYear);
+  const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
+
+  function onDateChange(dateSelection: DateSelection) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.date = dateSelection.data;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setDate(dateSelection.data);
+  }
+
+  function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition; }) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.condition = threshType;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setThresholdType(threshType);
+  }
+
+  return (
+    <Field label={`Last played ${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}
+      description={
+        <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
+          <DatePicker
+            focusDropdowns={true}
+            modalType='simple'
+            buttonContainerStyle={{ flex: 1 }}
+            onChange={onDateChange}
+            dateIncludes={dateIncludes}
+            selectedDate={date}
+            toLocaleStringOptions={{ dateStyle: 'long' }}
+            animate={true}
+            transparencyMode={EnhancedSelectorTransparencyMode.selection}
+            focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
+          />
+          <div style={{ margin: '0 10px' }}>
+            <Dropdown
+              rgOptions={[
+                { label: 'By Day', data: DateIncludes.dayMonthYear },
+                { label: 'By Month', data: DateIncludes.monthYear },
+                { label: 'By Year', data: DateIncludes.yearOnly }
+              ]}
+              selectedOption={dateIncludes}
+              onChange={option => setDateIncludes(option.data)}
+            />
+          </div>
+          <div>
+            <Dropdown rgOptions={[{ label: 'Earliest', data: 'above' }, { label: 'Latest', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
+          </div>
+        </Focusable>}
     />
   );
 };
@@ -551,6 +609,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <SizeOnDiskFilterOptions index={index} filter={filter as TabFilterSettings<'size on disk'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "release date":
         return <ReleaseDateFilterOptions index={index} filter={filter as TabFilterSettings<'release date'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "last played":
+        return <LastPlayedFilterOptions index={index} filter={filter as TabFilterSettings<'last played'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       default:
         return <Fragment />;
     }

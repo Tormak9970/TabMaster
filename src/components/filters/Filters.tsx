@@ -333,48 +333,43 @@ export class Filter {
       let releaseTimeMs;
       if (appOverview.rt_original_release_date) {
         releaseTimeMs = appOverview.rt_original_release_date * 1000;
-      } else if (appOverview.rt_steam_release_date !== 0){
+      } else if (appOverview.rt_steam_release_date !== 0) {
         releaseTimeMs = appOverview.rt_steam_release_date * 1000;
       } else {
         return false;
       }
-      const {day, month, year} = params.date!;
-      
+      const { day, month, year } = params.date!;
+
       if (params.condition === 'above') {
         return releaseTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
       } else {
         const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
-        switch (dateIncludes){
+        switch (dateIncludes) {
           case DateIncludes.dayMonthYear:
             return releaseTimeMs < new Date(year, month! - 1, day! + 1).getTime();
-            case DateIncludes.monthYear: 
+          case DateIncludes.monthYear:
             return releaseTimeMs < new Date(year, month!, 1).getTime();
-            case DateIncludes.yearOnly: 
+          case DateIncludes.yearOnly:
             return releaseTimeMs < new Date(year + 1, 0, 1).getTime();
         }
       }
     },
     'last played': (params: FilterParams<'last played'>, appOverview: SteamAppOverview) => {
-      let lastPlayedTimeMs;
-      if (appOverview.rt_original_release_date) {
-        lastPlayedTimeMs = appOverview.rt_original_release_date * 1000;
-      } else if (appOverview.rt_steam_release_date !== 0){
-        lastPlayedTimeMs = appOverview.rt_steam_release_date * 1000;
-      } else {
-        return false;
-      }
-      const {day, month, year} = params.date!;
-      
+      const lastPlayedTimeMs = appOverview.rt_last_time_played * 1000;
+      if (lastPlayedTimeMs === 0) return false;
+
+      const { day, month, year } = params.date!;
+
       if (params.condition === 'above') {
         return lastPlayedTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
       } else {
         const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
-        switch (dateIncludes){
+        switch (dateIncludes) {
           case DateIncludes.dayMonthYear:
             return lastPlayedTimeMs < new Date(year, month! - 1, day! + 1).getTime();
-            case DateIncludes.monthYear: 
+          case DateIncludes.monthYear:
             return lastPlayedTimeMs < new Date(year, month!, 1).getTime();
-            case DateIncludes.yearOnly: 
+          case DateIncludes.yearOnly:
             return lastPlayedTimeMs < new Date(year + 1, 0, 1).getTime();
         }
       }
