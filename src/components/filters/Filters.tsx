@@ -1,6 +1,7 @@
-import { PluginController } from "../../lib/controllers/PluginController"
+import { PluginController } from "../../lib/controllers/PluginController";
+import { DateIncludes, DateObj } from '../generic/DatePickers';
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played';
 
 export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
@@ -15,20 +16,22 @@ type CollectionFilterParams = {
   /**
    * @deprecated Replaced by id. Used pre v1.2.2
    */
-  collection?: SteamCollection['id']
+  collection?: SteamCollection['id'];
 };
-type InstalledFilterParams = { installed: boolean };
-type RegexFilterParams = { regex: string };
-type FriendsFilterParams = { friends: number[], mode: LogicalMode };
-type TagsFilterParams = { tags: number[], mode: LogicalMode };
-type WhitelistFilterParams = { games: number[] }
-type BlacklistFilterParams = { games: number[] }
-type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode, includesHidden: boolean }
-type PlatformFilterParams = { platform: SteamPlatform }
-type DeckCompatFilterParams = { category: number }
-type ReviewScoreFilterParams = { scoreThreshold: number , condition: ThresholdCondition, type: ReviewScoreType };
-type TimePlayedFilterParams = { timeThreshold: number , condition: ThresholdCondition, units: TimeUnit };
-type SizeOnDiskFilterParams = { gbThreshold: number , condition: ThresholdCondition };
+type InstalledFilterParams = { installed: boolean; };
+type RegexFilterParams = { regex: string; };
+type FriendsFilterParams = { friends: number[], mode: LogicalMode; };
+type TagsFilterParams = { tags: number[], mode: LogicalMode; };
+type WhitelistFilterParams = { games: number[]; };
+type BlacklistFilterParams = { games: number[]; };
+type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode, includesHidden: boolean; };
+type PlatformFilterParams = { platform: SteamPlatform; };
+type DeckCompatFilterParams = { category: number; };
+type ReviewScoreFilterParams = { scoreThreshold: number, condition: ThresholdCondition, type: ReviewScoreType; };
+type TimePlayedFilterParams = { timeThreshold: number, condition: ThresholdCondition, units: TimeUnit; };
+type SizeOnDiskFilterParams = { gbThreshold: number, condition: ThresholdCondition; };
+type ReleaseDateFilterParams = { date?: DateObj, condition: ThresholdCondition; };
+type LastPlayedFilterParams = { date?: DateObj, condition: ThresholdCondition; };
 
 export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -44,13 +47,15 @@ export type FilterParams<T extends FilterType> =
   T extends 'review score' ? ReviewScoreFilterParams :
   T extends 'time played' ? TimePlayedFilterParams :
   T extends 'size on disk' ? SizeOnDiskFilterParams :
-  never
+  T extends 'release date' ? ReleaseDateFilterParams :
+  T extends 'last played' ? LastPlayedFilterParams :
+  never;
 
 export type TabFilterSettings<T extends FilterType> = {
   type: T,
   inverted: boolean,
-  params: FilterParams<T>
-}
+  params: FilterParams<T>;
+};
 
 type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview, includesHidden?: boolean) => boolean;
 
@@ -71,7 +76,9 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "deck compatibility": { category: 3 },
   "review score": { scoreThreshold: 50, condition: 'above', type: 'metacritic' },
   "time played": { timeThreshold: 60, condition: 'above', units: 'minutes' },
-  "size on disk": { gbThreshold: 10, condition: 'above' }
+  "size on disk": { gbThreshold: 10, condition: 'above' },
+  "release date": { date: undefined, condition: 'above' },
+  "last played": { date: undefined, condition: 'above' }
 };
 
 /**
@@ -95,6 +102,8 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "review score":
     case "time played":
     case "size on disk":
+    case "release date":
+    case "last played":
       return false;
   }
 }
@@ -117,15 +126,18 @@ export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean 
     case "installed":
     case "whitelist":
     case "blacklist":
-      return false
+      return false;
     case "merge":
-      return (filter as TabFilterSettings<'merge'>).params.filters.length === 0
+      return (filter as TabFilterSettings<'merge'>).params.filters.length === 0;
     case "platform":
     case "deck compatibility":
     case "review score":
     case "time played":
     case "size on disk":
-      return false
+      return false;
+    case "release date":
+    case "last played":
+      return (filter as TabFilterSettings<'release date'>).params.date === null;
   }
 }
 
@@ -172,7 +184,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       const collectionFromStores = collectionStore.GetCollection(collectionFilter.params.id);
       if (!collectionFromStores) {
         //* try to find collection by name
-        if(collectionFilter.params.name){
+        if (collectionFilter.params.name) {
           const updatedIdCollection = collectionStore.userCollections.find(collection => collection.displayName === collectionFilter.params.name);
           if (updatedIdCollection) {
             collectionFilter.params.id = updatedIdCollection.id;
@@ -180,7 +192,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
             errors.push(`Collection: ${collectionFilter.params.name} no longer exists`);
             passed = false;
           }
-        //* fallback to error on id if user has old config without name
+          //* fallback to error on id if user has old config without name
         } else {
           errors.push(`Collection with id: ${collectionFilter.params.id} no longer exists`);
           passed = false;
@@ -192,12 +204,12 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       return {
         passed: passed,
         errors: errors
-      }
+      };
     }
     case "merge": {
       let passed = true;
       const errors: string[] = [];
-      const mergeErrorEntries: FilterErrorEntry[] = []
+      const mergeErrorEntries: FilterErrorEntry[] = [];
 
       if (!Object.keys(filter.params).includes("includesHidden")) (filter as TabFilterSettings<'merge'>).params.includesHidden = false;
       const mergeFilter = filter as TabFilterSettings<'merge'>;
@@ -209,15 +221,15 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
 
         if (!validated.passed) {
           passed = false;
-          errors.push(`Filter ${i+1} - ${validated.errors.length} ${validated.errors.length === 1 ? "error" : "errors"}`);
-          
+          errors.push(`Filter ${i + 1} - ${validated.errors.length} ${validated.errors.length === 1 ? "error" : "errors"}`);
+
           let entry: FilterErrorEntry = {
             filterIdx: i,
             errors: validated.errors,
-          }
+          };
 
           if (validated.mergeErrorEntries) entry.mergeErrorEntries = validated.mergeErrorEntries;
-          
+
           mergeErrorEntries.push(entry);
         }
       }
@@ -226,7 +238,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
         passed: passed,
         errors: errors,
         mergeErrorEntries: mergeErrorEntries
-      }
+      };
     }
     case "regex":
     case "friends":
@@ -239,11 +251,13 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "review score":
     case "time played":
     case "size on disk":
+    case "release date":
+    case "last played":
       return {
         passed: true,
         errors: []
-      }
-    }
+      };
+  }
 }
 
 /**
@@ -310,12 +324,62 @@ export class Filter {
     },
     'time played': (params: FilterParams<'time played'>, appOverview: SteamAppOverview) => {
       const minutesThreshold = params.units === 'minutes' ? params.timeThreshold : params.units === 'hours' ? params.timeThreshold * 60 : params.timeThreshold * 1440;
-      return params.condition === 'above' ?  appOverview.minutes_playtime_forever >= minutesThreshold : appOverview.minutes_playtime_forever <= minutesThreshold;
+      return params.condition === 'above' ? appOverview.minutes_playtime_forever >= minutesThreshold : appOverview.minutes_playtime_forever <= minutesThreshold;
     },
     'size on disk': (params: FilterParams<'size on disk'>, appOverview: SteamAppOverview) => {
       return params.condition === 'above' ? Number(appOverview.size_on_disk) / 1024 ** 3 >= params.gbThreshold : Number(appOverview.size_on_disk) / 1024 ** 3 <= params.gbThreshold;
+    },
+    'release date': (params: FilterParams<'release date'>, appOverview: SteamAppOverview) => {
+      let releaseTimeMs;
+      if (appOverview.rt_original_release_date) {
+        releaseTimeMs = appOverview.rt_original_release_date * 1000;
+      } else if (appOverview.rt_steam_release_date !== 0){
+        releaseTimeMs = appOverview.rt_steam_release_date * 1000;
+      } else {
+        return false;
+      }
+      const {day, month, year} = params.date!;
+      
+      if (params.condition === 'above') {
+        return releaseTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
+      } else {
+        const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
+        switch (dateIncludes){
+          case DateIncludes.dayMonthYear:
+            return releaseTimeMs < new Date(year, month! - 1, day! + 1).getTime();
+            case DateIncludes.monthYear: 
+            return releaseTimeMs < new Date(year, month!, 1).getTime();
+            case DateIncludes.yearOnly: 
+            return releaseTimeMs < new Date(year + 1, 0, 1).getTime();
+        }
+      }
+    },
+    'last played': (params: FilterParams<'last played'>, appOverview: SteamAppOverview) => {
+      let lastPlayedTimeMs;
+      if (appOverview.rt_original_release_date) {
+        lastPlayedTimeMs = appOverview.rt_original_release_date * 1000;
+      } else if (appOverview.rt_steam_release_date !== 0){
+        lastPlayedTimeMs = appOverview.rt_steam_release_date * 1000;
+      } else {
+        return false;
+      }
+      const {day, month, year} = params.date!;
+      
+      if (params.condition === 'above') {
+        return lastPlayedTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
+      } else {
+        const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
+        switch (dateIncludes){
+          case DateIncludes.dayMonthYear:
+            return lastPlayedTimeMs < new Date(year, month! - 1, day! + 1).getTime();
+            case DateIncludes.monthYear: 
+            return lastPlayedTimeMs < new Date(year, month!, 1).getTime();
+            case DateIncludes.yearOnly: 
+            return lastPlayedTimeMs < new Date(year + 1, 0, 1).getTime();
+        }
+      }
     }
-  }
+  };
 
   /**
    * Checks if a game passes a given filter.

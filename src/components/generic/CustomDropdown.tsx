@@ -62,7 +62,7 @@ export const CustomDropdown: VFC<CustomDropdownProps> = ({
 
   useEffect(() => {
     if (changed) {
-      setTimeout(() => setChanged(false), 1);
+      setTimeout(() => setChanged(false), 15);
     }
   }, [changed]);
 

@@ -23,7 +23,7 @@ export enum DateIncludes {
 /** Props for DatePicker component */
 export interface DatePickerProps extends Omit<SimpleDatePickerModalProps, 'onSelectDate' | 'closeModal'> {
   /** The date picker modal style. Either "simple" or "pretty" @default 'simple' */
-  modalType: DatePickerModalType;
+  modalType?: DatePickerModalType;
 
   /** Callback function to call when the date is changed */
   onChange?: (date: DateSelection) => void;
@@ -95,8 +95,8 @@ export const DatePicker: VFC<DatePickerProps> = ({
     label: dateToLabel(year!, month, day, toLocaleStringOptions),
     data: date!
   }] : undefined, [day, month, year, valid]);
-
-  if (update && valid) onChange?.(options![0]);
+  
+  // if (update && valid) onChange?.(options![0]);
 
   return (
     <CustomDropdown
