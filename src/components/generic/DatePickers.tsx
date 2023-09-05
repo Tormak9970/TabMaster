@@ -1,5 +1,5 @@
 import { ConfirmModal, Focusable, SingleDropdownOption, quickAccessMenuClasses } from 'decky-frontend-lib';
-import { ReactElement, VFC, useMemo, useState, Fragment } from 'react';
+import { ReactElement, VFC, useMemo, useState, Fragment, useEffect } from 'react';
 import { TbCalendarEvent } from 'react-icons/tb';
 import { EnhancedSelector, EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from './EnhancedSelector';
 import { SoundEffect } from '../../lib/GamepadUIAudio';
@@ -77,26 +77,63 @@ export const DatePicker: VFC<DatePickerProps> = ({
   const DatePickerModal = modalType === 'pretty' ? PrettyDatePickerModal : SimpleDatePickerModal;
   const include = dateIncludes ?? DateIncludes.dayMonthYear;
 
-  const { day: incomingDay, month: incomingMonth, year: incomingYear } = selectedDate ?? {};
-  const valid = selectedDate && isValidDate(incomingDay, incomingMonth, incomingYear);
-  let update = false;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  const day = include === DateIncludes.dayMonthYear ? incomingDay ?? ((update = true) && 1) : (update = true) && undefined;
-  const month = include >= DateIncludes.monthYear ? incomingMonth ?? ((update = true) && 1) : (update = true) && undefined;
-  const year = incomingYear;
+  const { day: incomingDay, month: incomingMonth, year: incomingYear } = selectedDate ?? {};
+
+  const [day, setDay] = useState(include === DateIncludes.dayMonthYear ? incomingDay ?? 1 : undefined);
+  const [month, setMonth] = useState(include >= DateIncludes.monthYear ? incomingMonth ?? 1 : undefined);
+  const [year, setYear] = useState(incomingYear);
+
+  const valid = isValidDate(day, month, year);
+
+  useEffect(() => {
+    if (mounted) {
+      const { day, month, year } = selectedDate ?? {};
+      const valid = selectedDate && isValidDate(day, month, year);
+      if (valid) {
+        setYear(year);
+        setMonth(month);
+        setDay(day);
+      }
+    }
+  }, [incomingDay, incomingMonth, incomingYear]);
 
   const _date: DateObj = { year: year! };
   if (month) _date.month = month;
   if (day) _date.day = day;
 
-  const date = useMemo(() => valid ? _date : undefined, [day, month, year, valid]);
+  const date = useMemo(() => valid ? _date : undefined, [day, month, year, valid, include]);
 
   const options = useMemo(() => valid ? [{
     label: dateToLabel(year!, month, day, toLocaleStringOptions),
     data: date!
-  }] : undefined, [day, month, year, valid]);
-  
-  // if (update && valid) onChange?.(options![0]);
+  }] : undefined, [day, month, year, valid, include]);
+
+  useEffect(() => {
+    if (valid && mounted) {
+      const newDate = { ...options![0].data };
+
+      switch (include) {
+        case DateIncludes.dayMonthYear:
+          if (!newDate.day) newDate.day = 1;
+          if (!newDate.month) newDate.month = 1;
+          break;
+        case DateIncludes.monthYear:
+          if (!newDate.month) newDate.month = 1;
+          delete newDate.day;
+          break;
+        case DateIncludes.yearOnly:
+          delete newDate.day;
+          delete newDate.month;
+      }
+      setYear(newDate.year);
+      setMonth(newDate.month);
+      setDay(newDate.day);
+      onChange?.({ label: dateToLabel(newDate.year!, newDate.month, newDate.day, toLocaleStringOptions), data: newDate });
+    }
+  }, [include]);
 
   return (
     <CustomDropdown
@@ -112,7 +149,12 @@ export const DatePicker: VFC<DatePickerProps> = ({
       containerClassName={DatePickerClasses.topLevel}
       useCustomModal={({ onSelectOption, selectedOption, closeModal }: ModalWrapperProps) => {
         return <DatePickerModal
-          onSelectDate={onSelectOption}
+          onSelectDate={date => {
+            onSelectOption(date);
+            setYear(date.data.year);
+            setMonth(date.data.month);
+            setDay(date.data.day);
+          }}
           selectedDate={selectedOption}
           dateIncludes={include}
           toLocaleStringOptions={toLocaleStringOptions}
