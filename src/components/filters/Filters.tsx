@@ -1,3 +1,4 @@
+import { IncludeCategories } from '../../lib/Utils';
 import { PluginController } from "../../lib/controllers/PluginController";
 import { DateIncludes, DateObj } from '../generic/DatePickers';
 
@@ -308,7 +309,8 @@ export class Filter {
     },
     platform: (params: FilterParams<'platform'>, appOverview: SteamAppOverview) => {
       if (params.platform === "steam") {
-        return appOverview.app_type === 1;
+        //make sure to exlcude tools: 4 and videos: 2048
+        return appOverview.app_type !== 1073741824 && appOverview.app_type !== 4 && appOverview.app_type !== 2048
       } else if (params.platform === "nonSteam") {
         return appOverview.app_type === 1073741824;
       }
