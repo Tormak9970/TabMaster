@@ -17,18 +17,18 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
     collection: "Selects apps that are in a certain Steam Collection.",
     installed: "Selects apps that are installed/uninstalled.",
     regex: "Selects apps whose titles match a regular expression.",
-    friends: "Selects apps that are also owned by any/all listed friends.",
-    tags: "Selects apps that have any/all specific tags.",
+    friends: "Selects apps that are also owned by friends.",
+    tags: "Selects apps that have pecific community tags.",
     whitelist: "Selects apps that are added to the list.",
     blacklist: "Selects apps that are not added to the list.",
     merge: "Selects apps that pass a subgroup of filters.",
     platform: "Selects Steam or non-Steam apps.",
     "deck compatibility": "Selects apps that have a specific Steam Deck compatibilty status.",
-    "review score": "Selects apps that are greater/less than the provided metacritic/steam review score.",
-    "time played": "Selects apps that have a play time greater/less than the provided time.",
-    "size on disk": "Selects apps that have an install size greater/less than the provided size.",
-    "release date": "Selects apps that were released before/after the provided date.",
-    "last played": "Selects apps that were last played before/after the provided date."
+    "review score": "Selects apps based on their metacritic/steam review score.",
+    "time played": "Selects apps based on your play time.",
+    "size on disk": "Selects apps based on their install size.",
+    "release date": "Selects apps based on their release date.",
+    "last played": "Selects apps based on when they were last played."
   }
 
   function handleSelect(selectedFilter: FilterType) {
