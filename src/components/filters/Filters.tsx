@@ -1,6 +1,8 @@
 import { PluginController } from "../../lib/controllers/PluginController";
+import { DateIncludes, DateObj } from '../generic/DatePickers';
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played';
+
 export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
 export type ReviewScoreType = 'metacritic' | 'steampercent';
@@ -14,20 +16,22 @@ type CollectionFilterParams = {
   /**
    * @deprecated Replaced by id. Used pre v1.2.2
    */
-  collection?: SteamCollection['id']
+  collection?: SteamCollection['id'];
 };
-type InstalledFilterParams = { installed: boolean };
-type RegexFilterParams = { regex: string };
-type FriendsFilterParams = { friends: number[], mode: LogicalMode };
-type TagsFilterParams = { tags: number[], mode: LogicalMode };
-type WhitelistFilterParams = { games: number[] };
-type BlacklistFilterParams = { games: number[] };
-type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode };
-type PlatformFilterParams = { platform: SteamPlatform };
-type DeckCompatFilterParams = { category: number };
-type ReviewScoreFilterParams = { scoreThreshold: number , condition: ThresholdCondition, type: ReviewScoreType };
-type TimePlayedFilterParams = { timeThreshold: number , condition: ThresholdCondition, units: TimeUnit };
-type SizeOnDiskFilterParams = { gbThreshold: number , condition: ThresholdCondition };
+type InstalledFilterParams = { installed: boolean; };
+type RegexFilterParams = { regex: string; };
+type FriendsFilterParams = { friends: number[], mode: LogicalMode; };
+type TagsFilterParams = { tags: number[], mode: LogicalMode; };
+type WhitelistFilterParams = { games: number[]; };
+type BlacklistFilterParams = { games: number[]; };
+type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode; };
+type PlatformFilterParams = { platform: SteamPlatform; };
+type DeckCompatFilterParams = { category: number; };
+type ReviewScoreFilterParams = { scoreThreshold: number, condition: ThresholdCondition, type: ReviewScoreType; };
+type TimePlayedFilterParams = { timeThreshold: number, condition: ThresholdCondition, units: TimeUnit; };
+type SizeOnDiskFilterParams = { gbThreshold: number, condition: ThresholdCondition; };
+type ReleaseDateFilterParams = { date?: DateObj, condition: ThresholdCondition; };
+type LastPlayedFilterParams = { date?: DateObj, condition: ThresholdCondition; };
 
 export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -40,12 +44,17 @@ export type FilterParams<T extends FilterType> =
   T extends 'merge' ? MergeFilterParams :
   T extends 'platform' ? PlatformFilterParams :
   T extends 'deck compatibility' ? DeckCompatFilterParams :
+  T extends 'review score' ? ReviewScoreFilterParams :
+  T extends 'time played' ? TimePlayedFilterParams :
+  T extends 'size on disk' ? SizeOnDiskFilterParams :
+  T extends 'release date' ? ReleaseDateFilterParams :
+  T extends 'last played' ? LastPlayedFilterParams :
   never;
 
 export type TabFilterSettings<T extends FilterType> = {
   type: T,
   inverted: boolean,
-  params: FilterParams<T>
+  params: FilterParams<T>;
 };
 
 type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview) => boolean;
@@ -67,7 +76,9 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "deck compatibility": { category: 3 },
   "review score": { scoreThreshold: 50, condition: 'above', type: 'metacritic' },
   "time played": { timeThreshold: 60, condition: 'above', units: 'minutes' },
-  "size on disk": { gbThreshold: 10, condition: 'above' }
+  "size on disk": { gbThreshold: 10, condition: 'above' },
+  "release date": { date: undefined, condition: 'above' },
+  "last played": { date: undefined, condition: 'above' }
 };
 
 /**
@@ -91,6 +102,8 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "review score":
     case "time played":
     case "size on disk":
+    case "release date":
+    case "last played":
       return false;
   }
 }
@@ -121,7 +134,10 @@ export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean 
     case "review score":
     case "time played":
     case "size on disk":
-      return false
+      return false;
+    case "release date":
+    case "last played":
+      return (filter as TabFilterSettings<'release date'>).params.date === undefined;
   }
 }
 
@@ -237,6 +253,8 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "review score":
     case "time played":
     case "size on disk":
+    case "release date":
+    case "last played":
       return {
         passed: true,
         errors: []
@@ -305,10 +323,55 @@ export class Filter {
     },
     'time played': (params: FilterParams<'time played'>, appOverview: SteamAppOverview) => {
       const minutesThreshold = params.units === 'minutes' ? params.timeThreshold : params.units === 'hours' ? params.timeThreshold * 60 : params.timeThreshold * 1440;
-      return params.condition === 'above' ?  appOverview.minutes_playtime_forever >= minutesThreshold : appOverview.minutes_playtime_forever <= minutesThreshold;
+      return params.condition === 'above' ? appOverview.minutes_playtime_forever >= minutesThreshold : appOverview.minutes_playtime_forever <= minutesThreshold;
     },
     'size on disk': (params: FilterParams<'size on disk'>, appOverview: SteamAppOverview) => {
       return params.condition === 'above' ? Number(appOverview.size_on_disk) / 1024 ** 3 >= params.gbThreshold : Number(appOverview.size_on_disk) / 1024 ** 3 <= params.gbThreshold;
+    },
+    'release date': (params: FilterParams<'release date'>, appOverview: SteamAppOverview) => {
+      let releaseTimeMs;
+      if (appOverview.rt_original_release_date) {
+        releaseTimeMs = appOverview.rt_original_release_date * 1000;
+      } else if (appOverview.rt_steam_release_date !== 0) {
+        releaseTimeMs = appOverview.rt_steam_release_date * 1000;
+      } else {
+        return false;
+      }
+      const { day, month, year } = params.date!;
+
+      if (params.condition === 'above') {
+        return releaseTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
+      } else {
+        const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
+        switch (dateIncludes) {
+          case DateIncludes.dayMonthYear:
+            return releaseTimeMs < new Date(year, month! - 1, day! + 1).getTime();
+          case DateIncludes.monthYear:
+            return releaseTimeMs < new Date(year, month!, 1).getTime();
+          case DateIncludes.yearOnly:
+            return releaseTimeMs < new Date(year + 1, 0, 1).getTime();
+        }
+      }
+    },
+    'last played': (params: FilterParams<'last played'>, appOverview: SteamAppOverview) => {
+      const lastPlayedTimeMs = appOverview.rt_last_time_played * 1000;
+      if (lastPlayedTimeMs === 0) return false;
+
+      const { day, month, year } = params.date!;
+
+      if (params.condition === 'above') {
+        return lastPlayedTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
+      } else {
+        const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
+        switch (dateIncludes) {
+          case DateIncludes.dayMonthYear:
+            return lastPlayedTimeMs < new Date(year, month! - 1, day! + 1).getTime();
+          case DateIncludes.monthYear:
+            return lastPlayedTimeMs < new Date(year, month!, 1).getTime();
+          case DateIncludes.yearOnly:
+            return lastPlayedTimeMs < new Date(year + 1, 0, 1).getTime();
+        }
+      }
     }
   };
 
