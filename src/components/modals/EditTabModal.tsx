@@ -1,13 +1,12 @@
 import {
   ConfirmModal,
-  DialogButton,
   DialogCheckbox,
   Field,
   Focusable,
   TextField,
   afterPatch,
   quickAccessControlsClasses,
-  showModal
+
 } from "decky-frontend-lib";
 import { useState, VFC, useEffect, Fragment } from "react";
 import { FilterType, TabFilterSettings, isDefaultParams } from "../filters/Filters";
@@ -16,8 +15,6 @@ import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabMasterManager } from "../../state/TabMasterManager";
 import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";
-import { MdQuestionMark } from "react-icons/md";
-import { FitlerDescModal } from "./FilterDescModal";
 import { capitalizeFirstLetter, getIncludedCategoriesFromBitField, updateCategoriesToIncludeBitField } from "../../lib/Utils";
 import { BiSolidDownArrow } from "react-icons/bi";
 
@@ -109,20 +106,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
           bAllowFullSize
           onCancel={closeModal}
           onEscKeypress={closeModal}
-          strTitle={
-            <div style={{ display: 'flex', marginRight: '15px', width: '100%' }}>
-              <div>
-                {tabTitle ? `Modifying: ${tabTitle}` : 'Create New Tab'}
-              </div>
-              <DialogButton
-                style={{ height: '28px', width: '30px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto' }}
-                onOKActionDescription={'Filter Descriptions'}
-                onClick={() => { showModal(<FitlerDescModal />); }}
-              >
-                <MdQuestionMark style={{ marginTop: '-4px', marginLeft: '-5px', display: 'block' }} />
-              </DialogButton>
-            </div>
-          }
+          strTitle={tabTitle ? `Modifying: ${tabTitle}` : 'Create New Tab'}
           onOK={onSave}
         >
           <div style={{ padding: "4px 16px 1px" }} className="name-field">
