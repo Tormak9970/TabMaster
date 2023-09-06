@@ -1,6 +1,7 @@
 import { Fragment, VFC } from "react";
 import { FilterType, TabFilterSettings, compatCategoryToLabel } from "./Filters";
 import { dateToLabel } from '../generic/DatePickers';
+import { capitalizeEachWord } from '../../lib/Utils';
 
 type FilterPreviewProps<T extends FilterType> = {
   filter: TabFilterSettings<T>,
@@ -8,69 +9,69 @@ type FilterPreviewProps<T extends FilterType> = {
 
 
 const CollectionFilterPreview: VFC<FilterPreviewProps<'collection'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">collection - {filter.params.name ?? filter.params.id}{filter.inverted ? " (inverted)" : ""}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.name ?? filter.params.id}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 const InstalledFilterPreview: VFC<FilterPreviewProps<'installed'>> = ({filter }) => {
-  return <div className="merge-filter-entry">installed - {filter.params.installed ? "yes" : "no"}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.installed ? "yes" : "no"}</div>
 }
 
 const RegexFilterPreview: VFC<FilterPreviewProps<'regex'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">regex - {filter.params.regex}{filter.inverted ? " (inverted)" : ""}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.regex}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 const FriendsFilterPreview: VFC<FilterPreviewProps<'friends'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">friends - {filter.params.friends.length} {filter.params.friends.length == 1 ? "friend" : "friends"}{filter.inverted ? " (inverted)" : ""}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.friends.length} {filter.params.friends.length == 1 ? "friend" : "friends"}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 const TagsFilterPreview: VFC<FilterPreviewProps<'tags'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">tags - {filter.params.tags.length} {filter.params.tags.length == 1 ? "tag" : "tags"}{filter.inverted ? " (inverted)" : ""}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.tags.length} {filter.params.tags.length == 1 ? "tag" : "tags"}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 const WhitelistFilterPreview: VFC<FilterPreviewProps<'whitelist'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">whitelist - {filter.params.games.length} whitelisted</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.games.length} whitelisted</div>
 }
 
 const BlackListFilterPreview: VFC<FilterPreviewProps<'blacklist'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">blacklist - {filter.params.games.length} blacklisted</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.games.length} blacklisted</div>
 }
 
 const MergeFilterPreview: VFC<FilterPreviewProps<'merge'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">merge - {filter.params.filters.length} grouped filters{filter.inverted ? " (inverted)" : ""}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.filters.length} grouped filters{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 const PlatformFilterPreview: VFC<FilterPreviewProps<'platform'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">platform - {filter.params.platform === "steam" ? "Steam" : "Non Steam"}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.platform === "steam" ? "Steam" : "Non Steam"}</div>
 }
 
 const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">deck compat - {compatCategoryToLabel(filter.params.category)}{filter.inverted ? " (inverted)" : ""}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{compatCategoryToLabel(filter.params.category)}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
 
 const ReviewScoreFilterPreview: VFC<FilterPreviewProps<'review score'>> = ({ filter }) => {
   const { scoreThreshold, condition, type } = filter.params
-  return <div className="merge-filter-entry">review score - {type === 'metacritic' ? `Metacritic of ${scoreThreshold} or ${condition === 'above' ? 'higher' : 'lower'}` : `At ${condition === 'above' ? 'least' : 'most'} ${scoreThreshold}% positive Steam reviews`}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{type === 'metacritic' ? `Metacritic of ${scoreThreshold} or ${condition === 'above' ? 'higher' : 'lower'}` : `At ${condition === 'above' ? 'least' : 'most'} ${scoreThreshold}% positive Steam reviews`}</div>
 }
 
 const TimePlayedFilterPreview: VFC<FilterPreviewProps<'time played'>> = ({ filter }) => {
   const { timeThreshold, condition, units} = filter.params
-  return <div className="merge-filter-entry">time played - {`${timeThreshold} ${timeThreshold === 1 ? units.slice(0, -1) : units} or ${condition === 'above' ? 'more' : 'less'}`}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${timeThreshold} ${timeThreshold === 1 ? units.slice(0, -1) : units} or ${condition === 'above' ? 'more' : 'less'}`}</div>
 }
 
 const SizeOnDiskFilterPreview: VFC<FilterPreviewProps<'size on disk'>> = ({ filter }) => {
   const { gbThreshold, condition } = filter.params
-  return <div className="merge-filter-entry">size on disk - {`${gbThreshold} GB or ${condition === 'above' ? 'more' : 'less'}`}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${gbThreshold} GB or ${condition === 'above' ? 'more' : 'less'}`}</div>
 }
 
 const ReleaseDateFilterPreview: VFC<FilterPreviewProps<'release date'>> = ({ filter }) => {
   const { day, month, year } = filter.params.date!
-  return <div className="merge-filter-entry">release date - {`${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, {dateStyle: 'long'})}`}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, {dateStyle: 'long'})}`}</div>
 }
 
 const LastPlayedFilterPreview: VFC<FilterPreviewProps<'last played'>> = ({ filter }) => {
   const { day, month, year } = filter.params.date!
-  return <div className="merge-filter-entry">last played - {`${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, {dateStyle: 'long'})}`}</div>
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, {dateStyle: 'long'})}`}</div>
 }
 
 /**

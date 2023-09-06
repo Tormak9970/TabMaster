@@ -1,7 +1,7 @@
 import { Fragment, VFC, useState } from "react";
 import { DialogButton, Focusable, ModalRoot, showModal } from "decky-frontend-lib";
 import { FilterDefaultParams, FilterType } from "./Filters";
-import { capitalizeFirstLetter } from "../../lib/Utils";
+import { capitalizeEachWord, capitalizeFirstLetter } from "../../lib/Utils";
 import { FilterSelectStyles, achievementClasses } from "../styles/FilterSelectionStyles";
 
 interface FilterSelectModalProps {
@@ -65,7 +65,7 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
                   className={achievementClasses.AchievementListItemBase}
                   style={{ display: "flex", flexDirection: "column", padding: "0.5em", height: "60px" }}
                 >
-                  <div className="entry-label">{filterType.split(" ").map((word: string) => capitalizeFirstLetter(word)).join(" ")}</div>
+                  <div className="entry-label">{capitalizeEachWord(filterType)}</div>
                   <div className="entry-desc">{filterDescriptions[filterType]}</div>
                 </div>
               </Focusable>
@@ -107,7 +107,7 @@ export const FilterSelect: VFC<FilterSelectProps> = ({ selectedOption, onChange 
 
   return (
     <DialogButton onOKActionDescription={"Change Filter Type"} onOKButton={showFilterSelection} onClick={showFilterSelection}>
-      {selected}
+      {capitalizeEachWord(selected)}
     </DialogButton>
   )
 };
