@@ -150,16 +150,21 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContaini
  * The options for a whitelist filter.
  */
 const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
-  const usersGames: SteamAppOverview[] = collectionStore.appTypeCollectionMap.get('type-games')!.allApps;
+  let appsList: SteamAppOverview[] = [];
   const selected: DropdownOption[] = [];
+  const types = ['games', 'music', 'software'];
+
+  for (const type of types) {
+    appsList = appsList.concat(collectionStore.appTypeCollectionMap.get(`type-${type as 'games' | 'music' | 'software'}`)!.allApps);
+  }
 
   for (const gameid of filter.params.games) {
-    const game = usersGames.find((game) => game.appid === gameid);
+    const game = appsList.find((game) => game.appid === gameid);
 
     if (game) selected.push({ label: game.display_name, data: gameid });
   }
 
-  const dropdownOptions: DropdownOption[] = usersGames.map((game: SteamAppOverview) => { return { label: game.display_name, data: game.appid }; });
+  const dropdownOptions: DropdownOption[] = appsList.map((game: SteamAppOverview) => { return { label: game.display_name, data: game.appid }; });
 
   function onChange(selected: DropdownOption[]) {
     const updatedFilter = { ...filter };
@@ -178,16 +183,21 @@ const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, s
  * The options for a blacklist filter.
  */
 const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
-  const usersGames: SteamAppOverview[] = collectionStore.appTypeCollectionMap.get('type-games')!.allApps;
+  let appsList: SteamAppOverview[] = [];
   const selected: DropdownOption[] = [];
+  const types = ['games', 'music', 'software'];
+
+  for (const type of types) {
+    appsList = appsList.concat(collectionStore.appTypeCollectionMap.get(`type-${type as 'games' | 'music' | 'software'}`)!.allApps);
+  }
 
   for (const gameid of filter.params.games) {
-    const game = usersGames.find((game) => game.appid === gameid);
+    const game = appsList.find((game) => game.appid === gameid);
 
     if (game) selected.push({ label: game.display_name, data: gameid });
   }
 
-  const dropdownOptions: DropdownOption[] = usersGames.map((game: SteamAppOverview) => { return { label: game.display_name, data: game.appid }; });
+  const dropdownOptions: DropdownOption[] = appsList.map((game: SteamAppOverview) => { return { label: game.display_name, data: game.appid }; });
 
   function onChange(selected: DropdownOption[]) {
     const updatedFilter = { ...filter };
