@@ -1,5 +1,6 @@
 import { Fragment, VFC } from "react";
 import { FilterType, TabFilterSettings, compatCategoryToLabel } from "./Filters";
+import { dateToLabel } from '../generic/DatePickers';
 
 type FilterPreviewProps<T extends FilterType> = {
   filter: TabFilterSettings<T>,
@@ -46,6 +47,16 @@ const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = (
   return <div className="merge-filter-entry">deck compat - {compatCategoryToLabel(filter.params.category)}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
+const ReleaseDateFilterPreview: VFC<FilterPreviewProps<'release date'>> = ({ filter }) => {
+  const { day, month, year } = filter.params.date!
+  return <div className="merge-filter-entry">release date - {`${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, {dateStyle: 'long'})}`}</div>
+}
+
+const LastPlayedFilterPreview: VFC<FilterPreviewProps<'last played'>> = ({ filter }) => {
+  const { day, month, year } = filter.params.date!
+  return <div className="merge-filter-entry">last played - {`${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, {dateStyle: 'long'})}`}</div>
+}
+
 /**
  * Generates the preview data for filters in a merge group.
  */
@@ -72,6 +83,10 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <PlatformFilterPreview filter={filter as TabFilterSettings<'platform'>} />
       case "deck compatibility":
         return <DeckCompatFilterPreview filter={filter as TabFilterSettings<'deck compatibility'>} />
+      case "release date":
+        return <ReleaseDateFilterPreview filter={filter as TabFilterSettings<'release date'>} />
+      case "last played":
+        return <LastPlayedFilterPreview filter={filter as TabFilterSettings<'last played'>} />
       default:
         return <Fragment />
     }

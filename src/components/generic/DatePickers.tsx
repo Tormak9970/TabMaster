@@ -393,7 +393,7 @@ function getDaysInMonth(month: number, year: number) {
   return new Date(year, month, 0).getDate();
 }
 
-function dateToLabel(year: number, month?: number, day?: number, formatOptions?: Intl.DateTimeFormatOptions) {
+export function dateToLabel(year: number, month?: number, day?: number, formatOptions?: Intl.DateTimeFormatOptions) {
   const defaultOptions: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'numeric',
