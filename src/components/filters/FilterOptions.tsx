@@ -170,7 +170,7 @@ const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, s
   }
 
   return (
-    <MultiSelect fieldLabel="Whitelisted Games" dropdownLabel="Add a game" options={dropdownOptions} selected={selected} onChange={onChange} />
+    <MultiSelect fieldLabel="Whitelisted Apps" dropdownLabel="Add an app" options={dropdownOptions} selected={selected} onChange={onChange} />
   );
 };
 
@@ -198,7 +198,7 @@ const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, s
   }
 
   return (
-    <MultiSelect fieldLabel="Blacklisted Games" dropdownLabel="Add a game" options={dropdownOptions} selected={selected} onChange={onChange} />
+    <MultiSelect fieldLabel="Blacklisted Apps" dropdownLabel="Add an app" options={dropdownOptions} selected={selected} onChange={onChange} />
   );
 };
 

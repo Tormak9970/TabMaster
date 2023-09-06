@@ -56,7 +56,7 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
                         bDestructiveWarning={true}
                         strTitle="Collections Tab is hidden by Tab Master!"
                       >
-                        In order to manage hidden games, Tab Master must unhide your Collections tab.
+                        In order to manage hidden apps, Tab Master must unhide your Collections tab.
                       </ConfirmModal>
                     );
                   } else {

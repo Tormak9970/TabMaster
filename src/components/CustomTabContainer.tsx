@@ -67,7 +67,7 @@ export class CustomTabContainer implements TabContainer {
   }
 
   /**
-   * Builds the list of games for this tab.
+   * Builds the list of apps for this tab.
    */
   buildCollection() {
     if (this.position > -1) { 
