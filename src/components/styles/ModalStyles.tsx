@@ -104,13 +104,11 @@ export const ModalStyles: VFC<{}> = ({}) => {
         width: 100%;
       }
       .tab-master-modal-scope .slider-with-2dropdown-container .${gamepadDialogClasses.Field} {
-        padding-right: 154px;
-        padding-top: 38px;
-        padding-bottom: 17px;
+        padding-right: 279px;
         width: 100%;
       }
       .tab-master-modal-scope .slider-with-2dropdown-container.wide-dropdown .${gamepadDialogClasses.Field} {
-        padding-right: 169px;
+        padding-right: 294px;
       }
     `}</style>
   );

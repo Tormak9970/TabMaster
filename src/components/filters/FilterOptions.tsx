@@ -347,10 +347,12 @@ const ReviewScoreFilterOptions: VFC<FilterOptionsProps<'review score'>> = ({ ind
   return (
     <Focusable className="slider-with-2dropdown-container wide-dropdown" style={{ display: 'flex', flexDirection: 'row' }}>
       <SliderField value={value} label={reviewType === 'metacritic' ? `Metacritic score of ${value} or ${thresholdType === 'above' ? 'higher' : 'lower'}` : `At ${thresholdType === 'above' ? 'least' : 'most'} ${value}% positive Steam reviews`} min={0} max={100} onChange={onSliderChange} />
-      <div style={{ right: '40px', position: 'absolute', zIndex: 1, transform: 'translate(0px, 10px)', minWidth: '130px' }}>
-        <Focusable>
-          <Dropdown rgOptions={[{ label: 'Metacritic', data: 'metacritic' }, { label: 'Steam ', data: 'steampercent' }]} selectedOption={reviewType} onChange={onReviewTypeChange} />
-          <div style={{ paddingTop: '8px' }}>
+      <div style={{ right: '40px', position: 'absolute', zIndex: 1, transform: 'translate(0px, 18px)' }}>
+        <Focusable style={{ display: 'flex' }}>
+          <div style={{ width: '130px' }}>
+            <Dropdown rgOptions={[{ label: 'Metacritic', data: 'metacritic' }, { label: 'Steam ', data: 'steampercent' }]} selectedOption={reviewType} onChange={onReviewTypeChange} />
+          </div>
+          <div style={{ marginLeft: '10px', width: '115px' }}>
             <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
           </div>
         </Focusable>
@@ -395,18 +397,20 @@ const TimePlayedFilterOptions: VFC<FilterOptionsProps<'time played'>> = ({ index
   return (
     <Focusable className="slider-with-2dropdown-container" style={{ display: 'flex', flexDirection: 'row' }}>
       <SliderField value={time} label={`Played for ${time} ${time === 1 ? units.slice(0, -1) : units} or ${thresholdType === 'above' ? 'more' : 'less'}`} min={0} max={300} onChange={onSliderChange} />
-      <div style={{ right: '40px', position: 'absolute', zIndex: 1, transform: 'translate(0px, 10px)' }}>
-        <Focusable>
-          <Dropdown
-            rgOptions={[
-              { label: 'Minutes', data: 'minutes' },
-              { label: 'Hours', data: 'hours' },
-              { label: 'Days', data: 'days' }
-            ]}
-            selectedOption={units}
-            onChange={onUnitChange}
-          />
-          <div style={{ paddingTop: '8px' }}>
+      <div style={{ right: '40px', position: 'absolute', zIndex: 1, transform: 'translate(0px, 18px)' }}>
+        <Focusable style={{ display: 'flex' }}>
+          <div style={{ width: '115px' }}>
+            <Dropdown
+              rgOptions={[
+                { label: 'Minutes', data: 'minutes' },
+                { label: 'Hours', data: 'hours' },
+                { label: 'Days', data: 'days' }
+              ]}
+              selectedOption={units}
+              onChange={onUnitChange}
+            />
+          </div>
+          <div style={{ marginLeft: '10px', width: "115px" }}>
             <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
           </div>
         </Focusable>
