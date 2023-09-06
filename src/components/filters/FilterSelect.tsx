@@ -1,8 +1,10 @@
 import { Fragment, VFC, useState } from "react";
-import { DialogButton, Focusable, ModalRoot, showModal } from "decky-frontend-lib";
+import { Focusable, ModalRoot, showModal } from "decky-frontend-lib";
 import { FilterDefaultParams, FilterType } from "./Filters";
-import { capitalizeEachWord, capitalizeFirstLetter } from "../../lib/Utils";
+import { capitalizeEachWord } from "../../lib/Utils";
 import { FilterSelectStyles, achievementClasses } from "../styles/FilterSelectionStyles";
+import { CustomButton } from '../generic/CustomButton';
+import { IoFilter } from 'react-icons/io5'
 
 interface FilterSelectModalProps {
   selectedOption: FilterType,
@@ -106,8 +108,17 @@ export const FilterSelect: VFC<FilterSelectProps> = ({ selectedOption, onChange 
   }
 
   return (
-    <DialogButton onOKActionDescription={"Change Filter Type"} onOKButton={showFilterSelection} onClick={showFilterSelection}>
-      {capitalizeEachWord(selected)}
-    </DialogButton>
-  )
+    <CustomButton style={{ padding: '10px 12px' }} onOKActionDescription={"Change Filter Type"} onOKButton={showFilterSelection} onClick={showFilterSelection}>
+      <div style={{ display: 'flex', overflow: 'hidden' }}>
+        <div style={{ overflow: 'hidden', flex: 'auto' }}>
+          <div style={{ textAlign: 'left', minHeight: '20px' }}>
+            {capitalizeEachWord(selected)}
+          </div>
+        </div>
+        <div style={{ display: 'flex', marginLeft: '1ch', flex: 'none' }}>
+          <IoFilter style={{ margin: 'auto', height: '.9em' }} />
+        </div>
+      </div>
+    </CustomButton>
+  );
 };
