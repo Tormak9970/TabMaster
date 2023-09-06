@@ -65,7 +65,7 @@ type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOv
  */
 export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "collection": { id: "", name: "" },
-  "installed": { installed: false },
+  "installed": { installed: true },
   "regex": { regex: "" },
   "friends": { friends: [], mode: 'and' },
   "tags": { tags: [], mode: 'and' },
