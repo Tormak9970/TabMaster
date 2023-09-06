@@ -14,20 +14,21 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
   const [selected, setSelected] = useState<FilterType>(selectedOption);
   const filterTypeOptions = Object.keys(FilterDefaultParams) as FilterType[];
   const filterDescriptions: { [filterType in FilterType]: string } = {
-    collection: "Selects games that are in a certain Steam Collection.",
-    installed: "Selects games that are installed/uninstalled.",
-    regex: "Selects games whose titles match a regular expression.",
-    friends: "Selects games that are also owned by any/all listed friends.",
-    tags: "Selects games that have any/all specific tags.",
-    whitelist: "Selects games that are added to the list.",
-    blacklist: "Selects games that are not added to the list.",
-    merge: "Selects games that pass a subgroup of filters.",
-    platform: "Selects Steam or non-Steam games.",
-    "deck compatibility": "Selects games that have a specific Steam Deck compatibilty status.",
-    metacritic: "",
-    "steam score": "",
-    "time played": "",
-    "size on disk": ""
+    collection: "Selects apps that are in a certain Steam Collection.",
+    installed: "Selects apps that are installed/uninstalled.",
+    regex: "Selects apps whose titles match a regular expression.",
+    friends: "Selects apps that are also owned by any/all listed friends.",
+    tags: "Selects apps that have any/all specific tags.",
+    whitelist: "Selects apps that are added to the list.",
+    blacklist: "Selects apps that are not added to the list.",
+    merge: "Selects apps that pass a subgroup of filters.",
+    platform: "Selects Steam or non-Steam apps.",
+    "deck compatibility": "Selects apps that have a specific Steam Deck compatibilty status.",
+    "review score": "Selects apps that are greater/less than the provided metacritic/steam review score.",
+    "time played": "Selects apps that have a play time greater/less than the provided time.",
+    "size on disk": "Selects apps that have an install size greater/less than the provided size.",
+    "release date": "Selects apps that were released before/after the provided date.",
+    "last played": "Selects apps that were last played before/after the provided date."
   }
 
   function handleSelect(selectedFilter: FilterType) {
