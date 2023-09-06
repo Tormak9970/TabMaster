@@ -123,7 +123,7 @@ export function capitalizeFirstLetter(word: string): string {
  * @returns The capitalized string of words.
  */
 export function capitalizeEachWord(words: string): string {
-  return words.split(" ").map((word: string) => capitalizeFirstLetter(word)).join(" ")
+  return words.split(" ").map((word: string) => capitalizeFirstLetter(word)).join(" ");
 }
 
 /**

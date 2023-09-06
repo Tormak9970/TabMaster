@@ -50,27 +50,27 @@ const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = (
 
 
 const ReviewScoreFilterPreview: VFC<FilterPreviewProps<'review score'>> = ({ filter }) => {
-  const { scoreThreshold, condition, type } = filter.params
+  const { scoreThreshold, condition, type } = filter.params;
   return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{type === 'metacritic' ? `Metacritic of ${scoreThreshold} or ${condition === 'above' ? 'higher' : 'lower'}` : `At ${condition === 'above' ? 'least' : 'most'} ${scoreThreshold}% positive Steam reviews`}</div>
 }
 
 const TimePlayedFilterPreview: VFC<FilterPreviewProps<'time played'>> = ({ filter }) => {
-  const { timeThreshold, condition, units} = filter.params
+  const { timeThreshold, condition, units} = filter.params;
   return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${timeThreshold} ${timeThreshold === 1 ? units.slice(0, -1) : units} or ${condition === 'above' ? 'more' : 'less'}`}</div>
 }
 
 const SizeOnDiskFilterPreview: VFC<FilterPreviewProps<'size on disk'>> = ({ filter }) => {
-  const { gbThreshold, condition } = filter.params
+  const { gbThreshold, condition } = filter.params;
   return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${gbThreshold} GB or ${condition === 'above' ? 'more' : 'less'}`}</div>
 }
 
 const ReleaseDateFilterPreview: VFC<FilterPreviewProps<'release date'>> = ({ filter }) => {
-  const { day, month, year } = filter.params.date!
+  const { day, month, year } = filter.params.date!;
   return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, {dateStyle: 'long'})}`}</div>
 }
 
 const LastPlayedFilterPreview: VFC<FilterPreviewProps<'last played'>> = ({ filter }) => {
-  const { day, month, year } = filter.params.date!
+  const { day, month, year } = filter.params.date!;
   return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, {dateStyle: 'long'})}`}</div>
 }
 

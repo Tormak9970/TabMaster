@@ -17,6 +17,7 @@ import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";
 import { capitalizeFirstLetter, getIncludedCategoriesFromBitField, updateCategoriesToIncludeBitField } from "../../lib/Utils";
 import { BiSolidDownArrow } from "react-icons/bi";
+import { GamepadUIAudio } from '../../lib/GamepadUIAudio';
 
 export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>;
 
@@ -147,7 +148,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
 
   const catsToIncludeObj = getIncludedCategoriesFromBitField(categoriesToInclude);
 
-  const showHiddenCat = Object.entries(catsToIncludeObj).filter(([cat]) => cat !== 'hidden').some(([cat, checked]) => checked);
+  const showHiddenCat = Object.entries(catsToIncludeObj).filter(([cat]) => cat !== 'hidden').some(([_cat, checked]) => checked);
 
   const getCatLabel = (category: string) => category === 'music' ? 'Soundtracks' : capitalizeFirstLetter(category)
 
@@ -161,7 +162,15 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
   return (
     <>
       <div className="tab-master-scope" style={{ marginBottom: "24px" }}>
-        <Focusable style={{ margin: "0 calc(-12px - 1.4vw)" }} onActivate={() => setIsOpen(isOpen => !isOpen)} noFocusRing={true} focusClassName="start-focused" >
+        <Focusable
+          style={{ margin: "0 calc(-12px - 1.4vw)" }}
+          onActivate={() => {
+            GamepadUIAudio.AudioPlaybackManager.PlayAudioURL('/sounds/deck_ui_misc_01.wav');
+            setIsOpen(isOpen => !isOpen);
+          }}
+          noFocusRing={true}
+          focusClassName="start-focused"
+        >
           <div style={{ margin: "0 calc(12px + 1.4vw)", padding: "0 16px" }}>
             <div style={{ display: "flex", alignItems: "center" }}>
               <div style={{ padding: "12px 0", float: "left" }} className={quickAccessControlsClasses.PanelSectionTitle}>
