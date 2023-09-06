@@ -94,7 +94,7 @@ const RegexFilterOptions: VFC<FilterOptionsProps<'regex'>> = ({ index, setContai
 const FriendsFilterOptions: VFC<FilterOptionsProps<'friends'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const { currentUsersFriends } = useTabMasterContext();
 
-  const dropdownOptions: DropdownOption[] = currentUsersFriends.map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid }; });
+  const dropdownOptions: DropdownOption[] = currentUsersFriends.sort((friendA: FriendEntry, friendB: FriendEntry) => friendA.name.localeCompare(friendB.name)).map((friend: FriendEntry) => { return { label: friend.name, data: friend.steamid }; });
   const selected: DropdownOption[] = filter.params.friends.map((id: number) => {
     return {
       label: currentUsersFriends.find((friend) => friend.steamid === id)!.name,
@@ -123,7 +123,7 @@ const FriendsFilterOptions: VFC<FilterOptionsProps<'friends'>> = ({ index, setCo
 const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const { allStoreTags } = useTabMasterContext();
 
-  const dropdownOptions: DropdownOption[] = allStoreTags.map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag }; });
+  const dropdownOptions: DropdownOption[] = allStoreTags.sort((tagA: TagResponse, tagB: TagResponse) => tagA.string!.localeCompare(tagB.string!)).map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag }; });
   const selected: DropdownOption[] = filter.params.tags.map((tagNum: number) => {
     return {
       label: allStoreTags.find((tag) => tag.tag === tagNum)!.string,
