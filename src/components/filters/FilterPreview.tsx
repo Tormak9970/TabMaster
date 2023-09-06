@@ -47,6 +47,22 @@ const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = (
   return <div className="merge-filter-entry">deck compat - {compatCategoryToLabel(filter.params.category)}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
+
+const ReviewScoreFilterPreview: VFC<FilterPreviewProps<'review score'>> = ({ filter }) => {
+  const { scoreThreshold, condition, type } = filter.params
+  return <div className="merge-filter-entry">review score - {type === 'metacritic' ? `Metacritic of ${scoreThreshold} or ${condition === 'above' ? 'higher' : 'lower'}` : `At ${condition === 'above' ? 'least' : 'most'} ${scoreThreshold}% positive Steam reviews`}</div>
+}
+
+const TimePlayedFilterPreview: VFC<FilterPreviewProps<'time played'>> = ({ filter }) => {
+  const { timeThreshold, condition, units} = filter.params
+  return <div className="merge-filter-entry">time played - {`${timeThreshold} ${timeThreshold === 1 ? units.slice(0, -1) : units} or ${condition === 'above' ? 'more' : 'less'}`}</div>
+}
+
+const SizeOnDiskFilterPreview: VFC<FilterPreviewProps<'size on disk'>> = ({ filter }) => {
+  const { gbThreshold, condition } = filter.params
+  return <div className="merge-filter-entry">size on disk - {`${gbThreshold} GB or ${condition === 'above' ? 'more' : 'less'}`}</div>
+}
+
 const ReleaseDateFilterPreview: VFC<FilterPreviewProps<'release date'>> = ({ filter }) => {
   const { day, month, year } = filter.params.date!
   return <div className="merge-filter-entry">release date - {`${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, {dateStyle: 'long'})}`}</div>
@@ -83,6 +99,12 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <PlatformFilterPreview filter={filter as TabFilterSettings<'platform'>} />
       case "deck compatibility":
         return <DeckCompatFilterPreview filter={filter as TabFilterSettings<'deck compatibility'>} />
+      case "review score":
+        return <ReviewScoreFilterPreview filter={filter as TabFilterSettings<'review score'>} />
+      case "time played":
+        return <TimePlayedFilterPreview filter={filter as TabFilterSettings<'time played'>} />
+      case "size on disk":
+        return <SizeOnDiskFilterPreview filter={filter as TabFilterSettings<'size on disk'>} />
       case "release date":
         return <ReleaseDateFilterPreview filter={filter as TabFilterSettings<'release date'>} />
       case "last played":
