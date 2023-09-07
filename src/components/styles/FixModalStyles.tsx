@@ -21,6 +21,9 @@ export const FixModalStyles: VFC<{}> = ({}) => {
       .tab-master-fix-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildren} {
         width: 100%;
       }
+      .tab-master-fix-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldChildrenWithIcon} {
+        width: 100%;
+      }
 
       /* The button item wrapper */
       .tab-master-fix-modal-scope .filter-entry .${gamepadDialogClasses.Field} {

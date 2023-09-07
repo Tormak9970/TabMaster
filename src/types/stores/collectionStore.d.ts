@@ -1,7 +1,9 @@
 // Types for the collectionStore global
 
+type AppCollectionType = 'type-games' | 'type-software' | 'type-music' | 'type-videos' | 'type-tools'
+
 type CollectionStore = {
-  appTypeCollectionMap: Map<'type-games', Collection>,
+  appTypeCollectionMap: Map<AppCollectionType, Collection>,
   userCollections: SteamCollection[],
   allGamesCollection: Collection,
   deckDesktopApps: Collection | null,

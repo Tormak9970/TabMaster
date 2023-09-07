@@ -35,6 +35,7 @@ import { CustomTabContainer } from "./components/CustomTabContainer";
 import { TabActionsButton } from "./components/TabActions";
 import { LogController } from "./lib/controllers/LogController";
 import { DocPage } from "./components/docs/DocsPage";
+import { IncludeCategories } from "./lib/Utils";
 
 declare global {
   var SteamClient: SteamClient;
@@ -69,12 +70,12 @@ const Content: VFC<{}> = ({ }) => {
     showModal(
       <EditTabModal
         onConfirm={(_: any, tabSettings: EditableTabSettings) => {
-          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode, tabSettings.includesHidden);
+          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode, tabSettings.categoriesToInclude);
         }}
         tabFilters={[]}
         tabMasterManager={tabMasterManager}
         filtersMode="and"
-        includesHidden={false}
+        categoriesToInclude={IncludeCategories.games}
       />
     );
   }
@@ -117,7 +118,7 @@ const Content: VFC<{}> = ({ }) => {
               {tabMasterManager.hasSettingsLoaded &&
                 <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
                   <DialogButton
-                    style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center" }}
+                    style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center", marginRight: "8px" }}
                     onOKActionDescription={'Refresh Tab Games'}
                     onClick={refreshTabs}
                   >

@@ -3,6 +3,7 @@ import React, { VFC, useState } from "react"
 import { FilterType, TabFilterSettings } from "../filters/Filters"
 import { capitalizeFirstLetter } from "../../lib/Utils"
 import { BiSolidDownArrow } from "react-icons/bi"
+import { GamepadUIAudio } from '../../lib/GamepadUIAudio';
 
 type FilterSectionAccordionProps = {
   index: number,
@@ -19,6 +20,7 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
 
   function onClick(e: any) {
     e.stopPropagation();
+    GamepadUIAudio.AudioPlaybackManager.PlayAudioURL('/sounds/deck_ui_misc_01.wav');
     setOpen(!open);
   }
 

@@ -1,4 +1,4 @@
-import { PanelSection, PanelSectionRow, Field, ButtonItem, Dropdown, Toggle, afterPatch, Focusable } from "decky-frontend-lib";
+import { PanelSection, PanelSectionRow, Field, ButtonItem, Dropdown, afterPatch, Focusable } from "decky-frontend-lib";
 import { VFC, Fragment, useMemo, useCallback } from "react";
 import { FilterEntry } from "./FilterEntry";
 import { FilterOptions } from "./FilterOptions";
@@ -8,17 +8,15 @@ import { FilterSectionAccordion } from "../accordions/FilterSectionAccordion";
 interface FiltersPanelProps {
   groupFilters: TabFilterSettings<FilterType>[],
   groupLogicMode: string,
-  groupIncludesHidden: boolean,
   setGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>,
   setGroupLogicMode: React.Dispatch<React.SetStateAction<LogicalMode>>,
-  setGroupIncludesHidden: React.Dispatch<React.SetStateAction<boolean>>,
   addFilter: () => void,
   canAddFilter: boolean,
   shouldFocusAddButton?: boolean,
   collapseFilters?: boolean
 }
 
-export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicMode, groupIncludesHidden, setGroupFilters, setGroupLogicMode, setGroupIncludesHidden, addFilter, canAddFilter, shouldFocusAddButton, collapseFilters }) => {
+export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicMode, setGroupFilters, setGroupLogicMode, addFilter, canAddFilter, shouldFocusAddButton, collapseFilters }) => {
   const modeOptions = [
     { label: "And", data: "and" },
     { label: "Or", data: "or" }
@@ -46,17 +44,6 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
             <div style={{ width: "150px" }}>
               <Dropdown rgOptions={modeOptions} selectedOption={groupLogicMode} onChange={(option) => setGroupLogicMode(option.data)} focusable={true} />
             </div>
-          </Field>
-        </PanelSectionRow>
-        <PanelSectionRow>
-          <Field
-            label="Include Hidden Games"
-            childrenLayout="inline"
-            childrenContainerWidth="min"
-            inlineWrap="keep-inline"
-            className="no-sep"
-          >
-            <Toggle value={groupIncludesHidden} onChange={(checked) => setGroupIncludesHidden(checked)} />
           </Field>
         </PanelSectionRow>
         <PanelSectionRow>

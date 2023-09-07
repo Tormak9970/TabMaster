@@ -25,7 +25,7 @@ export class PythonInterop {
    * @param message The message to log.
    */
   static async log(message: String): Promise<void> {
-    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 2 });
+    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 0 });
   }
 
   /**
@@ -42,6 +42,60 @@ export class PythonInterop {
    */
   static async error(message: string): Promise<void> {
     await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 2 });
+  }
+  
+  /**
+   * Gets the plugin's users dictionary.
+   * @returns A promise resolving to the plugin's users dictionary.
+   */
+  static async getUsersDict(): Promise<UsersDict | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, UsersDict>("get_users_dict", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+  
+  /**
+   * Sends the active user's steamID to the backend.
+   * @returns A promise resolving to the plugin's users dictionary.
+   */
+  static async setActiveSteamId(userId: string): Promise<boolean | Error> {
+    const result = await this.serverAPI.callPluginMethod<{ user_id: string }, boolean>("set_active_user_id", { user_id: userId});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+
+  /**
+   * Removes any legacy settings fields that may be present in the settings file.
+   */
+  static async removeLegacySettings(): Promise<void | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, void>("remove_legacy_settings", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+
+  /**
+   * Migrates a legacy user to use the new settings system.
+   */
+  static async migrateLegacySettings(): Promise<void | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, void>("migrate_legacy_settings", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
   }
   
   /**
@@ -99,7 +153,7 @@ export class PythonInterop {
    * @returns A promise resolving to the cached user friends.
    */
   static async getFriends(): Promise<FriendEntry[] | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{}, FriendEntry[]>("get_friends", []);
+    let result = await PythonInterop.serverAPI.callPluginMethod<{}, FriendEntry[]>("get_friends", {});
 
     if (result.success) {
       return result.result;

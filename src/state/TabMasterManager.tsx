@@ -210,7 +210,7 @@ export class TabMasterManager {
                         title: tabContainer.title,
                         filters: tabContainer.filters,
                         filtersMode: tabContainer.filtersMode,
-                        includesHidden: tabContainer.includesHidden
+                        categoriesToInclude: tabContainer.categoriesToInclude
                       };
 
                       this.updateCustomTab(tabContainer.id, asEditableSettings);
@@ -439,12 +439,12 @@ export class TabMasterManager {
    * @param position The position of the tab.
    * @param filterSettingsList The list of filters for the tab.
    * @param filtersMode The logic mode for these filters.
-   * @param includesHidden Whether or not this tab includes hidden games.
+   * @param categoriesToInclude A bit field of which categories should be included in the tab.
    */
-  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, includesHidden: boolean) {
+  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number) {
     const id = uuidv4();
     this.addCollectionReactionsForFilters(flattenFilters(filterSettingsList));
-    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode, includesHidden));
+    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode, categoriesToInclude));
     this.updateAndSave();
   }
 
@@ -516,6 +516,7 @@ export class TabMasterManager {
     PythonInterop.getTags().then((res: TagResponse[] | Error) => {
       if (res instanceof Error) {
         LogController.log("TabMaster couldn't load tags settings");
+        LogController.error(res.message);
       } else {
         if (this.allStoreTags.length === 0) {
           this.allStoreTags = res;
@@ -525,6 +526,7 @@ export class TabMasterManager {
     PythonInterop.getFriends().then((res: FriendEntry[] | Error) => {
       if (res instanceof Error) {
         LogController.log("TabMaster couldn't load friends settings");
+        LogController.error(res.message);
       } else {
         if (this.currentUsersFriends.length === 0) {
           this.currentUsersFriends = res;
@@ -534,6 +536,7 @@ export class TabMasterManager {
     PythonInterop.getFriendsGames().then((res: Map<number, number[]> | Error) => {
       if (res instanceof Error) {
         LogController.log("TabMaster couldn't load friends games settings");
+        LogController.error(res.message);
       } else {
         if (this.friendsGameMap.size === 0) {
           this.friendsGameMap = res;
@@ -543,6 +546,7 @@ export class TabMasterManager {
 
     if (settings instanceof Error) {
       LogController.log("TabMaster couldn't load tab settings");
+      LogController.error(settings.message);
       return;
     }
 
@@ -598,8 +602,8 @@ export class TabMasterManager {
     }
 
     for (const keyId in tabsSettings) {
-      const { id, title, filters, position, filtersMode, includesHidden } = tabsSettings[keyId];
-      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!, includesHidden!) : this.addDefaultTabContainer(tabsSettings[keyId]);
+      const { id, title, filters, position, filtersMode, categoriesToInclude } = tabsSettings[keyId];
+      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!, categoriesToInclude!) : this.addDefaultTabContainer(tabsSettings[keyId]);
 
       if (favoritesOriginalIndex !== null && favoritesOriginalIndex > -1 && tabContainer.position > favoritesOriginalIndex) {
         tabContainer.position--;
@@ -669,8 +673,15 @@ export class TabMasterManager {
     const allTabsSettings: TabSettingsDictionary = {};
 
     this.tabsMap.forEach(tabContainer => {
-      const tabSettings = tabContainer.filters ?
-        { id: tabContainer.id, title: tabContainer.title, position: tabContainer.position, filters: tabContainer.filters, filtersMode: (tabContainer as CustomTabContainer).filtersMode, includesHidden: (tabContainer as CustomTabContainer).includesHidden }
+      const tabSettings: TabSettings = tabContainer.filters ?
+        { 
+          id: tabContainer.id, 
+          title: tabContainer.title, 
+          position: tabContainer.position, 
+          filters: tabContainer.filters, 
+          filtersMode: (tabContainer as CustomTabContainer).filtersMode, 
+          categoriesToInclude: (tabContainer as CustomTabContainer).categoriesToInclude 
+        }
         : tabContainer;
 
       allTabsSettings[tabContainer.id] = tabSettings;
@@ -684,11 +695,11 @@ export class TabMasterManager {
    * @param title The title of the tab.
    * @param position The position of the tab.
    * @param filterSettingsList The tab's filters.
-   * @param includesHidden Whether this tab should include hidden games.
+   * @param categoriesToInclude A bit field of which categories should be included in the tab.
    * @returns A tab container for this tab.
    */
-  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, includesHidden: boolean) {
-    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode, includesHidden);
+  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number) {
+    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode, categoriesToInclude);
     this.tabsMap.set(tabId, tabContainer);
     return tabContainer;
   }
