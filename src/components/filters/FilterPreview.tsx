@@ -4,7 +4,7 @@ import { dateToLabel } from '../generic/DatePickers';
 import { capitalizeEachWord } from '../../lib/Utils';
 
 type FilterPreviewProps<T extends FilterType> = {
-  filter: TabFilterSettings<T>,
+  filter: TabFilterSettings<T>
 }
 
 
