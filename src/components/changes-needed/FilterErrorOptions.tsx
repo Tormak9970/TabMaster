@@ -94,7 +94,6 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ isMerg
   const initialParams = {
     filters: [...filter.params.filters],
     mode: filter.params.mode,
-    includesHidden: filter.params.includesHidden
   }
   const [mergeParams, setMergeParams] = useState<TabFilterSettings<'merge'>['params']>(initialParams);
 

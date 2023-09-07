@@ -35,7 +35,9 @@ This is where you can add new tabs to your library. You can find the various opt
 
 **Name** - The name of the tab (This will show up in your Steam Library).
 
-**Logic Mode** - Two modes, `And` (games must match all filters) and `Or` (games must match at least one filter).
+**Include** - The types of apps to include (defaults to games).
+
+**Logic Mode** - Two modes, `And` (apps must match all filters) and `Or` (apps must match at least one filter).
 
 **Filters** - The filters for this tab. More details on these can be found on the next page.
 

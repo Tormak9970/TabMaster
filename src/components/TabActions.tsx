@@ -32,7 +32,7 @@ export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabCont
             tabFilters={tabContainer.filters!}
             tabMasterManager={tabMasterManager}
             filtersMode={tabContainer.filtersMode!}
-            includesHidden={tabContainer.includesHidden!}
+            categoriesToInclude={tabContainer.categoriesToInclude!}
           />
         )
       }}>
