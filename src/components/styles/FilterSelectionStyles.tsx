@@ -51,8 +51,51 @@ type AchievementClasses = Record<
   string
 >;
 
+type MainMenuAppRunningClasses = Record<
+"duration-app-launch" |
+"ScrollMask" |
+"HideMask" |
+"MainMenuAppRunning" |
+"MenuOpen" |
+"NavigationColumn" |
+"ControllerColumnFocused" |
+"NavColumnFocused" |
+"NavigationBox" |
+"NavigationMenuItem" |
+"ItemFocusAnim-darkerGrey" |
+"Active" |
+"Disabled" |
+"SwitchAppsTitle" |
+"SelectableAppWindow" |
+"ActiveDot" |
+"NavigationMenuItemSeparator" |
+"AppColumn" |
+"FocusedColumn" |
+"AppColumnContent" |
+"ActiveContent" |
+"CurrentGameBackground" |
+"CurrentGameLogo" |
+"OverlayAchievements" |
+"Container" |
+"OverlayGuides" |
+"OverlayNotes" |
+"OverlayInplaceBrowser" |
+"ItemFocusAnim-darkerGrey-nocolor" |
+"ItemFocusAnim-darkGrey" |
+"ItemFocusAnim-grey" |
+"ItemFocusAnimBorder-darkGrey" |
+"ItemFocusAnim-green" |
+"focusAnimation" |
+"hoverAnimation",
+string
+>;
+
 export const achievementClasses: AchievementClasses = findModule(
-  (mod) => typeof mod === 'object' && mod?.AchievementListItemBase?.includes('achievementslist'),
+  (mod) => typeof mod === 'object' && mod?.AchievementListItemBase?.includes('achievementslist')
+);
+
+export const mainMenuAppRunningClasses: MainMenuAppRunningClasses = findModule(
+  (mod) => typeof mod === 'object' && mod?.MainMenuAppRunning?.includes('mainmenuapprunning')
 );
 
 /**

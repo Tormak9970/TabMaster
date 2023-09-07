@@ -1,8 +1,8 @@
-import { Fragment, VFC, useState } from "react";
+import { Fragment, VFC, useEffect, useState } from "react";
 import { Focusable, ModalRoot, showModal } from "decky-frontend-lib";
 import { FilterDefaultParams, FilterType } from "./Filters";
 import { capitalizeEachWord } from "../../lib/Utils";
-import { FilterSelectStyles, achievementClasses } from "../styles/FilterSelectionStyles";
+import { FilterSelectStyles, achievementClasses, mainMenuAppRunningClasses } from "../styles/FilterSelectionStyles";
 import { CustomButton } from '../generic/CustomButton';
 import { IoFilter } from 'react-icons/io5'
 
@@ -13,6 +13,7 @@ interface FilterSelectModalProps {
 }
 
 const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSelect, closeModal }) => {
+  const [focusable, setFocusable] = useState(false);
   const [selected, setSelected] = useState<FilterType>(selectedOption);
   const filterTypeOptions = Object.keys(FilterDefaultParams) as FilterType[];
   const filterDescriptions: { [filterType in FilterType]: string } = {
@@ -32,6 +33,8 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
     "release date": "Selects apps based on their release date.",
     "last played": "Selects apps based on when they were last played."
   }
+
+  useEffect(() => {setTimeout(() => setFocusable(true), 10)}, []);
 
   function handleSelect(selectedFilter: FilterType) {
     setSelected(selectedFilter);
@@ -54,14 +57,14 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
         >
           Change Filter Type
         </h1>
-        <div className="tab-master-filter-select">
+        <div className={`tab-master-filter-select ${mainMenuAppRunningClasses.OverlayAchievements}`}>
           {filterTypeOptions.map((filterType: FilterType) => {
             return (
               <Focusable
                 focusWithinClassName="gpfocuswithin"
-                onActivate={() => {}}
+                onActivate={focusable || selected === filterType ? () => {} : undefined}
                 style={{ width: "100%", margin: 0, marginBottom: "10px", padding: 0 }}
-                onOKButton={() => handleSelect(filterType)}
+                onOKButton={focusable || selected === filterType ? () => handleSelect(filterType) : undefined}
               >
                 <div
                   className={achievementClasses.AchievementListItemBase}
