@@ -18,18 +18,23 @@ Features Include:<br/>
  - Reordering default and custom tabs
 
 Available Filters:
- - **Collections**: add games in a collection to the tab
-   - **Multiple**: will restrict it to games in all specified collections
- - **Regex**: filters game titles using a [regex](https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285) (for testing, use [this website](https://regexr.com/))
- - **Installed**: filters games by if they are installed or not
- - **Friends**: filters games by if they are owned by a friend as well
-   - **Multiple**: depending on mode, either game must be owned by all friends, or at least 1 friend
-   - **Mode**: "and" means all friends must own, "or" means any
- - **Tags**: filters games by if they have a given tag associated with them
-   - **Multiple**: depending on mode, either game must have all tags, or at least 1 tag
-   - **Mode**: "and" means must have all tags, "or" means any
+ - **Collection** - Selects apps that are in a certain Steam Collection.
+ - **Installed** - Selects apps that are installed/uninstalled.
+ - **Regex** - Selects apps whose titles match a [regular expression](https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285) (for testing, use [this website](https://regexr.com/)).
+ - **Friends** - Selects apps that are also owned by any/all listed friends.
+ - **Tags** - Selects apps that have any/all specific tags.
+ - **Whitelist** - Selects apps that are added to the list.
+ - **Blacklist** - Selects apps that are not added to the list.
+ - **Merge** - Selects apps that pass a subgroup of filters.
+ - **Platform** - Selects Steam or non-Steam apps.
+ - **Deck Compatibility** - Selects apps that have a specific Steam Deck compatibilty status.
+ - **Review Score** - Selects apps that are greater/less than the provided metacritic/steam review score.
+ - **Time Played** - Selects apps that have a play time greater/less than the provided time.
+ - **Size on Disk** - Selects apps that have an install size greater/less than the provided size.
+ - **Release Date** - Selects apps that were released before/after the provided date.
+ - **Last Played** - Selects apps that were last played before/after the provided date.
 
-If you want to see another filter, please open a filter request [here]().
+If you want to see another filter, please open a filter request [here](https://github.com/Tormak9970/TabMaster/issues/new/choose).
 
 
 # Using the plugin

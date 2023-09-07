@@ -88,7 +88,7 @@ export const defaultTabsSettings: TabSettingsDictionary = {
     title: "Soundtracks",
     position: 6,
   }
-}
+};
 
 /**
  * Validates that the tabs adhere to the expected structure.
@@ -98,7 +98,6 @@ export const defaultTabsSettings: TabSettingsDictionary = {
 export function validateTabs(tabs: TabSettingsDictionary): boolean {
   return Object.values(tabs).every((tab: TabSettings) => {
     if (tab.filters) {
-      if (!Object.keys(tab).includes("includesHidden")) tab.includesHidden = false;
       if (!Object.keys(tab).includes("filtersMode")) tab.filtersMode = "and";
       return tab.filters.every((filter: TabFilterSettings<FilterType>) => {
         return (filter as TabFilterSettings<FilterType>).type !== undefined;
@@ -116,4 +115,79 @@ export function validateTabs(tabs: TabSettingsDictionary): boolean {
  */
 export function capitalizeFirstLetter(word: string): string {
   return word[0].toUpperCase().concat(word.substring(1));
+}
+
+/**
+ * Capitalizes the first letter of each word.
+ * @param words A string of words.
+ * @returns The capitalized string of words.
+ */
+export function capitalizeEachWord(words: string): string {
+  return words.split(" ").map((word: string) => capitalizeFirstLetter(word)).join(" ");
+}
+
+/**
+ * Gets the current user's steam id.
+ * @param useU64 Whether or not the id should be a u64.
+ * @returns The user's steam id.
+ */
+export function getCurrentUserId(useU64 = false): string {
+  if (useU64) return window.App.m_CurrentUser.strSteamID;
+  return BigInt.asUintN(32, BigInt(window.App.m_CurrentUser.strSteamID)).toString();
+};
+
+/**
+ * Bit defines for inlcudeable categories
+ */
+export enum IncludeCategories {
+  games = 1,
+  software = 2,
+  // tools = 4,   
+  // videos = 2048,
+  music = 8192,
+  hidden = 16
+};
+
+/**
+ * Gets an updated bit field of categories to include
+ * @param bitField The current bit field of categories to include
+ * @param categoriesToInclude Object of categories whose bits are to be set
+ * @returns A bit field of categories to include with desired bits updated
+ */
+export function updateCategoriesToIncludeBitField(bitField: number, categoriesToInclude: { games?: boolean, software?: boolean, music?: boolean, hidden?: boolean }) {
+  let onMask = 0;
+  let offMask = 0;
+
+  for(const key in categoriesToInclude) {
+    const category = key as keyof typeof categoriesToInclude;
+
+    if (categoriesToInclude[category]) {
+      onMask |= IncludeCategories[category];
+    } else {
+      offMask |= IncludeCategories[category];
+    }
+  }
+
+  return (bitField | onMask) & ~offMask;
+}
+
+/**
+ * Gets on object containing flags of which categories are set based on bit field of categories
+ * @param bitField The bit field of categories to include
+ * @returns An object of categories to include
+ */
+export function getIncludedCategoriesFromBitField(bitField: number) {
+  const includes = {
+    games: false,
+    music: false,
+    software: false,
+    // videos: false,
+    // tools: false,
+    hidden: false
+  };
+
+  for (const key of Object.keys(IncludeCategories).filter(key => isNaN(Number(key)))) {
+    includes[key as keyof typeof IncludeCategories] = (IncludeCategories[key as keyof typeof IncludeCategories] & bitField) !== 0;
+  }
+  return includes;
 }

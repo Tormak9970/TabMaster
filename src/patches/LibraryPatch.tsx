@@ -39,7 +39,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
           // @ts-ignore
           const origMemoFn = ret2.type.type;
           // @ts-ignore
-          wrapReactType(ret2.type.type);
+          wrapReactType(ret2);
 
           //* This runs once for every outer run
           innerPatch = replacePatch(ret2.type, 'type', (args) => {

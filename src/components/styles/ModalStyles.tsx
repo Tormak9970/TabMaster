@@ -21,6 +21,9 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildren} {
         width: 100%;
       }
+      .tab-master-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldChildrenWithIcon} {
+        width: 100%;
+      }
 
       /* The button item wrapper */
       .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.Field} {
@@ -35,6 +38,14 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.FieldChildren} > button.${gamepadDialogClasses.Button}.DialogButton {
         padding: 10px;
         min-width: 45px;
+      }
+      .tab-master-modal-scope .name-field .${gamepadDialogClasses.Field} {
+        padding-bottom: 16px;
+        padding-top: 0px;
+      }
+      .tab-master-modal-scope .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
+        left: 1vw;
+        right: 1vw;
       }
 
       .tab-master-modal-scope .no-sep .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after,
@@ -62,6 +73,9 @@ export const ModalStyles: VFC<{}> = ({}) => {
       }
       
       /* Focused styles */
+      .tab-master-modal-scope .start-focused {
+        background-color: #3d4450 !important;
+      }
       .tab-master-modal-scope .filter-start-cont.start-focused {
         background-color: #3d4450 !important;
       }
@@ -73,8 +87,10 @@ export const ModalStyles: VFC<{}> = ({}) => {
       }
 
       /* merge entries */
-      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
+      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry-container {
         margin: 5px;
+        display: flex; 
+        justify-content: space-between;
       }
 
       /* red buttons on destructive modals, matches steams */
@@ -83,9 +99,16 @@ export const ModalStyles: VFC<{}> = ({}) => {
         color: #fff
       }
 
-      /* merge entries */
-      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
-        margin: 5px;
+      .tab-master-modal-scope .slider-with-dropdown-container .${gamepadDialogClasses.Field} {
+        padding-right: 154px;
+        width: 100%;
+      }
+      .tab-master-modal-scope .slider-with-2dropdown-container .${gamepadDialogClasses.Field} {
+        padding-right: 279px;
+        width: 100%;
+      }
+      .tab-master-modal-scope .slider-with-2dropdown-container.wide-dropdown .${gamepadDialogClasses.Field} {
+        padding-right: 294px;
       }
     `}</style>
   );

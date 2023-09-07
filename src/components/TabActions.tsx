@@ -32,7 +32,7 @@ export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabCont
             tabFilters={tabContainer.filters!}
             tabMasterManager={tabMasterManager}
             filtersMode={tabContainer.filtersMode!}
-            includesHidden={tabContainer.includesHidden!}
+            categoriesToInclude={tabContainer.categoriesToInclude!}
           />
         )
       }}>
@@ -82,7 +82,7 @@ export const TabActionsButton: VFC<TabActionButtionProps> = (props) => {
   }
   return (
     <DialogButton
-      style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px" }}
+      style={{ height: "40px", minWidth: "40px", width: "40px", display: "flex", justifyContent: "center", alignItems: "center", padding: "10px", marginRight: "8px" }}
       onClick={onClick}
       onOKButton={onClick}
       onOKActionDescription="Open tab options"
