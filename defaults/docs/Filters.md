@@ -21,6 +21,7 @@
    - Size on Disk
    - Release Date
    - Last Played
+   - Demo
 
 <br/>
 
@@ -243,6 +244,18 @@ Filters apps based on when they were last played.
 
 **Example:**<br/>
 <img title="Last Played Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_last-played-example.png" />
+
+<br/>
+
+#### Demo
+**Options:**<br/>
+`Is demo` - A toggle. On is a demo, off is not a demo.
+
+**Behavior:**<br/>
+Filters apps based on if they are a demo or not.
+
+**Example:**<br/>
+<img title="Demo Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_demo-example.png" />
 
 <br/>
 

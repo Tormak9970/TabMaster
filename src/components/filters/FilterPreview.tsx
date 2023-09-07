@@ -48,7 +48,6 @@ const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = (
   return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{compatCategoryToLabel(filter.params.category)}{filter.inverted ? " (inverted)" : ""}</div>
 }
 
-
 const ReviewScoreFilterPreview: VFC<FilterPreviewProps<'review score'>> = ({ filter }) => {
   const { scoreThreshold, condition, type } = filter.params;
   return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{type === 'metacritic' ? `Metacritic of ${scoreThreshold} or ${condition === 'above' ? 'higher' : 'lower'}` : `At ${condition === 'above' ? 'least' : 'most'} ${scoreThreshold}% positive Steam reviews`}</div>
@@ -72,6 +71,9 @@ const ReleaseDateFilterPreview: VFC<FilterPreviewProps<'release date'>> = ({ fil
 const LastPlayedFilterPreview: VFC<FilterPreviewProps<'last played'>> = ({ filter }) => {
   const { day, month, year } = filter.params.date!;
   return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, {dateStyle: 'long'})}`}</div>
+}
+const DemoFilterPreview: VFC<FilterPreviewProps<'demo'>> = ({ filter }) => {
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.isDemo ? "yes" : "no"}</div>
 }
 
 /**
@@ -110,6 +112,8 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <ReleaseDateFilterPreview filter={filter as TabFilterSettings<'release date'>} />
       case "last played":
         return <LastPlayedFilterPreview filter={filter as TabFilterSettings<'last played'>} />
+      case "demo":
+        return <DemoFilterPreview filter={filter as TabFilterSettings<'demo'>} />
       default:
         return <Fragment />
     }

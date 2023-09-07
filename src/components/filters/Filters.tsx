@@ -1,7 +1,7 @@
 import { PluginController } from "../../lib/controllers/PluginController";
 import { DateIncludes, DateObj } from '../generic/DatePickers';
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo';
 
 export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
@@ -32,6 +32,7 @@ type TimePlayedFilterParams = { timeThreshold: number, condition: ThresholdCondi
 type SizeOnDiskFilterParams = { gbThreshold: number, condition: ThresholdCondition; };
 type ReleaseDateFilterParams = { date?: DateObj, condition: ThresholdCondition; };
 type LastPlayedFilterParams = { date?: DateObj, condition: ThresholdCondition; };
+type DemoFilterParams = { isDemo: boolean; };
 
 export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -49,6 +50,7 @@ export type FilterParams<T extends FilterType> =
   T extends 'size on disk' ? SizeOnDiskFilterParams :
   T extends 'release date' ? ReleaseDateFilterParams :
   T extends 'last played' ? LastPlayedFilterParams :
+  T extends 'demo' ? DemoFilterParams :
   never;
 
 export type TabFilterSettings<T extends FilterType> = {
@@ -78,7 +80,8 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "time played": { timeThreshold: 60, condition: 'above', units: 'minutes' },
   "size on disk": { gbThreshold: 10, condition: 'above' },
   "release date": { date: undefined, condition: 'above' },
-  "last played": { date: undefined, condition: 'above' }
+  "last played": { date: undefined, condition: 'above' },
+  "demo": { isDemo: true }
 };
 
 /**
@@ -104,6 +107,7 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "size on disk":
     case "release date":
     case "last played":
+    case "demo":
       return false;
   }
 }
@@ -134,6 +138,7 @@ export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean 
     case "review score":
     case "time played":
     case "size on disk":
+    case "demo":
       return false;
     case "release date":
     case "last played":
@@ -255,6 +260,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "size on disk":
     case "release date":
     case "last played":
+    case "demo":
       return {
         passed: true,
         errors: []
@@ -373,6 +379,9 @@ export class Filter {
             return lastPlayedTimeMs < new Date(year + 1, 0, 1).getTime();
         }
       }
+    },
+    demo: (params: FilterParams<'demo'>, appOverview: SteamAppOverview) => {
+      return params.isDemo ? appOverview.app_type === 8 : appOverview.app_type !== 8; 
     }
   };
 

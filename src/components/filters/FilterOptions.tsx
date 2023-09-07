@@ -588,6 +588,23 @@ const LastPlayedFilterOptions: VFC<FilterOptionsProps<'last played'>> = ({ index
 };
 
 /**
+ * The options for an installed filter.
+ */
+const DemoFilterOptions: VFC<FilterOptionsProps<'demo'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  function onChange(checked: boolean) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.isDemo = checked ?? false;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  return (
+    <ToggleField label="Is demo" checked={filter.params.isDemo} onChange={onChange} />
+  );
+};
+
+/**
  * The options for an individual filter.
  */
 export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
@@ -623,6 +640,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <ReleaseDateFilterOptions index={index} filter={filter as TabFilterSettings<'release date'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "last played":
         return <LastPlayedFilterOptions index={index} filter={filter as TabFilterSettings<'last played'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "demo":
+        return <DemoFilterOptions index={index} filter={filter as TabFilterSettings<'demo'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       default:
         return <Fragment />;
     }

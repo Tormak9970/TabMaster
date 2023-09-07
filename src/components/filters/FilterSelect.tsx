@@ -31,7 +31,8 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
     "time played": "Selects apps based on your play time.",
     "size on disk": "Selects apps based on their install size.",
     "release date": "Selects apps based on their release date.",
-    "last played": "Selects apps based on when they were last played."
+    "last played": "Selects apps based on when they were last played.",
+    demo: "Selects apps that are/aren't demos."
   }
 
   useEffect(() => {setTimeout(() => setFocusable(true), 10)}, []);
