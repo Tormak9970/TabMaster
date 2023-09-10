@@ -21,6 +21,10 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
   //* This only runs 1 time, which is perfect
   return serverAPI.routerHook.addPatch("/library", (props: { path: string; children: ReactElement; }) => {
     afterPatch(props.children, "type", (_: Record<string, unknown>[], ret1: ReactElement) => {
+      if (!ret1?.type) {
+        LogController.raiseError('Failed to find outer library element to patch');
+        return ret1;
+      }
       const [refresh, setRefresh] = useState(false);
 
       let innerPatch: Patch;
@@ -33,11 +37,15 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
 
       //* This patch always runs twice
       afterPatch(ret1, "type", (_: Record<string, unknown>[], ret2: ReactElement) => {
+        if (!ret2?.type) {
+          LogController.raiseError('Failed to find inner library element to patch');
+          return ret2;
+        }
         if (memoCache) {
           ret2.type = memoCache;
         } else {
           // @ts-ignore
-          const origMemoFn = ret2.type.type;
+          const origMemoComponent = ret2.type.type;
           // @ts-ignore
           wrapReactType(ret2);
 
@@ -50,6 +58,10 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
             const fakeUseMemo = (fn: () => any, deps: any[]) => {
               return realUseMemo(() => {
                 const tabs: SteamTab[] = fn();
+                if (!Array.isArray(tabs)){
+                  LogController.raiseError('No array returned when trying to retrieve default tabs');
+                  return tabs;
+                }
 
                 const [eSortBy, setSortBy, showSortingContextMenu] = deps;
                 const sortingProps = { eSortBy, setSortBy, showSortingContextMenu };
@@ -57,7 +69,8 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
 
                 const tabTemplate = tabs.find((tab: SteamTab) => tab?.id === "AllGames");
                 if (tabTemplate === undefined) {
-                  LogController.error(`Tab Master couldn't find default tab "AllGames" to copy from`);
+                  LogController.raiseError(`Couldn't find default tab "AllGames" to copy from`);
+                  return tabs;
                 }
 
                 const tabContentComponent = tabTemplate!.content.type as TabContentComponent;
@@ -83,7 +96,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
             };
 
             hooks.useMemo = fakeUseMemo;
-            const res = origMemoFn(...args);
+            const res = origMemoComponent(...args);
             hooks.useMemo = realUseMemo;
 
             return res;

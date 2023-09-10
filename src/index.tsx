@@ -17,7 +17,7 @@ import {
 import { VFC, Fragment, ReactNode } from "react";
 
 import { TbLayoutNavbarExpand } from "react-icons/tb";
-import { FaSteam, FaArrowRotateRight } from "react-icons/fa6";
+import { FaSteam, FaArrowRotateRight, FaCircleExclamation } from "react-icons/fa6";
 import { MdNumbers } from "react-icons/md";
 
 import { PluginController } from "./lib/controllers/PluginController";
@@ -102,6 +102,23 @@ const Content: VFC<{}> = ({ }) => {
 
   return (
     <>
+      {LogController.errorFlag && <div style={{ padding: '0 15px', marginBottom: '40px' }}>
+        <h3>
+          <FaCircleExclamation style={{ height: '.8em', marginRight: '5px' }} fill="red" />
+          Tab Master encountered an error
+        </h3>
+        <div style={{ wordWrap: 'break-word' }}>
+          Please reach out to 
+          <br/>
+          <a href='https://github.com/Tormak9970/TabMaster/issues'>https://github.com/Tormak9970/TabMaster/issues</a>
+          <br/>
+          or
+          <br/>
+          <a href='https://discord.com/channels/960281551428522045/1049449185214206053'>https://discord.com/channels/960281551428522045/1049449185214206053</a>
+          <br/>
+          for support.
+        </div>
+      </div>}
       <QamStyles />
       <div className="tab-master-scope">
         <Focusable onMenuActionDescription='Open Docs' onMenuButton={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }}>
