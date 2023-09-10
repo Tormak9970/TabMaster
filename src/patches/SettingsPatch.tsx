@@ -7,7 +7,10 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
   return serverAPI.routerHook.addPatch("/settings", (props: { path: string; children: ReactElement; }) => {
     //* This only runs once which is perfect
     afterPatch(props.children, 'type', (_: any, ret: any) => {
-      // console.log('ret 1', ret);
+      if (!ret?.type) {
+        LogController.raiseError('Failed to find settings element to patch');
+        return ret;
+      }
 
       let firstCache: any;
       let secondCache: any;
@@ -20,7 +23,8 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
           // console.log('ret 2', ret);
           const homeElement = ret?.props?.children?.props?.pages?.find((obj: any) => obj.route === '/settings/home')?.content;
           if (homeElement === undefined) {
-            LogController.throw('Tab Master could not find home element to patch');
+            LogController.raiseError("Couldn't find home element to patch in settings");
+            return ret;
           }
 
           if (secondCache) {
@@ -33,14 +37,18 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
                 return elt?.type?.toString?.().includes('HomeSettings');
               });
               if (buttonElement === undefined) {
-                LogController.throw('Tab Master could not find button element to patch');
+                LogController.raiseError("Couldn't find button element to patch in settings");
+                return ret;
               }
 
               // console.log('button', buttonElement);
 
               afterPatch(buttonElement, 'type', (_: any, ret: any) => {
                 // console.log('ret 4', ret);
-                if (!ret) return ret
+                if (!ret?.props?.onClick) {
+                  LogController.raiseError("Couldn't patch button onClick fn in settings");
+                  return ret;
+                }
 
                 const origOnClick = ret.props.onClick;
 
