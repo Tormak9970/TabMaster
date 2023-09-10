@@ -2,6 +2,11 @@ import { PythonInterop } from "./PythonInterop";
 
 export class LogController {
   /**
+   * Error flag to check for showing a problem has occured in the QAM.
+   */
+  static errorFlag = false;
+
+  /**
    * Logs a message to the plugin's log file and the frontend console.
    * @param message The message to log.
    */
@@ -50,5 +55,17 @@ export class LogController {
 	static throw(...args: any[]) {
     PythonInterop.error(args.join(" "));
     throw new Error([`%c TabMaster %c ERROR %c`, 'background: #ff6d05; color: black;', 'background: #c70808; color: black;', 'background: transparent;', ...args].join(' '));
+  }
+
+  /**
+   * Logs error to backend, frontend, and toasts the error and sets the error flag to show in QAM.
+   * 
+   * intended for patching/ ui errors but may be useful for other cases in the future.
+   */
+  static raiseError(...args: any[]){
+    PythonInterop.error(args.join(" "));
+    LogController.error(...args);
+    PythonInterop.toast("TAB MASTER ERROR", args.join(" "));
+    LogController.errorFlag = true;
   }
 }
