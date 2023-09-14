@@ -93,12 +93,6 @@ export const ModalStyles: VFC<{}> = ({}) => {
         justify-content: space-between;
       }
 
-      /* red buttons on destructive modals, matches steams */
-      .tab-master-destructive-modal button.${gamepadDialogClasses.Button}.DialogButton.gpfocus.Primary {
-        background: #de3618;
-        color: #fff
-      }
-
       .tab-master-modal-scope .slider-with-dropdown-container .${gamepadDialogClasses.Field} {
         padding-right: 154px;
         width: 100%;

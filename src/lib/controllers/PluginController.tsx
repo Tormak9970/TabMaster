@@ -4,6 +4,7 @@ import { SteamController } from "./SteamController";
 import { LogController } from "./LogController";
 import { TabMasterManager } from "../../state/TabMasterManager";
 import { getCurrentUserId } from "../Utils";
+import { DestructiveModal } from '../../components/generic/DestructiveModal';
 
 function showMigrationModal(okCallback: () => Promise<void>, cancelCallback: () => Promise<void>) {
   showModal(
@@ -23,17 +24,15 @@ function showMigrationModal(okCallback: () => Promise<void>, cancelCallback: () 
 
 function showDiscardConfirm(okCallback: () => Promise<void>, onCancel: () => Promise<void>) {
   showModal(
-    <ConfirmModal
-      className={'tab-master-destructive-modal'}
+    <DestructiveModal
       strOKButtonText={"Confirm"}
       onOK={okCallback}
       strCancelButtonText={"Back"}
       onCancel={onCancel}
-      bDestructiveWarning={true}
       strTitle="Are You Sure?"
     >
       Are you sure you want to discard the previous settings? This can't be undone.
-    </ConfirmModal>
+    </DestructiveModal>
   )
 }
 

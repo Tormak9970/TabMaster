@@ -65,12 +65,6 @@ export const FixModalStyles: VFC<{}> = ({}) => {
         margin: 5px;
       }
 
-      /* red buttons on destructive modals, matches steams */
-      .tab-master-destructive-modal button.${gamepadDialogClasses.Button}.DialogButton.gpfocus.Primary {
-        background: #de3618;
-        color: #fff
-      }
-
       /* Error Accordion styles */
       .tab-master-fix-modal-scope .filter-start-cont.tab-errors {
         background-color: #23262e;
