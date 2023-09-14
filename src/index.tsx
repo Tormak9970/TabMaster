@@ -47,7 +47,7 @@ declare global {
   let securitystore: SecurityStore;
 }
 
-type TabIdEntryType = {
+export type TabIdEntryType = {
   id: string;
 };
 
