@@ -7,6 +7,7 @@ import {
   Dropdown,
   Focusable,
   Marquee,
+  ModalRoot,
   SingleDropdownOption,
   TextField,
   ToggleField,
@@ -38,7 +39,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, En
 
   return (
     // TODO: need to wrap this in a modal root
-    <>
+    <ModalRoot onCancel={closeModal} onEscKeypress={closeModal}>
       <DialogBody className="deckyFilePicker">
         <DialogControlsSection>
           <Focusable flow-children="right" style={{ display: 'flex', marginBottom: '1em' }}>
@@ -151,7 +152,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, En
           </DialogButton>
         </DialogFooter>
       )} */}
-    </>
+    </ModalRoot>
   );
 };
 
