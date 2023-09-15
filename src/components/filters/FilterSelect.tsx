@@ -112,7 +112,7 @@ export const FilterSelect: VFC<FilterSelectProps> = ({ selectedOption, onChange 
   }
 
   return (
-    <CustomButton style={{ padding: '10px 12px' }} onOKActionDescription={"Change Filter Type"} onOKButton={showFilterSelection} onClick={showFilterSelection}>
+    <CustomButton style={{ padding: '10px 16px' }} onOKActionDescription={"Change Filter Type"} onOKButton={showFilterSelection} onClick={showFilterSelection}>
       <div style={{ display: 'flex', overflow: 'hidden' }}>
         <div style={{ overflow: 'hidden', flex: 'auto' }}>
           <div style={{ textAlign: 'left', minHeight: '20px' }}>
