@@ -174,7 +174,7 @@ export function ListSearchTrigger({ labelOverride, options, onChange, TriggerIco
     <CustomDropdown
       rgOptions={options}
       labelOverride={labelOverride}
-      customDropdownIcon={<TriggerIcon />}
+      customDropdownIcon={<TriggerIcon style={{ margin: 'auto' }} />}
       onChange={onChange}
       useCustomModal={ModalWrapper}
       disabled={disabled}
