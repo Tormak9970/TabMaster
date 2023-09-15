@@ -1,8 +1,10 @@
-import { Dropdown, DropdownOption, Field, Focusable } from "decky-frontend-lib";
+import { Dropdown, DropdownOption, Field, Focusable, SingleDropdownOption } from "decky-frontend-lib";
 import { useState, VFC, useEffect } from "react";
 import { MultiSelectStyles } from "../styles/MultiSelectStyles";
 import { MultiSelectedOption } from "./MultiSelectOption";
 import { MultiSelectProps } from "./MultiSelect";
+import { ListSearchTrigger } from "../modals/ListSearchModal";
+import { FaTag, FaTags } from "react-icons/fa6";
 
 
 export interface ModeMultiSelectProps extends Omit<MultiSelectProps, 'onChange'> {
@@ -68,7 +70,15 @@ export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, f
               <Focusable style={{
                 width: "calc(100% - 100px)"
               }}>
-                <Dropdown rgOptions={available} selectedOption={dropdownSelected} onChange={onSelectedChange} strDefaultLabel={dropdownLabel} focusable={true} disabled={available.length == 0 || (!!maxOptions && selected.length == maxOptions)} />
+                <ListSearchTrigger
+                  options={available as SingleDropdownOption[]}
+                  onChange={onSelectedChange}
+                  labelOverride={dropdownSelected.label!}
+                  disabled={available.length == 0 || (!!maxOptions && selected.length == maxOptions)}
+                  TriggerIcon={FaTags} //!This is just temporary
+                  EntryIcon={FaTag} //!This is just temporary
+                />
+                {/* <Dropdown rgOptions={available} selectedOption={dropdownSelected} onChange={onSelectedChange} strDefaultLabel={dropdownLabel} focusable={true} disabled={available.length == 0 || (!!maxOptions && selected.length == maxOptions)} /> */}
               </Focusable>
               <Focusable style={{
                 marginLeft: "10px",

@@ -3,6 +3,13 @@ import { ReactElement, VFC, useState, useEffect } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
 import { CustomButtonProps, CustomButton } from './CustomButton';
 
+export type BaseModalProps = {
+  onSelectOption: (option: SingleDropdownOption) => void,
+  rgOptions?: SingleDropdownOption[],
+  selectedOption?: SingleDropdownOption['data'],
+  closeModal?: () => void
+}
+
 export interface CustomDropdownProps extends Omit<DropdownProps, 'rgOptions' | 'onMenuWillOpen' | 'selectedOption' | 'contextMenuPositionOptions' | 'renderButtonValue'>, Omit<CustomButtonProps, 'audioSFX' | 'noAudio' | 'onClick' | 'children'> {
   /** An array of options to choose from */
   rgOptions?: SingleDropdownOption[];
@@ -13,6 +20,9 @@ export interface CustomDropdownProps extends Omit<DropdownProps, 'rgOptions' | '
   /** Whether or not the selection label should be centered @default false */
   labelCenter?: boolean;
 
+  /** A string to always show in place of the selected option's label */
+  labelOverride?: string;
+
   /** Whether or not the selection dropdown arrow should be removed @default false */
   noDropdownIcon?: boolean;
 
@@ -20,7 +30,7 @@ export interface CustomDropdownProps extends Omit<DropdownProps, 'rgOptions' | '
   customDropdownIcon?: ReactElement;
 
   /** A custom modal to use to select options instead of the default context menu */
-  useCustomModal?: VFC<{ onSelectOption: (option: SingleDropdownOption) => void, rgOptions?: SingleDropdownOption[], selectedOption?: SingleDropdownOption['data']; }>;
+  useCustomModal?: VFC<BaseModalProps>;
 
   /** CSS style for the selection label div */
   labelStyle?: React.CSSProperties;
@@ -44,6 +54,7 @@ export const CustomDropdown: VFC<CustomDropdownProps> = ({
   labelStyle,
   labelChangedStyle,
   containerClassName,
+  labelOverride,
   strDefaultLabel,
   labelCenter,
   menuLabel,
@@ -111,7 +122,7 @@ export const CustomDropdown: VFC<CustomDropdownProps> = ({
       <div style={{ display: 'flex', overflow: 'hidden' }}>
         <div style={{ overflow: 'hidden', flex: 'auto' }}>
           <div style={Object.assign({ textAlign: labelCenter ? 'center' : 'left', minHeight: '20px' }, changed ? labelChangedStyle : labelStyle)} className={addClasses(CustomDropdownClasses.label, changed && CustomDropdownClasses.selectionChanged)}>
-            {selected?.label ?? strDefaultLabel}
+            {labelOverride ?? selected?.label ?? strDefaultLabel}
           </div>
         </div>
         {!noDropdownIcon && (
