@@ -124,12 +124,15 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContaini
   const { allStoreTags } = useTabMasterContext();
 
   const dropdownOptions: DropdownOption[] = allStoreTags.sort((tagA: TagResponse, tagB: TagResponse) => tagA.string!.localeCompare(tagB.string!)).map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag }; });
-  const selected: DropdownOption[] = filter.params.tags.map((tagNum: number) => {
-    return {
-      label: allStoreTags.find((tag) => tag.tag === tagNum)!.string,
-      data: tagNum
-    };
-  });
+  let selected: DropdownOption[] = [];
+  setTimeout(() => {
+    selected = filter.params.tags.map((tagNum: number) => {
+      return {
+        label: allStoreTags.find((tag) => tag.tag === tagNum)!.string,
+        data: tagNum
+      };
+    });
+  }, 50);
   const tagsMode = filter.params.mode;
 
   function onChange(selected: DropdownOption[], mode: LogicalMode) {
@@ -141,7 +144,7 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContaini
     setContainingGroupFilters(updatedFilters);
   }
 
-  return (
+  return ( 
     <ModeMultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={tagsMode} options={dropdownOptions} selected={selected} onChange={onChange} />
   );
 };

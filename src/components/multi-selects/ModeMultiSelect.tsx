@@ -6,7 +6,6 @@ import { MultiSelectProps } from "./MultiSelect";
 import { ListSearchTrigger } from "../modals/ListSearchModal";
 import { FaTag, FaTags } from "react-icons/fa6";
 
-
 export interface ModeMultiSelectProps extends Omit<MultiSelectProps, 'onChange'> {
   mode: LogicalMode,
   onChange?: (selected:DropdownOption[], mode: LogicalMode) => void
@@ -71,6 +70,7 @@ export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, f
                 width: "calc(100% - 100px)"
               }}>
                 <ListSearchTrigger
+                  entryLabel={"Tags"}
                   options={available as SingleDropdownOption[]}
                   onChange={onSelectedChange}
                   labelOverride={dropdownSelected.label!}
