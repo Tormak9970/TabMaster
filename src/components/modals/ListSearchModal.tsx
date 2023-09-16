@@ -139,7 +139,7 @@ export function ListSearchTrigger({ entryLabel, labelOverride, options, onChange
     <CustomDropdown
       rgOptions={options}
       labelOverride={labelOverride}
-      customDropdownIcon={<TriggerIcon />}
+      customDropdownIcon={<TriggerIcon style={{ margin: 'auto' }} />}
       onChange={onChange}
       useCustomModal={ModalWrapper}
       disabled={disabled}
