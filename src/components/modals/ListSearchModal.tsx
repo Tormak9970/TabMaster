@@ -7,8 +7,7 @@ import {
   ModalRoot,
   PanelSection,
   SingleDropdownOption,
-  TextField,
-  quickAccessControlsClasses
+  TextField
 } from "decky-frontend-lib";
 import { VFC, useEffect, useState } from "react";
 import { IconType } from "react-icons/lib";
@@ -16,6 +15,7 @@ import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { BaseModalProps, CustomDropdown } from "../generic/CustomDropdown";
+import { ListSearchModalStyles } from "../styles/ListSearchModalStyles";
 
 export type ListSearchModalProps = {
   rgOptions: SingleDropdownOption[],
@@ -58,17 +58,8 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
 
   return (
     <ModalRoot onCancel={closeModal} onEscKeypress={closeModal}>
-      {/* TODO: abstract this to a component */}
-      <style>{`
-        .list-search-modal .${quickAccessControlsClasses.PanelSection} {
-          margin: 0px;
-          padding: 0px;
-        }
-        .list-search-modal .${quickAccessControlsClasses.PanelSection}:first-of-type {
-          margin: 0px;
-        }
-      `}</style>
-      <DialogBody className="list-search-modal">
+      <ListSearchModalStyles />
+      <DialogBody className="tab-master-list-search-modal">
         <DialogControlsSection>
           <Focusable flow-children="right" style={{ display: "flex" }}>
             <div
