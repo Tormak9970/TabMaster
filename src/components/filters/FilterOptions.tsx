@@ -17,8 +17,11 @@ import { ModeMultiSelect } from "../multi-selects/ModeMultiSelect";
 import { EditMergeFilterModal } from "../modals/EditMergeFilterModal";
 import { MultiSelect } from "../multi-selects/MultiSelect";
 import { FilterPreview } from "./FilterPreview";
+import { FaSquareSteam, FaTag, FaTags, FaUser } from "react-icons/fa6";
 import { DateIncludes, DateObj, DatePicker, DateSelection } from '../generic/DatePickers';
 import { EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from '../generic/EnhancedSelector';
+import { FaUserFriends } from "react-icons/fa";
+import { MdApps } from "react-icons/md";
 
 type FilterOptionsProps<T extends FilterType> = {
   index: number,
@@ -113,7 +116,7 @@ const FriendsFilterOptions: VFC<FilterOptionsProps<'friends'>> = ({ index, setCo
   }
 
   return (
-    <ModeMultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={friendsMode} options={dropdownOptions} selected={selected} onChange={onChange} />
+    <ModeMultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={friendsMode} options={dropdownOptions} selected={selected} onChange={onChange} entryLabel={"Friends"} EntryIcon={FaUser} TriggerIcon={FaUserFriends} />
   );
 };
 
@@ -124,15 +127,12 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContaini
   const { allStoreTags } = useTabMasterContext();
 
   const dropdownOptions: DropdownOption[] = allStoreTags.sort((tagA: TagResponse, tagB: TagResponse) => tagA.string!.localeCompare(tagB.string!)).map((storeTag: TagResponse) => { return { label: storeTag.string, data: storeTag.tag }; });
-  let selected: DropdownOption[] = [];
-  setTimeout(() => {
-    selected = filter.params.tags.map((tagNum: number) => {
-      return {
-        label: allStoreTags.find((tag) => tag.tag === tagNum)!.string,
-        data: tagNum
-      };
-    });
-  }, 50);
+  const selected: DropdownOption[] = filter.params.tags.map((tagNum: number) => {
+    return {
+      label: allStoreTags.find((tag) => tag.tag === tagNum)!.string,
+      data: tagNum
+    };
+  });
   const tagsMode = filter.params.mode;
 
   function onChange(selected: DropdownOption[], mode: LogicalMode) {
@@ -145,7 +145,7 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContaini
   }
 
   return ( 
-    <ModeMultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={tagsMode} options={dropdownOptions} selected={selected} onChange={onChange} />
+    <ModeMultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={tagsMode} options={dropdownOptions} selected={selected} onChange={onChange} entryLabel="Tags" EntryIcon={FaTag} TriggerIcon={FaTags} />
   );
 };
 
@@ -178,7 +178,7 @@ const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, s
   }
 
   return (
-    <MultiSelect fieldLabel="Whitelisted Apps" dropdownLabel="Add an app" options={dropdownOptions} selected={selected} onChange={onChange} />
+    <MultiSelect fieldLabel="Whitelisted Apps" dropdownLabel="Add an app" options={dropdownOptions} selected={selected} onChange={onChange} entryLabel={"Your Apps"} EntryIcon={FaSquareSteam} TriggerIcon={MdApps} />
   );
 };
 
@@ -211,7 +211,7 @@ const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, s
   }
 
   return (
-    <MultiSelect fieldLabel="Blacklisted Apps" dropdownLabel="Add an app" options={dropdownOptions} selected={selected} onChange={onChange} />
+    <MultiSelect fieldLabel="Blacklisted Apps" dropdownLabel="Add an app" options={dropdownOptions} selected={selected} onChange={onChange} entryLabel={"Your Apps"} EntryIcon={FaSquareSteam} TriggerIcon={MdApps} />
   );
 };
 

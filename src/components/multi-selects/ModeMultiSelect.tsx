@@ -4,17 +4,20 @@ import { MultiSelectStyles } from "../styles/MultiSelectStyles";
 import { MultiSelectedOption } from "./MultiSelectOption";
 import { MultiSelectProps } from "./MultiSelect";
 import { ListSearchTrigger } from "../modals/ListSearchModal";
-import { FaTag, FaTags } from "react-icons/fa6";
+import { IconType } from "react-icons/lib";
 
 export interface ModeMultiSelectProps extends Omit<MultiSelectProps, 'onChange'> {
+  entryLabel: string,
   mode: LogicalMode,
+  EntryIcon: IconType,
+  TriggerIcon: IconType,
   onChange?: (selected:DropdownOption[], mode: LogicalMode) => void
 }
 
 /**
  * A component for multi select dropdown menus that supports modes.
  */
-export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps }) => {
+export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps, entryLabel, EntryIcon, TriggerIcon }) => {
   const [ sel, setSel ] = useState(selected);
   const [ available, setAvailable ] = useState(options.filter((opt) => !selected.includes(opt)));
   const [ innerMode, setInnerMode ] = useState(mode);
@@ -70,15 +73,14 @@ export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, f
                 width: "calc(100% - 100px)"
               }}>
                 <ListSearchTrigger
-                  entryLabel={"Tags"}
+                  entryLabel={entryLabel}
                   options={available as SingleDropdownOption[]}
                   onChange={onSelectedChange}
                   labelOverride={dropdownSelected.label!}
                   disabled={available.length == 0 || (!!maxOptions && selected.length == maxOptions)}
-                  TriggerIcon={FaTags} //!This is just temporary
-                  EntryIcon={FaTag} //!This is just temporary
+                  TriggerIcon={TriggerIcon}
+                  EntryIcon={EntryIcon}
                 />
-                {/* <Dropdown rgOptions={available} selectedOption={dropdownSelected} onChange={onSelectedChange} strDefaultLabel={dropdownLabel} focusable={true} disabled={available.length == 0 || (!!maxOptions && selected.length == maxOptions)} /> */}
               </Focusable>
               <Focusable style={{
                 marginLeft: "10px",

@@ -11,7 +11,7 @@ import {
   quickAccessControlsClasses
 } from "decky-frontend-lib";
 import { VFC, useEffect, useState } from "react";
-import { IconType } from "react-icons";
+import { IconType } from "react-icons/lib";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FaMagnifyingGlass } from "react-icons/fa6";
@@ -96,7 +96,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
           </Focusable>
         </DialogControlsSection>
         <DialogControlsSection style={{ marginTop: "1em" }}>
-          <PanelSection title={entryLabel}>
+          <PanelSection title={`${entryLabel} - ${filteredList.length}`}>
             <Focusable
               style={{ display: "flex", gap: "4px", flexDirection: "column", height: "48.7vh", overflow: "scroll" }}
             >
