@@ -8,6 +8,7 @@ import { defaultTabsSettings, getNonBigIntUserId } from "../lib/Utils";
 import { LogController } from "../lib/controllers/LogController";
 import { showModal } from "decky-frontend-lib";
 import { FixTabErrorsModalRoot } from "../components/modals/FixTabErrorsModal";
+import { PresetName, PresetOptions, getPreset } from '../presets/presets';
 
 /**
  * Converts a list of filters into a 1D array.
@@ -446,6 +447,11 @@ export class TabMasterManager {
     this.addCollectionReactionsForFilters(flattenFilters(filterSettingsList));
     this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode, categoriesToInclude));
     this.updateAndSave();
+  }
+
+  createPresetTab<Name extends PresetName>(presetName: Name, ...options: PresetOptions<Name>){
+    const { title, filters, filtersMode, categoriesToInclude} = getPreset(presetName, ...options);
+    this.createCustomTab(title, this.visibleTabsList.length, filters, filtersMode, categoriesToInclude);
   }
 
   /**
