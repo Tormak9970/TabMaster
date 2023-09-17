@@ -7,7 +7,7 @@ import { IconType } from "react-icons/lib";
 
 export type MultiSelectProps = {
   entryLabel: string,
-  EntryIcon: IconType,
+  determineEntryIcon: (entry: any) => IconType,
   TriggerIcon: IconType,
   options: DropdownOption[],
   selected: DropdownOption[],
@@ -21,7 +21,7 @@ export type MultiSelectProps = {
 /**
  * A component for multi select dropdown menus.
  */
-export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, onChange = () => {}, maxOptions, fieldProps, entryLabel, EntryIcon, TriggerIcon }) => {
+export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, onChange = () => {}, maxOptions, fieldProps, entryLabel, determineEntryIcon, TriggerIcon }) => {
   const [ sel, setSel ] = useState(selected);
   const [ available, setAvailable ] = useState(options.filter((opt) => !selected.includes(opt)));
 
@@ -67,7 +67,7 @@ export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, fieldLabe
                 labelOverride={dropdownSelected.label!}
                 disabled={available.length == 0 || (!!maxOptions && selected.length == maxOptions)}
                 TriggerIcon={TriggerIcon}
-                EntryIcon={EntryIcon}
+                determineEntryIcon={determineEntryIcon}
               />
             </Focusable>
           </div>

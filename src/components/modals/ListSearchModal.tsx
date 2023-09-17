@@ -21,7 +21,7 @@ export type ListSearchModalProps = {
   rgOptions: SingleDropdownOption[],
   entryLabel: string,
   onSelectOption: (option: SingleDropdownOption) => void,
-  EntryIcon: IconType,
+  determineEntryIcon: (entry?: any) => IconType,
   closeModal?: () => void
 }
 
@@ -30,7 +30,7 @@ const iconStyles = {
   width: "1em",
 };
 
-export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, entryLabel, EntryIcon, onSelectOption, closeModal }: ListSearchModalProps) => {
+export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, entryLabel, determineEntryIcon, onSelectOption, closeModal }: ListSearchModalProps) => {
   const [query, setQuery] = useState("");
   const [filteredList, setFilteredList] = useState(list);
 
@@ -38,23 +38,26 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
     setFilteredList(list.filter((entry) => (entry.label as string).toLowerCase().includes(query)));
   }, [query]);
 
-  const ListEntry = ({ index, style }: { index: number, style: any}) => (
-    <div style={style} className="post">
-      <DialogButton
-        key={`${filteredList[index].label}`}
-        style={{ borderRadius: "unset", margin: "0", padding: "10px" }}
-        onClick={() => {
-          onSelectOption(filteredList[index]);
-          closeModal!();
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start" }}>
-          <EntryIcon style={iconStyles} />
-          <Marquee>{filteredList[index].label}</Marquee>
-        </div>
-      </DialogButton>
-    </div>
-  );
+  const ListEntry = ({ index, style }: { index: number, style: any}) => {
+    const EntryIcon = determineEntryIcon(filteredList[index]);
+    return (
+      <div style={style} className="post">
+        <DialogButton
+          key={`${filteredList[index].label}`}
+          style={{ borderRadius: "unset", margin: "0", padding: "10px" }}
+          onClick={() => {
+            onSelectOption(filteredList[index]);
+            closeModal!();
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
+            <EntryIcon style={iconStyles} />
+            <Marquee>{filteredList[index].label}</Marquee>
+          </div>
+        </DialogButton>
+      </div>
+    );
+  };
 
   return (
     <ModalRoot onCancel={closeModal} onEscKeypress={closeModal}>
@@ -117,13 +120,13 @@ export type ListSearchTrigger = {
   options: SingleDropdownOption[],
   onChange: (option: SingleDropdownOption) => void,
   TriggerIcon: IconType,
-  EntryIcon: IconType,
+  determineEntryIcon: (entry?: any) => IconType,
   disabled: boolean
 }
 
-export function ListSearchTrigger({ entryLabel, labelOverride, options, onChange, TriggerIcon, EntryIcon, disabled }: ListSearchTrigger) {
+export function ListSearchTrigger({ entryLabel, labelOverride, options, onChange, TriggerIcon, determineEntryIcon, disabled }: ListSearchTrigger) {
   const ModalWrapper: VFC<BaseModalProps> = ({ onSelectOption, rgOptions, closeModal }: BaseModalProps) => {
-    return <ListSearchModal entryLabel={entryLabel} rgOptions={rgOptions!} onSelectOption={onSelectOption} EntryIcon={EntryIcon} closeModal={closeModal} />
+    return <ListSearchModal entryLabel={entryLabel} rgOptions={rgOptions!} onSelectOption={onSelectOption} determineEntryIcon={determineEntryIcon} closeModal={closeModal} />
   }
   
   return (

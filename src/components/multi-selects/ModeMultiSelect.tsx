@@ -6,7 +6,7 @@ import { MultiSelectProps } from "./MultiSelect";
 import { ListSearchTrigger } from "../modals/ListSearchModal";
 import { IconType } from "react-icons/lib";
 
-export interface ModeMultiSelectProps extends Omit<MultiSelectProps, 'onChange'> {
+export interface ModeMultiSelectProps extends Omit<MultiSelectProps, 'onChange' | 'determineEntryIcon'> {
   entryLabel: string,
   mode: LogicalMode,
   EntryIcon: IconType,
@@ -79,7 +79,7 @@ export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, f
                   labelOverride={dropdownSelected.label!}
                   disabled={available.length == 0 || (!!maxOptions && selected.length == maxOptions)}
                   TriggerIcon={TriggerIcon}
-                  EntryIcon={EntryIcon}
+                  determineEntryIcon={() => EntryIcon}
                 />
               </Focusable>
               <Focusable style={{
