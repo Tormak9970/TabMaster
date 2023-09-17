@@ -5,8 +5,7 @@ import {
   Focusable,
   TextField,
   afterPatch,
-  quickAccessControlsClasses,
-
+  quickAccessControlsClasses
 } from "decky-frontend-lib";
 import { useState, VFC, useEffect, Fragment } from "react";
 import { FilterType, TabFilterSettings, isDefaultParams } from "../filters/Filters";
