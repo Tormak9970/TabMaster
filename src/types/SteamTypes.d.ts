@@ -44,10 +44,12 @@ type SteamTab = {
     id: string,
     content: React.ReactElement<TabContentProps>,
     footer?: {
-        onOptrionActionsDescription: string,
-        onOptionsButtion: () => any,
-        onSecondaryActionDescription: any, //Returns a reactElement
-        onSecondaryButton: () => any
+        onOptionsActionDescription?: string,
+        onOptionsButtion?: () => any,
+        onSecondaryActionDescription?: any, //Returns a reactElement
+        onSecondaryButton?: () => any,
+        onMenuActionDescription?: string,
+        onMenuButton?: (e: any) => void
     },
     renderTabAddon: () => any //Returns a reactElement
 }
