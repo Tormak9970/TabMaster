@@ -11,12 +11,6 @@ export const LibraryMenuStyles: VFC<{}> = ({ }) => {
         margin: 0 0 10px;
       }
 
-      .tab-master-library-menu-reorderable-group .seperator {
-        width: 100%;
-        height: .8px;
-        background: #23262e;
-      }
-
       .tab-master-library-menu-reorderable-group .tab-label-cont {
         display: flex;
         align-items: center;

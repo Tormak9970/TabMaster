@@ -65,8 +65,7 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
       Add Tab
     </MenuItem>
     <MenuGroup label='Reorder Tabs'>
-      <Focusable style={{ width: '240px', background: "#23262e" }} className='tab-master-library-menu-reorderable-group' onOKActionDescription=''>
-        <div className="seperator"></div>
+      <Focusable style={{ width: '240px', background: "#23262e", margin: '0' }} className='tab-master-library-menu-reorderable-group' onOKActionDescription=''>
         <ReorderableList<TabIdEntryType>
           entries={visibleTabsList.map((tabContainer) => {
             return {
