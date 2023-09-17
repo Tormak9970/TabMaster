@@ -65,7 +65,7 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
       Add Tab
     </MenuItem>
     <MenuGroup label='Reorder Tabs'>
-      <Focusable style={{ width: '240px' }} className='tab-master-library-menu-reorderable-group' onOKActionDescription=''>
+      <Focusable style={{ width: '240px', background: "#23262e" }} className='tab-master-library-menu-reorderable-group' onOKActionDescription=''>
         <div className="seperator"></div>
         <ReorderableList<TabIdEntryType>
           entries={visibleTabsList.map((tabContainer) => {
@@ -80,61 +80,70 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
             };
           })}
           onSave={(entries: ReorderableEntry<TabIdEntryType>[]) => {
-            tabMasterManager.reorderTabs(entries.map(entry => entry.data!.id));
+            const currentOrder = visibleTabsList.sort((a, b) => a.position - b.position).map(entry => entry.id);
+            const newOrder = entries.map(entry => entry.data!.id);
+
+            if (JSON.stringify(currentOrder) !== JSON.stringify(newOrder)) tabMasterManager.reorderTabs(newOrder);
           }}
         />
       </Focusable>
     </MenuGroup>
-    {hiddenTabsList.length > 0 && <MenuGroup label='Unhide Tabs' disabled={hiddenTabsList.length === 0}>
-      <HiddenItems onSelectTab={id => tabMasterManager.showTab(id)} hiddenTabsList={hiddenTabsList} />
-    </MenuGroup>}
+    {hiddenTabsList.length > 0 &&
+      <MenuGroup label='Unhide Tabs' disabled={hiddenTabsList.length === 0}>
+        <HiddenItems onSelectTab={id => tabMasterManager.showTab(id)} hiddenTabsList={hiddenTabsList} />
+      </MenuGroup>
+    }
     <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
-    {isCustomTab && <MenuItem
-      onOKActionDescription='Edit Tab'
-      onClick={() => {
-        const tabContainer = tabsMap.get(selectedTabId)!;
-        showModal(
-          <EditTabModal
-            onConfirm={(tabId: string | undefined, updatedTabSettings: EditableTabSettings) => {
-              tabMasterManager.updateCustomTab(tabId!, updatedTabSettings);
-            }}
-            tabId={tabContainer.id}
-            tabTitle={tabContainer.title}
-            tabFilters={tabContainer.filters!}
-            tabMasterManager={tabMasterManager}
-            filtersMode={tabContainer.filtersMode!}
-            categoriesToInclude={tabContainer.categoriesToInclude!}
-          />
-        );
-      }}
-    >
-      Edit
-    </MenuItem>}
+    {isCustomTab &&
+      <MenuItem
+        onOKActionDescription='Edit Tab'
+        onClick={() => {
+          const tabContainer = tabsMap.get(selectedTabId)!;
+          showModal(
+            <EditTabModal
+              onConfirm={(tabId: string | undefined, updatedTabSettings: EditableTabSettings) => {
+                tabMasterManager.updateCustomTab(tabId!, updatedTabSettings);
+              }}
+              tabId={tabContainer.id}
+              tabTitle={tabContainer.title}
+              tabFilters={tabContainer.filters!}
+              tabMasterManager={tabMasterManager}
+              filtersMode={tabContainer.filtersMode!}
+              categoriesToInclude={tabContainer.categoriesToInclude!}
+            />
+          );
+        }}
+      >
+        Edit
+      </MenuItem>
+    }
     <MenuItem onClick={() => tabMasterManager.hideTab(selectedTabId)} onOKActionDescription='Hide Tab'>
       Hide
     </MenuItem>
-    {isCustomTab && <MenuItem
-      onOKActionDescription='Delete Tab'
-      //@ts-ignore
-      className={gamepadContextMenuClasses.Destructive}
-      onClick={() => {
-        const closeModal = () => { };
-        showModal(
-          <DestructiveModal
-            onOK={() => {
-              tabMasterManager.deleteTab(selectedTabId);
-              closeMenu();
-            }}
-            closeModal={closeModal}
-            strTitle="WARNING!"
-          >
-            Are you sure you want to delete this Tab? This can't be undone.
-          </DestructiveModal>
-        );
-      }}
-    >
-      Delete
-    </MenuItem>}
+    {isCustomTab &&
+      <MenuItem
+        onOKActionDescription='Delete Tab'
+        //@ts-ignore
+        className={gamepadContextMenuClasses.Destructive}
+        onClick={() => {
+          const closeModal = () => { };
+          showModal(
+            <DestructiveModal
+              onOK={() => {
+                tabMasterManager.deleteTab(selectedTabId);
+                closeMenu();
+              }}
+              closeModal={closeModal}
+              strTitle="WARNING!"
+            >
+              Are you sure you want to delete this Tab? This can't be undone.
+            </DestructiveModal>
+          );
+        }}
+      >
+        Delete
+      </MenuItem>
+    }
   </>;
 };
 
