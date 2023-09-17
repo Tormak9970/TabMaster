@@ -23,8 +23,8 @@ const presetDefines = {
     return {
       title: 'All Games',
       filters: [
-        { type: 'installed', inverted: false, installed: true },
-        { type: 'installed', inverted: false, installed: false }
+        { type: 'installed', inverted: false, params: { installed: true } },
+        { type: 'installed', inverted: false, params: { installed: false } }
       ],
       filtersMode: 'or',
       categoriesToInclude: IncludeCategories.games
@@ -35,7 +35,7 @@ const presetDefines = {
     return {
       title: installed ? 'Installed' : 'Not Installed',
       filters: [
-        { type: 'installed', inverted: false, installed: installed }
+        { type: 'installed', inverted: false, params: { installed: installed } }
       ],
       filtersMode: 'and',
       categoriesToInclude: IncludeCategories.games
@@ -45,7 +45,7 @@ const presetDefines = {
   'deck compatibility': (compat: number) => {
     return {
       title: compatCategoryToLabel(compat),
-      filters: [{ type: 'deck compatibility', inverted: false, category: compat }],
+      filters: [{ type: 'deck compatibility', inverted: false, params: { category: compat } }],
       filtersMode: 'and',
       categoriesToInclude: IncludeCategories.games
     };
@@ -55,8 +55,8 @@ const presetDefines = {
     return {
       title: 'Soundtracks',
       filters: [
-        { type: 'installed', inverted: false, installed: true },
-        { type: 'installed', inverted: false, installed: false }
+        { type: 'installed', inverted: false, params: { installed: true } },
+        { type: 'installed', inverted: false, params: { installed: false } }
       ],
       filtersMode: 'or',
       categoriesToInclude: IncludeCategories.music
@@ -67,8 +67,8 @@ const presetDefines = {
     return {
       title: 'Software',
       filters: [
-        { type: 'installed', inverted: false, installed: true },
-        { type: 'installed', inverted: false, installed: false }
+        { type: 'installed', inverted: false, params: { installed: true } },
+        { type: 'installed', inverted: false, params: { installed: false } }
       ],
       filtersMode: 'or',
       categoriesToInclude: IncludeCategories.software
