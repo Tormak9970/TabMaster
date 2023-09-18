@@ -35,7 +35,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
   const [filteredList, setFilteredList] = useState(list);
 
   useEffect(() => {
-    setFilteredList(list.filter((entry) => (entry.label as string).toLowerCase().includes(query)));
+    setFilteredList(list.filter((entry) => (entry.label as string).toLowerCase().includes(query.toLowerCase())));
   }, [query]);
 
   const ListEntry = ({ index, style }: { index: number, style: any}) => {
