@@ -1,10 +1,17 @@
+import { debounce } from '../Utils';
 import { PythonInterop } from "./PythonInterop";
 
+const errorToastLimit = 10;
 export class LogController {
   /**
    * Error flag to check for showing a problem has occured in the QAM.
    */
   static errorFlag = false;
+
+  /**
+   * Counts of raised error massages
+   */
+  static errorCounts: {[message: string]: number} = {};
 
   /**
    * Logs a message to the plugin's log file and the frontend console.
@@ -59,13 +66,16 @@ export class LogController {
 
   /**
    * Logs error to backend, frontend, and toasts the error and sets the error flag to show in QAM.
-   * 
+   *
    * intended for patching/ ui errors but may be useful for other cases in the future.
    */
-  static raiseError(...args: any[]){
-    PythonInterop.error(args.join(" "));
+  static raiseError = debounce((...args: any[]) => {
+    const msg = args.join(" ");
+    PythonInterop.error(msg);
     LogController.error(...args);
-    PythonInterop.toast("TAB MASTER ERROR", args.join(" "));
+    if (!LogController.errorCounts[msg]) LogController.errorCounts[msg] = 0;
+    if (LogController.errorCounts[msg] <= errorToastLimit) PythonInterop.toast("TAB MASTER ERROR", msg);
+    LogController.errorCounts[msg]++;
     LogController.errorFlag = true;
-  }
+  }, 5000, true) as (...args: any[]) => void;
 }
