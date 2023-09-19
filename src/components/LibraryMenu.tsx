@@ -9,6 +9,7 @@ import { IncludeCategories } from '../lib/Utils';
 import { LibraryMenuStyles } from './styles/LibraryMenuStyles';
 import { DestructiveModal } from './generic/DestructiveModal';
 import { gamepadContextMenuClasses } from '../lib/GamepadContextMenuClasses';
+import { PresetMenuItems } from './menus/PresetMenu';
 
 export interface LibraryMenuProps {
   closeMenu: () => void;
@@ -24,7 +25,7 @@ export const LibraryMenu: VFC<LibraryMenuProps> = ({ closeMenu, selectedTabId, t
   //@ts-ignore
   return <Menu label={
     <div>
-      <h3 style={{ marginTop: '0', marginBottom: '8px' }}>Tab Master</h3>
+      <h3 style={{ margin: 0 }}>Tab Master</h3>
       <small>{tabMasterManager.getTabs().tabsMap.get(selectedTabId)?.title}</small>
     </div>
   }>
@@ -42,6 +43,7 @@ interface LibraryMenuItemsProps extends Omit<LibraryMenuProps, 'tabMasterManager
  */
 const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu }) => {
   const { tabsMap, visibleTabsList, hiddenTabsList, tabMasterManager } = useTabMasterContext();
+  const tabTitle = tabMasterManager.getTabs().tabsMap.get(selectedTabId)?.title
   const isCustomTab = !!tabsMap.get(selectedTabId)?.filters;
 
   return <>
@@ -64,6 +66,10 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
     >
       Add Tab
     </MenuItem>
+    <MenuGroup label='Quick Tabs' >
+      <PresetMenuItems tabMasterManager={tabMasterManager} />
+    </MenuGroup>
+    <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
     <MenuGroup label='Reorder Tabs'>
       <Focusable style={{ width: '240px', background: "#23262e", margin: '0' }} className='tab-master-library-menu-reorderable-group' onOKActionDescription=''>
         <ReorderableList<TabIdEntryType>
@@ -95,7 +101,7 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
     <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
     {isCustomTab &&
       <MenuItem
-        onOKActionDescription='Edit Tab'
+        onOKActionDescription={`Edit "${tabTitle}"`}
         onClick={() => {
           const tabContainer = tabsMap.get(selectedTabId)!;
           showModal(
@@ -116,12 +122,12 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
         Edit
       </MenuItem>
     }
-    <MenuItem onClick={() => tabMasterManager.hideTab(selectedTabId)} onOKActionDescription='Hide Tab'>
+    <MenuItem onClick={() => tabMasterManager.hideTab(selectedTabId)} onOKActionDescription={`Hide "${tabTitle}"`}>
       Hide
     </MenuItem>
     {isCustomTab &&
       <MenuItem
-        onOKActionDescription='Delete Tab'
+        onOKActionDescription={`Delete "${tabTitle}"`}
         //@ts-ignore
         className={gamepadContextMenuClasses.Destructive}
         onClick={() => {
