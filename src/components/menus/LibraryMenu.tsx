@@ -1,15 +1,15 @@
 import { Menu, MenuItem, showModal, Focusable, MenuGroup, ReorderableEntry, ReorderableList, MenuItemProps } from 'decky-frontend-lib';
 import { FC, Fragment, VFC, useState } from 'react';
-import { TabMasterManager } from '../state/TabMasterManager';
+import { TabMasterManager } from '../../state/TabMasterManager';
 import { FaSteam } from 'react-icons/fa6';
-import { TabIdEntryType } from '..';
-import { TabMasterContextProvider, useTabMasterContext } from '../state/TabMasterContext';
-import { EditTabModal, EditableTabSettings } from './modals/EditTabModal';
-import { IncludeCategories } from '../lib/Utils';
-import { LibraryMenuStyles } from './styles/LibraryMenuStyles';
-import { DestructiveModal } from './generic/DestructiveModal';
-import { gamepadContextMenuClasses } from '../lib/GamepadContextMenuClasses';
-import { PresetMenuItems } from './menus/PresetMenu';
+import { TabIdEntryType } from '../..';
+import { TabMasterContextProvider, useTabMasterContext } from '../../state/TabMasterContext';
+import { EditTabModal, EditableTabSettings } from '../modals/EditTabModal';
+import { IncludeCategories } from '../../lib/Utils';
+import { LibraryMenuStyles } from '../styles/LibraryMenuStyles';
+import { DestructiveModal } from '../generic/DestructiveModal';
+import { gamepadContextMenuClasses } from '../../lib/GamepadContextMenuClasses';
+import { PresetMenuItems } from './PresetMenu';
 
 export interface LibraryMenuProps {
   closeMenu: () => void;

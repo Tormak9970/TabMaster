@@ -11,7 +11,7 @@ import { ReactElement, useEffect, useState } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { LogController } from "../lib/controllers/LogController";
-import { LibraryMenu } from '../components/LibraryMenu';
+import { LibraryMenu } from '../components/menus/LibraryMenu';
 
 /**
  * Patches the Steam library to allow the plugin to change the tabs.
