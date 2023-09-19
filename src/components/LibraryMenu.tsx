@@ -43,11 +43,13 @@ interface LibraryMenuItemsProps extends Omit<LibraryMenuProps, 'tabMasterManager
  */
 const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu }) => {
   const { tabsMap, visibleTabsList, hiddenTabsList, tabMasterManager } = useTabMasterContext();
-  const tabTitle = tabMasterManager.getTabs().tabsMap.get(selectedTabId)?.title
+  const tabTitle = tabMasterManager.getTabs().tabsMap.get(selectedTabId)?.title;
   const isCustomTab = !!tabsMap.get(selectedTabId)?.filters;
 
   return <>
     <MenuItem
+      //@ts-ignore
+      className={gamepadContextMenuClasses.Positive}
       onOKActionDescription='Add Tab'
       onClick={() => {
         showModal(
@@ -66,7 +68,11 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
     >
       Add Tab
     </MenuItem>
-    <MenuGroup label='Quick Tabs' >
+    <MenuGroup
+      //@ts-ignore
+      className={gamepadContextMenuClasses.Emphasis}
+      label='Quick Tabs'
+    >
       <PresetMenuItems tabMasterManager={tabMasterManager} />
     </MenuGroup>
     <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
