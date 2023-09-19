@@ -11,6 +11,13 @@ import {
   showModal
 } from "decky-frontend-lib";
 import React, { VFC, Fragment, useState } from "react";
+import { FaTag, FaTags, FaUser, FaCompactDisc } from "react-icons/fa6";
+import { FaUserFriends, FaQuestionCircle } from "react-icons/fa";
+import { MdApps } from "react-icons/md";
+import { IoGameController } from "react-icons/io5";
+import { BsWindow } from "react-icons/bs";
+import { IconType } from "react-icons/lib";
+
 import { FilterType, ReviewScoreType, TabFilterSettings, ThresholdCondition, TimeUnit, compatCategoryToLabel } from "./Filters";
 import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMasterContext";
 import { ModeMultiSelect } from "../multi-selects/ModeMultiSelect";
@@ -19,6 +26,7 @@ import { MultiSelect } from "../multi-selects/MultiSelect";
 import { FilterPreview } from "./FilterPreview";
 import { DateIncludes, DateObj, DatePicker, DateSelection } from '../generic/DatePickers';
 import { EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from '../generic/EnhancedSelector';
+import { IncludeCategories } from "../../lib/Utils";
 
 type FilterOptionsProps<T extends FilterType> = {
   index: number,
@@ -27,6 +35,23 @@ type FilterOptionsProps<T extends FilterType> = {
   setContainingGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>;
 };
 
+/**
+ * Gets an entry icon for an app based on its type.
+ * @param entry The app entry.
+ * @returns The icon for the app.
+ */
+function getAppIconType(entry: any): IconType {
+  switch (entry.data.appType) {
+    case IncludeCategories.games:
+      return IoGameController;
+    case IncludeCategories.music:
+      return FaCompactDisc;
+    case IncludeCategories.software:
+      return BsWindow;
+    default:
+      return FaQuestionCircle;
+  }
+}
 
 /**
  * The options for a collection filter.
@@ -113,7 +138,7 @@ const FriendsFilterOptions: VFC<FilterOptionsProps<'friends'>> = ({ index, setCo
   }
 
   return (
-    <ModeMultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={friendsMode} options={dropdownOptions} selected={selected} onChange={onChange} />
+    <ModeMultiSelect fieldLabel="Selected Friends" dropdownLabel="Add a friend" mode={friendsMode} options={dropdownOptions} selected={selected} onChange={onChange} entryLabel={"Friends"} EntryIcon={FaUser} TriggerIcon={FaUserFriends} />
   );
 };
 
@@ -141,8 +166,8 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContaini
     setContainingGroupFilters(updatedFilters);
   }
 
-  return (
-    <ModeMultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={tagsMode} options={dropdownOptions} selected={selected} onChange={onChange} />
+  return ( 
+    <ModeMultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={tagsMode} options={dropdownOptions} selected={selected} onChange={onChange} entryLabel="Tags" EntryIcon={FaTag} TriggerIcon={FaTags} />
   );
 };
 
@@ -164,18 +189,18 @@ const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, s
     if (game) selected.push({ label: game.display_name, data: gameid });
   }
 
-  const dropdownOptions: DropdownOption[] = appsList.map((game: SteamAppOverview) => { return { label: game.display_name, data: game.appid }; });
+  const dropdownOptions: DropdownOption[] = appsList.map((game: SteamAppOverview) => { return { label: game.display_name, data: { appid: game.appid, appType: game.app_type } }; });
 
   function onChange(selected: DropdownOption[]) {
     const updatedFilter = { ...filter };
-    updatedFilter.params.games = selected.map((gameEntry) => gameEntry.data as number);
+    updatedFilter.params.games = selected.map((gameEntry) => gameEntry.data.appid as number);
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
     setContainingGroupFilters(updatedFilters);
   }
 
   return (
-    <MultiSelect fieldLabel="Whitelisted Apps" dropdownLabel="Add an app" options={dropdownOptions} selected={selected} onChange={onChange} />
+    <MultiSelect fieldLabel="Whitelisted Apps" dropdownLabel="Add an app" options={dropdownOptions} selected={selected} onChange={onChange} entryLabel={"Your Apps"} determineEntryIcon={getAppIconType} TriggerIcon={MdApps} />
   );
 };
 
@@ -197,18 +222,18 @@ const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, s
     if (game) selected.push({ label: game.display_name, data: gameid });
   }
 
-  const dropdownOptions: DropdownOption[] = appsList.map((game: SteamAppOverview) => { return { label: game.display_name, data: game.appid }; });
+  const dropdownOptions: DropdownOption[] = appsList.map((game: SteamAppOverview) => { return { label: game.display_name, data: { appid: game.appid, appType: game.app_type } }; });
 
   function onChange(selected: DropdownOption[]) {
     const updatedFilter = { ...filter };
-    updatedFilter.params.games = selected.map((gameEntry) => gameEntry.data as number);
+    updatedFilter.params.games = selected.map((gameEntry) => gameEntry.data.appid as number);
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
     setContainingGroupFilters(updatedFilters);
   }
 
   return (
-    <MultiSelect fieldLabel="Blacklisted Apps" dropdownLabel="Add an app" options={dropdownOptions} selected={selected} onChange={onChange} />
+    <MultiSelect fieldLabel="Blacklisted Apps" dropdownLabel="Add an app" options={dropdownOptions} selected={selected} onChange={onChange} entryLabel={"Your Apps"} determineEntryIcon={getAppIconType} TriggerIcon={MdApps} />
   );
 };
 
