@@ -10,7 +10,7 @@ interface PresetMenuProps {
 }
 
 export const PresetMenu: VFC<PresetMenuProps> = ({ tabMasterManager }) => {
-  return <Menu label='Preset Tabs'>
+  return <Menu label='Quick Tabs'>
     <PresetMenuItems tabMasterManager={tabMasterManager} />
   </Menu>;
 };
@@ -20,6 +20,11 @@ interface PresetMenuItemsProps {
 }
 
 export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager }) => {
+
+  function getActionDescription(name: string) {
+    return { onOKActionDescription: `Create Tab "${name}"` };
+  }
+
   return <>
     {presetKeys.map(name => {
       const presetName = name as PresetName;
@@ -28,31 +33,26 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager })
           return (
             <MenuGroup label='Collection'>
               {collectionStore.userCollections.map(({ displayName, id }: { displayName: string; id: string; }) =>
-                <MenuItem
-                  onClick={() => tabMasterManager.createPresetTab(presetName, id, displayName)}
-                >
+                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, id, displayName)} {...getActionDescription(displayName)}>
                   {displayName}
                 </MenuItem>
               )}
             </MenuGroup>
           );
         case 'installation':
-          const getOnClick = (installed: boolean) => () => tabMasterManager.createPresetTab(presetName, installed);
           return (
             <MenuGroup label='Installation'>
-              <MenuItem onClick={getOnClick(true)}>
-                Installed
-              </MenuItem>
-              <MenuItem onClick={getOnClick(false)}>
-                Not Installed
-              </MenuItem>
+              {['Installed', 'Not Installed'].map(name =>
+                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, name === 'installed')} {...getActionDescription(name)}>
+                  {name}
+                </MenuItem>)}
             </MenuGroup>
           );
         case 'deck compatibility':
           return (
             <MenuGroup label='Deck Compatibility'>
-              {[0, 1, 2, 3].map((level) =>
-                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, level)}>
+              {[0, 1, 2, 3].map(level =>
+                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, level)} {...getActionDescription(compatCategoryToLabel(level))}>
                   {compatCategoryToLabel(level)}
                 </MenuItem>
               )}
@@ -60,7 +60,9 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager })
           );
         default:
           return (
-            <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName)} >{capitalizeEachWord(presetName)}</MenuItem>
+            <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName)} {...getActionDescription(presetName)}>
+              {capitalizeEachWord(presetName)}
+            </MenuItem>
           );
       }
     })}

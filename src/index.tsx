@@ -18,7 +18,8 @@ import {
 import { VFC, Fragment, ReactNode } from "react";
 
 import { TbLayoutNavbarExpand } from "react-icons/tb";
-import { FaSteam, FaArrowRotateRight, FaCircleExclamation } from "react-icons/fa6";
+import { FaSteam, FaCircleExclamation } from "react-icons/fa6";
+import { PiListPlusBold } from "react-icons/pi";
 import { MdNumbers } from "react-icons/md";
 
 import { PluginController } from "./lib/controllers/PluginController";
@@ -32,7 +33,6 @@ import { patchSettings } from "./patches/SettingsPatch";
 
 import { QamStyles } from "./components/styles/QamStyles";
 import { EditableTabSettings, EditTabModal } from "./components/modals/EditTabModal";
-import { CustomTabContainer } from "./components/CustomTabContainer";
 import { TabActionsButton } from "./components/TabActions";
 import { LogController } from "./lib/controllers/LogController";
 import { DocPage } from "./components/docs/DocsPage";
@@ -80,14 +80,6 @@ const Content: VFC<{}> = ({ }) => {
         categoriesToInclude={IncludeCategories.games}
       />
     );
-  }
-
-  function refreshTabs() {
-    tabMasterManager.getTabs().visibleTabsList.forEach((tabContainer) => {
-      if (tabContainer.filters && tabContainer.filters.length !== 0) {
-        (tabContainer as CustomTabContainer).buildCollection();
-      }
-    });
   }
 
   const entries = visibleTabsList.map((tabContainer) => {
@@ -138,10 +130,10 @@ const Content: VFC<{}> = ({ }) => {
                 <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
                   <DialogButton
                     style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center", marginRight: "8px" }}
-                    onOKActionDescription={'Refresh Tab Games'}
+                    onOKActionDescription={'Add Quick Tab'}
                     onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} />)}
                   >
-                    <FaArrowRotateRight />
+                    <PiListPlusBold size='1.4em' />
                   </DialogButton>
                 </Focusable>}
             </Focusable>
