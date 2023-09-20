@@ -95,6 +95,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
               style={{ display: "flex", gap: "4px", flexDirection: "column", height: "48.7vh", overflow: "scroll" }}
             >
               <AutoSizer>
+                {/* @ts-ignore */}
                 {({ height, width }) => (
                   <List
                     width={width}
