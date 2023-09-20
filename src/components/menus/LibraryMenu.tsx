@@ -68,11 +68,7 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
     >
       Add Tab
     </MenuItem>
-    <MenuGroup
-      //@ts-ignore
-      className={gamepadContextMenuClasses.Emphasis}
-      label='Quick Tabs'
-    >
+    <MenuGroup label='Quick Tabs'>
       <PresetMenuItems tabMasterManager={tabMasterManager} />
     </MenuGroup>
     <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
