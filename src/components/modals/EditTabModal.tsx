@@ -192,6 +192,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
               const label = getCatLabel(category)
 
               const onChange = (checked: boolean) => {
+                GamepadUIAudio.AudioPlaybackManager.PlayAudioURL(checked ? '/sounds/deck_ui_switch_toggle_on.wav' : '/sounds/deck_ui_switch_toggle_off.wav');
                 setCategoriesToInclude(currentCatsBitField => updateCategoriesToIncludeBitField(currentCatsBitField, { [category]: checked }));
               }; 
               return category === 'hidden' && !showHiddenCat ? null : <DialogCheckbox checked={shouldInclude} onChange={onChange} label={label} />;
