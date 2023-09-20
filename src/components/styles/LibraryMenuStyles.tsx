@@ -8,7 +8,7 @@ export const LibraryMenuStyles: VFC<{}> = ({ }) => {
   return (
     <style>{`
       .${gamepadContextMenuClasses.BasicContextMenuHeader} {
-        margin: 0 0 10px;
+        margin: 0;
       }
 
       .tab-master-library-menu-reorderable-group .tab-label-cont {
