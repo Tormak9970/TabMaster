@@ -2,6 +2,24 @@ import { gamepadDialogClasses } from "decky-frontend-lib";
 import { VFC } from "react";
 
 /**
+ * defines used to calculate positions when using dropdowns together with slider field
+ */
+const fieldAtts = {
+  negativeHMargin: '2.8vw',
+  extraMargin: '16px' 
+}
+
+/**
+ * defines used to calculate positions when using dropdowns together with slider field
+ */
+export const sliderWDropdown = {
+  d1: '118px',
+  d2: '130px',
+  spacing: '10px',
+  rightBound: `calc(${fieldAtts.extraMargin} + ${fieldAtts.negativeHMargin})`
+}
+
+/**
  * All css styling for TabMaster's modals.
  */
 export const ModalStyles: VFC<{}> = ({}) => {
@@ -94,16 +112,17 @@ export const ModalStyles: VFC<{}> = ({}) => {
       }
 
       .tab-master-modal-scope .slider-with-dropdown-container .${gamepadDialogClasses.Field} {
-        padding-right: 154px;
+        padding-right: calc(${sliderWDropdown.spacing} + ${sliderWDropdown.d1} + ${fieldAtts.negativeHMargin});
         width: 100%;
       }
       .tab-master-modal-scope .slider-with-2dropdown-container .${gamepadDialogClasses.Field} {
-        padding-right: 279px;
+        padding-right: calc(${sliderWDropdown.spacing} + ${sliderWDropdown.d1} + ${sliderWDropdown.spacing} + ${sliderWDropdown.d1} + ${fieldAtts.negativeHMargin});
         width: 100%;
       }
       .tab-master-modal-scope .slider-with-2dropdown-container.wide-dropdown .${gamepadDialogClasses.Field} {
-        padding-right: 294px;
+        padding-right: calc(${sliderWDropdown.spacing} + ${sliderWDropdown.d2} + ${sliderWDropdown.spacing} + ${sliderWDropdown.d1} + ${fieldAtts.negativeHMargin});
       }
     `}</style>
   );
 }
+// padding-right: 282px;
