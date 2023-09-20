@@ -21,7 +21,7 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
     installed: "Selects apps that are installed/uninstalled.",
     regex: "Selects apps whose titles match a regular expression.",
     friends: "Selects apps that are also owned by friends.",
-    tags: "Selects apps that have pecific community tags.",
+    tags: "Selects apps that have specific community tags.",
     whitelist: "Selects apps that are added to the list.",
     blacklist: "Selects apps that are not added to the list.",
     merge: "Selects apps that pass a subgroup of filters.",
