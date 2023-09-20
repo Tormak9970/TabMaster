@@ -552,7 +552,7 @@ const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ ind
 };
 
 /**
- * The options for a time played filter.
+ * The options for a last played filter.
  */
 const LastPlayedFilterOptions: VFC<FilterOptionsProps<'last played'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const [date, setDate] = useState<DateObj | undefined>(filter.params.date);
@@ -613,7 +613,7 @@ const LastPlayedFilterOptions: VFC<FilterOptionsProps<'last played'>> = ({ index
 };
 
 /**
- * The options for an installed filter.
+ * The options for a demo filter.
  */
 const DemoFilterOptions: VFC<FilterOptionsProps<'demo'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   function onChange(checked: boolean) {
@@ -626,6 +626,23 @@ const DemoFilterOptions: VFC<FilterOptionsProps<'demo'>> = ({ index, setContaini
 
   return (
     <ToggleField label="Is demo" checked={filter.params.isDemo} onChange={onChange} />
+  );
+};
+
+/**
+ * The options for a streamable filter.
+ */
+const StreamableFilterOptions: VFC<FilterOptionsProps<'streamable'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  function onChange(checked: boolean) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.isStreamable = checked ?? false;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  return (
+    <ToggleField label="Is Streamable" checked={filter.params.isStreamable} onChange={onChange} />
   );
 };
 
@@ -667,6 +684,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <LastPlayedFilterOptions index={index} filter={filter as TabFilterSettings<'last played'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "demo":
         return <DemoFilterOptions index={index} filter={filter as TabFilterSettings<'demo'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "streamable":
+        return <StreamableFilterOptions index={index} filter={filter as TabFilterSettings<'streamable'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       default:
         return <Fragment />;
     }

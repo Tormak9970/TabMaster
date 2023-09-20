@@ -1,4 +1,4 @@
-import { MenuItem, showModal, ConfirmModal, Menu, showContextMenu, DialogButton } from "decky-frontend-lib"
+import { MenuItem, showModal, Menu, showContextMenu, DialogButton } from "decky-frontend-lib"
 import { VFC } from "react"
 import { FaEllipsisH } from "react-icons/fa"
 import { TabMasterManager } from "../state/TabMasterManager"

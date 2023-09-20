@@ -1,6 +1,5 @@
 import {
   ButtonItem,
-  ConfirmModal,
   DialogButton,
   Dropdown,
   DropdownOption,

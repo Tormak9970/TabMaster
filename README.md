@@ -33,6 +33,8 @@ Available Filters:
  - **Size on Disk** - Selects apps that have an install size greater/less than the provided size.
  - **Release Date** - Selects apps that were released before/after the provided date.
  - **Last Played** - Selects apps that were last played before/after the provided date.
+ - **Demo** - Selects apps that are/aren't demos.
+ - **Streamable** - Selects apps that can/can't be streamed from another computer.
 
 If you want to see another filter, please open a filter request [here](https://github.com/Tormak9970/TabMaster/issues/new/choose).
 
