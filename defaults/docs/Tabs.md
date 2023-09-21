@@ -26,6 +26,14 @@ Before you continue, it is important to understand that there are two types of t
 <br/>
 
 
+### Quick Tabs
+<img title="Quick Tabs UI" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_quick-tabs.png" />
+<br/>
+Quick Tabs are premade tabs that allow you to quickly generate a new tab for a variety of use cases. They are modifiable just like a regular tab as well.
+
+<br/>
+
+
 ### Adding Tabs
 <img title="Add UI" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_create-tab.png" />
 <br/>
