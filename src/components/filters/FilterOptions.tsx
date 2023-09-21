@@ -5,7 +5,6 @@ import {
   Field,
   Focusable,
   SingleDropdownOption,
-  SliderField,
   TextField,
   ToggleField,
   showModal
@@ -27,7 +26,7 @@ import { FilterPreview } from "./FilterPreview";
 import { DateIncludes, DateObj, DatePicker, DateSelection } from '../generic/DatePickers';
 import { EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from '../generic/EnhancedSelector';
 import { IncludeCategories } from "../../lib/Utils";
-import { sliderWDropdown } from '../styles/ModalStyles';
+import { Slider } from '../generic/Slider';
 
 type FilterOptionsProps<T extends FilterType> = {
   index: number,
@@ -381,19 +380,19 @@ const ReviewScoreFilterOptions: VFC<FilterOptionsProps<'review score'>> = ({ ind
   }
 
   return (
-    <Focusable className="slider-with-2dropdown-container wide-dropdown" style={{ display: 'flex', flexDirection: 'row' }}>
-      <SliderField value={value} label={reviewType === 'metacritic' ? `Metacritic score of ${value} or ${thresholdType === 'above' ? 'higher' : 'lower'}` : `At ${thresholdType === 'above' ? 'least' : 'most'} ${value}% positive Steam reviews`} min={0} max={100} onChange={onSliderChange} />
-      <div style={{ right: sliderWDropdown.rightBound, position: 'absolute', zIndex: 1, transform: 'translate(0px, 18px)' }}>
-        <Focusable style={{ display: 'flex' }}>
-          <div style={{ width: sliderWDropdown.d2 }}>
+    <Field
+      label={reviewType === 'metacritic' ? `Metacritic score of ${value} or ${thresholdType === 'above' ? 'higher' : 'lower'}` : `At ${thresholdType === 'above' ? 'least' : 'most'} ${value}% positive Steam reviews`}
+      description={
+        <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
+          <Slider value={value} min={0} max={100} onChange={onSliderChange} />
+          <div style={{ marginLeft: '12px', marginRight: '10px' }}>
             <Dropdown rgOptions={[{ label: 'Metacritic', data: 'metacritic' }, { label: 'Steam ', data: 'steampercent' }]} selectedOption={reviewType} onChange={onReviewTypeChange} />
           </div>
-          <div style={{ marginLeft: sliderWDropdown.spacing, width: sliderWDropdown.d1 }}>
+          <div>
             <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
           </div>
-        </Focusable>
-      </div>
-    </Focusable>
+        </Focusable>}
+    />
   );
 };
 
@@ -431,11 +430,12 @@ const TimePlayedFilterOptions: VFC<FilterOptionsProps<'time played'>> = ({ index
   }
 
   return (
-    <Focusable className="slider-with-2dropdown-container" style={{ display: 'flex', flexDirection: 'row' }}>
-      <SliderField value={time} label={`Played for ${time} ${time === 1 ? units.slice(0, -1) : units} or ${thresholdType === 'above' ? 'more' : 'less'}`} min={0} max={300} onChange={onSliderChange} />
-      <div style={{ right: sliderWDropdown.rightBound, position: 'absolute', zIndex: 1, transform: 'translate(0px, 18px)' }}>
-        <Focusable style={{ display: 'flex' }}>
-          <div style={{ width: sliderWDropdown.d1 }}>
+    <Field
+      label={`Played for ${time} ${time === 1 ? units.slice(0, -1) : units} or ${thresholdType === 'above' ? 'more' : 'less'}`}
+      description={
+        <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
+          <Slider value={time} min={0} max={300} onChange={onSliderChange} />
+          <div style={{ marginLeft: '12px', marginRight: '10px' }}>
             <Dropdown
               rgOptions={[
                 { label: 'Minutes', data: 'minutes' },
@@ -446,12 +446,11 @@ const TimePlayedFilterOptions: VFC<FilterOptionsProps<'time played'>> = ({ index
               onChange={onUnitChange}
             />
           </div>
-          <div style={{ marginLeft: sliderWDropdown.spacing, width: sliderWDropdown.d1 }}>
+          <div>
             <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
           </div>
-        </Focusable>
-      </div>
-    </Focusable>
+        </Focusable>}
+    />
   );
 };
 
@@ -482,12 +481,16 @@ const SizeOnDiskFilterOptions: VFC<FilterOptionsProps<'size on disk'>> = ({ inde
   }
 
   return (
-    <Focusable className="slider-with-dropdown-container" style={{ display: 'flex', flexDirection: 'row' }}>
-      <SliderField value={value} label={`${value} GB or ${thresholdType === 'above' ? 'more' : 'less'} on disk`} min={0} max={200} onChange={onSliderChange} />
-      <div style={{ right: sliderWDropdown.rightBound, position: 'absolute', zIndex: 1, transform: 'translate(0px, 18px)', width: '118px' }}>
-        <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
-      </div>
-    </Focusable>
+    <Field
+      label={`${value} GB or ${thresholdType === 'above' ? 'more' : 'less'} on disk`}
+      description={
+        <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
+          <Slider value={value} min={0} max={200} onChange={onSliderChange} />
+          <div style={{ marginLeft: '12px' }}>
+            <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
+          </div>
+        </Focusable>}
+    />
   );
 };
 
