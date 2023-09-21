@@ -117,4 +117,11 @@ export class PluginController {
     this.tabMasterManager.disposeReactions();
     LogController.log("PluginController dismounted.");
   }
+
+  /**
+   * Function to run when resuming from sleep.
+   */
+  static onWakeFromSleep() {
+    this.tabMasterManager.buildTimeBasedFilterTabs();
+  }
 }

@@ -206,3 +206,19 @@ export function debounce(func:Function, wait:number, immediate?:boolean) {
       if (callNow) func.apply(context, args);
   };
 }
+
+/**
+ * Recursive function that checks whether an array of TabFilterSettings contains any filters of a specified type.
+ * @param filters The array of TabFilterSettings to check in.
+ * @param filterType The filter types to check are included.
+ * @returns Boolean
+ */
+export function filtersHaveType(filters: TabFilterSettings<FilterType>[], ...filterTypes: FilterType[] ) {
+  if (filters.find(filter =>  filterTypes.includes(filter.type))) return true;
+  for (const filter of filters) {
+    if (filter.type === 'merge') {
+      if (filtersHaveType((filter as TabFilterSettings<'merge'>).params.filters, ...filterTypes)) return true;
+    }
+  }
+  return false;
+}

@@ -89,7 +89,7 @@ const InstalledFilterOptions: VFC<FilterOptionsProps<'installed'>> = ({ index, s
   }
 
   return (
-    <ToggleField label="Installed" checked={filter.params.installed} onChange={onChange} />
+    <ToggleField label="Is installed?" checked={filter.params.installed} onChange={onChange} />
   );
 };
 
@@ -501,6 +501,8 @@ const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ ind
   const [date, setDate] = useState<DateObj | undefined>(filter.params.date);
   const [dateIncludes, setDateIncludes] = useState<DateIncludes>(filter.params.date ? (filter.params.date.day === undefined ? (filter.params.date.month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear) : DateIncludes.dayMonthYear);
   const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
+  const [byDaysAgo, setByDaysAgo] = useState(filter.params.daysAgo !== undefined);
+  const [daysAgo, setDaysAgo] = useState<number>(filter.params.daysAgo ?? 30);
 
   function onDateChange(dateSelection: DateSelection) {
     const updatedFilter = { ...filter };
@@ -520,10 +522,36 @@ const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ ind
     setThresholdType(threshType);
   }
 
+  function onByDaysAgoChange(byDaysAgo: boolean) {
+    const updatedFilter = { ...filter };
+    if (byDaysAgo) {
+      delete updatedFilter.params.date;
+      updatedFilter.params.daysAgo = daysAgo;
+    } else {
+      delete updatedFilter.params.daysAgo;
+      updatedFilter.params.date = date;
+    }
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setByDaysAgo(byDaysAgo);
+  }
+
+  function onSliderChange(value: number) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.daysAgo = value;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setDaysAgo(value);
+  }
+
   return (
-    <Field label={`Released ${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}
+    <Field label={`Released ${byDaysAgo ? `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${thresholdType === 'above' ? 'later' : 'earlier'}` : `${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}`}
       description={
         <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
+          {byDaysAgo ? 
+          <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange}/> :
           <DatePicker
             focusDropdowns={true}
             modalType='simple'
@@ -535,16 +563,24 @@ const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ ind
             animate={true}
             transparencyMode={EnhancedSelectorTransparencyMode.selection}
             focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
-          />
+          />}
           <div style={{ margin: '0 10px' }}>
             <Dropdown
               rgOptions={[
                 { label: 'By Day', data: DateIncludes.dayMonthYear },
                 { label: 'By Month', data: DateIncludes.monthYear },
-                { label: 'By Year', data: DateIncludes.yearOnly }
+                { label: 'By Year', data: DateIncludes.yearOnly },
+                { label: 'By Days Ago', data: 'byDaysAgo'}
               ]}
               selectedOption={dateIncludes}
-              onChange={option => setDateIncludes(option.data)}
+              onChange={option => {
+                if (option.data === 'byDaysAgo') {
+                  onByDaysAgoChange(true);
+                } else {
+                  if (byDaysAgo) onByDaysAgoChange(false);
+                  setDateIncludes(option.data);
+                }
+              }}
             />
           </div>
           <div>
@@ -562,6 +598,8 @@ const LastPlayedFilterOptions: VFC<FilterOptionsProps<'last played'>> = ({ index
   const [date, setDate] = useState<DateObj | undefined>(filter.params.date);
   const [dateIncludes, setDateIncludes] = useState<DateIncludes>(filter.params.date ? (filter.params.date.day === undefined ? (filter.params.date.month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear) : DateIncludes.dayMonthYear);
   const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
+  const [byDaysAgo, setByDaysAgo] = useState(filter.params.daysAgo !== undefined);
+  const [daysAgo, setDaysAgo] = useState<number>(filter.params.daysAgo ?? 30);
 
   function onDateChange(dateSelection: DateSelection) {
     const updatedFilter = { ...filter };
@@ -581,10 +619,36 @@ const LastPlayedFilterOptions: VFC<FilterOptionsProps<'last played'>> = ({ index
     setThresholdType(threshType);
   }
 
+  function onByDaysAgoChange(byDaysAgo: boolean) {
+    const updatedFilter = { ...filter };
+    if (byDaysAgo) {
+      delete updatedFilter.params.date;
+      updatedFilter.params.daysAgo = daysAgo;
+    } else {
+      delete updatedFilter.params.daysAgo;
+      updatedFilter.params.date = date;
+    }
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setByDaysAgo(byDaysAgo);
+  }
+
+  function onSliderChange(value: number) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.daysAgo = value;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setDaysAgo(value);
+  }
+
   return (
-    <Field label={`Last played ${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}
+    <Field label={`Last played ${byDaysAgo ? `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${thresholdType === 'above' ? 'later' : 'earlier'}` : `${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}`}
       description={
         <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
+          {byDaysAgo ? 
+          <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange}/> :
           <DatePicker
             focusDropdowns={true}
             modalType='simple'
@@ -596,16 +660,24 @@ const LastPlayedFilterOptions: VFC<FilterOptionsProps<'last played'>> = ({ index
             animate={true}
             transparencyMode={EnhancedSelectorTransparencyMode.selection}
             focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
-          />
+          />}
           <div style={{ margin: '0 10px' }}>
             <Dropdown
               rgOptions={[
                 { label: 'By Day', data: DateIncludes.dayMonthYear },
                 { label: 'By Month', data: DateIncludes.monthYear },
-                { label: 'By Year', data: DateIncludes.yearOnly }
+                { label: 'By Year', data: DateIncludes.yearOnly },
+                { label: 'By Days Ago', data: 'byDaysAgo'}
               ]}
               selectedOption={dateIncludes}
-              onChange={option => setDateIncludes(option.data)}
+              onChange={option => {
+                if (option.data === 'byDaysAgo') {
+                  onByDaysAgoChange(true);
+                } else {
+                  if (byDaysAgo) onByDaysAgoChange(false);
+                  setDateIncludes(option.data);
+                }
+              }}
             />
           </div>
           <div>
@@ -629,7 +701,7 @@ const DemoFilterOptions: VFC<FilterOptionsProps<'demo'>> = ({ index, setContaini
   }
 
   return (
-    <ToggleField label="Is demo" checked={filter.params.isDemo} onChange={onChange} />
+    <ToggleField label="Is demo?" checked={filter.params.isDemo} onChange={onChange} />
   );
 };
 
@@ -646,7 +718,7 @@ const StreamableFilterOptions: VFC<FilterOptionsProps<'streamable'>> = ({ index,
   }
 
   return (
-    <ToggleField label="Is Streamable" checked={filter.params.isStreamable} onChange={onChange} />
+    <ToggleField label="Is streamable?" checked={filter.params.isStreamable} onChange={onChange} />
   );
 };
 

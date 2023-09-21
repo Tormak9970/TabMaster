@@ -30,8 +30,8 @@ type DeckCompatFilterParams = { category: number; };
 type ReviewScoreFilterParams = { scoreThreshold: number, condition: ThresholdCondition, type: ReviewScoreType; };
 type TimePlayedFilterParams = { timeThreshold: number, condition: ThresholdCondition, units: TimeUnit; };
 type SizeOnDiskFilterParams = { gbThreshold: number, condition: ThresholdCondition; };
-type ReleaseDateFilterParams = { date?: DateObj, condition: ThresholdCondition; };
-type LastPlayedFilterParams = { date?: DateObj, condition: ThresholdCondition; };
+type ReleaseDateFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition; };
+type LastPlayedFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition; };
 type DemoFilterParams = { isDemo: boolean; };
 type StreamableFilterParams = { isStreamable: boolean; }
 
@@ -147,7 +147,7 @@ export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean 
       return false;
     case "release date":
     case "last played":
-      return (filter as TabFilterSettings<'release date'>).params.date === undefined;
+      return (filter as TabFilterSettings<'release date'>).params.date === undefined && (filter as TabFilterSettings<'release date'>).params.daysAgo === undefined;
   }
 }
 
@@ -343,47 +343,62 @@ export class Filter {
     },
     'release date': (params: FilterParams<'release date'>, appOverview: SteamAppOverview) => {
       let releaseTimeMs;
-      if (appOverview.rt_original_release_date) {
-        releaseTimeMs = appOverview.rt_original_release_date * 1000;
-      } else if (appOverview.rt_steam_release_date !== 0) {
-        releaseTimeMs = appOverview.rt_steam_release_date * 1000;
-      } else {
-        return false;
-      }
-      const { day, month, year } = params.date!;
+      if (appOverview.rt_original_release_date) releaseTimeMs = appOverview.rt_original_release_date * 1000;
+      else if (appOverview.rt_steam_release_date !== 0) releaseTimeMs = appOverview.rt_steam_release_date * 1000;
+      else return false;
 
-      if (params.condition === 'above') {
-        return releaseTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
-      } else {
-        const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
-        switch (dateIncludes) {
-          case DateIncludes.dayMonthYear:
-            return releaseTimeMs < new Date(year, month! - 1, day! + 1).getTime();
-          case DateIncludes.monthYear:
-            return releaseTimeMs < new Date(year, month!, 1).getTime();
-          case DateIncludes.yearOnly:
-            return releaseTimeMs < new Date(year + 1, 0, 1).getTime();
+      //by date case
+      if (params.date) {
+        const { day, month, year } = params.date;
+
+        if (params.condition === 'above') {
+          return releaseTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
+        } else {
+          const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
+          switch (dateIncludes) {
+            case DateIncludes.dayMonthYear:
+              return releaseTimeMs < new Date(year, month! - 1, day! + 1).getTime();
+            case DateIncludes.monthYear:
+              return releaseTimeMs < new Date(year, month!, 1).getTime();
+            case DateIncludes.yearOnly:
+              return releaseTimeMs < new Date(year + 1, 0, 1).getTime();
+          }
         }
+        //by days ago case
+      } else {
+        const today = new Date();
+        return params.condition === 'above' ?
+          releaseTimeMs >= new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - params.daysAgo!).getTime() :
+          releaseTimeMs < new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1 - params.daysAgo!).getTime();
       }
     },
     'last played': (params: FilterParams<'last played'>, appOverview: SteamAppOverview) => {
       const lastPlayedTimeMs = appOverview.rt_last_time_played * 1000;
       if (lastPlayedTimeMs === 0) return false;
 
-      const { day, month, year } = params.date!;
+      //by date case
+      if (params.date) {
+        const { day, month, year } = params.date;
 
-      if (params.condition === 'above') {
-        return lastPlayedTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
-      } else {
-        const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
-        switch (dateIncludes) {
-          case DateIncludes.dayMonthYear:
-            return lastPlayedTimeMs < new Date(year, month! - 1, day! + 1).getTime();
-          case DateIncludes.monthYear:
-            return lastPlayedTimeMs < new Date(year, month!, 1).getTime();
-          case DateIncludes.yearOnly:
-            return lastPlayedTimeMs < new Date(year + 1, 0, 1).getTime();
+        if (params.condition === 'above') {
+          return lastPlayedTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
+        } else {
+          const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
+          switch (dateIncludes) {
+            case DateIncludes.dayMonthYear:
+              return lastPlayedTimeMs < new Date(year, month! - 1, day! + 1).getTime();
+            case DateIncludes.monthYear:
+              return lastPlayedTimeMs < new Date(year, month!, 1).getTime();
+            case DateIncludes.yearOnly:
+              return lastPlayedTimeMs < new Date(year + 1, 0, 1).getTime();
+          }
         }
+        //by days ago case
+      } else {
+        const today = new Date();
+        return params.condition === 'above' ?
+          lastPlayedTimeMs >= new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - params.daysAgo!).getTime() :
+          lastPlayedTimeMs < new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1 - params.daysAgo!).getTime();
       }
     },
     demo: (params: FilterParams<'demo'>, appOverview: SteamAppOverview) => {

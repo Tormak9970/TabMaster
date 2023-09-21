@@ -1,7 +1,7 @@
 import { EditableTabSettings } from "./modals/EditTabModal";
 import { TabFilterSettings, FilterType, Filter } from "./filters/Filters";
 import { gamepadTabbedPageClasses } from "../GamepadTabbedPageClasses";
-import { getIncludedCategoriesFromBitField } from "../lib/Utils";
+import { filtersHaveType, getIncludedCategoriesFromBitField } from "../lib/Utils";
 
 /**
  * Wrapper for injecting custom tabs.
@@ -110,5 +110,14 @@ export class CustomTabContainer implements TabContainer {
     this.categoriesToInclude = categoriesToInclude;
     this.filters = filters;
     this.buildCollection();
+  }
+
+  /**
+   * Checks if the tabs filters contain any specified filter types, including those nested within a merge filter.
+   * @param filterTypes The filter types to check for.
+   * @returns Boolean
+   */
+  containsFilterType(...filterTypes: FilterType[]) {
+    return filtersHaveType(this.filters, ...filterTypes);
   }
 }
