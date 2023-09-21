@@ -62,8 +62,8 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   }, []);
 
   useEffect(() => {
-    setCanSave(name != "" && topLevelFilters.length > 0);
-  }, [name, topLevelFilters]);
+    setCanSave(name != "" && topLevelFilters.length > 0 && canAddFilter);
+  }, [name, topLevelFilters, canAddFilter]);
 
   useEffect(() => {
     setCanAddFilter(topLevelFilters.length == 0 || topLevelFilters.every(filter => !isDefaultParams(filter)));
@@ -74,7 +74,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   }
 
   function onSave() {
-    if (canSave && canAddFilter) {
+    if (canSave) {
       const updated: EditableTabSettings = {
         title: name,
         filters: topLevelFilters,
@@ -84,7 +84,8 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
       onConfirm(tabId, updated);
       closeModal!();
     } else {
-      PythonInterop.toast("Error", "Please add a name and at least 1 filter before saving");
+      if(!canAddFilter) PythonInterop.toast("Cannot Save Tab", "Some filters are incomplete");
+      else PythonInterop.toast("Cannot Save Tab", "Please add a name and at least 1 filter");
     }
   }
 
