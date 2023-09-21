@@ -3,6 +3,8 @@
 ### Table of Contents
  - Overview
  - Custom vs. Default
+ - The TabMaster Context Menu
+ - Quick Tabs
  - Adding Tabs
    - New Tab Options
  - Editing Tabs
@@ -22,6 +24,14 @@ Here you can find everything about tabs, including adding, availale options, reo
 
 ### Custom vs. Default
 Before you continue, it is important to understand that there are two types of tabs, default tabs (marked with the Steam logo) and custom tabs (ones you make). Default tabs can only be hidden, while custom tabs have all the following features.
+
+<br/>
+
+
+### The TabMaster Context Menu
+<img title="TabMaster Context Menu" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_context-menu.png" />
+<br/>
+The TabMaster context menu aims to provide access to all of TabMaster's features straight from the library page. Simply navigate to a tab in the library header, and hit the menu button to open the context menu.
 
 <br/>
 
