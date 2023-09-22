@@ -1,9 +1,11 @@
 import { Button, Focusable } from "decky-frontend-lib"
 import React, { VFC, useState } from "react"
-import { FilterType, TabFilterSettings } from "../filters/Filters"
+import { FilterType, TabFilterSettings, isValidParams } from "../filters/Filters"
 import { capitalizeFirstLetter } from "../../lib/Utils"
 import { BiSolidDownArrow } from "react-icons/bi"
 import { GamepadUIAudio } from '../../lib/GamepadUIAudio';
+import { FaXmark } from 'react-icons/fa6';
+import { CgCheck } from 'react-icons/cg';
 
 type FilterSectionAccordionProps = {
   index: number,
@@ -41,8 +43,9 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
           alignItems: "center"
         }} onOKButton={onClick} onClick={onClick}>
           <div className="filter-line" />
-          <div className="filter-label">
+          <div className="filter-label" style={{ display: 'flex', alignItems: 'center' }}>
             Filter {index + 1} - {capitalizeFirstLetter(filter.type)}{filter.type === "merge" ? ` - mode: ${capitalizeFirstLetter((filter as TabFilterSettings<'merge'>).params.mode)}` : ""}
+            {isValidParams(filter) ? <CgCheck viewBox='5 5 14 14' size='0.9em' style={{ marginLeft: '3px', color: '#009e0eb3' }} /> : <FaXmark size='0.9em' style={{ marginLeft: '3px'}} fill='#ff0016a3'/>}
             <BiSolidDownArrow
               style={{
                 transition: "transform 0.2s ease-in-out",
