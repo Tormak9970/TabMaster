@@ -3,7 +3,7 @@ import { VFC, useState, Fragment, useEffect } from "react";
 import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";
 import { TabFilterSettings, FilterType } from "../filters/Filters";
-import { isDefaultParams } from "../filters/Filters";
+import { isValidParams } from "../filters/Filters";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
 
 interface EditMergeFilterModalProps {
@@ -28,11 +28,11 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
   }, []);
 
   useEffect(() => {
-    setCanSave(groupFilters.length >= 2);
-  }, [groupFilters]);
+    setCanSave(groupFilters.length >= 2 && canAddFilter);
+  }, [groupFilters, canAddFilter]);
 
   useEffect(() => {
-    setCanAddFilter(groupFilters.length == 0 || groupFilters.every(filter => !isDefaultParams(filter)));
+    setCanAddFilter(groupFilters.length == 0 || groupFilters.every(filter => isValidParams(filter)));
   }, [groupFilters]);
 
   function addFilterToGroup() {
@@ -47,7 +47,7 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
   }
 
   function onOkButton() {
-    if (canSave && canAddFilter) {
+    if (canSave) {
       const mergeParams = {
         filters: [...groupFilters],
         mode: groupLogicMode,
@@ -56,7 +56,8 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
       saveMerge(mergeParams);
       closeModal();
     } else {
-      PythonInterop.toast("Error", "A Merge group should have at least 2 filters");
+      if(!canAddFilter) PythonInterop.toast("Cannot Save Merge Group", "Some filters are incomplete");
+      else PythonInterop.toast("Cannot Save Merge Group", "A Merge group should have at least 2 filters");
     }
   }
 
@@ -67,6 +68,7 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
         <ConfirmModal onOK={onOkButton}
           onCancel={closeModal}
           strTitle={"Merge Group"}
+          strOKButtonText="Save Group"
         >
           <FiltersPanel
             groupFilters={groupFilters}

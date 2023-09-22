@@ -8,7 +8,7 @@ import {
   quickAccessControlsClasses
 } from "decky-frontend-lib";
 import { useState, VFC, useEffect, Fragment } from "react";
-import { FilterType, TabFilterSettings, isDefaultParams } from "../filters/Filters";
+import { FilterType, TabFilterSettings, isValidParams } from "../filters/Filters";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
 import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabMasterManager } from "../../state/TabMasterManager";
@@ -62,11 +62,11 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   }, []);
 
   useEffect(() => {
-    setCanSave(name != "" && topLevelFilters.length > 0);
-  }, [name, topLevelFilters]);
+    setCanSave(name != "" && topLevelFilters.length > 0 && canAddFilter);
+  }, [name, topLevelFilters, canAddFilter]);
 
   useEffect(() => {
-    setCanAddFilter(topLevelFilters.length == 0 || topLevelFilters.every(filter => !isDefaultParams(filter)));
+    setCanAddFilter(topLevelFilters.length == 0 || topLevelFilters.every(filter => isValidParams(filter)));
   }, [topLevelFilters]);
 
   function onNameChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -74,7 +74,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   }
 
   function onSave() {
-    if (canSave && canAddFilter) {
+    if (canSave) {
       const updated: EditableTabSettings = {
         title: name,
         filters: topLevelFilters,
@@ -84,7 +84,8 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
       onConfirm(tabId, updated);
       closeModal!();
     } else {
-      PythonInterop.toast("Error", "Please add a name and at least 1 filter before saving");
+      if(!canAddFilter) PythonInterop.toast("Cannot Save Tab", "Some filters are incomplete");
+      else PythonInterop.toast("Cannot Save Tab", "Please add a name and at least 1 filter");
     }
   }
 
@@ -108,6 +109,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
           onEscKeypress={closeModal}
           strTitle={tabTitle ? `Modifying: ${tabTitle}` : 'Create New Tab'}
           onOK={onSave}
+          strOKButtonText="Save"
         >
           <div style={{ padding: "4px 16px 1px" }} className="name-field">
             <Field description={
@@ -181,7 +183,12 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
                 </span>}
               </div>
               <div style={{ paddingRight: "10px", display: "flex", alignItems: "center" }}>
-                <BiSolidDownArrow style={{ transform: !isOpen ? "rotate(90deg)" : "" }} />
+                <BiSolidDownArrow
+                  style={{
+                    transform: !isOpen ? "rotate(90deg)" : "",
+                    transition: "transform 0.2s ease-in-out",
+                  }}
+                />
               </div>
             </div>
           </div>

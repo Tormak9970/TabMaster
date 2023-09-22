@@ -1,6 +1,8 @@
 import { gamepadDialogClasses } from "decky-frontend-lib";
 import { VFC } from "react";
 
+export const modalMargin = '16px + 2.8vw';
+
 /**
  * All css styling for TabMaster's modals.
  */
@@ -55,18 +57,18 @@ export const ModalStyles: VFC<{}> = ({}) => {
 
       /* Filter section start */
       .tab-master-modal-scope .filter-start-cont {
-        width: 114%;
-        margin-left: -40px;
+        margin-left: calc((${modalMargin}) * -1);
+        margin-right: calc((${modalMargin}) * -1);
         padding: 0;
 
         font-size: 14px;
       }
       .tab-master-modal-scope .filter-start-cont .filter-line {
         height: 2px;
-        flex-grow: 1;
         
         background: #23262e;
       }
+      .tab-master-modal-scope .filter-start-cont .filter-accordion-arrow,
       .tab-master-modal-scope .filter-start-cont .filter-label {
         margin: 0px 5px;
         color: #343945;
@@ -82,6 +84,7 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .filter-start-cont.start-focused .filter-line {
         background: #a9a9a9;
       }
+      .tab-master-modal-scope .filter-start-cont.start-focused .filter-accordion-arrow,
       .tab-master-modal-scope .filter-start-cont.start-focused .filter-label {
         color: #a9a9a9;
       }
