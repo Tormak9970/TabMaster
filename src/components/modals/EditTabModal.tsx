@@ -182,7 +182,12 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
                 </span>}
               </div>
               <div style={{ paddingRight: "10px", display: "flex", alignItems: "center" }}>
-                <BiSolidDownArrow style={{ transform: !isOpen ? "rotate(90deg)" : "" }} />
+                <BiSolidDownArrow
+                  style={{
+                    transform: !isOpen ? "rotate(90deg)" : "",
+                    transition: "transform 0.2s ease-in-out",
+                  }}
+                />
               </div>
             </div>
           </div>

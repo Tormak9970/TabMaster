@@ -45,7 +45,7 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
             Filter {index + 1} - {capitalizeFirstLetter(filter.type)}{filter.type === "merge" ? ` - mode: ${capitalizeFirstLetter((filter as TabFilterSettings<'merge'>).params.mode)}` : ""}
             <BiSolidDownArrow
               style={{
-                animation: "transform 0.2s ease-in-out",
+                transition: "transform 0.2s ease-in-out",
                 transform: !open ? "rotate(90deg)" : "",
                 fontSize: "0.8em",
                 marginLeft: "5px"
