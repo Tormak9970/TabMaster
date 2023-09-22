@@ -8,7 +8,7 @@ import {
   quickAccessControlsClasses
 } from "decky-frontend-lib";
 import { useState, VFC, useEffect, Fragment } from "react";
-import { FilterType, TabFilterSettings, isDefaultParams } from "../filters/Filters";
+import { FilterType, TabFilterSettings, isValidParams } from "../filters/Filters";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
 import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabMasterManager } from "../../state/TabMasterManager";
@@ -66,7 +66,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   }, [name, topLevelFilters, canAddFilter]);
 
   useEffect(() => {
-    setCanAddFilter(topLevelFilters.length == 0 || topLevelFilters.every(filter => !isDefaultParams(filter)));
+    setCanAddFilter(topLevelFilters.length == 0 || topLevelFilters.every(filter => isValidParams(filter)));
   }, [topLevelFilters]);
 
   function onNameChange(e: React.ChangeEvent<HTMLInputElement>) {

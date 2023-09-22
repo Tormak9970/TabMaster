@@ -3,7 +3,7 @@ import { VFC, useState, Fragment, useEffect } from "react";
 import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";
 import { TabFilterSettings, FilterType } from "../filters/Filters";
-import { isDefaultParams } from "../filters/Filters";
+import { isValidParams } from "../filters/Filters";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
 
 interface EditMergeFilterModalProps {
@@ -32,7 +32,7 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
   }, [groupFilters, canAddFilter]);
 
   useEffect(() => {
-    setCanAddFilter(groupFilters.length == 0 || groupFilters.every(filter => !isDefaultParams(filter)));
+    setCanAddFilter(groupFilters.length == 0 || groupFilters.every(filter => isValidParams(filter)));
   }, [groupFilters]);
 
   function addFilterToGroup() {

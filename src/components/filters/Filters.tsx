@@ -116,27 +116,32 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
   }
 }
 
+//* I changed this from 'isDefaultParams' because some default params can still be valid
+//* make sure the check is the inversion from before going forward
 /**
- * Checks if the user has made any changes to a filter.
+ * Checks if a filter has valid params.
  * @param filter The filter to check.
- * @returns True if the filter is the default (wont filter anything).
+ * @returns True if the filter has valid params.
  */
-export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
+export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
   switch (filter.type) {
     case "regex":
-      return (filter as TabFilterSettings<'regex'>).params.regex === "";
+      return (filter as TabFilterSettings<'regex'>).params.regex !== "";
     case "collection":
-      return (filter as TabFilterSettings<'collection'>).params.id === "" || (filter as TabFilterSettings<'collection'>).params.name === "";
+      return (filter as TabFilterSettings<'collection'>).params.id !== "" && (filter as TabFilterSettings<'collection'>).params.name !== "";
     case "friends":
-      return (filter as TabFilterSettings<'friends'>).params.friends.length === 0;
+      return (filter as TabFilterSettings<'friends'>).params.friends.length !== 0;
     case "tags":
-      return (filter as TabFilterSettings<'tags'>).params.tags.length === 0;
-    case "installed":
+      return (filter as TabFilterSettings<'tags'>).params.tags.length !== 0;
     case "whitelist":
     case "blacklist":
-      return false;
+      return (filter as TabFilterSettings<'whitelist'>).params.games.length !== 0;
     case "merge":
-      return (filter as TabFilterSettings<'merge'>).params.filters.length === 0;
+      return (filter as TabFilterSettings<'merge'>).params.filters.length !== 0;
+    case "release date":
+    case "last played":
+      return (filter as TabFilterSettings<'release date'>).params.date !== undefined;
+    case "installed":
     case "platform":
     case "deck compatibility":
     case "review score":
@@ -144,10 +149,7 @@ export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean 
     case "size on disk":
     case "demo":
     case "streamable":
-      return false;
-    case "release date":
-    case "last played":
-      return (filter as TabFilterSettings<'release date'>).params.date === undefined;
+      return true;
   }
 }
 
