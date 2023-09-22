@@ -109,6 +109,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
           onEscKeypress={closeModal}
           strTitle={tabTitle ? `Modifying: ${tabTitle}` : 'Create New Tab'}
           onOK={onSave}
+          strOKButtonText="Save"
         >
           <div style={{ padding: "4px 16px 1px" }} className="name-field">
             <Field description={

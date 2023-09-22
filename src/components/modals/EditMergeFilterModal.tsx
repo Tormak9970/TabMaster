@@ -68,6 +68,7 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
         <ConfirmModal onOK={onOkButton}
           onCancel={closeModal}
           strTitle={"Merge Group"}
+          strOKButtonText="Save Group"
         >
           <FiltersPanel
             groupFilters={groupFilters}
