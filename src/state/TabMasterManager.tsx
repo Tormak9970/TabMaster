@@ -322,6 +322,27 @@ export class TabMasterManager {
   }
 
   /**
+   * Checks for tabs with filters that are based on time ago and rebuilds their collections.
+   */
+  buildTimeBasedFilterTabs() {
+    this.visibleTabsList.forEach(tabContainer => {
+      if (tabContainer.filters) {
+        const tab = tabContainer as CustomTabContainer;
+        if (tab.containsFilterType('last played', 'release date')) {
+          if (!tab.containsFilterType('merge')) {
+            //@ts-ignore
+            if (tab.filters.find(filter => filter.params.daysAgo !== undefined)) {
+              tab.buildCollection();
+            }
+          } else {
+            tab.buildCollection();
+          }
+        }
+      }
+    });
+  }
+
+  /**
    * Handles cleaning up all reactions.
    */
   disposeReactions(): void {
