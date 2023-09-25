@@ -1,19 +1,23 @@
-import { Dropdown, DropdownOption, Field, Focusable } from "decky-frontend-lib";
+import { Dropdown, DropdownOption, Field, Focusable, SingleDropdownOption } from "decky-frontend-lib";
 import { useState, VFC, useEffect } from "react";
 import { MultiSelectStyles } from "../styles/MultiSelectStyles";
 import { MultiSelectedOption } from "./MultiSelectOption";
 import { MultiSelectProps } from "./MultiSelect";
+import { ListSearchTrigger } from "../modals/ListSearchModal";
+import { IconType } from "react-icons/lib";
 
-
-export interface ModeMultiSelectProps extends Omit<MultiSelectProps, 'onChange'> {
+export interface ModeMultiSelectProps extends Omit<MultiSelectProps, 'onChange' | 'determineEntryIcon'> {
+  entryLabel: string,
   mode: LogicalMode,
+  EntryIcon: IconType,
+  TriggerIcon: IconType,
   onChange?: (selected:DropdownOption[], mode: LogicalMode) => void
 }
 
 /**
  * A component for multi select dropdown menus that supports modes.
  */
-export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps }) => {
+export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps, entryLabel, EntryIcon, TriggerIcon }) => {
   const [ sel, setSel ] = useState(selected);
   const [ available, setAvailable ] = useState(options.filter((opt) => !selected.includes(opt)));
   const [ innerMode, setInnerMode ] = useState(mode);
@@ -68,7 +72,15 @@ export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, f
               <Focusable style={{
                 width: "calc(100% - 100px)"
               }}>
-                <Dropdown rgOptions={available} selectedOption={dropdownSelected} onChange={onSelectedChange} strDefaultLabel={dropdownLabel} focusable={true} disabled={available.length == 0 || (!!maxOptions && selected.length == maxOptions)} />
+                <ListSearchTrigger
+                  entryLabel={entryLabel}
+                  options={available as SingleDropdownOption[]}
+                  onChange={onSelectedChange}
+                  labelOverride={dropdownSelected.label!}
+                  disabled={available.length == 0 || (!!maxOptions && selected.length == maxOptions)}
+                  TriggerIcon={TriggerIcon}
+                  determineEntryIcon={() => EntryIcon}
+                />
               </Focusable>
               <Focusable style={{
                 marginLeft: "10px",

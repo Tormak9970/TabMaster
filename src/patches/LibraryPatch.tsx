@@ -4,12 +4,14 @@ import {
   replacePatch,
   RoutePatch,
   ServerAPI,
+  showContextMenu,
   wrapReactType
 } from "decky-frontend-lib";
 import { ReactElement, useEffect, useState } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { LogController } from "../lib/controllers/LogController";
+import { LibraryMenu } from '../components/menus/LibraryMenu';
 
 /**
  * Patches the Steam library to allow the plugin to change the tabs.
@@ -74,7 +76,6 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                 }
 
                 const tabContentComponent = tabTemplate!.content.type as TabContentComponent;
-                const footer = tabTemplate!.footer;
 
                 let pacthedTabs: SteamTab[];
 
@@ -82,9 +83,18 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                   let tablist = tabMasterManager.getTabs().visibleTabsList;
                   pacthedTabs = tablist.flatMap((tabContainer) => {
                     if (tabContainer.filters) {
+                      const footer = { ...(tabTemplate!.footer ?? {}), onMenuButton: getShowMenu(tabContainer.id, tabMasterManager), onMenuActionDescription: 'Tab Master' };
                       return (tabContainer as CustomTabContainer).getActualTab(tabContentComponent, sortingProps, footer, collectionsAppFilterGamepad);
                     } else {
-                      return tabs.find(actualTab => actualTab.id === tabContainer.id) ?? [];
+                      return tabs.find(actualTab => {
+                        if (actualTab.id === tabContainer.id) {
+                          if (!actualTab.footer) actualTab.footer = {};
+                          actualTab.footer!.onMenuActionDescription = 'Tab Master';
+                          actualTab.footer!.onMenuButton = getShowMenu(tabContainer.id, tabMasterManager);
+                          return true;
+                        }
+                        return false;
+                      }) ?? [];
                     }
                   });
                 } else {
@@ -114,3 +124,16 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
     return props;
   });
 };
+
+/**
+ * Get's the fn to show library menu for each tab.
+ * @param id Tab container id.
+ * @param tabMasterManager TabMasterManager instance.
+ */
+function getShowMenu(id: string, tabMasterManager: TabMasterManager) {
+  return () => {
+    let menu: { Hide: () => void };
+    //@ts-ignore
+    menu = showContextMenu(<LibraryMenu selectedTabId={id} tabMasterManager={tabMasterManager} closeMenu={() => menu.Hide()}/>);
+  }
+}

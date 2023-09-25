@@ -1,8 +1,9 @@
-import { MenuItem, showModal, ConfirmModal, Menu, showContextMenu, DialogButton } from "decky-frontend-lib"
+import { MenuItem, showModal, Menu, showContextMenu, DialogButton } from "decky-frontend-lib"
 import { VFC } from "react"
 import { FaEllipsisH } from "react-icons/fa"
 import { TabMasterManager } from "../state/TabMasterManager"
 import { EditTabModal, EditableTabSettings } from "./modals/EditTabModal"
+import { DestructiveModal } from './generic/DestructiveModal';
 
 interface TabActionsContextMenuProps {
   tabContainer: TabContainer,
@@ -44,16 +45,14 @@ export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabCont
       <MenuItem onSelected={() => {
         if (tabContainer.filters) {
           showModal(
-            <ConfirmModal
-              className={'tab-master-destructive-modal'}
+            <DestructiveModal
               onOK={() => {
                 tabMasterManager.deleteTab(tabContainer.id);
               }}
-              bDestructiveWarning={true}
               strTitle="WARNING!"
             >
               Are you sure you want to delete this Tab? This can't be undone.
-            </ConfirmModal>
+            </DestructiveModal>
           )
         }
       }}>
