@@ -21,7 +21,7 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
     installed: "Selects apps that are installed/uninstalled.",
     regex: "Selects apps whose titles match a regular expression.",
     friends: "Selects apps that are also owned by friends.",
-    tags: "Selects apps that have pecific community tags.",
+    tags: "Selects apps that have specific community tags.",
     whitelist: "Selects apps that are added to the list.",
     blacklist: "Selects apps that are not added to the list.",
     merge: "Selects apps that pass a subgroup of filters.",
@@ -32,7 +32,8 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
     "size on disk": "Selects apps based on their install size.",
     "release date": "Selects apps based on their release date.",
     "last played": "Selects apps based on when they were last played.",
-    demo: "Selects apps that are/aren't demos."
+    demo: "Selects apps that are/aren't demos.",
+    streamable: "Selects apps that can/can't be streamed from another computer."
   }
 
   useEffect(() => {setTimeout(() => setFocusable(true), 10)}, []);
@@ -112,7 +113,7 @@ export const FilterSelect: VFC<FilterSelectProps> = ({ selectedOption, onChange 
   }
 
   return (
-    <CustomButton style={{ padding: '10px 12px' }} onOKActionDescription={"Change Filter Type"} onOKButton={showFilterSelection} onClick={showFilterSelection}>
+    <CustomButton style={{ padding: '10px 16px' }} onOKActionDescription={"Change Filter Type"} onOKButton={showFilterSelection} onClick={showFilterSelection}>
       <div style={{ display: 'flex', overflow: 'hidden' }}>
         <div style={{ overflow: 'hidden', flex: 'auto' }}>
           <div style={{ textAlign: 'left', minHeight: '20px' }}>

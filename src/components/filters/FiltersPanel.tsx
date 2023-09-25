@@ -41,7 +41,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
             inlineWrap="keep-inline"
             className="no-sep"
           >
-            <div style={{ width: "150px" }}>
+            <div style={{ width: "100px" }}>
               <Dropdown rgOptions={modeOptions} selectedOption={groupLogicMode} onChange={(option) => setGroupLogicMode(option.data)} focusable={true} />
             </div>
           </Field>

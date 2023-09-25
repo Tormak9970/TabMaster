@@ -10,6 +10,7 @@ import {
   ReorderableList,
   RoutePatch,
   ServerAPI,
+  showContextMenu,
   showModal,
   SidebarNavigation,
   staticClasses,
@@ -17,7 +18,8 @@ import {
 import { VFC, Fragment, ReactNode } from "react";
 
 import { TbLayoutNavbarExpand } from "react-icons/tb";
-import { FaSteam, FaArrowRotateRight } from "react-icons/fa6";
+import { FaSteam, FaCircleExclamation } from "react-icons/fa6";
+import { PiListPlusBold } from "react-icons/pi";
 import { MdNumbers } from "react-icons/md";
 
 import { PluginController } from "./lib/controllers/PluginController";
@@ -31,11 +33,11 @@ import { patchSettings } from "./patches/SettingsPatch";
 
 import { QamStyles } from "./components/styles/QamStyles";
 import { EditableTabSettings, EditTabModal } from "./components/modals/EditTabModal";
-import { CustomTabContainer } from "./components/CustomTabContainer";
 import { TabActionsButton } from "./components/TabActions";
 import { LogController } from "./lib/controllers/LogController";
 import { DocPage } from "./components/docs/DocsPage";
 import { IncludeCategories } from "./lib/Utils";
+import { PresetMenu } from './components/menus/PresetMenu';
 
 declare global {
   var SteamClient: SteamClient;
@@ -47,7 +49,7 @@ declare global {
   let securitystore: SecurityStore;
 }
 
-type TabIdEntryType = {
+export type TabIdEntryType = {
   id: string;
 };
 
@@ -80,14 +82,6 @@ const Content: VFC<{}> = ({ }) => {
     );
   }
 
-  function refreshTabs() {
-    tabMasterManager.getTabs().visibleTabsList.forEach((tabContainer) => {
-      if (tabContainer.filters && tabContainer.filters.length !== 0) {
-        (tabContainer as CustomTabContainer).buildCollection();
-      }
-    });
-  }
-
   const entries = visibleTabsList.map((tabContainer) => {
     return {
       label:
@@ -102,6 +96,23 @@ const Content: VFC<{}> = ({ }) => {
 
   return (
     <>
+      {LogController.errorFlag && <div style={{ padding: '0 15px', marginBottom: '40px' }}>
+        <h3>
+          <FaCircleExclamation style={{ height: '.8em', marginRight: '5px' }} fill="red" />
+          Tab Master encountered an error
+        </h3>
+        <div style={{ wordWrap: 'break-word' }}>
+          Please reach out to 
+          <br/>
+          <a href='https://github.com/Tormak9970/TabMaster/issues'>https://github.com/Tormak9970/TabMaster/issues</a>
+          <br/>
+          or
+          <br/>
+          <a href='https://discord.com/channels/960281551428522045/1049449185214206053'>https://discord.com/channels/960281551428522045/1049449185214206053</a>
+          <br/>
+          for support.
+        </div>
+      </div>}
       <QamStyles />
       <div className="tab-master-scope">
         <Focusable onMenuActionDescription='Open Docs' onMenuButton={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }}>
@@ -119,10 +130,10 @@ const Content: VFC<{}> = ({ }) => {
                 <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
                   <DialogButton
                     style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center", marginRight: "8px" }}
-                    onOKActionDescription={'Refresh Tab Games'}
-                    onClick={refreshTabs}
+                    onOKActionDescription={'Add Quick Tab'}
+                    onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} />)}
                   >
-                    <FaArrowRotateRight />
+                    <PiListPlusBold size='1.4em' />
                   </DialogButton>
                 </Focusable>}
             </Focusable>
@@ -230,6 +241,8 @@ export default definePlugin((serverAPI: ServerAPI) => {
     settingsPatch = patchSettings(serverAPI, tabMasterManager);
   });
 
+  const onWakeUnregister = SteamClient.System.RegisterForOnResumeFromSuspend(PluginController.onWakeFromSleep.bind(PluginController)).unregister;
+
   PythonInterop.getDocs().then((pages: DocPages | Error) => {
     if (pages instanceof Error) {
       LogController.error(pages);
@@ -255,6 +268,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
       serverAPI.routerHook.removeRoute("/tab-master-docs");
 
       loginUnregisterer.unregister();
+      onWakeUnregister();
       PluginController.dismount();
     },
   };

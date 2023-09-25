@@ -22,6 +22,7 @@
    - Release Date
    - Last Played
    - Demo
+   - Streamable
 
 <br/>
 
@@ -249,13 +250,25 @@ Filters apps based on when they were last played.
 
 #### Demo
 **Options:**<br/>
-`Is demo` - A toggle. On is a demo, off is not a demo.
+`Is demo` - Whether to only include games that are demos, or only those that aren't.
 
 **Behavior:**<br/>
 Filters apps based on if they are a demo or not.
 
 **Example:**<br/>
 <img title="Demo Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_demo-example.png" />
+
+<br/>
+
+#### Streamable
+**Options:**<br/>
+`Is Streamable` - Whether to only include games that can be streamed, or only those that can't.
+
+**Behavior:**<br/>
+Filters apps based on if they can be streamed or not.
+
+**Example:**<br/>
+<img title="Streamable Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_streamable-example.png" />
 
 <br/>
 

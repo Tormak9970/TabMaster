@@ -18,7 +18,6 @@ export const MultiSelectStyles: VFC<{}> = ({}) => {
       }
       /* The button item */
       .tab-master-modal-scope .multi-select button.${gamepadDialogClasses.Button}.DialogButton {
-        padding: 10px;
         min-width: 45px;
       }
     `}</style>

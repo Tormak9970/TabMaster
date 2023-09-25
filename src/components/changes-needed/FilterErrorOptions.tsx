@@ -1,6 +1,5 @@
 import {
   ButtonItem,
-  ConfirmModal,
   DialogButton,
   Dropdown,
   DropdownOption,
@@ -14,6 +13,7 @@ import { FilterType, TabFilterSettings } from "../filters/Filters";
 import { FixMergeFilterModal } from "../modals/FixMergeFilterModal";
 import { ErrorPanelTabNameContext } from "../../state/ErrorPanelNameContext";
 import { FaTrash } from "react-icons/fa";
+import { DestructiveModal } from '../generic/DestructiveModal';
 
 type FilterErrorOptionsProps<T extends FilterType> = {
   isMergeGroup: boolean | undefined,
@@ -60,14 +60,12 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
               <DialogButton 
                 onClick={() => {
                   showModal(
-                    <ConfirmModal
-                      className={'tab-master-destructive-modal'}
+                    <DestructiveModal
                       onOK={onFilterDelete}
-                      bDestructiveWarning={true}
                       strTitle="WARNING!"
                     >
                       {'Are you sure you want to delete this filter? ' + (numFilters === 1 ? `There are no other filters in this ${isMergeGroup ? 'merge group' : 'tab'}. Deleting it will automatically delete the ${isMergeGroup ? 'merge filter' : 'tab'} as well. ` : '') + `This can't be undone.`}
-                    </ConfirmModal>
+                    </DestructiveModal>
                   );
                 }}
                 style={{
@@ -147,14 +145,12 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ isMerg
             <ButtonItem
               onClick={() => {
                 showModal(
-                  <ConfirmModal
-                    className={'tab-master-destructive-modal'}
+                  <DestructiveModal
                     onOK={onFilterDelete}
-                    bDestructiveWarning={true}
                     strTitle="WARNING!"
                   >
                     {'Are you sure you want to delete this filter? ' + (numFilters === 1 ? `There are no other filters in this ${isMergeGroup ? 'merge group' : 'tab'}. Deleting it will automatically delete the ${isMergeGroup ? 'merge filter' : 'tab'} as well. ` : '') + `This can't be undone.`}
-                  </ConfirmModal>
+                  </DestructiveModal>
                 );
               }}
             >

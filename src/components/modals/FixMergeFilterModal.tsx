@@ -5,6 +5,7 @@ import { PythonInterop } from "../../lib/controllers/PythonInterop"
 import { ErroredFiltersPanel } from "../changes-needed/ErroredFiltersPanel"
 import { ErrorPanelTabNameContext } from "../../state/ErrorPanelNameContext"
 import { FixModalStyles } from "../styles/FixModalStyles"
+import { DestructiveModal } from '../generic/DestructiveModal';
 
 interface FixMergeFilterModalProps {
   mergeParams: TabFilterSettings<'merge'>['params'],
@@ -49,14 +50,12 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({ mergeParams
     <ConfirmModal
       onOK={() => {
         showModal(
-          <ConfirmModal
-            className={'tab-master-destructive-modal'}
+          <DestructiveModal
             onOK={onOkButton}
-            bDestructiveWarning={true}
             strTitle="WARNING!"
           >
             Are you sure you want save these fixes to this merge group? This can't be can't be changed later.
-          </ConfirmModal>
+          </DestructiveModal>
         );
       }}
       bOKDisabled={!isPassing}

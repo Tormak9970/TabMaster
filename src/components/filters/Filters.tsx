@@ -1,7 +1,7 @@
 import { PluginController } from "../../lib/controllers/PluginController";
 import { DateIncludes, DateObj } from '../generic/DatePickers';
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo' | 'streamable';
 
 export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
@@ -30,9 +30,10 @@ type DeckCompatFilterParams = { category: number; };
 type ReviewScoreFilterParams = { scoreThreshold: number, condition: ThresholdCondition, type: ReviewScoreType; };
 type TimePlayedFilterParams = { timeThreshold: number, condition: ThresholdCondition, units: TimeUnit; };
 type SizeOnDiskFilterParams = { gbThreshold: number, condition: ThresholdCondition; };
-type ReleaseDateFilterParams = { date?: DateObj, condition: ThresholdCondition; };
-type LastPlayedFilterParams = { date?: DateObj, condition: ThresholdCondition; };
+type ReleaseDateFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition; };
+type LastPlayedFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition; };
 type DemoFilterParams = { isDemo: boolean; };
+type StreamableFilterParams = { isStreamable: boolean; }
 
 export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -51,6 +52,7 @@ export type FilterParams<T extends FilterType> =
   T extends 'release date' ? ReleaseDateFilterParams :
   T extends 'last played' ? LastPlayedFilterParams :
   T extends 'demo' ? DemoFilterParams :
+  T extends 'streamable' ? StreamableFilterParams :
   never;
 
 export type TabFilterSettings<T extends FilterType> = {
@@ -81,7 +83,8 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "size on disk": { gbThreshold: 10, condition: 'above' },
   "release date": { date: undefined, condition: 'above' },
   "last played": { date: undefined, condition: 'above' },
-  "demo": { isDemo: true }
+  "demo": { isDemo: true },
+  "streamable": { isStreamable: true }
 };
 
 /**
@@ -108,41 +111,45 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "release date":
     case "last played":
     case "demo":
+    case "streamable":
       return false;
   }
 }
 
+//* I changed this from 'isDefaultParams' because some default params can still be valid
+//* make sure the check is the inversion from before going forward
 /**
- * Checks if the user has made any changes to a filter.
+ * Checks if a filter has valid params.
  * @param filter The filter to check.
- * @returns True if the filter is the default (wont filter anything).
+ * @returns True if the filter has valid params.
  */
-export function isDefaultParams(filter: TabFilterSettings<FilterType>): boolean {
+export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
   switch (filter.type) {
     case "regex":
-      return (filter as TabFilterSettings<'regex'>).params.regex === "";
+      return (filter as TabFilterSettings<'regex'>).params.regex !== "";
     case "collection":
-      return (filter as TabFilterSettings<'collection'>).params.id === "" || (filter as TabFilterSettings<'collection'>).params.name === "";
+      return (filter as TabFilterSettings<'collection'>).params.id !== "" && (filter as TabFilterSettings<'collection'>).params.name !== "";
     case "friends":
-      return (filter as TabFilterSettings<'friends'>).params.friends.length === 0;
+      return (filter as TabFilterSettings<'friends'>).params.friends.length !== 0;
     case "tags":
-      return (filter as TabFilterSettings<'tags'>).params.tags.length === 0;
-    case "installed":
+      return (filter as TabFilterSettings<'tags'>).params.tags.length !== 0;
     case "whitelist":
     case "blacklist":
-      return false;
+      return (filter as TabFilterSettings<'whitelist'>).params.games.length !== 0;
     case "merge":
-      return (filter as TabFilterSettings<'merge'>).params.filters.length === 0;
+      return (filter as TabFilterSettings<'merge'>).params.filters.length !== 0;
+    case "release date":
+    case "last played":
+      return (filter as TabFilterSettings<'release date'>).params.date !== undefined || (filter as TabFilterSettings<'release date'>).params.daysAgo !== undefined;
+    case "installed":
     case "platform":
     case "deck compatibility":
     case "review score":
     case "time played":
     case "size on disk":
     case "demo":
-      return false;
-    case "release date":
-    case "last played":
-      return (filter as TabFilterSettings<'release date'>).params.date === undefined;
+    case "streamable":
+      return true;
   }
 }
 
@@ -261,6 +268,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "release date":
     case "last played":
     case "demo":
+    case "streamable":
       return {
         passed: true,
         errors: []
@@ -337,51 +345,70 @@ export class Filter {
     },
     'release date': (params: FilterParams<'release date'>, appOverview: SteamAppOverview) => {
       let releaseTimeMs;
-      if (appOverview.rt_original_release_date) {
-        releaseTimeMs = appOverview.rt_original_release_date * 1000;
-      } else if (appOverview.rt_steam_release_date !== 0) {
-        releaseTimeMs = appOverview.rt_steam_release_date * 1000;
-      } else {
-        return false;
-      }
-      const { day, month, year } = params.date!;
+      if (appOverview.rt_original_release_date) releaseTimeMs = appOverview.rt_original_release_date * 1000;
+      else if (appOverview.rt_steam_release_date !== 0) releaseTimeMs = appOverview.rt_steam_release_date * 1000;
+      else return false;
 
-      if (params.condition === 'above') {
-        return releaseTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
-      } else {
-        const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
-        switch (dateIncludes) {
-          case DateIncludes.dayMonthYear:
-            return releaseTimeMs < new Date(year, month! - 1, day! + 1).getTime();
-          case DateIncludes.monthYear:
-            return releaseTimeMs < new Date(year, month!, 1).getTime();
-          case DateIncludes.yearOnly:
-            return releaseTimeMs < new Date(year + 1, 0, 1).getTime();
+      //by date case
+      if (params.date) {
+        const { day, month, year } = params.date;
+
+        if (params.condition === 'above') {
+          return releaseTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
+        } else {
+          const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
+          switch (dateIncludes) {
+            case DateIncludes.dayMonthYear:
+              return releaseTimeMs < new Date(year, month! - 1, day! + 1).getTime();
+            case DateIncludes.monthYear:
+              return releaseTimeMs < new Date(year, month!, 1).getTime();
+            case DateIncludes.yearOnly:
+              return releaseTimeMs < new Date(year + 1, 0, 1).getTime();
+          }
         }
+        //by days ago case
+      } else {
+        const today = new Date();
+        return params.condition === 'above' ?
+          releaseTimeMs >= new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - params.daysAgo!).getTime() :
+          releaseTimeMs < new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1 - params.daysAgo!).getTime();
       }
     },
     'last played': (params: FilterParams<'last played'>, appOverview: SteamAppOverview) => {
       const lastPlayedTimeMs = appOverview.rt_last_time_played * 1000;
       if (lastPlayedTimeMs === 0) return false;
 
-      const { day, month, year } = params.date!;
+      //by date case
+      if (params.date) {
+        const { day, month, year } = params.date;
 
-      if (params.condition === 'above') {
-        return lastPlayedTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
-      } else {
-        const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
-        switch (dateIncludes) {
-          case DateIncludes.dayMonthYear:
-            return lastPlayedTimeMs < new Date(year, month! - 1, day! + 1).getTime();
-          case DateIncludes.monthYear:
-            return lastPlayedTimeMs < new Date(year, month!, 1).getTime();
-          case DateIncludes.yearOnly:
-            return lastPlayedTimeMs < new Date(year + 1, 0, 1).getTime();
+        if (params.condition === 'above') {
+          return lastPlayedTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
+        } else {
+          const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
+          switch (dateIncludes) {
+            case DateIncludes.dayMonthYear:
+              return lastPlayedTimeMs < new Date(year, month! - 1, day! + 1).getTime();
+            case DateIncludes.monthYear:
+              return lastPlayedTimeMs < new Date(year, month!, 1).getTime();
+            case DateIncludes.yearOnly:
+              return lastPlayedTimeMs < new Date(year + 1, 0, 1).getTime();
+          }
         }
+        //by days ago case
+      } else {
+        const today = new Date();
+        return params.condition === 'above' ?
+          lastPlayedTimeMs >= new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - params.daysAgo!).getTime() :
+          lastPlayedTimeMs < new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1 - params.daysAgo!).getTime();
       }
     },
     demo: (params: FilterParams<'demo'>, appOverview: SteamAppOverview) => {
       return params.isDemo ? appOverview.app_type === 8 : appOverview.app_type !== 8; 
+    },
+    streamable: (params: FilterParams<'streamable'>, appOverview: SteamAppOverview) => {
+      const isStreamable = appOverview.per_client_data.some((clientData) => clientData.client_name !== "This machine" && clientData.installed);
+      return params.isStreamable ? isStreamable : !isStreamable;
     }
   };
 

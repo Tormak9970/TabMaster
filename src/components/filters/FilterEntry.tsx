@@ -95,8 +95,8 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
             marginLeft: "10px",
             width: "45px"
           }}>
-            <DialogButton onClick={onDelete} style={{ minWidth: "45px", padding: "10px" }}>
-              <FaTrash />
+            <DialogButton onClick={onDelete} style={{ minWidth: "45px", padding: '10px 16px', minHeight: '40px', display: 'flex' }}>
+              <FaTrash style={{ margin: 'auto', height: '.9em' }}/>
             </DialogButton>
           </Focusable>
         </Focusable>

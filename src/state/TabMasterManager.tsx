@@ -8,6 +8,7 @@ import { defaultTabsSettings, getNonBigIntUserId } from "../lib/Utils";
 import { LogController } from "../lib/controllers/LogController";
 import { showModal } from "decky-frontend-lib";
 import { FixTabErrorsModalRoot } from "../components/modals/FixTabErrorsModal";
+import { PresetName, PresetOptions, getPreset } from '../presets/presets';
 
 /**
  * Converts a list of filters into a 1D array.
@@ -321,6 +322,27 @@ export class TabMasterManager {
   }
 
   /**
+   * Checks for tabs with filters that are based on time ago and rebuilds their collections.
+   */
+  buildTimeBasedFilterTabs() {
+    this.visibleTabsList.forEach(tabContainer => {
+      if (tabContainer.filters) {
+        const tab = tabContainer as CustomTabContainer;
+        if (tab.containsFilterType('last played', 'release date')) {
+          if (!tab.containsFilterType('merge')) {
+            //@ts-ignore
+            if (tab.filters.find(filter => filter.params.daysAgo !== undefined)) {
+              tab.buildCollection();
+            }
+          } else {
+            tab.buildCollection();
+          }
+        }
+      }
+    });
+  }
+
+  /**
    * Handles cleaning up all reactions.
    */
   disposeReactions(): void {
@@ -446,6 +468,11 @@ export class TabMasterManager {
     this.addCollectionReactionsForFilters(flattenFilters(filterSettingsList));
     this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode, categoriesToInclude));
     this.updateAndSave();
+  }
+
+  createPresetTab<Name extends PresetName>(presetName: Name, ...options: PresetOptions<Name>){
+    const { title, filters, filtersMode, categoriesToInclude} = getPreset(presetName, ...options);
+    this.createCustomTab(title, this.visibleTabsList.length, filters, filtersMode, categoriesToInclude);
   }
 
   /**
