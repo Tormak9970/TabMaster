@@ -43,7 +43,7 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager })
           return (
             <MenuGroup label='Installation'>
               {['Installed', 'Not Installed'].map(name =>
-                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, name === 'installed')} {...getActionDescription(name)}>
+                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, name === 'Installed')} {...getActionDescription(name)}>
                   {name}
                 </MenuItem>)}
             </MenuGroup>
