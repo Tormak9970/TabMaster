@@ -58,6 +58,15 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager })
               )}
             </MenuGroup>
           );
+        case 'platform':
+          return (
+            <MenuGroup label='Platform'>
+              {(['steam', 'nonSteam'] as SteamPlatform[]).map(platform =>
+                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, platform)} {...getActionDescription(name)}>
+                  {platform === 'nonSteam' ? 'Non Steam' : 'Steam'}
+                </MenuItem>)}
+            </MenuGroup>
+          );
         default:
           return (
             <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName)} {...getActionDescription(presetName)}>

@@ -51,6 +51,15 @@ const presetDefines = {
     };
   },
 
+  'platform': (platform: SteamPlatform) => {
+    return {
+      title: platform === 'nonSteam' ? 'Non Steam' : 'Steam',
+      filters: [{ type: 'platform', inverted: false, params: { platform: platform } }],
+      filtersMode: 'and',
+      categoriesToInclude: IncludeCategories.games
+    };
+  },
+
   music: () => {
     return {
       title: 'Soundtracks',
