@@ -1,8 +1,7 @@
-import { FilterType, TabFilterSettings, compatCategoryToLabel } from '../components/filters/Filters';
+import { FilterType, TabFilterSettings } from '../components/filters/Filters';
 import { IncludeCategories } from '../lib/Utils';
 
 type TabPreset = {
-  title: string,
   filters: TabFilterSettings<FilterType>[],
   filtersMode: LogicalMode,
   categoriesToInclude: number; //include categories bit field
@@ -12,7 +11,6 @@ const presetDefines = {
 
   collection: (collectionId: string, collectionName: string) => {
     return {
-      title: collectionName,
       filters: [{ type: 'collection', inverted: false, params: { id: collectionId, name: collectionName } }],
       filtersMode: 'and',
       categoriesToInclude: IncludeCategories.games
@@ -21,7 +19,6 @@ const presetDefines = {
 
   'all games': () => {
     return {
-      title: 'All Games',
       filters: [
         { type: 'installed', inverted: false, params: { installed: true } },
         { type: 'installed', inverted: false, params: { installed: false } }
@@ -33,7 +30,6 @@ const presetDefines = {
 
   installation: (installed: boolean) => {
     return {
-      title: installed ? 'Installed' : 'Not Installed',
       filters: [
         { type: 'installed', inverted: false, params: { installed: installed } }
       ],
@@ -44,7 +40,6 @@ const presetDefines = {
 
   'deck compatibility': (compat: number) => {
     return {
-      title: compatCategoryToLabel(compat),
       filters: [{ type: 'deck compatibility', inverted: false, params: { category: compat } }],
       filtersMode: 'and',
       categoriesToInclude: IncludeCategories.games
@@ -53,16 +48,14 @@ const presetDefines = {
 
   'platform': (platform: SteamPlatform) => {
     return {
-      title: platform === 'nonSteam' ? 'Non Steam' : 'Steam',
       filters: [{ type: 'platform', inverted: false, params: { platform: platform } }],
       filtersMode: 'and',
       categoriesToInclude: IncludeCategories.games
     };
   },
 
-  music: () => {
+  soundtracks: () => {
     return {
-      title: 'Soundtracks',
       filters: [
         { type: 'installed', inverted: false, params: { installed: true } },
         { type: 'installed', inverted: false, params: { installed: false } }
@@ -74,7 +67,6 @@ const presetDefines = {
 
   software: () => {
     return {
-      title: 'Software',
       filters: [
         { type: 'installed', inverted: false, params: { installed: true } },
         { type: 'installed', inverted: false, params: { installed: false } }
@@ -94,4 +86,3 @@ export const presetKeys = Object.keys(presetDefines);
 export function getPreset<Name extends PresetName>(presetName: Name, ...presetOptions: PresetOptions<Name>) {
   return (presetDefines[presetName] as (...options: any[]) => TabPreset)(...presetOptions);
 }
-

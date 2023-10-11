@@ -33,7 +33,7 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager })
           return (
             <MenuGroup label='Collection'>
               {collectionStore.userCollections.map(({ displayName, id }: { displayName: string; id: string; }) =>
-                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, id, displayName)} {...getActionDescription(displayName)}>
+                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, displayName, id, displayName)} {...getActionDescription(displayName)}>
                   {displayName}
                 </MenuItem>
               )}
@@ -42,35 +42,39 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager })
         case 'installation':
           return (
             <MenuGroup label='Installation'>
-              {['Installed', 'Not Installed'].map(name =>
-                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, name === 'Installed')} {...getActionDescription(name)}>
-                  {name}
+              {['Installed', 'Not Installed'].map(tabName =>
+                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, tabName, tabName === 'Installed')} {...getActionDescription(tabName)}>
+                  {tabName}
                 </MenuItem>)}
             </MenuGroup>
           );
         case 'deck compatibility':
           return (
             <MenuGroup label='Deck Compatibility'>
-              {[0, 1, 2, 3].map(level =>
-                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, level)} {...getActionDescription(compatCategoryToLabel(level))}>
-                  {compatCategoryToLabel(level)}
-                </MenuItem>
-              )}
+              {[0, 1, 2, 3].map(level => {
+                const tabName = compatCategoryToLabel(level);
+                return <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, tabName, level)} {...getActionDescription(tabName)}>
+                  {tabName}
+                </MenuItem>;
+              })}
             </MenuGroup>
           );
         case 'platform':
           return (
             <MenuGroup label='Platform'>
-              {(['steam', 'nonSteam'] as SteamPlatform[]).map(platform =>
-                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, platform)} {...getActionDescription(name)}>
-                  {platform === 'nonSteam' ? 'Non Steam' : 'Steam'}
-                </MenuItem>)}
+              {(['steam', 'nonSteam'] as SteamPlatform[]).map(platform => {
+                const tabName = platform === 'nonSteam' ? 'Non Steam' : 'Steam';
+                return <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, tabName, platform)} {...getActionDescription(tabName)}>
+                  {tabName}
+                </MenuItem>;
+              })}
             </MenuGroup>
           );
         default:
+          const tabName = capitalizeEachWord(presetName);
           return (
-            <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName)} {...getActionDescription(presetName)}>
-              {capitalizeEachWord(presetName)}
+            <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, tabName)} {...getActionDescription(tabName)}>
+              {tabName}
             </MenuItem>
           );
       }

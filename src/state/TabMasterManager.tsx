@@ -470,9 +470,9 @@ export class TabMasterManager {
     this.updateAndSave();
   }
 
-  createPresetTab<Name extends PresetName>(presetName: Name, ...options: PresetOptions<Name>){
-    const { title, filters, filtersMode, categoriesToInclude} = getPreset(presetName, ...options);
-    this.createCustomTab(title, this.visibleTabsList.length, filters, filtersMode, categoriesToInclude);
+  createPresetTab<Name extends PresetName>(presetName: Name, tabTitle: string, ...options: PresetOptions<Name>){
+    const { filters, filtersMode, categoriesToInclude} = getPreset(presetName, ...options);
+    this.createCustomTab(tabTitle, this.visibleTabsList.length, filters, filtersMode, categoriesToInclude);
   }
 
   /**
