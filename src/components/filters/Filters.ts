@@ -1,7 +1,7 @@
 import { PluginController } from "../../lib/controllers/PluginController";
 import { DateIncludes, DateObj } from '../generic/DatePickers';
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo' | 'streamable';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo' | 'streamable' | 'current card' | 'on card';
 
 export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
@@ -34,6 +34,8 @@ type ReleaseDateFilterParams = { date?: DateObj, daysAgo?: number, condition: Th
 type LastPlayedFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition; };
 type DemoFilterParams = { isDemo: boolean; };
 type StreamableFilterParams = { isStreamable: boolean; }
+type CurrentCardParams = {}
+type OnCardParams = { cardId: string }
 
 export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -53,6 +55,8 @@ export type FilterParams<T extends FilterType> =
   T extends 'last played' ? LastPlayedFilterParams :
   T extends 'demo' ? DemoFilterParams :
   T extends 'streamable' ? StreamableFilterParams :
+  T extends 'current card' ? CurrentCardParams :
+  T extends 'on card' ? OnCardParams :
   never;
 
 export type TabFilterSettings<T extends FilterType> = {
@@ -84,7 +88,10 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "release date": { date: undefined, condition: 'above' },
   "last played": { date: undefined, condition: 'above' },
   "demo": { isDemo: true },
-  "streamable": { isStreamable: true }
+  "streamable": { isStreamable: true },
+  "current card": {},
+  "on card": { cardId: "" },
+
 };
 
 /**
@@ -112,6 +119,8 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "last played":
     case "demo":
     case "streamable":
+    case "current card":
+    case "on card":
       return false;
   }
 }
@@ -149,6 +158,8 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
     case "size on disk":
     case "demo":
     case "streamable":
+    case "current card":
+    case "on card":
       return true;
   }
 }
@@ -254,6 +265,30 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
         mergeErrorEntries: mergeErrorEntries
       };
     }
+    case "on card": {
+      const cardFilter = filter as TabFilterSettings<'on card'>;
+
+      const cardsAndGames = MicroSDeck?.CardsAndGames;
+
+      if(!(cardsAndGames?.length)) {
+        return {
+          passed: false,
+          errors: ["No Cards avaliable"]
+        }
+      }
+      
+      let passed = false;
+      for(let [card] of cardsAndGames) {
+        if(cardFilter.params.cardId == card.uid) {
+          passed = true;
+        }
+      }
+
+      return {
+        passed,
+        errors: passed ? [] : ["Couldn't find the selected card in the list of current cards."]
+      }
+    }
     case "regex":
     case "friends":
     case "tags":
@@ -269,6 +304,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "last played":
     case "demo":
     case "streamable":
+    case "current card":
       return {
         passed: true,
         errors: []
@@ -404,12 +440,30 @@ export class Filter {
       }
     },
     demo: (params: FilterParams<'demo'>, appOverview: SteamAppOverview) => {
-      return params.isDemo ? appOverview.app_type === 8 : appOverview.app_type !== 8; 
+      return params.isDemo ? appOverview.app_type === 8 : appOverview.app_type !== 8;
     },
     streamable: (params: FilterParams<'streamable'>, appOverview: SteamAppOverview) => {
       const isStreamable = appOverview.per_client_data.some((clientData) => clientData.client_name !== "This machine" && clientData.installed);
       return params.isStreamable ? isStreamable : !isStreamable;
-    }
+    },
+    //@ts-ignore params is unused
+    'current card': (params: FilterParams<'current card'>, appOverview: SteamAppOverview) => {
+      const currentCardAndGames = MicroSDeck?.CurrentCardAndGames;
+
+      if(!currentCardAndGames) return false;
+
+     const [_, games] = currentCardAndGames;
+
+     return !!games.find((game) => +game.uid == appOverview.appid);
+    },
+    'on card': (params: FilterParams<'on card'>, appOverview: SteamAppOverview) => {
+      const cardsAndGames = MicroSDeck?.CardsAndGames;
+      const card = cardsAndGames?.find(([card]) => card.uid == params.cardId);
+
+      if(!card)return false;
+
+      return !!card[1].find((game) => +game.uid == appOverview.appid);
+    },
   };
 
   /**

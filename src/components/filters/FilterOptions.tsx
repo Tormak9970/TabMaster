@@ -166,7 +166,7 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContaini
     setContainingGroupFilters(updatedFilters);
   }
 
-  return ( 
+  return (
     <ModeMultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={tagsMode} options={dropdownOptions} selected={selected} onChange={onChange} entryLabel="Tags" EntryIcon={FaTag} TriggerIcon={FaTags} />
   );
 };
@@ -246,7 +246,7 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
     filters: [...filter.params.filters],
     mode: filter.params.mode,
   }
-  
+
   const [isEditing, setIsEditing] = useState<boolean>(filter.params.filters.length !== 0);
   const [mergeParams, setMergeParams] = useState<TabFilterSettings<'merge'>['params']>(initialParams);
 
@@ -550,27 +550,27 @@ const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ ind
     <Field label={`Released ${byDaysAgo ? `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${thresholdType === 'above' ? 'later' : 'earlier'}` : `${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}`}
       description={
         <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-          {byDaysAgo ? 
-          <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange}/> :
-          <DatePicker
-            focusDropdowns={true}
-            modalType='simple'
-            buttonContainerStyle={{ flex: 1 }}
-            onChange={onDateChange}
-            dateIncludes={dateIncludes}
-            selectedDate={date}
-            toLocaleStringOptions={{ dateStyle: 'long' }}
-            animate={true}
-            transparencyMode={EnhancedSelectorTransparencyMode.selection}
-            focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
-          />}
+          {byDaysAgo ?
+            <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange} /> :
+            <DatePicker
+              focusDropdowns={true}
+              modalType='simple'
+              buttonContainerStyle={{ flex: 1 }}
+              onChange={onDateChange}
+              dateIncludes={dateIncludes}
+              selectedDate={date}
+              toLocaleStringOptions={{ dateStyle: 'long' }}
+              animate={true}
+              transparencyMode={EnhancedSelectorTransparencyMode.selection}
+              focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
+            />}
           <div style={{ margin: '0 10px' }}>
             <Dropdown
               rgOptions={[
                 { label: 'By Day', data: DateIncludes.dayMonthYear },
                 { label: 'By Month', data: DateIncludes.monthYear },
                 { label: 'By Year', data: DateIncludes.yearOnly },
-                { label: 'By Days Ago', data: 'byDaysAgo'}
+                { label: 'By Days Ago', data: 'byDaysAgo' }
               ]}
               selectedOption={dateIncludes}
               onChange={option => {
@@ -647,27 +647,27 @@ const LastPlayedFilterOptions: VFC<FilterOptionsProps<'last played'>> = ({ index
     <Field label={`Last played ${byDaysAgo ? `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${thresholdType === 'above' ? 'later' : 'earlier'}` : `${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}`}
       description={
         <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-          {byDaysAgo ? 
-          <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange}/> :
-          <DatePicker
-            focusDropdowns={true}
-            modalType='simple'
-            buttonContainerStyle={{ flex: 1 }}
-            onChange={onDateChange}
-            dateIncludes={dateIncludes}
-            selectedDate={date}
-            toLocaleStringOptions={{ dateStyle: 'long' }}
-            animate={true}
-            transparencyMode={EnhancedSelectorTransparencyMode.selection}
-            focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
-          />}
+          {byDaysAgo ?
+            <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange} /> :
+            <DatePicker
+              focusDropdowns={true}
+              modalType='simple'
+              buttonContainerStyle={{ flex: 1 }}
+              onChange={onDateChange}
+              dateIncludes={dateIncludes}
+              selectedDate={date}
+              toLocaleStringOptions={{ dateStyle: 'long' }}
+              animate={true}
+              transparencyMode={EnhancedSelectorTransparencyMode.selection}
+              focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
+            />}
           <div style={{ margin: '0 10px' }}>
             <Dropdown
               rgOptions={[
                 { label: 'By Day', data: DateIncludes.dayMonthYear },
                 { label: 'By Month', data: DateIncludes.monthYear },
                 { label: 'By Year', data: DateIncludes.yearOnly },
-                { label: 'By Days Ago', data: 'byDaysAgo'}
+                { label: 'By Days Ago', data: 'byDaysAgo' }
               ]}
               selectedOption={dateIncludes}
               onChange={option => {
@@ -723,6 +723,39 @@ const StreamableFilterOptions: VFC<FilterOptionsProps<'streamable'>> = ({ index,
 };
 
 /**
+ * The options for On Card Visbility
+ */
+const OnCardFilterOptions: VFC<FilterOptionsProps<'on card'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const cardsAndGames = MicroSDeck?.CardsAndGames || [];
+  
+  if (!cardsAndGames.length) {
+    return (
+      <div>
+        No Cards have been registered yet...
+      </div>
+    )
+  }
+
+  const currentOption = filter.params.cardId || cardsAndGames[0][0].uid;
+  const dropdownOptions: DropdownOption[] = cardsAndGames.map(([card]) => { return { label: card.name || "Unamed Card", data: card.uid } });
+
+  function onChange({data}: SingleDropdownOption) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.cardId = data;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  return (
+    <Field
+      label="Selected Collection"
+      description={<Dropdown rgOptions={dropdownOptions} selectedOption={currentOption} onChange={onChange} />}
+    />
+  );
+};
+
+/**
  * The options for an individual filter.
  */
 export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
@@ -762,6 +795,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <DemoFilterOptions index={index} filter={filter as TabFilterSettings<'demo'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "streamable":
         return <StreamableFilterOptions index={index} filter={filter as TabFilterSettings<'streamable'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "on card":
+        return <OnCardFilterOptions index={index} filter={filter as TabFilterSettings<'on card'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       default:
         return <Fragment />;
     }
