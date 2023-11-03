@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@cebbinghaus/microsdeck':
+    specifier: 0.9.6-3b08037
+    version: 0.9.6-3b08037
   mobx:
     specifier: ^5.15.7
     version: 5.15.7
@@ -114,6 +117,12 @@ packages:
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.14.0
+    dev: false
+
+  /@cebbinghaus/microsdeck@0.9.6-3b08037:
+    resolution: {integrity: sha512-YNdue4ZwRbHmzkYLEVPQd2k1DTPN2IZe8YHUHy0GTz5KRQlNmgOHQesWZGrzU9GOPnb6dI9Ps2RqmGJcWVXfVw==}
+    dependencies:
+      typescript: 4.9.5
     dev: false
 
   /@commitlint/cli@17.6.7:
@@ -2130,7 +2139,6 @@ packages:
     resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
     engines: {node: '>=4.2.0'}
     hasBin: true
-    dev: true
 
   /uc.micro@1.0.6:
     resolution: {integrity: sha512-8Y75pvTYkLJW2hWQHXxoqRgV7qb9B+9vFEtidML+7koHUFapnVJAZ6cKs+Qjz5Aw3aZWHMC6u0wJE3At+nSGwA==}

@@ -9,6 +9,7 @@ import { LogController } from "../lib/controllers/LogController";
 import { showModal } from "decky-frontend-lib";
 import { FixTabErrorsModalRoot } from "../components/modals/FixTabErrorsModal";
 import { PresetName, PresetOptions, getPreset } from '../presets/presets';
+import { MicroSDeckManager } from "@cebbinghaus/microsdeck";
 
 /**
  * Converts a list of filters into a 1D array.
@@ -50,6 +51,8 @@ export class TabMasterManager {
 
   public eventBus = new EventTarget();
 
+  public readonly microSDeck: MicroSDeckManager;
+
   private allGamesReaction: IReactionDisposer | undefined;
   private favoriteReaction: IReactionDisposer | undefined;
   private soundtrackReaction: IReactionDisposer | undefined;
@@ -67,8 +70,9 @@ export class TabMasterManager {
   /**
    * Creates a new TabMasterManager.
    */
-  constructor() {
+  constructor(microSDeck: MicroSDeckManager) {
     this.hasLoaded = false;
+    this.microSDeck = microSDeck;
     this.tabsMap = new Map<string, TabContainer>();
   }
 
@@ -156,8 +160,12 @@ export class TabMasterManager {
   /**
    * Handles rebuilding tabs when a collection changes.
    */
-  private rebuildCustomTabsOnCollectionChange() {
+  private async rebuildCustomTabsOnCollectionChange() {
     if (!this.hasLoaded) return;
+
+    if(MicroSDeck?.Enabled) {
+      await MicroSDeck.fetchCurrent();
+    }
 
     this.visibleTabsList.forEach((tabContainer) => {
       if (tabContainer.filters && tabContainer.filters.length !== 0) {

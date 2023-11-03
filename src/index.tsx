@@ -38,8 +38,10 @@ import { LogController } from "./lib/controllers/LogController";
 import { DocPage } from "./components/docs/DocsPage";
 import { IncludeCategories } from "./lib/Utils";
 import { PresetMenu } from './components/menus/PresetMenu';
+import { MicroSDeckManager } from "@cebbinghaus/microsdeck";
 
 declare global {
+  var MicroSDeck: MicroSDeckManager | undefined;
   var SteamClient: SteamClient;
   let collectionStore: CollectionStore;
   let appStore: AppStore;
@@ -232,7 +234,10 @@ export default definePlugin((serverAPI: ServerAPI) => {
   let settingsPatch: RoutePatch;
 
   PythonInterop.setServer(serverAPI);
-  const tabMasterManager = new TabMasterManager();
+
+  const microSDeckManager = window.MicroSDeck = (window.MicroSDeck || new MicroSDeckManager({url: "http://localhost:12412"}));
+
+  const tabMasterManager = new TabMasterManager(microSDeckManager);
   PluginController.setup(serverAPI, tabMasterManager);
 
   const loginUnregisterer = PluginController.initOnLogin(async () => {

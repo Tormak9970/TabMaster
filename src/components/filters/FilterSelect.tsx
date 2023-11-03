@@ -33,7 +33,9 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
     "release date": "Selects apps based on their release date.",
     "last played": "Selects apps based on when they were last played.",
     demo: "Selects apps that are/aren't demos.",
-    streamable: "Selects apps that can/can't be streamed from another computer."
+    streamable: "Selects apps that can/can't be streamed from another computer.",
+    "current card": "Selects apps that are present on the current MicroSD Card",
+    "on card": "Selects apps that are present on a given MicroSD Card"
   }
 
   useEffect(() => {setTimeout(() => setFocusable(true), 10)}, []);
