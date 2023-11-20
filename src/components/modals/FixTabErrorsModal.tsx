@@ -4,7 +4,7 @@ import {
   PanelSection,
   PanelSectionRow,
 } from "decky-frontend-lib";
-import { useState, VFC, useEffect } from "react";
+import { useState, VFC, useEffect, Fragment } from "react";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
 import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import type { TabMasterManager } from "../../state/TabMasterManager";
@@ -24,13 +24,15 @@ type FixTabErrorsModalRootProps = {
  */
 export const FixTabErrorsModalRoot: VFC<FixTabErrorsModalRootProps> = ({ closeModal, onConfirm, tabs, erroredFiltersMap, tabMasterManager }) => {
   return (
-    // Steam throws a fit if onCancel isn't present, so we made it do nothing
-    <ModalRoot bAllowFullSize onCancel={() => {}}>
-      <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-        <FixModalStyles />
-        <FixTabErrorsModal onConfirm={onConfirm} closeModal={closeModal!} tabs={tabs} erroredFiltersMap={erroredFiltersMap} />
-      </TabMasterContextProvider>
-    </ModalRoot>
+    <div className="tab-master-fix-modal-scope">
+      <FixModalStyles />
+      {/* Steam throws a fit if onCancel isn't present, so we made it do nothing */}
+      <ModalRoot bAllowFullSize onCancel={() => {}}>
+        <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+          <FixTabErrorsModal onConfirm={onConfirm} closeModal={closeModal!} tabs={tabs} erroredFiltersMap={erroredFiltersMap} />
+        </TabMasterContextProvider>
+      </ModalRoot>
+    </div>
   );
 };
 
@@ -78,7 +80,7 @@ const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal,
   }
 
   return (
-    <div className="tab-master-fix-modal-scope">
+    <>
       <PanelSection>
         <h1>Fixes Needed for One or More Tabs</h1>
         <PanelSectionRow>
@@ -104,6 +106,6 @@ const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal,
           </DialogButton>
         </PanelSectionRow>
       </PanelSection>
-    </div>
+    </>
   );
 };

@@ -1,4 +1,4 @@
-import { quickAccessControlsClasses } from "decky-frontend-lib";
+import { gamepadDialogClasses, quickAccessControlsClasses } from "decky-frontend-lib";
 import { VFC } from "react";
 
 /**
@@ -13,6 +13,10 @@ export const ListSearchModalStyles: VFC<{}> = ({}) => {
       }
       .tab-master-list-search-modal .${quickAccessControlsClasses.PanelSection}:first-of-type {
         margin: 0px;
+      }
+
+      .tab-master-list-search-modal .${gamepadDialogClasses.ModalPosition} > .${gamepadDialogClasses.GamepadDialogContent} {
+        background: radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%);
       }
     `}</style>
   );

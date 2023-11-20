@@ -43,13 +43,13 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
   const [patchInput, setPatchInput] = useState(true);
 
-  const nameInputElt = <TextField value={name} onChange={onNameChange} />;
+  const nameInputElement = <TextField value={name} onChange={onNameChange} />;
 
   //reference to input field class component instance, which has a focus method
   let inputComponentInstance: any;
 
   if (patchInput) {
-    afterPatch(nameInputElt.type.prototype, 'render', function (_: any, ret: any) {
+    afterPatch(nameInputElement.type.prototype, 'render', function (_: any, ret: any) {
       //@ts-ignore     get reference to instance
       inputComponentInstance = this;
       return ret;
@@ -117,7 +117,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
               <div style={{ paddingBottom: "6px" }} className={quickAccessControlsClasses.PanelSectionTitle}>
                 Name
               </div>
-              {nameInputElt}
+              {nameInputElement}
             </>
             } />
           </div>

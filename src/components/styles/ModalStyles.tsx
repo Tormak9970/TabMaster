@@ -3,6 +3,8 @@ import { VFC } from "react";
 
 export const modalMargin = '16px + 2.8vw';
 
+// New modal background should be "radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%)"
+
 /**
  * All css styling for TabMaster's modals.
  */
@@ -11,6 +13,10 @@ export const ModalStyles: VFC<{}> = ({}) => {
     <style>{`
       .tab-master-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
         margin-left: 15px;
+      }
+
+      .tab-master-modal-scope .${gamepadDialogClasses.ModalPosition} > .${gamepadDialogClasses.GamepadDialogContent} {
+        background: radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%);
       }
       
       /* The button item */
