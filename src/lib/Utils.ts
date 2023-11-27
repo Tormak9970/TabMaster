@@ -210,7 +210,7 @@ export function debounce(func:Function, wait:number, immediate?:boolean) {
 /**
  * Recursive function that checks whether an array of TabFilterSettings contains any filters of a specified type.
  * @param filters The array of TabFilterSettings to check in.
- * @param filterType The filter types to check are included.
+ * @param filterTypes The filter types to check are included.
  * @returns Boolean
  */
 export function filtersHaveType(filters: TabFilterSettings<FilterType>[], ...filterTypes: FilterType[] ) {

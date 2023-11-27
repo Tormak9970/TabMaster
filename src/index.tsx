@@ -39,8 +39,10 @@ import { DocPage } from "./components/docs/DocsPage";
 import { IncludeCategories } from "./lib/Utils";
 import { PresetMenu } from './components/menus/PresetMenu';
 import { MicroSDeckManager } from "@cebbinghaus/microsdeck";
+import { MicroSDeckInterop } from './lib/controllers/MicroSDeckInterop';
 
 declare global {
+  let DeckyPluginLoader: { pluginReloadQueue: { name: string; version?: string; }[]; };
   var MicroSDeck: MicroSDeckManager | undefined;
   var SteamClient: SteamClient;
   let collectionStore: CollectionStore;
@@ -64,6 +66,9 @@ interface TabEntryInteractablesProps {
  */
 const Content: VFC<{}> = ({ }) => {
   const { visibleTabsList, hiddenTabsList, tabsMap, tabMasterManager } = useTabMasterContext();
+
+  // MicroSDeckInterop.checkInstallStateChanged();
+  // const isMicroSDeckInstalled = MicroSDeckInterop.state === 'good';
 
   function TabEntryInteractables({ entry }: TabEntryInteractablesProps) {
     const tabContainer = tabsMap.get(entry.data!.id)!;
@@ -235,9 +240,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
 
   PythonInterop.setServer(serverAPI);
 
-  const microSDeckManager = window.MicroSDeck = (window.MicroSDeck || new MicroSDeckManager({url: "http://localhost:12412"}));
-
-  const tabMasterManager = new TabMasterManager(microSDeckManager);
+  const tabMasterManager = new TabMasterManager();
   PluginController.setup(serverAPI, tabMasterManager);
 
   const loginUnregisterer = PluginController.initOnLogin(async () => {

@@ -14,6 +14,7 @@ export class CustomTabContainer implements TabContainer {
   collection: Collection;
   filtersMode: LogicalMode;
   categoriesToInclude: number;
+  dependsOnMicroSDeck: boolean;
 
   /**
    * Creates a new CustomTabContainer.
@@ -31,6 +32,7 @@ export class CustomTabContainer implements TabContainer {
     this.filters = filterSettingsList;
     this.filtersMode = filtersMode;
     this.categoriesToInclude = categoriesToInclude;
+    this.dependsOnMicroSDeck = false;
 
     //@ts-ignore
     this.collection = {
@@ -47,6 +49,7 @@ export class CustomTabContainer implements TabContainer {
     };
 
     this.buildCollection();
+    this.checkMicroSDeckDependency();
   }
 
   getActualTab(TabContentComponent: TabContentComponent, sortingProps: Omit<TabContentProps, 'collection'>, footer: SteamTab['footer'], collectionAppFilter: any): SteamTab {
@@ -110,6 +113,14 @@ export class CustomTabContainer implements TabContainer {
     this.categoriesToInclude = categoriesToInclude;
     this.filters = filters;
     this.buildCollection();
+    this.checkMicroSDeckDependency;
+  }
+
+  /**
+   * Checks and sets whether or not the tab has filters that depend on MicroSDeck plugin.
+   */
+  checkMicroSDeckDependency() {
+    this.dependsOnMicroSDeck = this.containsFilterType('sd card');
   }
 
   /**
