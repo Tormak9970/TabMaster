@@ -14,9 +14,8 @@ import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabMasterManager } from "../../state/TabMasterManager";
 import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";
-import { capitalizeFirstLetter, getIncludedCategoriesFromBitField, updateCategoriesToIncludeBitField } from "../../lib/Utils";
+import { capitalizeFirstLetter, getIncludedCategoriesFromBitField, playUISound, updateCategoriesToIncludeBitField } from "../../lib/Utils";
 import { BiSolidDownArrow } from "react-icons/bi";
-import { GamepadUIAudio } from '../../lib/GamepadUIAudio';
 
 export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>;
 
@@ -166,7 +165,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
         <Focusable
           style={{ margin: "0 calc(-12px - 1.4vw)" }}
           onActivate={() => {
-            GamepadUIAudio.AudioPlaybackManager.PlayAudioURL('/sounds/deck_ui_misc_01.wav');
+            playUISound('/sounds/deck_ui_misc_01.wav');
             setIsOpen(isOpen => !isOpen);
           }}
           noFocusRing={true}
@@ -199,7 +198,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
               const label = getCatLabel(category)
 
               const onChange = (checked: boolean) => {
-                GamepadUIAudio.AudioPlaybackManager.PlayAudioURL(checked ? '/sounds/deck_ui_switch_toggle_on.wav' : '/sounds/deck_ui_switch_toggle_off.wav');
+                playUISound(checked ? '/sounds/deck_ui_switch_toggle_on.wav' : '/sounds/deck_ui_switch_toggle_off.wav');
                 setCategoriesToInclude(currentCatsBitField => updateCategoriesToIncludeBitField(currentCatsBitField, { [category]: checked }));
               }; 
               return category === 'hidden' && !showHiddenCat ? null : <DialogCheckbox checked={shouldInclude} onChange={onChange} label={label} />;
