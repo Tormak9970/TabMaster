@@ -1,6 +1,6 @@
 import { sleep } from 'decky-frontend-lib';
 import { LogController } from './LogController';
-import { MicroSDeckManager } from '@cebbinghaus/microsdeck';
+import { MicroSDeck as MicroSDeckManager } from '@cebbinghaus/microsdeck';
 
 export class MicroSDeckInterop {
   public static state: 'not installed' | 'version too low' | 'version too high' | 'good' = 'not installed';

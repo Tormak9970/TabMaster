@@ -75,7 +75,7 @@ export class TabMasterManager {
   }
 
   private initMicroSDeck(): void {
-    if(MicroSDeck?.Enabled) {
+    if (MicroSDeck?.Enabled) {
       LogController.log(`Initializing MicroSDeck listener`);
 
       // make sure we unsubscribe first
@@ -124,7 +124,7 @@ export class TabMasterManager {
     this.tagsReaction = reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 });
 
     this.storeTagReaction(appStore.m_mapStoreTagLocalization);
-    
+
     this.initMicroSDeck();
   }
 
@@ -489,8 +489,8 @@ export class TabMasterManager {
     this.updateAndSave();
   }
 
-  createPresetTab<Name extends PresetName>(presetName: Name, tabTitle: string, ...options: PresetOptions<Name>){
-    const { filters, filtersMode, categoriesToInclude} = getPreset(presetName, ...options);
+  createPresetTab<Name extends PresetName>(presetName: Name, tabTitle: string, ...options: PresetOptions<Name>) {
+    const { filters, filtersMode, categoriesToInclude } = getPreset(presetName, ...options);
     this.createCustomTab(tabTitle, this.visibleTabsList.length, filters, filtersMode, categoriesToInclude);
   }
 
@@ -531,7 +531,9 @@ export class TabMasterManager {
           const filter = tabSetting.filters[i];
           const filterValidated = validateFilter(filter);
 
-          if (!filterValidated.passed) {
+          if (!filterValidated) {
+            tabErroredFilters.push({ filterIdx: i, errors: [`Filter "${filter.type}" cannot be validated. It has likely been removed.`] });
+          } else if (!filterValidated.passed) {
             let entry: FilterErrorEntry = {
               filterIdx: i,
               errors: filterValidated.errors
@@ -720,13 +722,13 @@ export class TabMasterManager {
 
     this.tabsMap.forEach(tabContainer => {
       const tabSettings: TabSettings = tabContainer.filters ?
-        { 
-          id: tabContainer.id, 
-          title: tabContainer.title, 
-          position: tabContainer.position, 
-          filters: tabContainer.filters, 
-          filtersMode: (tabContainer as CustomTabContainer).filtersMode, 
-          categoriesToInclude: (tabContainer as CustomTabContainer).categoriesToInclude 
+        {
+          id: tabContainer.id,
+          title: tabContainer.title,
+          position: tabContainer.position,
+          filters: tabContainer.filters,
+          filtersMode: (tabContainer as CustomTabContainer).filtersMode,
+          categoriesToInclude: (tabContainer as CustomTabContainer).categoriesToInclude
         }
         : tabContainer;
 

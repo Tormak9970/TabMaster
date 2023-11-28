@@ -34,7 +34,7 @@ type ReleaseDateFilterParams = { date?: DateObj, daysAgo?: number, condition: Th
 type LastPlayedFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition; };
 type DemoFilterParams = { isDemo: boolean; };
 type StreamableFilterParams = { isStreamable: boolean; };
-type SdCardParams = { cardId: string } //use 'inserted' for currently inserted card
+type SdCardParams = { card: undefined | string } //use undefined for currently inserted card
 
 export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -111,7 +111,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "last played": { date: undefined, condition: 'above' },
   "demo": { isDemo: true },
   "streamable": { isStreamable: true },
-  "sd card": { cardId: 'inserted' },
+  "sd card": { card: undefined },
 };
 
 /**
@@ -309,13 +309,14 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       const cardFilter = filter as TabFilterSettings<'sd card'>;
 
       let passed = true;
-      if (PluginController.microSDeckInstalled) {
-        const cardsAndGames = MicroSDeck?.CardsAndGames;
+      if (PluginController.microSDeckInstalled && cardFilter.params.card) {
+        const cardsAndGames = MicroSDeck?.CardsAndGames || [];
 
-        if (!cardsAndGames?.find(([card]) => cardFilter.params.cardId === card.uid)) {
+        if (!cardsAndGames?.find(([card]) => cardFilter.params.card === card.uid)) {
           passed = false;
         }
       }
+      
       return {
         passed,
         errors: passed ? [] : ["Couldn't find the selected card in the list of known cards."]
@@ -478,7 +479,7 @@ export class Filter {
       return params.isStreamable ? isStreamable : !isStreamable;
     },
     'sd card': (params: FilterParams<'sd card'>, appOverview: SteamAppOverview) => {
-      const card = params.cardId === 'inserted' ? MicroSDeck?.CurrentCardAndGames : MicroSDeck?.CardsAndGames?.find(([card]) => card.uid == params.cardId);
+      const card = params.card === undefined ? MicroSDeck?.CurrentCardAndGames : MicroSDeck?.CardsAndGames?.find(([card]) => card.uid == params.card);
 
       if (!card) return false;
 

@@ -722,26 +722,28 @@ const StreamableFilterOptions: VFC<FilterOptionsProps<'streamable'>> = ({ index,
   );
 };
 
-/**
- * The options for On Card Visbility
- */
-const OnCardFilterOptions: VFC<FilterOptionsProps<'on card'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
-  const cardsAndGames = MicroSDeck?.CardsAndGames || [];
-  
-  if (!cardsAndGames.length) {
-    return (
-      <div>
-        No Cards have been registered yet...
-      </div>
-    )
-  }
+const CurrentlyInsertedCardOption: DropdownOption = {
+  label: "Inserted Card",
+  data: undefined,
+} 
 
-  const currentOption = filter.params.cardId || cardsAndGames[0][0].uid;
-  const dropdownOptions: DropdownOption[] = cardsAndGames.map(([card]) => { return { label: card.name || "Unamed Card", data: card.uid } });
+/**
+ * The options for SD Card Visbility
+ */
+const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const cardsAndGames = MicroSDeck?.CardsAndGames || [];  
+  const dropdownOptions: DropdownOption[] = [CurrentlyInsertedCardOption];
+
+  dropdownOptions.push({
+    label: "Specific Card",
+    options: cardsAndGames.map(([card]) => { return { label: card.name || "Unamed Card", data: card.uid } })
+  })
+
+  const currentOption = filter.params.card;
 
   function onChange({data}: SingleDropdownOption) {
     const updatedFilter = { ...filter };
-    updatedFilter.params.cardId = data;
+    updatedFilter.params.card = data;
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
     setContainingGroupFilters(updatedFilters);
@@ -795,8 +797,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <DemoFilterOptions index={index} filter={filter as TabFilterSettings<'demo'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "streamable":
         return <StreamableFilterOptions index={index} filter={filter as TabFilterSettings<'streamable'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
-      case "on card":
-        return <OnCardFilterOptions index={index} filter={filter as TabFilterSettings<'on card'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "sd card":
+        return <SDCardFilterOptions index={index} filter={filter as TabFilterSettings<'sd card'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       default:
         return <Fragment />;
     }
