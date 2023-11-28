@@ -7,6 +7,8 @@ export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
 export type ReviewScoreType = 'metacritic' | 'steampercent';
 
+export type PluginSources = "MicroSDeck";
+
 type CollectionFilterParams = {
   id: SteamCollection['id'],
   /**
@@ -117,7 +119,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
 /**
  * Which plugin needs to be installed for this filter to be active
  */
-export const FilterPluginSource: { [key in FilterType]?: string } = {
+export const FilterPluginSource: { [key in FilterType]?: PluginSources } = {
   "sd card": "MicroSDeck",
 };
 
