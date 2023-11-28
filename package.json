@@ -61,7 +61,7 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@cebbinghaus/microsdeck": "0.9.6-3b08037",
+    "@cebbinghaus/microsdeck": "0.9.7-ea88921",
     "mobx": "^5.15.7",
     "react-icons": "^4.10.1",
     "react-virtualized-auto-sizer": "^1.0.20",

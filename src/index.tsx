@@ -38,12 +38,12 @@ import { LogController } from "./lib/controllers/LogController";
 import { DocPage } from "./components/docs/DocsPage";
 import { IncludeCategories } from "./lib/Utils";
 import { PresetMenu } from './components/menus/PresetMenu';
-import { MicroSDeckManager } from "@cebbinghaus/microsdeck";
+import { MicroSDeck } from "@cebbinghaus/microsdeck";
 import { MicroSDeckInterop } from './lib/controllers/MicroSDeckInterop';
 
 declare global {
   let DeckyPluginLoader: { pluginReloadQueue: { name: string; version?: string; }[]; };
-  var MicroSDeck: MicroSDeckManager | undefined;
+  var MicroSDeck: MicroSDeck | undefined;
   var SteamClient: SteamClient;
   let collectionStore: CollectionStore;
   let appStore: AppStore;

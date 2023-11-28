@@ -74,6 +74,21 @@ export class TabMasterManager {
     this.tabsMap = new Map<string, TabContainer>();
   }
 
+  private initMicroSDeck(): void {
+    if(MicroSDeck?.Enabled) {
+      LogController.log(`Initializing MicroSDeck listener`);
+
+      // make sure we unsubscribe first
+      MicroSDeck.eventBus.removeEventListener("change", this.microSDeckEvent.bind(this));
+      MicroSDeck.eventBus.addEventListener("change", this.microSDeckEvent.bind(this));
+    }
+  }
+
+  private microSDeckEvent(e: Event) {
+    LogController.log("Recieved Update", e);
+    this.rebuildCustomTabsOnCollectionChange();
+  }
+
   private initReactions(): void {
     //* subscribe to changes to all games
     this.allGamesReaction = reaction(() => collectionStore.GetCollection("type-games").allApps, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 600 });
@@ -109,6 +124,8 @@ export class TabMasterManager {
     this.tagsReaction = reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 });
 
     this.storeTagReaction(appStore.m_mapStoreTagLocalization);
+    
+    this.initMicroSDeck();
   }
 
   /**
