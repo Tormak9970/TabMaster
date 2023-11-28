@@ -749,7 +749,7 @@ const OnCardFilterOptions: VFC<FilterOptionsProps<'on card'>> = ({ index, setCon
 
   return (
     <Field
-      label="Selected Collection"
+      label="MicroSD Card"
       description={<Dropdown rgOptions={dropdownOptions} selectedOption={currentOption} onChange={onChange} />}
     />
   );
