@@ -2,8 +2,14 @@ import { sleep } from 'decky-frontend-lib';
 import { LogController } from './LogController';
 import { MicroSDeck as MicroSDeckManager } from '@cebbinghaus/microsdeck';
 
+enum MicroSDeckInstallState {
+  'not installed',
+  'ver too low',
+  'ver too high',
+  'good'
+}
+
 export class MicroSDeckInterop {
-  public static state: 'not installed' | 'version too low' | 'version too high' | 'good' = 'not installed';
   public static ref: MicroSDeckManager | undefined;
 
   /**
@@ -14,7 +20,7 @@ export class MicroSDeckInterop {
     //* add version match verification here
     LogController.log("Checking for installation of MicroSDeck...");
     //MicroSDeck is already loaded
-    if (MicroSDeck) {
+    if (window.MicroSDeck) {
       LogController.log("MicroSDeck is installed");
       return true;
     } else {
@@ -25,7 +31,7 @@ export class MicroSDeckInterop {
 
       //MicroSDeck has either started loading or is not installed at all, wait a little longer to allow it to load.
       let tries = 0;
-      while (!MicroSDeck) {
+      while (!window.MicroSDeck) {
         tries++;
         if (tries > 10) {
           LogController.log("Could not find MicroSDeck installation");
@@ -41,21 +47,43 @@ export class MicroSDeckInterop {
 
 
   static checkInstallStateChanged() {
-    if (!MicroSDeck) {
+    if (!window.MicroSDeck) {
       this.ref = undefined;
-      this.state = 'not installed';
     } else {
       //* window.MicroSDeck = undefined needs to be added back to plugin's onDismount or fire an event there
       
 
       //MicroSDeck has been reinstalled or reloaded
-      if (MicroSDeck !== this.ref) {
-        this.ref = MicroSDeck;
+      if (window.MicroSDeck !== this.ref) {
+        this.ref = window.MicroSDeck;
 
         //* resub to new event bus
       } 
       //* check version
     }
+  }
+
+  static getInstallState() {
+    if (!window.MicroSDeck) {
+      return MicroSDeckInstallState['not installed'];
+    } else {
+      //* window.MicroSDeck = undefined needs to be added back to plugin's onDismount or fire an event there
+      
+
+      //MicroSDeck has been reinstalled or reloaded
+      if (window.MicroSDeck !== this.ref) {
+        this.ref = window.MicroSDeck;
+
+        //* resub to new event bus
+      } 
+      //* check version
+
+      return MicroSDeckInstallState['good'];
+    }
+  }
+
+  static isInstallOk() {
+    return this.getInstallState() === MicroSDeckInstallState['good'];
   }
 
   static checkVersion() {

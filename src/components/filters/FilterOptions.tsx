@@ -722,22 +722,20 @@ const StreamableFilterOptions: VFC<FilterOptionsProps<'streamable'>> = ({ index,
   );
 };
 
-const CurrentlyInsertedCardOption: DropdownOption = {
-  label: "Inserted Card",
-  data: undefined,
-} 
-
 /**
  * The options for SD Card Visbility
  */
 const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const cardsAndGames = MicroSDeck?.CardsAndGames || [];  
-  const dropdownOptions: DropdownOption[] = [CurrentlyInsertedCardOption];
-
-  dropdownOptions.push({
-    label: "Specific Card",
-    options: cardsAndGames.map(([card]) => { return { label: card.name || "Unamed Card", data: card.uid } })
-  })
+  const dropdownOptions: DropdownOption[] = [
+    {
+      label: "Inserted Card",
+      data: undefined,
+    },
+    {
+      label: "Specific Card",
+      options: cardsAndGames.map(([card]) => { return { label: card.name || card.uid, data: card.uid } })
+    }];
 
   const currentOption = filter.params.card;
 
@@ -751,7 +749,7 @@ const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({ index, setCon
 
   return (
     <Field
-      label="MicroSD Card"
+      label="Micro SD Card"
       description={<Dropdown rgOptions={dropdownOptions} selectedOption={currentOption} onChange={onChange} />}
     />
   );

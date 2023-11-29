@@ -75,10 +75,10 @@ const presetDefines = {
       categoriesToInclude: IncludeCategories.software
     };
   },
-  'MicroSD Card': () => {
+  'micro sd card': (card?: string) => {
     return {
       filters: [
-        { type: 'sd card', inverted: false, params: { card: undefined } },
+        { type: 'sd card', inverted: false, params: { card: card } },
       ],
       filtersMode: 'or',
       categoriesToInclude: IncludeCategories.games
@@ -90,15 +90,6 @@ export type PresetName = keyof typeof presetDefines;
 export type PresetOptions<Name extends keyof typeof presetDefines> = Parameters<typeof presetDefines[Name]>;
 
 export const presetKeys = Object.keys(presetDefines) as PresetName[];
-
-export function CanPresetBeUsed(presetKey: PresetName): boolean {
-  switch (presetKey) {
-    case "MicroSD Card":
-      return !!MicroSDeck;
-    default:
-      return true;
-  }
-}
 
 export function getPreset<Name extends PresetName>(presetName: Name, ...presetOptions: PresetOptions<Name>) {
   return (presetDefines[presetName] as (...options: any[]) => TabPreset)(...presetOptions);

@@ -1,3 +1,4 @@
+import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 import { PluginController } from "../../lib/controllers/PluginController";
 import { DateIncludes, DateObj } from '../generic/DatePickers';
 
@@ -127,7 +128,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
 export function isFilterDisabled(filter: FilterType): boolean {
   switch (filter) {
     case "sd card":
-      return !window.MicroSDeck;
+      return !MicroSDeckInterop.isInstallOk();
     default:
       return false;
   }
@@ -477,7 +478,7 @@ export class Filter {
       return params.isStreamable ? isStreamable : !isStreamable;
     },
     'sd card': (params: FilterParams<'sd card'>, appOverview: SteamAppOverview) => {
-      const card = params.card === undefined ? MicroSDeck?.CurrentCardAndGames : MicroSDeck?.CardsAndGames?.find(([card]) => card.uid == params.card);
+      const card = params.card === undefined ? window.MicroSDeck?.CurrentCardAndGames : window.MicroSDeck?.CardsAndGames?.find(([card]) => card.uid == params.card);
 
       if (!card) return false;
 

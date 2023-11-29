@@ -1,9 +1,10 @@
 import { Menu, MenuGroup, MenuItem } from 'decky-frontend-lib';
 import { VFC, Fragment } from 'react';
-import { CanPresetBeUsed, presetKeys } from '../../presets/presets';
+import { presetKeys } from '../../presets/presets';
 import { capitalizeEachWord } from '../../lib/Utils';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { compatCategoryToLabel } from '../filters/Filters';
+import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 
 interface PresetMenuProps {
   tabMasterManager: TabMasterManager;
@@ -26,7 +27,7 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager })
   }
 
   return <>
-    {presetKeys.filter(CanPresetBeUsed).map(presetName => {
+    {presetKeys.map(presetName => {
       switch (presetName) {
         case 'collection':
           return (
@@ -69,6 +70,22 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager })
               })}
             </MenuGroup>
           );
+        case 'micro sd card':
+            return (
+              <MenuGroup label='Micro SD Card' disabled={!MicroSDeckInterop.isInstallOk()}>
+                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, 'Inserted Card')} {...getActionDescription('Inserted Card')}>
+                  Inserted Card
+                </MenuItem>
+                <MenuGroup label='Specific Card'>
+                  {window.MicroSDeck?.CardsAndGames.map(([card]) => {
+                    const tabName = card.name || card.uid;
+                    return <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, tabName, card.uid)} {...getActionDescription(tabName)}>
+                      {tabName}
+                    </MenuItem>;
+                  })}
+                </MenuGroup>
+              </MenuGroup>
+            );
         default:
           const tabName = capitalizeEachWord(presetName);
           return (
