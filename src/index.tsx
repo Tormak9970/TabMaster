@@ -244,6 +244,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
   PluginController.setup(serverAPI, tabMasterManager);
 
   const loginUnregisterer = PluginController.initOnLogin(async () => {
+    await MicroSDeckInterop.waitForLoad();
     await tabMasterManager.loadTabs();
     libraryPatch = patchLibrary(serverAPI, tabMasterManager);
     settingsPatch = patchSettings(serverAPI, tabMasterManager);

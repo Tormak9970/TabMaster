@@ -1,4 +1,4 @@
-import { ConfirmModal, ServerAPI, showModal, sleep } from "decky-frontend-lib";
+import { ConfirmModal, ServerAPI, showModal } from "decky-frontend-lib";
 import { PythonInterop } from "./PythonInterop";
 import { SteamController } from "./SteamController";
 import { LogController } from "./LogController";
@@ -45,7 +45,6 @@ export class PluginController {
   private static tabMasterManager: TabMasterManager;
 
   private static steamController: SteamController;
-  public static microSDeckInstalled: boolean = false;
 
   /**
    * Sets the plugin's serverAPI.
@@ -66,7 +65,6 @@ export class PluginController {
       LogController.log(`User logged in. [DEBUG] username: ${username}.`);
       if (await this.steamController.waitForServicesToInitialize()) {
         await PluginController.init();
-        // this.microSDeckInstalled = await PluginController.isMicroSDeckInstalledOnLoad();
         onMount();
       } else {
         PythonInterop.toast("Error", "Failed to initialize, try restarting.");
@@ -125,38 +123,5 @@ export class PluginController {
    */
   static onWakeFromSleep() {
     this.tabMasterManager.buildTimeBasedFilterTabs();
-  }
-
-  /**
-   * Checks if MicroSDeck plugin is installed when loading
-   */
-  //* moving to MicroSDeckInterop
-  static async isMicroSDeckInstalledOnLoad() {
-    //* add version match verification here
-    LogController.log("Checking for installation of MicroSDeck...");
-    //MicroSDeck is already loaded
-    if (MicroSDeck) {
-      LogController.log("MicroSDeck is installed");
-      return true;
-    } else {
-      //MicroSDeck is in queue to be loaded, wait til it's removed (starts loading)
-      while (!!DeckyPluginLoader.pluginReloadQueue.find(plugin => plugin.name === 'MicroSDeck')) {
-        await sleep(200);
-      }
-
-      //MicroSDeck has either started loading or is not installed at all, wait a little longer to allow it to load.
-      let tries = 0;
-      while (!MicroSDeck) {
-        tries++;
-        if (tries > 10) {
-          LogController.log("Could not find MicroSDeck installation");
-          return false; // if MicroSDeck isn't found after number of attempts, give up
-        }
-        await sleep(100);
-      }
-
-      LogController.log("MicroSDeck is installed");
-      return true;
-    }
   }
 }

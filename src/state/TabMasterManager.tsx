@@ -9,7 +9,6 @@ import { LogController } from "../lib/controllers/LogController";
 import { showModal } from "decky-frontend-lib";
 import { FixTabErrorsModalRoot } from "../components/modals/FixTabErrorsModal";
 import { PresetName, PresetOptions, getPreset } from '../presets/presets';
-import { PluginController } from "../lib/controllers/PluginController";
 
 /**
  * Converts a list of filters into a 1D array.
@@ -112,25 +111,19 @@ export class TabMasterManager {
   }
 
   private updateChangedMicroSDeck() {
-    if (!this.hasLoaded || !PluginController.microSDeckInstalled) return;
+    if (!this.hasLoaded) return;
 
     let needsValidation = false;
-    const currentCardIds = new Set(MicroSDeck?.CardsAndGames?.map(([card]) => card.uid));
+    const currentCardIds = new Set(window.MicroSDeck?.CardsAndGames?.map(([card]) => card.uid));
 
-    for (let visibleTab of this.visibleTabsList) {
-      if (!visibleTab.filters || visibleTab.filters.length <= 0) {
-        continue;
-      }
+    for (let tab of this.visibleTabsList) {
+      const microSdTab = (tab as CustomTabContainer).dependsOnMicroSDeck ? tab as CustomTabContainer : null;
+      if (!microSdTab) continue;
 
-      // const isMicroSDeckDependent = runPredicateForFilters(visibleTab.filters, filter => FilterPluginSource[filter.type] === "MicroSDeck");
-      // if(!isMicroSDeckDependent) {
-      //   continue;
-      // }
-      
-      (visibleTab as CustomTabContainer).buildCollection();
+      microSdTab.buildCollection();
 
       if(!needsValidation){
-        needsValidation = !!runPredicateForFilters(visibleTab.filters, filter => {
+        needsValidation = !!runPredicateForFilters(microSdTab.filters, filter => {
           if(filter.type !== "sd card") {
             return undefined;
           }

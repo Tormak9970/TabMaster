@@ -308,8 +308,8 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       const cardFilter = filter as TabFilterSettings<'sd card'>;
 
       let passed = true;
-      if (PluginController.microSDeckInstalled && cardFilter.params.card) {
-        const cardsAndGames = MicroSDeck?.CardsAndGames || [];
+      if (MicroSDeckInterop.isInstallOk() && cardFilter.params.card) {
+        const cardsAndGames = window.MicroSDeck?.CardsAndGames || [];
 
         if (!cardsAndGames?.find(([card]) => cardFilter.params.card === card.uid)) {
           passed = false;

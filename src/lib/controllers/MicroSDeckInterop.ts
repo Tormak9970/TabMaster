@@ -16,7 +16,7 @@ export class MicroSDeckInterop {
    * Checks if MicroSDeck plugin is installed when loading
    */
   //* this is not complete, i have to change it
-  static async checkInstallStateOnLoad() {
+  static async waitForLoad() {
     //* add version match verification here
     LogController.log("Checking for installation of MicroSDeck...");
     //MicroSDeck is already loaded
