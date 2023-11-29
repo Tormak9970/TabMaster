@@ -1,6 +1,6 @@
 import { Menu, MenuGroup, MenuItem } from 'decky-frontend-lib';
 import { VFC, Fragment } from 'react';
-import { PresetName, presetKeys } from '../../presets/presets';
+import { CanPresetBeUsed, presetKeys } from '../../presets/presets';
 import { capitalizeEachWord } from '../../lib/Utils';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { compatCategoryToLabel } from '../filters/Filters';
@@ -26,8 +26,7 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager })
   }
 
   return <>
-    {presetKeys.map(name => {
-      const presetName = name as PresetName;
+    {presetKeys.filter(CanPresetBeUsed).map(presetName => {
       switch (presetName) {
         case 'collection':
           return (

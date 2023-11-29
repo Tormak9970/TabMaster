@@ -7,6 +7,8 @@ export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
 export type ReviewScoreType = 'metacritic' | 'steampercent';
 
+export type PluginSources = "MicroSDeck";
+
 type CollectionFilterParams = {
   id: SteamCollection['id'],
   /**
@@ -34,7 +36,7 @@ type ReleaseDateFilterParams = { date?: DateObj, daysAgo?: number, condition: Th
 type LastPlayedFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition; };
 type DemoFilterParams = { isDemo: boolean; };
 type StreamableFilterParams = { isStreamable: boolean; };
-type SdCardParams = { cardId: string } //use 'inserted' for currently inserted card
+type SdCardParams = { card: undefined | string } //use undefined for currently inserted card
 
 export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -66,6 +68,30 @@ export type TabFilterSettings<T extends FilterType> = {
 type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview) => boolean;
 
 /**
+ * Set the Description for a filter type here
+ */
+export const FilterDescriptions: { [filterType in FilterType]: string } = {
+  collection: "Selects apps that are in a certain Steam Collection.",
+  installed: "Selects apps that are installed/uninstalled.",
+  regex: "Selects apps whose titles match a regular expression.",
+  friends: "Selects apps that are also owned by friends.",
+  tags: "Selects apps that have specific community tags.",
+  whitelist: "Selects apps that are added to the list.",
+  blacklist: "Selects apps that are not added to the list.",
+  merge: "Selects apps that pass a subgroup of filters.",
+  platform: "Selects Steam or non-Steam apps.",
+  "deck compatibility": "Selects apps that have a specific Steam Deck compatibilty status.",
+  "review score": "Selects apps based on their metacritic/steam review score.",
+  "time played": "Selects apps based on your play time.",
+  "size on disk": "Selects apps based on their install size.",
+  "release date": "Selects apps based on their release date.",
+  "last played": "Selects apps based on when they were last played.",
+  demo: "Selects apps that are/aren't demos.",
+  streamable: "Selects apps that can/can't be streamed from another computer.",
+  "sd card": "Selects apps that are present on the inserted/ specific MicroSD Card",
+}
+
+/**
  * Define the deafult params for a filter type here
  * Checking and settings defaults in component is unnecessary
  */
@@ -87,9 +113,30 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "last played": { date: undefined, condition: 'above' },
   "demo": { isDemo: true },
   "streamable": { isStreamable: true },
-  "sd card": { cardId: 'inserted' },
-
+  "sd card": { card: undefined },
 };
+
+/**
+ * Which plugin needs to be installed for this filter to be active
+ */
+export const FilterPluginSource: { [key in FilterType]?: PluginSources } = {
+  "sd card": "MicroSDeck",
+};
+
+/**
+ * Whether the filter is disabled (cannot be selected or run)
+ * @param filter The filter to check.
+ * @returns True if the filter should be considered disabled
+ */
+export function isFilterDisabled(filter: FilterType): boolean {
+  switch (filter) {
+    case "sd card":
+      return !MicroSDeck
+    default:
+      return false;
+  }
+}
+
 
 /**
  * Whether the filter should have an invert option.
@@ -264,13 +311,14 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       const cardFilter = filter as TabFilterSettings<'sd card'>;
 
       let passed = true;
-      if (PluginController.microSDeckInstalled) {
-        const cardsAndGames = MicroSDeck?.CardsAndGames;
+      if (PluginController.microSDeckInstalled && cardFilter.params.card) {
+        const cardsAndGames = MicroSDeck?.CardsAndGames || [];
 
-        if (!cardsAndGames?.find(([card]) => cardFilter.params.cardId === card.uid)) {
+        if (!cardsAndGames?.find(([card]) => cardFilter.params.card === card.uid)) {
           passed = false;
         }
       }
+      
       return {
         passed,
         errors: passed ? [] : ["Couldn't find the selected card in the list of known cards."]
@@ -433,7 +481,7 @@ export class Filter {
       return params.isStreamable ? isStreamable : !isStreamable;
     },
     'sd card': (params: FilterParams<'sd card'>, appOverview: SteamAppOverview) => {
-      const card = params.cardId === 'inserted' ? MicroSDeck?.CurrentCardAndGames : MicroSDeck?.CardsAndGames?.find(([card]) => card.uid == params.cardId);
+      const card = params.card === undefined ? MicroSDeck?.CurrentCardAndGames : MicroSDeck?.CardsAndGames?.find(([card]) => card.uid == params.card);
 
       if (!card) return false;
 

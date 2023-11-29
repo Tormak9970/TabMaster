@@ -1,5 +1,5 @@
 import { EditableTabSettings } from "../components/modals/EditTabModal";
-import { TabFilterSettings, FilterType, validateFilter } from "../components/filters/Filters";
+import { TabFilterSettings, FilterType, validateFilter, FilterPluginSource } from "../components/filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { v4 as uuidv4 } from "uuid";
@@ -9,6 +9,7 @@ import { LogController } from "../lib/controllers/LogController";
 import { showModal } from "decky-frontend-lib";
 import { FixTabErrorsModalRoot } from "../components/modals/FixTabErrorsModal";
 import { PresetName, PresetOptions, getPreset } from '../presets/presets';
+import { PluginController } from "../lib/controllers/PluginController";
 
 /**
  * Converts a list of filters into a 1D array.
@@ -28,6 +29,33 @@ function flattenFilters(filters: TabFilterSettings<FilterType>[]): TabFilterSett
   }
 
   return res;
+}
+
+/**
+ * Runs a given predicate function for every node in the filter tree
+ * @param filters The filters tree to run on
+ * @param predicate The predicate to execute for each node. Exits early if it returns a truthy valud
+ * @returns undefined if the predicate never returned a truthy value. otherwise the value the predicate returned
+ */
+function runPredicateForFilters<T>(filters: TabFilterSettings<FilterType>[], predicate: (filter: TabFilterSettings<FilterType>) => T): T | undefined {
+  // we don't want to modify the original array
+  const queue: TabFilterSettings<FilterType>[] = [...filters];
+
+  let i = 0;
+
+  while (i < queue.length) {
+    const filter = queue[i++];
+    const result = predicate(filter);
+    if (result) {
+      return result;
+    }
+
+    // propogate any nested filters
+    if (filter.type === "merge") {
+      queue.push(...((filter as TabFilterSettings<"merge">).params.filters));
+    }
+  }
+  return undefined;
 }
 
 /**
@@ -74,6 +102,59 @@ export class TabMasterManager {
     this.tabsMap = new Map<string, TabContainer>();
   }
 
+  private initMicroSDeck(): void {
+    if (MicroSDeck?.Enabled) {
+      LogController.log(`Initializing MicroSDeck listener`);
+
+      // make sure we unsubscribe first
+      MicroSDeck.eventBus.addEventListener("change", this.updateChangedMicroSDeck.bind(this));
+    }
+  }
+
+  private updateChangedMicroSDeck() {
+    if (!this.hasLoaded || !PluginController.microSDeckInstalled) return;
+
+    let needsValidation = false;
+    const currentCardIds = new Set(MicroSDeck?.CardsAndGames?.map(([card]) => card.uid));
+
+    for (let visibleTab of this.visibleTabsList) {
+      if (!visibleTab.filters || visibleTab.filters.length <= 0) {
+        continue;
+      }
+
+      const isMicroSDeckDependent = runPredicateForFilters(visibleTab.filters, filter => FilterPluginSource[filter.type] === "MicroSDeck");
+      if(!isMicroSDeckDependent) {
+        continue;
+      }
+      
+      (visibleTab as CustomTabContainer).buildCollection();
+
+      if(!needsValidation){
+        needsValidation = !!runPredicateForFilters(visibleTab.filters, filter => {
+          if(filter.type !== "sd card") {
+            return undefined;
+          }
+
+          let card = (filter as TabFilterSettings<"sd card">).params.card;
+          return card !== undefined && !currentCardIds.has(card);
+        });
+      }
+    }
+
+    if (needsValidation) {
+      const tabsSettings = Object.fromEntries(this.tabsMap.entries());
+      const tabsToFix = this.checkForBrokenFilters(tabsSettings);
+
+      if (tabsToFix.size == 0) {
+        LogController.error("Filters should have been invalid but no broken filters could be found");
+        return;
+      }
+
+      LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
+      this.promptUserToFixBrokenTabs(tabsToFix, tabsSettings);
+    }
+  }
+
   private initReactions(): void {
     //* subscribe to changes to all games
     this.allGamesReaction = reaction(() => collectionStore.GetCollection("type-games").allApps, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 600 });
@@ -109,6 +190,8 @@ export class TabMasterManager {
     this.tagsReaction = reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 });
 
     this.storeTagReaction(appStore.m_mapStoreTagLocalization);
+
+    this.initMicroSDeck();
   }
 
   /**
@@ -198,37 +281,7 @@ export class TabMasterManager {
 
         if (tabsToFix.size > 0) {
           LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
-          showModal(
-            <FixTabErrorsModalRoot
-              onConfirm={(editedTabSettings: TabSettingsDictionary) => {
-                for (const fixedTab of Object.values(editedTabSettings)) {
-                  if (tabsToFix.has(fixedTab.id)) {
-                    const tabContainer = fixedTab as CustomTabContainer;
-
-                    if (tabContainer.filters.length === 0) {
-                      this.deleteTab(tabContainer.id);
-                    } else {
-
-                      const asEditableSettings: EditableTabSettings = {
-                        title: tabContainer.title,
-                        filters: tabContainer.filters,
-                        filtersMode: tabContainer.filtersMode,
-                        categoriesToInclude: tabContainer.categoriesToInclude
-                      };
-
-                      this.updateCustomTab(tabContainer.id, asEditableSettings);
-
-                      const flatFilters = flattenFilters(tabContainer.filters);
-                      this.addCollectionReactionsForFilters(flatFilters);
-                    }
-                  }
-                }
-              }}
-              tabs={tabsSettings}
-              erroredFiltersMap={tabsToFix}
-              tabMasterManager={this}
-            />
-          );
+          this.promptUserToFixBrokenTabs(tabsToFix, tabsSettings);
         }
       }
     } else {
@@ -472,8 +525,8 @@ export class TabMasterManager {
     this.updateAndSave();
   }
 
-  createPresetTab<Name extends PresetName>(presetName: Name, tabTitle: string, ...options: PresetOptions<Name>){
-    const { filters, filtersMode, categoriesToInclude} = getPreset(presetName, ...options);
+  createPresetTab<Name extends PresetName>(presetName: Name, tabTitle: string, ...options: PresetOptions<Name>) {
+    const { filters, filtersMode, categoriesToInclude } = getPreset(presetName, ...options);
     this.createCustomTab(tabTitle, this.visibleTabsList.length, filters, filtersMode, categoriesToInclude);
   }
 
@@ -514,7 +567,9 @@ export class TabMasterManager {
           const filter = tabSetting.filters[i];
           const filterValidated = validateFilter(filter);
 
-          if (!filterValidated.passed) {
+          if (!filterValidated) {
+            tabErroredFilters.push({ filterIdx: i, errors: [`Filter "${filter.type}" cannot be validated. It has likely been removed.`] });
+          } else if (!filterValidated.passed) {
             let entry: FilterErrorEntry = {
               filterIdx: i,
               errors: filterValidated.errors
@@ -606,6 +661,40 @@ export class TabMasterManager {
       this.finishLoadingTabs(tabsSettings);
     }
   };
+
+  private promptUserToFixBrokenTabs(tabsToFix: Map<string, FilterErrorEntry[]>, tabsSettings: { [k: string]: TabContainer; }) {
+    showModal(
+      <FixTabErrorsModalRoot
+        onConfirm={(editedTabSettings: TabSettingsDictionary) => {
+          for (const fixedTab of Object.values(editedTabSettings)) {
+            if (tabsToFix.has(fixedTab.id)) {
+              const tabContainer = fixedTab as CustomTabContainer;
+
+              if (tabContainer.filters.length === 0) {
+                this.deleteTab(tabContainer.id);
+              } else {
+
+                const asEditableSettings: EditableTabSettings = {
+                  title: tabContainer.title,
+                  filters: tabContainer.filters,
+                  filtersMode: tabContainer.filtersMode,
+                  categoriesToInclude: tabContainer.categoriesToInclude
+                };
+
+                this.updateCustomTab(tabContainer.id, asEditableSettings);
+
+                const flatFilters = flattenFilters(tabContainer.filters);
+                this.addCollectionReactionsForFilters(flatFilters);
+              }
+            }
+          }
+        }}
+        tabs={tabsSettings}
+        erroredFiltersMap={tabsToFix}
+        tabMasterManager={this}
+      />
+    );
+  }
 
   /**
    * Finishes the tab loading process.
@@ -703,13 +792,13 @@ export class TabMasterManager {
 
     this.tabsMap.forEach(tabContainer => {
       const tabSettings: TabSettings = tabContainer.filters ?
-        { 
-          id: tabContainer.id, 
-          title: tabContainer.title, 
-          position: tabContainer.position, 
-          filters: tabContainer.filters, 
-          filtersMode: (tabContainer as CustomTabContainer).filtersMode, 
-          categoriesToInclude: (tabContainer as CustomTabContainer).categoriesToInclude 
+        {
+          id: tabContainer.id,
+          title: tabContainer.title,
+          position: tabContainer.position,
+          filters: tabContainer.filters,
+          filtersMode: (tabContainer as CustomTabContainer).filtersMode,
+          categoriesToInclude: (tabContainer as CustomTabContainer).categoriesToInclude
         }
         : tabContainer;
 
