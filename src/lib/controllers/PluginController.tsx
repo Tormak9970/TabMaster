@@ -66,7 +66,7 @@ export class PluginController {
       LogController.log(`User logged in. [DEBUG] username: ${username}.`);
       if (await this.steamController.waitForServicesToInitialize()) {
         await PluginController.init();
-        this.microSDeckInstalled = await PluginController.isMicroSDeckInstalledOnLoad();
+        // this.microSDeckInstalled = await PluginController.isMicroSDeckInstalledOnLoad();
         onMount();
       } else {
         PythonInterop.toast("Error", "Failed to initialize, try restarting.");

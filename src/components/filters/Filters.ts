@@ -7,8 +7,6 @@ export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
 export type ReviewScoreType = 'metacritic' | 'steampercent';
 
-export type PluginSources = "MicroSDeck";
-
 type CollectionFilterParams = {
   id: SteamCollection['id'],
   /**
@@ -91,6 +89,10 @@ export const FilterDescriptions: { [filterType in FilterType]: string } = {
   "sd card": "Selects apps that are present on the inserted/ specific MicroSD Card",
 }
 
+export const FilterDescriptionSubLabels: {[key in FilterType]?: string} = {
+  "sd card": "(requires MicroSDeck plugin)"
+}
+
 /**
  * Define the deafult params for a filter type here
  * Checking and settings defaults in component is unnecessary
@@ -116,12 +118,6 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "sd card": { card: undefined },
 };
 
-/**
- * Which plugin needs to be installed for this filter to be active
- */
-export const FilterPluginSource: { [key in FilterType]?: PluginSources } = {
-  "sd card": "MicroSDeck",
-};
 
 /**
  * Whether the filter is disabled (cannot be selected or run)
@@ -131,7 +127,7 @@ export const FilterPluginSource: { [key in FilterType]?: PluginSources } = {
 export function isFilterDisabled(filter: FilterType): boolean {
   switch (filter) {
     case "sd card":
-      return !MicroSDeck
+      return !window.MicroSDeck;
     default:
       return false;
   }

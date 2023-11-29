@@ -1,5 +1,5 @@
 import { EditableTabSettings } from "../components/modals/EditTabModal";
-import { TabFilterSettings, FilterType, validateFilter, FilterPluginSource } from "../components/filters/Filters";
+import { TabFilterSettings, FilterType, validateFilter } from "../components/filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { v4 as uuidv4 } from "uuid";
@@ -122,10 +122,10 @@ export class TabMasterManager {
         continue;
       }
 
-      const isMicroSDeckDependent = runPredicateForFilters(visibleTab.filters, filter => FilterPluginSource[filter.type] === "MicroSDeck");
-      if(!isMicroSDeckDependent) {
-        continue;
-      }
+      // const isMicroSDeckDependent = runPredicateForFilters(visibleTab.filters, filter => FilterPluginSource[filter.type] === "MicroSDeck");
+      // if(!isMicroSDeckDependent) {
+      //   continue;
+      // }
       
       (visibleTab as CustomTabContainer).buildCollection();
 
@@ -191,7 +191,7 @@ export class TabMasterManager {
 
     this.storeTagReaction(appStore.m_mapStoreTagLocalization);
 
-    this.initMicroSDeck();
+    // this.initMicroSDeck();
   }
 
   /**

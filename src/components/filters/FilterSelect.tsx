@@ -1,6 +1,6 @@
 import { Fragment, VFC, useEffect, useState } from "react";
 import { Focusable, ModalRoot, showModal } from "decky-frontend-lib";
-import { FilterDefaultParams, FilterDescriptions, FilterPluginSource, FilterType, isFilterDisabled } from "./Filters";
+import { FilterDefaultParams, FilterDescriptionSubLabels, FilterDescriptions, FilterType, isFilterDisabled } from "./Filters";
 import { capitalizeEachWord } from "../../lib/Utils";
 import { FilterSelectStyles, achievementClasses, mainMenuAppRunningClasses } from "../styles/FilterSelectionStyles";
 import { CustomButton } from '../generic/CustomButton';
@@ -13,7 +13,7 @@ interface FilterSelectModalProps {
 }
 
 const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSelect, closeModal }) => {
-  const [focusable, setFocusable] = useState(false);
+  const [focusable, setFocusable] = useState(false); //this is to briefly (on modal mount) disable focus on all selections except last selected so it is remebered
   const [selected, setSelected] = useState<FilterType>(selectedOption);
   const filterTypeOptions = Object.keys(FilterDefaultParams) as FilterType[];
 
@@ -48,7 +48,8 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
               <FilterSelectElement
                 disabled={disabled}
                 filterType={filterType}
-                handleSelect={focusable || selected === filterType ? () => handleSelect(filterType) : undefined}
+                focusable={(focusable || selected === filterType) && !disabled}
+                onClick={() => handleSelect(filterType)}
               />
             );
           })}
@@ -61,25 +62,23 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
 interface FilterSelectElement {
   filterType: FilterType,
   disabled: boolean,
-  handleSelect: (() => void) | undefined;
+  focusable: boolean,
+  onClick: (() => void) | undefined;
 }
 
 /**
  * Individual Filter in the filter selection Modal
  */
-const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, disabled, handleSelect }) => {
+const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, disabled, focusable, onClick }) => {
 
-  const pluginSource = FilterPluginSource[filterType];
-
-  const pluginNotice = !pluginSource ? "" : (
-    <small style={{ marginLeft: "0.5em", fontSize: "0.5em" }}>(requires {pluginSource})</small>
-  );
+  const subLabel = FilterDescriptionSubLabels[filterType];
 
   return (
     <Focusable
       focusWithinClassName="gpfocuswithin"
       style={{ width: "100%", margin: 0, marginBottom: "10px", padding: 0 }}
-      onOKButton={disabled ? e => e.preventDefault() : handleSelect}
+      onActivate={focusable ? onClick : undefined}
+      onClick={focusable ? onClick : undefined}
     >
       <div
         className={`${achievementClasses.AchievementListItemBase} ${disabled && "entry-disabled"}`}
@@ -87,7 +86,7 @@ const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, disabled, h
       >
         <div className="entry-label">
           {capitalizeEachWord(filterType)}
-          {pluginNotice}
+          {subLabel && <small style={{ marginLeft: "0.5em", fontSize: "0.5em" }}>{subLabel}</small>}
         </div>
         <div className="entry-desc">{FilterDescriptions[filterType]}</div>
       </div>
