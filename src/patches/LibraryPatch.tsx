@@ -38,7 +38,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
         return innerPatch.unpatch();
       });
 
-      //MicroSDeckInterop.checkInstallStateChanged();
+      const isMicroSDeckInstalled = MicroSDeckInterop.isInstallOk(true);
 
       //* This patch always runs twice
       afterPatch(ret1, "type", (_: Record<string, unknown>[], ret2: ReactElement) => {
@@ -89,7 +89,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                       const footer = { ...(tabTemplate!.footer ?? {}), onMenuButton: getShowMenu(tabContainer.id, tabMasterManager), onMenuActionDescription: 'Tab Master' };
                       
                       //if MicroSDeck isn't installed don't display any tabs that depend on it; return empty array for flat map
-                      //if (!MicroSDeckInterop.state !== 'good' && (tabContainer as CustomTabContainer).dependsOnMicroSDeck) return [];
+                      if (!isMicroSDeckInstalled && (tabContainer as CustomTabContainer).dependsOnMicroSDeck) return [];
                       return (tabContainer as CustomTabContainer).getActualTab(tabContentComponent, sortingProps, footer, collectionsAppFilterGamepad);
                     } else {
                       return tabs.find(actualTab => {

@@ -9,6 +9,7 @@ import { LogController } from "../lib/controllers/LogController";
 import { showModal } from "decky-frontend-lib";
 import { FixTabErrorsModalRoot } from "../components/modals/FixTabErrorsModal";
 import { PresetName, PresetOptions, getPreset } from '../presets/presets';
+import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
 
 /**
  * Converts a list of filters into a 1D array.
@@ -28,33 +29,6 @@ function flattenFilters(filters: TabFilterSettings<FilterType>[]): TabFilterSett
   }
 
   return res;
-}
-
-/**
- * Runs a given predicate function for every node in the filter tree
- * @param filters The filters tree to run on
- * @param predicate The predicate to execute for each node. Exits early if it returns a truthy valud
- * @returns undefined if the predicate never returned a truthy value. otherwise the value the predicate returned
- */
-function runPredicateForFilters<T>(filters: TabFilterSettings<FilterType>[], predicate: (filter: TabFilterSettings<FilterType>) => T): T | undefined {
-  // we don't want to modify the original array
-  const queue: TabFilterSettings<FilterType>[] = [...filters];
-
-  let i = 0;
-
-  while (i < queue.length) {
-    const filter = queue[i++];
-    const result = predicate(filter);
-    if (result) {
-      return result;
-    }
-
-    // propogate any nested filters
-    if (filter.type === "merge") {
-      queue.push(...((filter as TabFilterSettings<"merge">).params.filters));
-    }
-  }
-  return undefined;
 }
 
 /**
@@ -101,50 +75,35 @@ export class TabMasterManager {
     this.tabsMap = new Map<string, TabContainer>();
   }
 
-  private initMicroSDeck(): void {
-    if (MicroSDeck?.Enabled) {
-      LogController.log(`Initializing MicroSDeck listener`);
-
-      // make sure we unsubscribe first
-      MicroSDeck.eventBus.addEventListener("change", this.updateChangedMicroSDeck.bind(this));
-    }
-  }
-
-  private updateChangedMicroSDeck() {
+  private handleMicroSDeckChange() {
     if (!this.hasLoaded) return;
 
-    let needsValidation = false;
-    const currentCardIds = new Set(window.MicroSDeck?.CardsAndGames?.map(([card]) => card.uid));
+    const microSDeckTabs: { [tabId: string]: CustomTabContainer } = {};
 
     for (let tab of this.visibleTabsList) {
-      const microSdTab = (tab as CustomTabContainer).dependsOnMicroSDeck ? tab as CustomTabContainer : null;
-      if (!microSdTab) continue;
-
-      microSdTab.buildCollection();
-
-      if(!needsValidation){
-        needsValidation = !!runPredicateForFilters(microSdTab.filters, filter => {
-          if(filter.type !== "sd card") {
-            return undefined;
-          }
-
-          let card = (filter as TabFilterSettings<"sd card">).params.card;
-          return card !== undefined && !currentCardIds.has(card);
-        });
-      }
+      if ((tab as CustomTabContainer).dependsOnMicroSDeck) microSDeckTabs[tab.id] = (tab as CustomTabContainer);
     }
 
-    if (needsValidation) {
-      const tabsSettings = Object.fromEntries(this.tabsMap.entries());
-      const tabsToFix = this.checkForBrokenFilters(tabsSettings);
+    const tabsToFix = this.checkForBrokenFilters(microSDeckTabs);
+    Object.values(microSDeckTabs).forEach(tabContainer => !tabsToFix.has(tabContainer.id) && tabContainer.buildCollection());
 
-      if (tabsToFix.size == 0) {
-        LogController.error("Filters should have been invalid but no broken filters could be found");
-        return;
-      }
-
+    if (tabsToFix.size > 0) {
       LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
-      this.promptUserToFixBrokenTabs(tabsToFix, tabsSettings);
+      showModal(
+        <FixTabErrorsModalRoot
+          onConfirm={(editedTabSettings: TabSettingsDictionary) => {
+            for (const tab of Object.values(editedTabSettings)) {
+              if (tabsToFix.has(tab.id)) {
+                if (tab.filters!.length === 0) this.deleteTab(tab.id);
+                else this.updateCustomTab(tab.id, tab as EditableTabSettings);
+              }
+            }
+          }}
+          tabs={microSDeckTabs}
+          erroredFiltersMap={tabsToFix}
+          tabMasterManager={this}
+        />
+      );
     }
   }
 
@@ -184,7 +143,7 @@ export class TabMasterManager {
 
     this.storeTagReaction(appStore.m_mapStoreTagLocalization);
 
-    // this.initMicroSDeck();
+    MicroSDeckInterop.initEventHandlers({change: this.handleMicroSDeckChange.bind(this)});
   }
 
   /**
@@ -274,7 +233,34 @@ export class TabMasterManager {
 
         if (tabsToFix.size > 0) {
           LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
-          this.promptUserToFixBrokenTabs(tabsToFix, tabsSettings);
+          showModal(
+            <FixTabErrorsModalRoot
+              onConfirm={(editedTabSettings: TabSettingsDictionary) => {
+                for (const tab of Object.values(editedTabSettings)) {
+                  if (tabsToFix.has(tab.id)) {
+                    const tabContainer = tab as CustomTabContainer;
+
+                    if (tabContainer.filters.length === 0) {
+                      this.deleteTab(tabContainer.id);
+                    } else {
+
+                      const asEditableSettings: EditableTabSettings = {
+                        title: tabContainer.title,
+                        filters: tabContainer.filters,
+                        filtersMode: tabContainer.filtersMode,
+                        categoriesToInclude: tabContainer.categoriesToInclude
+                      };
+
+                      this.updateCustomTab(tabContainer.id, asEditableSettings);
+                    }
+                  }
+                }
+              }}
+              tabs={tabsSettings}
+              erroredFiltersMap={tabsToFix}
+              tabMasterManager={this}
+            />
+          );
         }
       }
     } else {
@@ -636,9 +622,9 @@ export class TabMasterManager {
         <FixTabErrorsModalRoot
           onConfirm={(editedTabSettings: TabSettingsDictionary) => {
             const tabsToDelete: string[] = [];
-            for (const fixedTab of Object.values(editedTabSettings)) {
-              if (tabsToFix.has(fixedTab.id) && fixedTab.filters!.length === 0) {
-                tabsToDelete.push(fixedTab.id);
+            for (const tab of Object.values(editedTabSettings)) {
+              if (tabsToFix.has(tab.id) && tab.filters!.length === 0) {
+                tabsToDelete.push(tab.id);
               }
             }
 
@@ -654,40 +640,6 @@ export class TabMasterManager {
       this.finishLoadingTabs(tabsSettings);
     }
   };
-
-  private promptUserToFixBrokenTabs(tabsToFix: Map<string, FilterErrorEntry[]>, tabsSettings: { [k: string]: TabContainer; }) {
-    showModal(
-      <FixTabErrorsModalRoot
-        onConfirm={(editedTabSettings: TabSettingsDictionary) => {
-          for (const fixedTab of Object.values(editedTabSettings)) {
-            if (tabsToFix.has(fixedTab.id)) {
-              const tabContainer = fixedTab as CustomTabContainer;
-
-              if (tabContainer.filters.length === 0) {
-                this.deleteTab(tabContainer.id);
-              } else {
-
-                const asEditableSettings: EditableTabSettings = {
-                  title: tabContainer.title,
-                  filters: tabContainer.filters,
-                  filtersMode: tabContainer.filtersMode,
-                  categoriesToInclude: tabContainer.categoriesToInclude
-                };
-
-                this.updateCustomTab(tabContainer.id, asEditableSettings);
-
-                const flatFilters = flattenFilters(tabContainer.filters);
-                this.addCollectionReactionsForFilters(flatFilters);
-              }
-            }
-          }
-        }}
-        tabs={tabsSettings}
-        erroredFiltersMap={tabsToFix}
-        tabMasterManager={this}
-      />
-    );
-  }
 
   /**
    * Finishes the tab loading process.

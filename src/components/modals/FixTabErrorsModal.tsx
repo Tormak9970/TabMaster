@@ -66,11 +66,12 @@ const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal,
 
   function onApply() {
     if (canApply) {
+      const updatedTabs: TabSettingsDictionary = { ...tabs };
       for (const changedTab of Object.values(changedTabs)) {
-        changedTab.filters = changedTab.filters!.flatMap(filter => filter)
-        tabs[changedTab.id] = changedTab;
+        changedTab.filters = changedTab.filters!.flatMap(filter => filter);
+        updatedTabs[changedTab.id] = changedTab;
       }
-      onConfirm(tabs);
+      onConfirm(updatedTabs);
       closeModal();
     } else {
       PythonInterop.toast("Error", "Please fix all tabs before saving");
