@@ -172,26 +172,10 @@ export const FilterErrorOptions: VFC<FilterErrorOptionsProps<FilterType>> = ({ i
     switch (filter.type) {
       case "collection":
         return <CollectionFilterErrorOptions isMergeGroup={isMergeGroup} numFilters={numFilters} filter={filter as TabFilterSettings<'collection'>} onFilterUpdate={onFilterUpdate} onFilterDelete={onFilterDelete} />
-      case "installed":
-        throw new Error("FilterErrorOption for installed not implemented!");
-      case "regex":
-        throw new Error("FilterErrorOption for regex not implemented!");
-      case "friends":
-        throw new Error("FilterErrorOption for friends not implemented!");
-      case "tags":
-        throw new Error("FilterErrorOption for tags not implemented!");
-      case "whitelist":
-        throw new Error("FilterErrorOption for whitelist not implemented!");
-      case "blacklist":
-        throw new Error("FilterErrorOption for blacklist not implemented!");
       case "merge":
         return <MergeFilterErrorOptions isMergeGroup={isMergeGroup} numFilters={numFilters} filter={filter as TabFilterSettings<'merge'>} mergeErrorEntries={mergeErrorEntries} onFilterUpdate={onFilterUpdate} onFilterDelete={onFilterDelete} />
-      case "platform":
-        throw new Error("FilterErrorOption for platform not implemented!");
-      case "deck compatibility":
-        throw new Error("FilterErrorOption for deck compatibility not implemented!");
       default:
-        return <Fragment />
+        throw new Error(`FilterErrorOption for ${filter.type} not implemented!`);
     }
   } else {
     return <Fragment />
