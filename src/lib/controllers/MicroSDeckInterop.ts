@@ -16,7 +16,7 @@ export class MicroSDeckInterop {
 
   static initEventHandlers(handlers: { [eventType in EventType]?: () => void }) {
     this.eventHandlers = {...handlers};
-    this.subscribeToEvents();
+    this.getInstallState();
   }
 
   private static subscribeToEvents() {

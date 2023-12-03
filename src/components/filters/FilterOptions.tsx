@@ -9,7 +9,7 @@ import {
   ToggleField,
   showModal
 } from "decky-frontend-lib";
-import React, { VFC, Fragment, useState } from "react";
+import React, { VFC, Fragment, useState, useMemo } from "react";
 import { FaTag, FaTags, FaUser, FaCompactDisc } from "react-icons/fa6";
 import { FaUserFriends, FaQuestionCircle } from "react-icons/fa";
 import { MdApps } from "react-icons/md";
@@ -27,6 +27,7 @@ import { DateIncludes, DateObj, DatePicker, DateSelection } from '../generic/Dat
 import { EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from '../generic/EnhancedSelector';
 import { IncludeCategories } from "../../lib/Utils";
 import { Slider } from '../generic/Slider';
+import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 
 type FilterOptionsProps<T extends FilterType> = {
   index: number,
@@ -71,7 +72,7 @@ const CollectionFilterOptions: VFC<FilterOptionsProps<'collection'>> = ({ index,
   return (
     <Field
       label="Selected Collection"
-      description={<Dropdown rgOptions={collectionDropdownOptions} selectedOption={(filter as TabFilterSettings<'collection'>).params.id} onChange={onChange} />}
+      description={<Dropdown rgOptions={collectionDropdownOptions} selectedOption={filter.params.id} onChange={onChange} />}
     />
   );
 };
@@ -723,10 +724,11 @@ const StreamableFilterOptions: VFC<FilterOptionsProps<'streamable'>> = ({ index,
 };
 
 /**
- * The options for SD Card Visbility
+ * The options for an sd card filter
  */
 const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
-  const cardsAndGames = MicroSDeck?.CardsAndGames || [];  
+  const isMicroSDeckInstalled = useMemo(() => MicroSDeckInterop.isInstallOk(), []);
+  const cardsAndGames = window.MicroSDeck?.CardsAndGames || [];  
   const dropdownOptions: DropdownOption[] = [
     {
       label: "Inserted Card",
@@ -736,8 +738,6 @@ const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({ index, setCon
       label: "Specific Card",
       options: cardsAndGames.map(([card]) => { return { label: card.name || card.uid, data: card.uid } })
     }];
-
-  const currentOption = filter.params.card;
 
   function onChange({data}: SingleDropdownOption) {
     const updatedFilter = { ...filter };
@@ -750,7 +750,7 @@ const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({ index, setCon
   return (
     <Field
       label="Micro SD Card"
-      description={<Dropdown rgOptions={dropdownOptions} selectedOption={currentOption} onChange={onChange} />}
+      description={<Dropdown rgOptions={dropdownOptions} selectedOption={filter.params.card} onChange={onChange} disabled={!isMicroSDeckInstalled} />}
     />
   );
 };
