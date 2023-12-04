@@ -1,15 +1,15 @@
 import { Menu, MenuItem, showModal, Focusable, MenuGroup, ReorderableEntry, ReorderableList, MenuItemProps } from 'decky-frontend-lib';
 import { FC, Fragment, VFC, useState } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
-import { FaSteam } from 'react-icons/fa6';
 import { TabIdEntryType } from '../..';
 import { TabMasterContextProvider, useTabMasterContext } from '../../state/TabMasterContext';
 import { EditTabModal, EditableTabSettings } from '../modals/EditTabModal';
-import { IncludeCategories } from '../../lib/Utils';
+import { IncludeCategories, getTabIcon } from '../../lib/Utils';
 import { LibraryMenuStyles } from '../styles/LibraryMenuStyles';
 import { DestructiveModal } from '../generic/DestructiveModal';
 import { gamepadContextMenuClasses } from '../../lib/GamepadContextMenuClasses';
 import { PresetMenuItems } from './PresetMenu';
+import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 
 export interface LibraryMenuProps {
   closeMenu: () => void;
@@ -22,6 +22,8 @@ export interface LibraryMenuProps {
  * The library context menu for configuring tab master.
  */
 export const LibraryMenu: VFC<LibraryMenuProps> = ({ closeMenu, selectedTabId, tabMasterManager }) => {
+  const isMicroSDeckInstalled = MicroSDeckInterop.isInstallOk();
+
   //@ts-ignore
   return <Menu label={
     <div>
@@ -31,20 +33,23 @@ export const LibraryMenu: VFC<LibraryMenuProps> = ({ closeMenu, selectedTabId, t
   }>
     <LibraryMenuStyles />
     <TabMasterContextProvider tabMasterManager={tabMasterManager} >
-      <LibraryMenuItems selectedTabId={selectedTabId} closeMenu={closeMenu} />
+      <LibraryMenuItems selectedTabId={selectedTabId} closeMenu={closeMenu} isMicroSDeckInstalled={isMicroSDeckInstalled} />
     </TabMasterContextProvider>
   </Menu>;
 };
 
-interface LibraryMenuItemsProps extends Omit<LibraryMenuProps, 'tabMasterManager'> { }
+interface LibraryMenuItemsProps extends Omit<LibraryMenuProps, 'tabMasterManager'> { 
+  isMicroSDeckInstalled: boolean;
+}
 
 /**
  * The menu items for the library context menu (in a separate component to manage state correctly)
  */
-const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu }) => {
+const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu, isMicroSDeckInstalled }) => {
   const { tabsMap, visibleTabsList, hiddenTabsList, tabMasterManager } = useTabMasterContext();
   const tabTitle = tabMasterManager.getTabs().tabsMap.get(selectedTabId)?.title;
   const isCustomTab = !!tabsMap.get(selectedTabId)?.filters;
+
 
   return <>
     <MenuItem
@@ -69,7 +74,7 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
       Add Tab
     </MenuItem>
     <MenuGroup label='Quick Tabs'>
-      <PresetMenuItems tabMasterManager={tabMasterManager} />
+      <PresetMenuItems tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />
     </MenuGroup>
     <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
     <MenuGroup label='Reorder Tabs'>
@@ -80,7 +85,7 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
               label:
                 <div className="tab-label-cont">
                   <div className="tab-label">{tabContainer.title}</div>
-                  {tabContainer.filters ? <Fragment /> : <FaSteam />}
+                  {getTabIcon(tabContainer, !isMicroSDeckInstalled)}
                 </div>,
               position: tabContainer.position,
               data: { id: tabContainer.id }
@@ -97,7 +102,7 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
     </MenuGroup>
     {hiddenTabsList.length > 0 &&
       <MenuGroup label='Unhide Tabs' disabled={hiddenTabsList.length === 0}>
-        <HiddenItems onSelectTab={id => tabMasterManager.showTab(id)} hiddenTabsList={hiddenTabsList} />
+        <HiddenItems onSelectTab={id => tabMasterManager.showTab(id)} hiddenTabsList={hiddenTabsList} isMicroSDeckInstalled={isMicroSDeckInstalled} />
       </MenuGroup>
     }
     <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
@@ -156,13 +161,14 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
 
 interface HiddenItemsProps {
   hiddenTabsList: TabContainer[];
+  isMicroSDeckInstalled: boolean;
   onSelectTab: (id: TabContainer['id']) => void;
 }
 
 /**
  * The group of hidden tab menu items
  */
-const HiddenItems: VFC<HiddenItemsProps> = ({ hiddenTabsList, onSelectTab }) => {
+const HiddenItems: VFC<HiddenItemsProps> = ({ hiddenTabsList, isMicroSDeckInstalled, onSelectTab }) => {
   const [_refresh, setRefresh] = useState(true);
   return <>
     {hiddenTabsList.map(tabContainer =>
@@ -172,8 +178,11 @@ const HiddenItems: VFC<HiddenItemsProps> = ({ hiddenTabsList, onSelectTab }) => 
           onSelectTab(tabContainer.id);
           setRefresh(refresh => !refresh);
         }}
-      >
-        {tabContainer.title}
+      > 
+        <div style={{ marginRight: '4px'}}>
+          {tabContainer.title}
+        </div>
+        {getTabIcon(tabContainer, !isMicroSDeckInstalled)}
       </MenuItemNoClose>
     )}
   </>;

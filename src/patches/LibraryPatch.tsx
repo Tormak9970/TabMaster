@@ -139,7 +139,8 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
 function getShowMenu(id: string, tabMasterManager: TabMasterManager) {
   return () => {
     let menu: { Hide: () => void };
+    const menuElement = <LibraryMenu selectedTabId={id} tabMasterManager={tabMasterManager} closeMenu={() => menu.Hide()}/>;
     //@ts-ignore
-    menu = showContextMenu(<LibraryMenu selectedTabId={id} tabMasterManager={tabMasterManager} closeMenu={() => menu.Hide()}/>);
+    menu = showContextMenu(menuElement);
   }
 }

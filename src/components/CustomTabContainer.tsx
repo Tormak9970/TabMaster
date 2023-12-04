@@ -113,7 +113,7 @@ export class CustomTabContainer implements TabContainer {
     this.categoriesToInclude = categoriesToInclude;
     this.filters = filters;
     this.buildCollection();
-    this.checkMicroSDeckDependency;
+    this.checkMicroSDeckDependency();
   }
 
   /**

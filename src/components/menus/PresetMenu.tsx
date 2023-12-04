@@ -4,23 +4,21 @@ import { presetKeys } from '../../presets/presets';
 import { capitalizeEachWord } from '../../lib/Utils';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { compatCategoryToLabel } from '../filters/Filters';
-import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 
 interface PresetMenuProps {
   tabMasterManager: TabMasterManager;
+  isMicroSDeckInstalled: boolean;
 }
 
-export const PresetMenu: VFC<PresetMenuProps> = ({ tabMasterManager }) => {
+export const PresetMenu: VFC<PresetMenuProps> = ({ tabMasterManager, isMicroSDeckInstalled }) => {
   return <Menu label='Quick Tabs'>
-    <PresetMenuItems tabMasterManager={tabMasterManager} />
+    <PresetMenuItems tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />
   </Menu>;
 };
 
-interface PresetMenuItemsProps {
-  tabMasterManager: TabMasterManager;
-}
+interface PresetMenuItemsProps extends PresetMenuProps { }
 
-export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager }) => {
+export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, isMicroSDeckInstalled }) => {
 
   function getActionDescription(name: string) {
     return { onOKActionDescription: `Create Tab "${name}"` };
@@ -72,7 +70,7 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager })
           );
         case 'micro sd card':
             return (
-              <MenuGroup label='Micro SD Card' disabled={!MicroSDeckInterop.isInstallOk()}>
+              <MenuGroup label='Micro SD Card' disabled={!isMicroSDeckInstalled}>
                 <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, 'Inserted Card')} {...getActionDescription('Inserted Card')}>
                   Inserted Card
                 </MenuItem>

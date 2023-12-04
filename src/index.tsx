@@ -18,7 +18,7 @@ import {
 import { VFC, Fragment, ReactNode } from "react";
 
 import { TbLayoutNavbarExpand } from "react-icons/tb";
-import { FaSteam, FaCircleExclamation } from "react-icons/fa6";
+import { FaCircleExclamation } from "react-icons/fa6";
 import { PiListPlusBold } from "react-icons/pi";
 import { MdNumbers } from "react-icons/md";
 
@@ -36,7 +36,7 @@ import { EditableTabSettings, EditTabModal } from "./components/modals/EditTabMo
 import { TabActionsButton } from "./components/TabActions";
 import { LogController } from "./lib/controllers/LogController";
 import { DocPage } from "./components/docs/DocsPage";
-import { IncludeCategories } from "./lib/Utils";
+import { getTabIcon, IncludeCategories } from "./lib/Utils";
 import { PresetMenu } from './components/menus/PresetMenu';
 import { MicroSDeck } from "@cebbinghaus/microsdeck";
 import { MicroSDeckInterop } from './lib/controllers/MicroSDeckInterop';
@@ -67,7 +67,7 @@ interface TabEntryInteractablesProps {
 const Content: VFC<{}> = ({ }) => {
   const { visibleTabsList, hiddenTabsList, tabsMap, tabMasterManager } = useTabMasterContext();
 
-  // MicroSDeckInterop.checkInstallStateChanged();
+  const isMicroSDeckInstalled =  MicroSDeckInterop.isInstallOk();;
   // const isMicroSDeckInstalled = MicroSDeckInterop.state === 'good';
 
   function TabEntryInteractables({ entry }: TabEntryInteractablesProps) {
@@ -94,7 +94,7 @@ const Content: VFC<{}> = ({ }) => {
       label:
         <div className="tab-label-cont">
           <div className="tab-label">{tabContainer.title}</div>
-          {tabContainer.filters ? <Fragment /> : <FaSteam />}
+          {getTabIcon(tabContainer, !isMicroSDeckInstalled)}
         </div>,
       position: tabContainer.position,
       data: { id: tabContainer.id }
@@ -138,7 +138,7 @@ const Content: VFC<{}> = ({ }) => {
                   <DialogButton
                     style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center", marginRight: "8px" }}
                     onOKActionDescription={'Add Quick Tab'}
-                    onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} />)}
+                    onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />)}
                   >
                     <PiListPlusBold size='1.4em' />
                   </DialogButton>
@@ -170,7 +170,7 @@ const Content: VFC<{}> = ({ }) => {
                     label={
                       <div className="tab-label-cont">
                         <div className="tab-label">{tabContainer.title}</div>
-                        {tabContainer.filters ? <Fragment /> : <FaSteam />}
+                        {getTabIcon(tabContainer, !isMicroSDeckInstalled)}
                       </div>
                     }
                     onClick={() => tabMasterManager.showTab(tabContainer.id)}
