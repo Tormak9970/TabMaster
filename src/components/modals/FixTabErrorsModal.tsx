@@ -28,7 +28,7 @@ export const FixTabErrorsModalRoot: VFC<FixTabErrorsModalRootProps> = ({ closeMo
     <ModalRoot bAllowFullSize onCancel={() => {}}>
       <TabMasterContextProvider tabMasterManager={tabMasterManager}>
         <FixModalStyles />
-        <FixTabErrorsModal onConfirm={onConfirm} closeModal={closeModal!} tabs={tabs} erroredFiltersMap={erroredFiltersMap} />
+        <FixTabErrorsModal onConfirm={onConfirm} closeModal={closeModal!} tabs={{...tabs}} erroredFiltersMap={erroredFiltersMap} />
       </TabMasterContextProvider>
     </ModalRoot>
   );

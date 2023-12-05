@@ -1,15 +1,14 @@
 import { EditableTabSettings } from "../components/modals/EditTabModal";
-import { TabFilterSettings, FilterType, validateFilter } from "../components/filters/Filters";
+import { TabFilterSettings, FilterType } from "../components/filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { v4 as uuidv4 } from "uuid";
 import { IReactionDisposer, reaction } from "mobx";
 import { defaultTabsSettings, getNonBigIntUserId } from "../lib/Utils";
 import { LogController } from "../lib/controllers/LogController";
-import { showModal } from "decky-frontend-lib";
-import { FixTabErrorsModalRoot } from "../components/modals/FixTabErrorsModal";
 import { PresetName, PresetOptions, getPreset } from '../presets/presets';
 import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
+import { TabErrorController } from '../lib/controllers/TabErrorController';
 
 /**
  * Converts a list of filters into a 1D array.
@@ -78,33 +77,12 @@ export class TabMasterManager {
   private handleMicroSDeckChange() {
     if (!this.hasLoaded) return;
 
-    const microSDeckTabs: { [tabId: string]: CustomTabContainer } = {};
-
-    for (let tab of this.visibleTabsList) {
-      if ((tab as CustomTabContainer).dependsOnMicroSDeck) microSDeckTabs[tab.id] = (tab as CustomTabContainer);
+    const microSDeckTabs: string[] = [];
+    for (let tab of this.tabsMap.values()) {
+      if ((tab as CustomTabContainer).dependsOnMicroSDeck) microSDeckTabs.push(tab.id);
     }
 
-    const tabsToFix = this.checkForBrokenFilters(microSDeckTabs);
-    Object.values(microSDeckTabs).forEach(tabContainer => !tabsToFix.has(tabContainer.id) && tabContainer.buildCollection());
-
-    if (tabsToFix.size > 0) {
-      LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
-      showModal(
-        <FixTabErrorsModalRoot
-          onConfirm={(editedTabSettings: TabSettingsDictionary) => {
-            for (const tab of Object.values(editedTabSettings)) {
-              if (tabsToFix.has(tab.id)) {
-                if (tab.filters!.length === 0) this.deleteTab(tab.id);
-                else this.updateCustomTab(tab.id, tab as EditableTabSettings);
-              }
-            }
-          }}
-          tabs={microSDeckTabs}
-          erroredFiltersMap={tabsToFix}
-          tabMasterManager={this}
-        />
-      );
-    }
+    TabErrorController.validateTabs(microSDeckTabs, this, true);
   }
 
   private initReactions(): void {
@@ -211,7 +189,7 @@ export class TabMasterManager {
     const userCollections = collectionStore.userCollections;
 
     if (newLength < this.userCollectionIds.length && this.hasLoaded) {
-      let showFixNeeded = false;
+      let validateTabs = false;
       const collectionsInUse = Object.keys(this.collectionReactions);
       const currentUserCollectionIds = userCollections.map((collection) => collection.id);
 
@@ -219,7 +197,7 @@ export class TabMasterManager {
         const isIncluded = currentUserCollectionIds.includes(id);
 
         if (!isIncluded && collectionsInUse.includes(id)) {
-          showFixNeeded = true;
+          validateTabs = true;
           this.collectionReactions[id]();
           delete this.collectionReactions[id];
         }
@@ -227,42 +205,7 @@ export class TabMasterManager {
         return isIncluded;
       });
 
-      if (showFixNeeded) {
-        const tabsSettings = Object.fromEntries(this.tabsMap.entries());
-        const tabsToFix = this.checkForBrokenFilters(tabsSettings);
-
-        if (tabsToFix.size > 0) {
-          LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
-          showModal(
-            <FixTabErrorsModalRoot
-              onConfirm={(editedTabSettings: TabSettingsDictionary) => {
-                for (const tab of Object.values(editedTabSettings)) {
-                  if (tabsToFix.has(tab.id)) {
-                    const tabContainer = tab as CustomTabContainer;
-
-                    if (tabContainer.filters.length === 0) {
-                      this.deleteTab(tabContainer.id);
-                    } else {
-
-                      const asEditableSettings: EditableTabSettings = {
-                        title: tabContainer.title,
-                        filters: tabContainer.filters,
-                        filtersMode: tabContainer.filtersMode,
-                        categoriesToInclude: tabContainer.categoriesToInclude
-                      };
-
-                      this.updateCustomTab(tabContainer.id, asEditableSettings);
-                    }
-                  }
-                }
-              }}
-              tabs={tabsSettings}
-              erroredFiltersMap={tabsToFix}
-              tabMasterManager={this}
-            />
-          );
-        }
-      }
+      if (validateTabs) TabErrorController.validateTabs(Array.from(this.tabsMap.keys()), this);
     } else {
       for (const userCollection of userCollections) {
         if (!this.userCollectionIds.includes(userCollection.id)) this.userCollectionIds.push(userCollection.id);
@@ -530,44 +473,7 @@ export class TabMasterManager {
     }
   }
 
-  /**
-   * Checks the provided tabsSettings for broken filters.
-   * @param tabsSettings The tabsSettings to check.
-   * @returns A map of tabIds to broken filters.
-   */
-  private checkForBrokenFilters(tabsSettings: TabSettingsDictionary): Map<string, FilterErrorEntry[]> {
-    const tabsToFix = new Map<string, FilterErrorEntry[]>();
-
-    for (const [id, tabSetting] of Object.entries(tabsSettings)) {
-      if (tabSetting.filters) {
-        const tabErroredFilters: FilterErrorEntry[] = [];
-
-        for (let i = 0; i < tabSetting.filters.length; i++) {
-          const filter = tabSetting.filters[i];
-          const filterValidated = validateFilter(filter);
-
-          if (!filterValidated) {
-            tabErroredFilters.push({ filterIdx: i, errors: [`Filter "${filter.type}" cannot be validated. It has likely been removed.`] });
-          } else if (!filterValidated.passed) {
-            let entry: FilterErrorEntry = {
-              filterIdx: i,
-              errors: filterValidated.errors
-            };
-
-            if (filterValidated.mergeErrorEntries) entry.mergeErrorEntries = filterValidated.mergeErrorEntries;
-
-            tabErroredFilters.push(entry);
-          }
-        }
-
-        if (tabErroredFilters.length > 0) {
-          tabsToFix.set(id, tabErroredFilters);
-        }
-      }
-    }
-
-    return tabsToFix;
-  }
+  
 
   /**
    * Loads the user's tabs from the backend.
@@ -613,32 +519,7 @@ export class TabMasterManager {
       return;
     }
 
-    const tabsSettings = Object.keys(settings).length > 0 ? settings : { ...defaultTabsSettings };
-    const tabsToFix = this.checkForBrokenFilters(tabsSettings);
-
-    if (tabsToFix.size > 0) {
-      LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
-      showModal(
-        <FixTabErrorsModalRoot
-          onConfirm={(editedTabSettings: TabSettingsDictionary) => {
-            const tabsToDelete: string[] = [];
-            for (const tab of Object.values(editedTabSettings)) {
-              if (tabsToFix.has(tab.id) && tab.filters!.length === 0) {
-                tabsToDelete.push(tab.id);
-              }
-            }
-
-            this.finishLoadingTabs(editedTabSettings);
-            tabsToDelete.forEach(tabId => this.deleteTab(tabId));
-          }}
-          tabs={tabsSettings}
-          erroredFiltersMap={tabsToFix}
-          tabMasterManager={this}
-        />
-      );
-    } else {
-      this.finishLoadingTabs(tabsSettings);
-    }
+    TabErrorController.validateSettingsOnLoad((Object.keys(settings).length > 0) ? settings : defaultTabsSettings, this, this.finishLoadingTabs.bind(this));
   };
 
   /**

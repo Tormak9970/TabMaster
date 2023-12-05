@@ -67,8 +67,7 @@ interface TabEntryInteractablesProps {
 const Content: VFC<{}> = ({ }) => {
   const { visibleTabsList, hiddenTabsList, tabsMap, tabMasterManager } = useTabMasterContext();
 
-  const isMicroSDeckInstalled =  MicroSDeckInterop.isInstallOk();;
-  // const isMicroSDeckInstalled = MicroSDeckInterop.state === 'good';
+  const isMicroSDeckInstalled =  MicroSDeckInterop.isInstallOk();
 
   function TabEntryInteractables({ entry }: TabEntryInteractablesProps) {
     const tabContainer = tabsMap.get(entry.data!.id)!;
