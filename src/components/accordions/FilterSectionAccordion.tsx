@@ -29,7 +29,7 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
 
   return (
     <Focusable style={{ width: "100%", padding: "0" }}>
-      <Focusable className="filter-start-cont" focusClassName="start-focused" focusWithinClassName="start-focused">
+      <Focusable className="filter-start-cont highlight-on-focus" focusClassName="start-focused" focusWithinClassName="start-focused">
         <Button style={{
           width: "100%",
           padding: "0",
