@@ -30,6 +30,8 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
   })(), []);
   useMemo(() => shouldFocusFilterDropdown = cb(), [groupFilters.length]);
 
+  // TODO: need to set shouldFocus of next index filter after one is deleted
+
   const element = (
     <Focusable>
       <PanelSection title="Filters">
@@ -55,14 +57,16 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
                   filter={filter}
                   isOpen={shouldFocusFilterDropdown ? index === groupFilters.length - 1 : !collapseFilters}
                 >
-                  <div className="no-sep">
-                    <Field
-                      label="Filter Type"
-                      description={<FilterEntry index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} shouldFocus={shouldFocusFilterDropdown && index === groupFilters.length - 1} />}
-                    />
-                  </div>
                   <div className="no-sep" key={`${filter.type}`}>
-                    <FilterOptions index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />
+                    <div className="no-sep"> {/* adding this key fixes the issue of */}
+                      <Field
+                        label="Filter Type"
+                        description={<FilterEntry index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} shouldFocus={shouldFocusFilterDropdown && index === groupFilters.length - 1} />}
+                      />
+                    </div>
+                    <div className="no-sep"> {/* key={`${filter.type}`} */}
+                      <FilterOptions index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />
+                    </div>
                   </div>
                 </FilterSectionAccordion>
                 {index == groupFilters.length - 1 ? (

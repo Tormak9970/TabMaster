@@ -58,7 +58,6 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
   }
 
   if (filter) {
-
     const filterTypeDropdownElt = (
       <Focusable style={!canBeInverted(filter) ? { width: "calc(100% - 55px)" } : { width: "calc(100% - 185px)" }}>
         <FilterSelect selectedOption={filter.type} onChange={onChange} />
