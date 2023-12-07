@@ -82,10 +82,10 @@ export const ModalStyles: VFC<{}> = ({}) => {
       
       /* Focused styles */
       .tab-master-modal-scope .start-focused {
-        background-color: #3d4450 !important;
+        background-color: rgba(255, 255, 255, 0.15) !important;
       }
       .tab-master-modal-scope .filter-start-cont.start-focused {
-        background-color: #3d4450 !important;
+        background-color: rgba(255, 255, 255, 0.15) !important;
       }
       .tab-master-modal-scope .filter-start-cont.start-focused .filter-line {
         background: #a9a9a9;
