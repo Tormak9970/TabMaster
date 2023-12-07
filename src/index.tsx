@@ -17,7 +17,7 @@ import {
 import { VFC, Fragment, ReactNode } from "react";
 
 import { TbLayoutNavbarExpand } from "react-icons/tb";
-import { FaSteam, FaCircleExclamation } from "react-icons/fa6";
+import { FaCircleExclamation } from "react-icons/fa6";
 import { PiListPlusBold } from "react-icons/pi";
 import { MdNumbers } from "react-icons/md";
 
