@@ -47,6 +47,7 @@ declare global {
   let friendStore: FriendStore;
   //* This casing is correct, idk why it doesn't match the others.
   let securitystore: SecurityStore;
+  let settingsStore: SettingsStore;
 }
 
 export type TabIdEntryType = {

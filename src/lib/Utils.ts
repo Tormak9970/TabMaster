@@ -1,5 +1,6 @@
 import { sleep } from 'decky-frontend-lib';
 import { FilterType, TabFilterSettings } from "../components/filters/Filters";
+import { GamepadUIAudio, SFXPath } from './GamepadUIAudio';
 
 /**
  * Waits for a condition to be true.
@@ -221,4 +222,12 @@ export function filtersHaveType(filters: TabFilterSettings<FilterType>[], ...fil
     }
   }
   return false;
+}
+
+/**
+ * Plays audio url while respecting whether user has ui sounds enabled/ disabled
+ *  @param path Audio url 
+ */
+export function playUISound(path: SFXPath) {
+  if (settingsStore?.m_ClientSettings?.enable_ui_sounds) GamepadUIAudio.AudioPlaybackManager.PlayAudioURL(path);
 }
