@@ -31,7 +31,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
   useMemo(() => shouldFocusFilterDropdown = cb(), [groupFilters.length]);
 
   const element = (
-    <Focusable>
+    <Focusable style={{ marginTop: '24px' }}>
       <PanelSection title="Filters">
         <PanelSectionRow>
           <Field

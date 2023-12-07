@@ -1,15 +1,15 @@
 import { Menu, MenuItem, showModal, Focusable, MenuGroup, ReorderableEntry, ReorderableList, MenuItemProps } from 'decky-frontend-lib';
 import { FC, Fragment, VFC, useState } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
-import { FaSteam } from 'react-icons/fa6';
 import { TabIdEntryType } from '../..';
 import { TabMasterContextProvider, useTabMasterContext } from '../../state/TabMasterContext';
-import { EditTabModal, EditableTabSettings } from '../modals/EditTabModal';
-import { IncludeCategories } from '../../lib/Utils';
+import { showModalEditTab, showModalNewTab } from '../modals/EditTabModal';
 import { LibraryMenuStyles } from '../styles/LibraryMenuStyles';
 import { DestructiveModal } from '../generic/DestructiveModal';
 import { gamepadContextMenuClasses } from '../../lib/GamepadContextMenuClasses';
 import { PresetMenuItems } from './PresetMenu';
+import { CustomTabContainer } from '../CustomTabContainer';
+import { TabListLabel } from '../TabListLabel';
 
 export interface LibraryMenuProps {
   closeMenu: () => void;
@@ -44,27 +44,15 @@ interface LibraryMenuItemsProps extends Omit<LibraryMenuProps, 'tabMasterManager
 const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu }) => {
   const { tabsMap, visibleTabsList, hiddenTabsList, tabMasterManager } = useTabMasterContext();
   const tabTitle = tabMasterManager.getTabs().tabsMap.get(selectedTabId)?.title;
-  const isCustomTab = !!tabsMap.get(selectedTabId)?.filters;
+  const tabContainer = tabsMap.get(selectedTabId);
+  const isCustomTab = !!tabContainer?.filters;
 
   return <>
     <MenuItem
       //@ts-ignore
       className={gamepadContextMenuClasses.Positive}
       onOKActionDescription='Add Tab'
-      onClick={() => {
-        showModal(
-          <EditTabModal
-            onConfirm={(_: any, tabSettings: EditableTabSettings) => {
-              tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode, tabSettings.categoriesToInclude);
-              closeMenu();
-            }}
-            tabFilters={[]}
-            tabMasterManager={tabMasterManager}
-            filtersMode="and"
-            categoriesToInclude={IncludeCategories.games}
-          />
-        );
-      }}
+      onClick={() => showModalNewTab(tabMasterManager)}
     >
       Add Tab
     </MenuItem>
@@ -77,11 +65,7 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
         <ReorderableList<TabIdEntryType>
           entries={visibleTabsList.map((tabContainer) => {
             return {
-              label:
-                <div className="tab-label-cont">
-                  <div className="tab-label">{tabContainer.title}</div>
-                  {tabContainer.filters ? <Fragment /> : <FaSteam />}
-                </div>,
+              label: <TabListLabel tabContainer={tabContainer} style={{ marginLeft: '12px' }}/>,
               position: tabContainer.position,
               data: { id: tabContainer.id }
             };
@@ -104,22 +88,7 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
     {isCustomTab &&
       <MenuItem
         onOKActionDescription={`Edit "${tabTitle}"`}
-        onClick={() => {
-          const tabContainer = tabsMap.get(selectedTabId)!;
-          showModal(
-            <EditTabModal
-              onConfirm={(tabId: string | undefined, updatedTabSettings: EditableTabSettings) => {
-                tabMasterManager.updateCustomTab(tabId!, updatedTabSettings);
-              }}
-              tabId={tabContainer.id}
-              tabTitle={tabContainer.title}
-              tabFilters={tabContainer.filters!}
-              tabMasterManager={tabMasterManager}
-              filtersMode={tabContainer.filtersMode!}
-              categoriesToInclude={tabContainer.categoriesToInclude!}
-            />
-          );
-        }}
+        onClick={() => showModalEditTab(tabContainer as CustomTabContainer, tabMasterManager)}
       >
         Edit
       </MenuItem>
@@ -173,7 +142,7 @@ const HiddenItems: VFC<HiddenItemsProps> = ({ hiddenTabsList, onSelectTab }) => 
           setRefresh(refresh => !refresh);
         }}
       >
-        {tabContainer.title}
+        <TabListLabel tabContainer={tabContainer}/>
       </MenuItemNoClose>
     )}
   </>;
