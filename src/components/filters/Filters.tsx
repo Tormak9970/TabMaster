@@ -291,6 +291,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "last played":
     case "demo":
     case "streamable":
+    default:
       return {
         passed: true,
         errors: []
@@ -433,6 +434,17 @@ export class Filter {
       return params.isStreamable ? isStreamable : !isStreamable;
     }
   };
+
+  /**
+   * Removes filters that are of unknown types.
+   * @param filters Array of tabs filters.
+   * @returns 
+   */
+  static removeUnknownTypes(filters?: TabFilterSettings<FilterType>[]) {
+    if (!filters) return undefined;
+    const knownFilterTypes = Object.keys(Filter.filterFunctions);
+    return filters.filter(filter => knownFilterTypes.includes(filter.type));
+  }
 
   /**
    * Checks if a game passes a given filter.
