@@ -9,13 +9,14 @@ type FilterEntryProps = {
   filter: TabFilterSettings<FilterType>,
   containingGroupFilters: TabFilterSettings<FilterType>[],
   setContainingGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>,
+  onFilterDelete(index: number): void,
   shouldFocus: boolean
 };
 
 /**
  * An individual filter for a tab.
  */
-export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGroupFilters, setContainingGroupFilters, shouldFocus }) => {
+export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGroupFilters, setContainingGroupFilters, onFilterDelete, shouldFocus }) => {
   const invertOptions = [
     {
       label: "default",
@@ -54,6 +55,7 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
   function onDelete() {
     const updatedFilters = [...containingGroupFilters];
     updatedFilters.splice(index, 1);
+    onFilterDelete(index);
     setContainingGroupFilters(updatedFilters);
   }
 
