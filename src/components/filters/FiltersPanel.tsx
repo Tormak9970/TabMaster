@@ -62,7 +62,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
                 <FilterSectionAccordion
                   index={index}
                   filter={filter}
-                  isOpen={(newFilterWasAdded.current ? index === groupFilters.length - 1 : !collapseFilters) || ((deletedFilterIndex.current !== -1 && deletedFilterIndex.current !== groupFilters.length) && index === deletedFilterIndex.current)}
+                  isOpen={(newFilterWasAdded.current ? index === groupFilters.length - 1 : !collapseFilters) || ((deletedFilterIndex.current !== -1) && (deletedFilterIndex.current !== groupFilters.length ? index === deletedFilterIndex.current : index === groupFilters.length - 1))}
                 >
                   <div className="no-sep" key={`${filter.type}`}>
                     <div className="no-sep">
@@ -75,7 +75,9 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
                             containingGroupFilters={groupFilters}
                             setContainingGroupFilters={setGroupFilters}
                             onFilterDelete={onFilterDelete}
-                            shouldFocus={(newFilterWasAdded.current ? index === groupFilters.length - 1 : !collapseFilters) || ((deletedFilterIndex.current !== -1 && deletedFilterIndex.current !== groupFilters.length) && index === deletedFilterIndex.current)}
+                            // * if a new filter was just added, focus the last filter (the new one).
+                            // * or, if a filter was just deleted, if its the last filter, focus the new last one, otherwise focus the correct one.
+                            shouldFocus={(newFilterWasAdded.current && index === groupFilters.length - 1) || ((deletedFilterIndex.current !== -1) && (deletedFilterIndex.current !== groupFilters.length ? index === deletedFilterIndex.current : index === groupFilters.length - 1))}
                           />
                         }
                       />
