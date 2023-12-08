@@ -162,7 +162,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
 
   return (
     <>
-      <div className="tab-master-scope" style={{ marginBottom: "24px" }}>
+      <div style={{ marginBottom: "24px" }}>
         <Focusable
           style={{ margin: "0 calc(-12px - 1.4vw)" }}
           onActivate={() => {
@@ -170,6 +170,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
             setIsOpen(isOpen => !isOpen);
           }}
           noFocusRing={true}
+          className='highlight-on-focus'
           focusClassName="start-focused"
         >
           <div style={{ margin: "0 calc(12px + 1.4vw)", padding: "0 16px" }}>

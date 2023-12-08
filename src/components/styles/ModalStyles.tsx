@@ -82,10 +82,13 @@ export const ModalStyles: VFC<{}> = ({}) => {
       
       /* Focused styles */
       .tab-master-modal-scope .start-focused {
-        background-color: rgba(255, 255, 255, 0.15) !important;
+        background-color: rgba(255, 255, 255, 0.15);
+        animation-name: gamepaddialog_ItemFocusAnim-darkGrey_2zfa-;
       }
-      .tab-master-modal-scope .filter-start-cont.start-focused {
-        background-color: rgba(255, 255, 255, 0.15) !important;
+      .tab-master-modal-scope .highlight-on-focus {
+        animation-duration: .5s;
+        animation-fill-mode: forwards;
+        animation-timing-function: cubic-bezier(0.17, 0.45, 0.14, 0.83);
       }
       .tab-master-modal-scope .filter-start-cont.start-focused .filter-line {
         background: #a9a9a9;
