@@ -443,7 +443,14 @@ export class Filter {
   static removeUnknownTypes(filters?: TabFilterSettings<FilterType>[]) {
     if (!filters) return undefined;
     const knownFilterTypes = Object.keys(Filter.filterFunctions);
-    return filters.filter(filter => knownFilterTypes.includes(filter.type));
+    return filters.flatMap(filter => {
+      if (filter.type === 'merge') {
+        const mergeFilter = {...filter} as TabFilterSettings<'merge'>;
+        mergeFilter.params.filters = this.removeUnknownTypes(mergeFilter.params.filters)!;
+        return mergeFilter;
+      }
+      return knownFilterTypes.includes(filter.type) ? filter : [];
+    });
   }
 
   /**
