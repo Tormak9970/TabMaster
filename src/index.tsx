@@ -15,7 +15,7 @@ import {
   SidebarNavigation,
   staticClasses,
 } from "decky-frontend-lib";
-import { VFC, Fragment, ReactNode } from "react";
+import { VFC, ReactNode, useState } from "react";
 
 import { TbLayoutNavbarExpand } from "react-icons/tb";
 import { FaCircleExclamation } from "react-icons/fa6";
@@ -39,7 +39,8 @@ import { DocPage } from "./components/docs/DocsPage";
 import { getTabIcon, IncludeCategories } from "./lib/Utils";
 import { PresetMenu } from './components/menus/PresetMenu';
 import { MicroSDeck } from "@cebbinghaus/microsdeck";
-import { MicroSDeckInterop } from './lib/controllers/MicroSDeckInterop';
+import { MicroSDeckInstallState, MicroSDeckInterop, microSDeckLibVersion } from './lib/controllers/MicroSDeckInterop';
+import { MicroSDeckNotice } from './components/MicroSDeckNotice';
 
 declare global {
   let DeckyPluginLoader: { pluginReloadQueue: { name: string; version?: string; }[]; };
@@ -65,9 +66,11 @@ interface TabEntryInteractablesProps {
  * The Quick Access Menu content for TabMaster.
  */
 const Content: VFC<{}> = ({ }) => {
+  const [microSDeckNoticeHidden, setMicroSDeckNoticeHidden] = useState(MicroSDeckInterop.noticeHidden);
   const { visibleTabsList, hiddenTabsList, tabsMap, tabMasterManager } = useTabMasterContext();
 
-  const isMicroSDeckInstalled =  MicroSDeckInterop.isInstallOk();
+  const microSDeckInstallState = MicroSDeckInterop.getInstallState();
+  const isMicroSDeckInstalled =  microSDeckInstallState === MicroSDeckInstallState['good'];
 
   function TabEntryInteractables({ entry }: TabEntryInteractablesProps) {
     const tabContainer = tabsMap.get(entry.data!.id)!;
@@ -101,89 +104,110 @@ const Content: VFC<{}> = ({ }) => {
   });
 
   return (
-    <>
+    <div className="tab-master-scope">
       {LogController.errorFlag && <div style={{ padding: '0 15px', marginBottom: '40px' }}>
         <h3>
           <FaCircleExclamation style={{ height: '.8em', marginRight: '5px' }} fill="red" />
           Tab Master encountered an error
         </h3>
         <div style={{ wordWrap: 'break-word' }}>
-          Please reach out to 
-          <br/>
+          Please reach out to
+          <br />
           <a href='https://github.com/Tormak9970/TabMaster/issues'>https://github.com/Tormak9970/TabMaster/issues</a>
-          <br/>
+          <br />
           or
-          <br/>
+          <br />
           <a href='https://discord.com/channels/960281551428522045/1049449185214206053'>https://discord.com/channels/960281551428522045/1049449185214206053</a>
-          <br/>
+          <br />
           for support.
         </div>
       </div>}
-      <QamStyles />
-      <div className="tab-master-scope">
-        <Focusable onMenuActionDescription='Open Docs' onMenuButton={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }}>
-          <div style={{ margin: "5px", marginTop: "0px" }}>
-            Here you can add, re-order, or remove tabs from the library.
-          </div>
-          <Field className="no-sep">
-            <Focusable style={{ width: "100%", display: "flex" }}>
-              <Focusable className="add-tab-btn" style={{ width: "calc(100% - 50px)" }}>
-                <DialogButton onClick={onAddClicked} onOKActionDescription={'Add Tab'}>
-                  Add Tab
-                </DialogButton>
-              </Focusable>
-              {tabMasterManager.hasSettingsLoaded &&
-                <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
-                  <DialogButton
-                    style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center", marginRight: "8px" }}
-                    onOKActionDescription={'Add Quick Tab'}
-                    onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />)}
-                  >
-                    <PiListPlusBold size='1.4em' />
-                  </DialogButton>
-                </Focusable>}
-            </Focusable>
-          </Field>
-          <PanelSection title="Tabs">
-            <div className="seperator"></div>
-            {tabMasterManager.hasSettingsLoaded ? (
-              <ReorderableList<TabIdEntryType>
-                entries={entries}
-                interactables={TabEntryInteractables}
-                onSave={(entries: ReorderableEntry<TabIdEntryType>[]) => {
-                  tabMasterManager.reorderTabs(entries.map(entry => entry.data!.id));
+      {!isMicroSDeckInstalled && !microSDeckNoticeHidden && (
+        <div className='notice-field-cont' style={{ paddingBottom: '10px' }}>
+          <Field>
+            <MicroSDeckNotice intallState={microSDeckInstallState} pluginVersion={window.MicroSDeck?.Version ?? ''} libVersion={microSDeckLibVersion} style={{ margin: '8px', fontSize: '11px' }} />
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <DialogButton
+                style={{ margin: '10px 8px 0px', width: 'auto' }}
+                onClick={() => {
+                  MicroSDeckInterop.noticeHidden = true;
+                  setMicroSDeckNoticeHidden(true);
                 }}
-              />
-            ) : (
-              <div style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", padding: "5px" }}>
-                Loading...
+              >
+                Hide Notice
+              </DialogButton>
+            </div>
+          </Field>
+        </div>
+      )}
+      <QamStyles />
+      <Focusable onMenuActionDescription='Open Docs' onMenuButton={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }}>
+        <div style={{ margin: "5px", marginTop: "0px" }}>
+          Here you can add, re-order, or remove tabs from the library.
+        </div>
+        <Field className="no-sep">
+          <Focusable style={{ width: "100%", display: "flex" }}>
+            <Focusable className="add-tab-btn" style={{ width: "calc(100% - 50px)" }}>
+              <DialogButton onClick={onAddClicked} onOKActionDescription={'Add Tab'}>
+                Add Tab
+              </DialogButton>
+            </Focusable>
+            {tabMasterManager.hasSettingsLoaded &&
+              <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
+                <DialogButton
+                  style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center", marginRight: "8px" }}
+                  onOKActionDescription={'Add Quick Tab'}
+                  onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />)}
+                >
+                  <PiListPlusBold size='1.4em' />
+                </DialogButton>
+              </Focusable>}
+          </Focusable>
+        </Field>
+        <PanelSection title="Tabs">
+          <div className="seperator"></div>
+          {tabMasterManager.hasSettingsLoaded ? (
+            <ReorderableList<TabIdEntryType>
+              entries={entries}
+              interactables={TabEntryInteractables}
+              onSave={(entries: ReorderableEntry<TabIdEntryType>[]) => {
+                tabMasterManager.reorderTabs(entries.map(entry => entry.data!.id));
+              }}
+            />
+          ) : (
+            <div style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", padding: "5px" }}>
+              Loading...
+            </div>
+          )}
+        </PanelSection>
+        <PanelSection title="Hidden Tabs">
+          <div className="seperator"></div>
+          {
+            hiddenTabsList.map(tabContainer =>
+              <div className="hidden-tab-btn">
+                <ButtonItem
+                  label={
+                    <div className="tab-label-cont">
+                      <div className="tab-label">{tabContainer.title}</div>
+                      {getTabIcon(tabContainer, !isMicroSDeckInstalled)}
+                    </div>
+                  }
+                  onClick={() => tabMasterManager.showTab(tabContainer.id)}
+                  onOKActionDescription="Unhide tab"
+                >
+                  Show
+                </ButtonItem>
               </div>
-            )}
-          </PanelSection>
-          <PanelSection title="Hidden Tabs">
-            <div className="seperator"></div>
-            {
-              hiddenTabsList.map(tabContainer =>
-                <div className="hidden-tab-btn">
-                  <ButtonItem
-                    label={
-                      <div className="tab-label-cont">
-                        <div className="tab-label">{tabContainer.title}</div>
-                        {getTabIcon(tabContainer, !isMicroSDeckInstalled)}
-                      </div>
-                    }
-                    onClick={() => tabMasterManager.showTab(tabContainer.id)}
-                    onOKActionDescription="Unhide tab"
-                  >
-                    Show
-                  </ButtonItem>
-                </div>
-              )
-            }
-          </PanelSection>
-        </Focusable>
-      </div>
-    </>
+            )
+          }
+        </PanelSection>
+        {!isMicroSDeckInstalled && microSDeckNoticeHidden && (
+          <Focusable onActivate={() => { }}>
+            <MicroSDeckNotice intallState={microSDeckInstallState} pluginVersion={window.MicroSDeck?.Version ?? ''} libVersion={microSDeckLibVersion} style={{ margin: '8px', fontSize: '11px' }} />
+          </Focusable>
+        )}
+      </Focusable>
+    </div>
   );
 };
 

@@ -2,23 +2,35 @@ import { sleep } from 'decky-frontend-lib';
 import { LogController } from './LogController';
 import { MicroSDeck as MicroSDeckManager } from '@cebbinghaus/microsdeck';
 import { EventType } from '@cebbinghaus/microsdeck/dist/backend';
+import { version } from '@cebbinghaus/microsdeck/package.json';
 
-enum MicroSDeckInstallState {
+export const microSDeckLibVersion = version;
+
+export enum MicroSDeckInstallState {
   'not installed',
   'ver too low',
   'ver too high',
+  'ver unknown',
   'good'
 }
 
 export class MicroSDeckInterop {
   private static ref: MicroSDeckManager | undefined;
-  private static eventHandlers: { [eventType in EventType]?: () => void }
+  private static eventHandlers: { [eventType in EventType]?: () => void };
+  static noticeHidden: boolean = false;
 
+  /**
+   * Initializes event handlers.
+   * @param handlers Event handler callbacks.
+   */
   static initEventHandlers(handlers: { [eventType in EventType]?: () => void }) {
     this.eventHandlers = {...handlers};
     this.getInstallState();
   }
 
+  /**
+   * Adds event listeners to MicroSDeck event bus using the stored handler callbacks.
+   */
   private static subscribeToEvents() {
     for (let event in this.eventHandlers) {
       if (event) window.MicroSDeck!.eventBus.addEventListener(event as EventType, this.eventHandlers[event as EventType]!);
@@ -26,9 +38,8 @@ export class MicroSDeckInterop {
   }
 
   /**
-   * Checks if MicroSDeck plugin is installed when loading
+   * Waits some time for MicroSDeck plugin to load
    */
-  //* this is not complete, i have to change it
   static async waitForLoad() {
     LogController.log("Checking for installation of MicroSDeck...");
     //MicroSDeck is already loaded
@@ -57,30 +68,53 @@ export class MicroSDeckInterop {
     }
   }
 
+  /**
+   * Gets install state of MicroSDeck
+   * @param runChangeHandlerIfNewInstance Whether or not the change event handler should be run in the case a new instance in MicroSDeck is detected (only necessary in library patch).
+   * @returns MicroSDeckInstallState
+   */
   static getInstallState(runChangeHandlerIfNewInstance?: boolean) {
     if (!window.MicroSDeck) {
       return MicroSDeckInstallState['not installed'];
     } else {
-      //* window.MicroSDeck = undefined needs to be added back to plugin's onDismount
       
-
       //MicroSDeck has been reinstalled or reloaded
       if (window.MicroSDeck !== this.ref) {
         this.ref = window.MicroSDeck;
         if (runChangeHandlerIfNewInstance) this.eventHandlers.change?.();
         this.subscribeToEvents();
       } 
-      //* check version
 
-      return MicroSDeckInstallState['good'];
+      return this.checkVersion();
     }
   }
 
+  /**
+   * Gets whether or not MicroSDeck is installed and usable in TabMaster.
+   * @param runChangeHandlerIfNewInstance Whether or not the change event handler should be run in the case a new instance in MicroSDeck is detected (only necessary in library patch).
+   * @returns boolean
+   */
   static isInstallOk(runChangeHandlerIfNewInstance?: boolean) {
     return this.getInstallState(runChangeHandlerIfNewInstance) === MicroSDeckInstallState['good'];
   }
 
-  static checkVersion() {
+  /**
+   * Compares version of lib TabMaster is using against installed plugin version.
+   * @returns MicroSDeckInstallState
+   */
+  private static checkVersion() {
+    const [pluginVerMajor, pluginVerMinor, pluginVerPatch] = window.MicroSDeck!.Version.split(/[.+-]/).map(str => parseInt(str));
+    const [libVerMajor, libVerMinor, libVerPatch] = microSDeckLibVersion.split(/[.+-]/).map(str => parseInt(str));
 
+    if (isNaN(pluginVerMajor) || isNaN(pluginVerMinor) || isNaN(pluginVerPatch) || isNaN(libVerMajor) || isNaN(libVerMinor) || isNaN(libVerPatch)) return MicroSDeckInstallState['ver unknown'];
+    if (pluginVerMajor === 0 && libVerMajor === 0) {
+      if (pluginVerMinor > libVerMinor || pluginVerPatch > libVerPatch) return MicroSDeckInstallState['ver too high'];
+      if (pluginVerMinor < libVerMinor || pluginVerPatch < libVerPatch) return MicroSDeckInstallState['ver too low'];
+      return MicroSDeckInstallState['good'];
+    }
+    
+    if (pluginVerMajor > libVerMajor) return MicroSDeckInstallState['ver too high'];
+    if (pluginVerMajor < libVerMajor) return MicroSDeckInstallState['ver too low'];
+    return MicroSDeckInstallState['good'];
   }
 }
