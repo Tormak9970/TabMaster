@@ -1,4 +1,4 @@
-import { findModule } from "decky-frontend-lib";
+import { findModule, gamepadDialogClasses } from "decky-frontend-lib";
 import { VFC } from "react";
 
 type AchievementClasses = Record<
@@ -107,6 +107,10 @@ export const FilterSelectStyles: VFC<{}> = ({}) => {
       .tab-master-filter-select {
         width: 100%;
         height: auto;
+      }
+
+      .tab-master-filter-select .${gamepadDialogClasses.ModalPosition} > .${gamepadDialogClasses.GamepadDialogContent} {
+        background: radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%);
       }
 
       .tab-master-filter-select .gpfocuswithin .${achievementClasses.AchievementListItemBase} {

@@ -1,5 +1,5 @@
 import { EditableTabSettings } from "../components/modals/EditTabModal";
-import { TabFilterSettings, FilterType, validateFilter } from "../components/filters/Filters";
+import { TabFilterSettings, FilterType, validateFilter, Filter } from "../components/filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { v4 as uuidv4 } from "uuid";
@@ -629,7 +629,8 @@ export class TabMasterManager {
     }
 
     for (const keyId in tabsSettings) {
-      const { id, title, filters, position, filtersMode, categoriesToInclude } = tabsSettings[keyId];
+      const { id, title, filters: _filters, position, filtersMode, categoriesToInclude } = tabsSettings[keyId];
+      const filters = Filter.removeUnknownTypes(_filters)
       const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!, categoriesToInclude!) : this.addDefaultTabContainer(tabsSettings[keyId]);
 
       if (favoritesOriginalIndex !== null && favoritesOriginalIndex > -1 && tabContainer.position > favoritesOriginalIndex) {

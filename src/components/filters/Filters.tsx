@@ -85,7 +85,30 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "last played": { date: undefined, condition: 'above' },
   "demo": { isDemo: true },
   "streamable": { isStreamable: true }
-};
+}
+
+/**
+ * Dictionary of descriptions for each filter.
+ */
+export const FilterDescriptions: { [filterType in FilterType]: string } = {
+  collection: "Selects apps that are in a certain Steam Collection.",
+  installed: "Selects apps that are installed/uninstalled.",
+  regex: "Selects apps whose titles match a regular expression.",
+  friends: "Selects apps that are also owned by friends.",
+  tags: "Selects apps that have specific community tags.",
+  whitelist: "Selects apps that are added to the list.",
+  blacklist: "Selects apps that are not added to the list.",
+  merge: "Selects apps that pass a subgroup of filters.",
+  platform: "Selects Steam or non-Steam apps.",
+  "deck compatibility": "Selects apps that have a specific Steam Deck compatibilty status.",
+  "review score": "Selects apps based on their metacritic/steam review score.",
+  "time played": "Selects apps based on your play time.",
+  "size on disk": "Selects apps based on their install size.",
+  "release date": "Selects apps based on their release date.",
+  "last played": "Selects apps based on when they were last played.",
+  demo: "Selects apps that are/aren't demos.",
+  streamable: "Selects apps that can/can't be streamed from another computer."
+}
 
 /**
  * Whether the filter should have an invert option.
@@ -116,8 +139,7 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
   }
 }
 
-//* I changed this from 'isDefaultParams' because some default params can still be valid
-//* make sure the check is the inversion from before going forward
+// * make sure the check is the inversion from before going forward
 /**
  * Checks if a filter has valid params.
  * @param filter The filter to check.
@@ -269,6 +291,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "last played":
     case "demo":
     case "streamable":
+    default:
       return {
         passed: true,
         errors: []
@@ -411,6 +434,24 @@ export class Filter {
       return params.isStreamable ? isStreamable : !isStreamable;
     }
   };
+
+  /**
+   * Removes filters that are of unknown types.
+   * @param filters Array of tabs filters.
+   * @returns 
+   */
+  static removeUnknownTypes(filters?: TabFilterSettings<FilterType>[]) {
+    if (!filters) return undefined;
+    const knownFilterTypes = Object.keys(Filter.filterFunctions);
+    return filters.flatMap(filter => {
+      if (filter.type === 'merge') {
+        const mergeFilter = {...filter} as TabFilterSettings<'merge'>;
+        mergeFilter.params.filters = this.removeUnknownTypes(mergeFilter.params.filters)!;
+        return mergeFilter;
+      }
+      return knownFilterTypes.includes(filter.type) ? filter : [];
+    });
+  }
 
   /**
    * Checks if a game passes a given filter.

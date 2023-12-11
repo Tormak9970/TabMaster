@@ -186,7 +186,7 @@ const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, s
   for (const gameid of filter.params.games) {
     const game = appsList.find((game) => game.appid === gameid);
 
-    if (game) selected.push({ label: game.display_name, data: gameid });
+    if (game) selected.push({ label: game.display_name, data: { appid: game.appid, appType: game.app_type } });
   }
 
   const dropdownOptions: DropdownOption[] = appsList.map((game: SteamAppOverview) => { return { label: game.display_name, data: { appid: game.appid, appType: game.app_type } }; });
@@ -219,7 +219,7 @@ const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, s
   for (const gameid of filter.params.games) {
     const game = appsList.find((game) => game.appid === gameid);
 
-    if (game) selected.push({ label: game.display_name, data: gameid });
+    if (game) selected.push({ label: game.display_name, data: { appid: game.appid, appType: game.app_type } });
   }
 
   const dropdownOptions: DropdownOption[] = appsList.map((game: SteamAppOverview) => { return { label: game.display_name, data: { appid: game.appid, appType: game.app_type } }; });

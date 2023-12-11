@@ -1,6 +1,6 @@
 import { Fragment, VFC, useEffect, useState } from "react";
 import { Focusable, ModalRoot, showModal } from "decky-frontend-lib";
-import { FilterDefaultParams, FilterType } from "./Filters";
+import { FilterDefaultParams, FilterDescriptions, FilterType } from "./Filters";
 import { capitalizeEachWord } from "../../lib/Utils";
 import { FilterSelectStyles, achievementClasses, mainMenuAppRunningClasses } from "../styles/FilterSelectionStyles";
 import { CustomButton } from '../generic/CustomButton';
@@ -16,25 +16,6 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
   const [focusable, setFocusable] = useState(false);
   const [selected, setSelected] = useState<FilterType>(selectedOption);
   const filterTypeOptions = Object.keys(FilterDefaultParams) as FilterType[];
-  const filterDescriptions: { [filterType in FilterType]: string } = {
-    collection: "Selects apps that are in a certain Steam Collection.",
-    installed: "Selects apps that are installed/uninstalled.",
-    regex: "Selects apps whose titles match a regular expression.",
-    friends: "Selects apps that are also owned by friends.",
-    tags: "Selects apps that have specific community tags.",
-    whitelist: "Selects apps that are added to the list.",
-    blacklist: "Selects apps that are not added to the list.",
-    merge: "Selects apps that pass a subgroup of filters.",
-    platform: "Selects Steam or non-Steam apps.",
-    "deck compatibility": "Selects apps that have a specific Steam Deck compatibilty status.",
-    "review score": "Selects apps based on their metacritic/steam review score.",
-    "time played": "Selects apps based on your play time.",
-    "size on disk": "Selects apps based on their install size.",
-    "release date": "Selects apps based on their release date.",
-    "last played": "Selects apps based on when they were last played.",
-    demo: "Selects apps that are/aren't demos.",
-    streamable: "Selects apps that can/can't be streamed from another computer."
-  }
 
   useEffect(() => {setTimeout(() => setFocusable(true), 10)}, []);
 
@@ -47,39 +28,41 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
   return (
     <>
       <FilterSelectStyles />
-      <ModalRoot onCancel={() => handleSelect(selected)} onEscKeypress={() => handleSelect(selected)}>
-        <h1
-          style={{
-            marginBlockEnd: "10px",
-            marginBlockStart: "0px",
-            overflowX: "hidden",
-            fontSize: "1.5em",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Change Filter Type
-        </h1>
-        <div className={`tab-master-filter-select ${mainMenuAppRunningClasses.OverlayAchievements}`}>
-          {filterTypeOptions.map((filterType: FilterType) => {
-            return (
-              <Focusable
-                focusWithinClassName="gpfocuswithin"
-                onActivate={focusable || selected === filterType ? () => {} : undefined}
-                style={{ width: "100%", margin: 0, marginBottom: "10px", padding: 0 }}
-                onOKButton={focusable || selected === filterType ? () => handleSelect(filterType) : undefined}
-              >
-                <div
-                  className={achievementClasses.AchievementListItemBase}
-                  style={{ display: "flex", flexDirection: "column", padding: "0.5em", height: "60px" }}
+      <div className={`tab-master-filter-select`}>
+        <ModalRoot onCancel={() => handleSelect(selected)} onEscKeypress={() => handleSelect(selected)}>
+          <h1
+            style={{
+              marginBlockEnd: "10px",
+              marginBlockStart: "0px",
+              overflowX: "hidden",
+              fontSize: "1.5em",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Change Filter Type
+          </h1>
+          <div className={mainMenuAppRunningClasses.OverlayAchievements}>
+            {filterTypeOptions.map((filterType: FilterType) => {
+              return (
+                <Focusable
+                  focusWithinClassName="gpfocuswithin"
+                  onActivate={focusable || selected === filterType ? () => {} : undefined}
+                  style={{ width: "100%", margin: 0, marginBottom: "10px", padding: 0 }}
+                  onOKButton={focusable || selected === filterType ? () => handleSelect(filterType) : undefined}
                 >
-                  <div className="entry-label">{capitalizeEachWord(filterType)}</div>
-                  <div className="entry-desc">{filterDescriptions[filterType]}</div>
-                </div>
-              </Focusable>
-            );
-          })}
-        </div>
-      </ModalRoot>
+                  <div
+                    className={achievementClasses.AchievementListItemBase}
+                    style={{ display: "flex", flexDirection: "column", padding: "0.5em", height: "60px" }}
+                  >
+                    <div className="entry-label">{capitalizeEachWord(filterType)}</div>
+                    <div className="entry-desc">{FilterDescriptions[filterType]}</div>
+                  </div>
+                </Focusable>
+              );
+            })}
+          </div>
+        </ModalRoot>
+      </div>
     </>
   );
 };

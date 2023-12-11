@@ -2,7 +2,7 @@
   "recommendations": [
     "stevencl.adddoccomments",
     "ms-vscode.vscode-typescript-next",
-    "aaron-bond.better-comments",
+    "EdwinHuiSH.better-comments-next",
     "editorconfig.editorconfig",
     "ms-vscode-remote.remote-ssh",
     "ms-vscode.remote-explorer"
