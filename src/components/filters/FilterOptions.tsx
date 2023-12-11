@@ -723,6 +723,23 @@ const StreamableFilterOptions: VFC<FilterOptionsProps<'streamable'>> = ({ index,
 };
 
 /**
+ * The options for a cloud save filter.
+ */
+const SteamCloudFilterOptions: VFC<FilterOptionsProps<'steam cloud'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  function onChange(checked: boolean) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.hasSupport = checked ?? false;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  return (
+    <ToggleField label="Has cloud support?" checked={filter.params.hasSupport} onChange={onChange} />
+  );
+};
+
+/**
  * The options for an individual filter.
  */
 export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
@@ -762,6 +779,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <DemoFilterOptions index={index} filter={filter as TabFilterSettings<'demo'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "streamable":
         return <StreamableFilterOptions index={index} filter={filter as TabFilterSettings<'streamable'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "steam cloud":
+        return <SteamCloudFilterOptions index={index} filter={filter as TabFilterSettings<'steam cloud'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       default:
         return <Fragment />;
     }
