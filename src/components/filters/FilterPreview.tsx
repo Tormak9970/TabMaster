@@ -90,6 +90,10 @@ const StreamableFilterPreview: VFC<FilterPreviewProps<'streamable'>> = ({ filter
   return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.isStreamable ? "yes" : "no"}</div>;
 };
 
+const SteamCloudFilterPreview: VFC<FilterPreviewProps<'steam cloud'>> = ({ filter }) => {
+  return <div className="merge-filter-entry">Has {capitalizeEachWord(filter.type) + ' Support - '}{filter.params.hasSupport ? "yes" : "no"}</div>;
+};
+
 /**
  * Generates the preview data for filters in a merge group.
  */
@@ -130,6 +134,8 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <DemoFilterPreview filter={filter as TabFilterSettings<'demo'>} />;
       case "streamable":
         return <StreamableFilterPreview filter={filter as TabFilterSettings<'streamable'>} />;
+      case "steam cloud":
+        return <SteamCloudFilterPreview filter={filter as TabFilterSettings<'steam cloud'>} />;
       default:
         return <Fragment />;
     }
