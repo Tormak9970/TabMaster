@@ -10,7 +10,7 @@ import {
   showModal
 } from "decky-frontend-lib";
 import React, { VFC, Fragment, useState } from "react";
-import { FaTag, FaTags, FaUser, FaCompactDisc } from "react-icons/fa6";
+import { FaTag, FaTags, FaUser, FaCompactDisc, FaListCheck, FaSteam } from "react-icons/fa6";
 import { FaUserFriends, FaQuestionCircle } from "react-icons/fa";
 import { MdApps } from "react-icons/md";
 import { IoGameController } from "react-icons/io5";
@@ -27,6 +27,7 @@ import { DateIncludes, DateObj, DatePicker, DateSelection } from '../generic/Dat
 import { EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from '../generic/EnhancedSelector';
 import { IncludeCategories } from "../../lib/Utils";
 import { Slider } from '../generic/Slider';
+import { STEAM_FEATURES_ID_MAP, STEAM_FEATURES_TO_RENDER } from "./SteamFeatures";
 
 type FilterOptionsProps<T extends FilterType> = {
   index: number,
@@ -725,17 +726,29 @@ const StreamableFilterOptions: VFC<FilterOptionsProps<'streamable'>> = ({ index,
 /**
  * The options for a cloud save filter.
  */
-const SteamCloudFilterOptions: VFC<FilterOptionsProps<'steam cloud'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
-  function onChange(checked: boolean) {
+const SteamFeatureFilterOptions: VFC<FilterOptionsProps<'steam features'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  // @ts-ignore
+  const dropdownOptions: DropdownOption[] = STEAM_FEATURES_TO_RENDER.map((featureId: number) => { return { label: STEAM_FEATURES_ID_MAP[featureId.toString()].display_name, data: featureId }; });
+  const selected: DropdownOption[] = filter.params.features.map((featureId: number) => {
+    return {
+      // @ts-ignore
+      label: STEAM_FEATURES_ID_MAP[featureId.toString()].display_name,
+      data: featureId
+    };
+  });
+  const featuresMode = filter.params.mode;
+
+  function onChange(selected: DropdownOption[], mode: LogicalMode) {
     const updatedFilter = { ...filter };
-    updatedFilter.params.hasSupport = checked ?? false;
+    updatedFilter.params.features = selected.map((featureEntry) => featureEntry.data as number);
+    updatedFilter.params.mode = mode;
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
     setContainingGroupFilters(updatedFilters);
   }
 
-  return (
-    <ToggleField label="Has cloud support?" checked={filter.params.hasSupport} onChange={onChange} />
+  return ( 
+    <ModeMultiSelect fieldLabel="Selected Features" dropdownLabel="Add a feature" mode={featuresMode} options={dropdownOptions} selected={selected} onChange={onChange} entryLabel="Features" EntryIcon={FaSteam} TriggerIcon={FaListCheck} />
   );
 };
 
@@ -779,8 +792,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <DemoFilterOptions index={index} filter={filter as TabFilterSettings<'demo'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "streamable":
         return <StreamableFilterOptions index={index} filter={filter as TabFilterSettings<'streamable'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
-      case "steam cloud":
-        return <SteamCloudFilterOptions index={index} filter={filter as TabFilterSettings<'steam cloud'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "steam features":
+        return <SteamFeatureFilterOptions index={index} filter={filter as TabFilterSettings<'steam features'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       default:
         return <Fragment />;
     }

@@ -90,8 +90,8 @@ const StreamableFilterPreview: VFC<FilterPreviewProps<'streamable'>> = ({ filter
   return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.isStreamable ? "yes" : "no"}</div>;
 };
 
-const SteamCloudFilterPreview: VFC<FilterPreviewProps<'steam cloud'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">Has {capitalizeEachWord(filter.type) + ' Support - '}{filter.params.hasSupport ? "yes" : "no"}</div>;
+const SteamFeaturesFilterPreview: VFC<FilterPreviewProps<'steam features'>> = ({ filter }) => {
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.features.length} {filter.params.features.length == 1 ? "feature" : "features"}{filter.inverted ? " (inverted)" : ""}</div>;
 };
 
 /**
@@ -134,8 +134,8 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <DemoFilterPreview filter={filter as TabFilterSettings<'demo'>} />;
       case "streamable":
         return <StreamableFilterPreview filter={filter as TabFilterSettings<'streamable'>} />;
-      case "steam cloud":
-        return <SteamCloudFilterPreview filter={filter as TabFilterSettings<'steam cloud'>} />;
+      case "steam features":
+        return <SteamFeaturesFilterPreview filter={filter as TabFilterSettings<'steam features'>} />;
       default:
         return <Fragment />;
     }
