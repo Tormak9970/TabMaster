@@ -1,10 +1,11 @@
 import { Fragment, VFC, useEffect, useState } from "react";
 import { Focusable, ModalRoot, showModal } from "decky-frontend-lib";
-import { FilterDefaultParams, FilterDescriptionSubLabels, FilterDescriptions, FilterType, isFilterDisabled } from "./Filters";
+import { FilterDefaultParams, FilterDescriptions, FilterType } from "./Filters";
 import { capitalizeEachWord } from "../../lib/Utils";
 import { FilterSelectStyles, achievementClasses, mainMenuAppRunningClasses } from "../styles/FilterSelectionStyles";
 import { CustomButton } from '../generic/CustomButton';
 import { IoFilter } from 'react-icons/io5'
+import { MicroSDeckInterop, microSDeckLibVersion } from '../../lib/controllers/MicroSDeckInterop';
 
 interface FilterSelectModalProps {
   selectedOption: FilterType,
@@ -42,13 +43,11 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
         </h1>
         <div className={`tab-master-filter-select ${mainMenuAppRunningClasses.OverlayAchievements}`}>
           {filterTypeOptions.map((filterType: FilterType) => {
-            const disabled = isFilterDisabled(filterType);
 
             return (
               <FilterSelectElement
-                disabled={disabled}
                 filterType={filterType}
-                focusable={(focusable || selected === filterType) && !disabled}
+                focusable={focusable || selected === filterType}
                 onClick={() => handleSelect(filterType)}
               />
             );
@@ -61,7 +60,6 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
 
 interface FilterSelectElement {
   filterType: FilterType,
-  disabled: boolean,
   focusable: boolean,
   onClick: (() => void) | undefined;
 }
@@ -69,16 +67,23 @@ interface FilterSelectElement {
 /**
  * Individual Filter in the filter selection Modal
  */
-const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, disabled, focusable, onClick }) => {
-
-  const subLabel = FilterDescriptionSubLabels[filterType];
+const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, focusable, onClick }) => {
+  let disabled = false;
+  let requiredMicroSDeckVer = '';
+  if (filterType === 'sd card') {
+    disabled = !MicroSDeckInterop.isInstallOk();
+    const [major, minor, patch] = microSDeckLibVersion.split(/[.+-]/, 3);
+    if (+major > 0) requiredMicroSDeckVer = major + '.x.x';
+    if (+major === 0) requiredMicroSDeckVer = `0.${minor}.${patch}`;
+  }
+  const canFocus = focusable && !disabled;
 
   return (
     <Focusable
       focusWithinClassName="gpfocuswithin"
       style={{ width: "100%", margin: 0, marginBottom: "10px", padding: 0 }}
-      onActivate={focusable ? onClick : undefined}
-      onClick={focusable ? onClick : undefined}
+      onActivate={canFocus ? onClick : undefined}
+      onClick={canFocus ? onClick : undefined}
     >
       <div
         className={`${achievementClasses.AchievementListItemBase} ${disabled && "entry-disabled"}`}
@@ -86,7 +91,7 @@ const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, disabled, f
       >
         <div className="entry-label">
           {capitalizeEachWord(filterType)}
-          {subLabel && <small style={{ marginLeft: "0.5em", fontSize: "0.5em" }}>{subLabel}</small>}
+          {filterType === 'sd card' && <small style={{ marginLeft: "0.5em", fontSize: "0.5em" }}>{`requires MicroSDeck ${requiredMicroSDeckVer}`}</small>}
         </div>
         <div className="entry-desc">{FilterDescriptions[filterType]}</div>
       </div>

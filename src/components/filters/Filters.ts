@@ -90,9 +90,6 @@ export const FilterDescriptions: { [filterType in FilterType]: string } = {
   "sd card": "Selects apps that are present on the inserted/ specific MicroSD Card",
 }
 
-export const FilterDescriptionSubLabels: {[key in FilterType]?: string} = {
-  "sd card": "(requires MicroSDeck plugin)"
-}
 
 /**
  * Define the deafult params for a filter type here
@@ -118,21 +115,6 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "streamable": { isStreamable: true },
   "sd card": { card: undefined },
 };
-
-
-/**
- * Whether the filter is disabled (cannot be selected or run)
- * @param filter The filter to check.
- * @returns True if the filter should be considered disabled
- */
-export function isFilterDisabled(filter: FilterType): boolean {
-  switch (filter) {
-    case "sd card":
-      return !MicroSDeckInterop.isInstallOk();
-    default:
-      return false;
-  }
-}
 
 
 /**
@@ -308,10 +290,10 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       const cardFilter = filter as TabFilterSettings<'sd card'>;
 
       let passed = true;
-      if (MicroSDeckInterop.isInstallOk() && cardFilter.params.card) {
-        const cardsAndGames = window.MicroSDeck?.CardsAndGames || [];
+      if (MicroSDeckInterop.isInstallOk() && window.MicroSDeck!.Enabled && cardFilter.params.card) {
+        const cardsAndGames = window.MicroSDeck!.CardsAndGames || [];
 
-        if (!cardsAndGames?.find(([card]) => cardFilter.params.card === card.uid)) {
+        if (!cardsAndGames.find(([card]) => cardFilter.params.card === card.uid)) {
           passed = false;
         }
       }

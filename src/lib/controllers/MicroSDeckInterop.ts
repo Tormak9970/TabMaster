@@ -103,8 +103,8 @@ export class MicroSDeckInterop {
    * @returns MicroSDeckInstallState
    */
   private static checkVersion() {
-    const [pluginVerMajor, pluginVerMinor, pluginVerPatch] = window.MicroSDeck!.Version.split(/[.+-]/).map(str => parseInt(str));
-    const [libVerMajor, libVerMinor, libVerPatch] = microSDeckLibVersion.split(/[.+-]/).map(str => parseInt(str));
+    const [pluginVerMajor, pluginVerMinor, pluginVerPatch] = window.MicroSDeck!.Version.split(/[.+-]/, 3).map(str => +str);
+    const [libVerMajor, libVerMinor, libVerPatch] = microSDeckLibVersion.split(/[.+-]/, 3).map(str => +str);
 
     if (isNaN(pluginVerMajor) || isNaN(pluginVerMinor) || isNaN(pluginVerPatch) || isNaN(libVerMajor) || isNaN(libVerMinor) || isNaN(libVerPatch)) return MicroSDeckInstallState['ver unknown'];
     if (pluginVerMajor === 0 && libVerMajor === 0) {

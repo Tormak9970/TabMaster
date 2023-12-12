@@ -41,6 +41,7 @@ import { PresetMenu } from './components/menus/PresetMenu';
 import { MicroSDeck } from "@cebbinghaus/microsdeck";
 import { MicroSDeckInstallState, MicroSDeckInterop, microSDeckLibVersion } from './lib/controllers/MicroSDeckInterop';
 import { MicroSDeckNotice } from './components/MicroSDeckNotice';
+import { CustomTabContainer } from './components/CustomTabContainer';
 
 declare global {
   let DeckyPluginLoader: { pluginReloadQueue: { name: string; version?: string; }[]; };
@@ -71,6 +72,7 @@ const Content: VFC<{}> = ({ }) => {
 
   const microSDeckInstallState = MicroSDeckInterop.getInstallState();
   const isMicroSDeckInstalled =  microSDeckInstallState === MicroSDeckInstallState['good'];
+  const hasSdTabs = !!visibleTabsList.find(tabContainer => (tabContainer as CustomTabContainer).dependsOnMicroSDeck);
 
   function TabEntryInteractables({ entry }: TabEntryInteractablesProps) {
     const tabContainer = tabsMap.get(entry.data!.id)!;
@@ -122,7 +124,7 @@ const Content: VFC<{}> = ({ }) => {
           for support.
         </div>
       </div>}
-      {!isMicroSDeckInstalled && !microSDeckNoticeHidden && (
+      {hasSdTabs && !isMicroSDeckInstalled && !microSDeckNoticeHidden && (
         <div className='notice-field-cont' style={{ paddingBottom: '10px' }}>
           <Field>
             <MicroSDeckNotice intallState={microSDeckInstallState} pluginVersion={window.MicroSDeck?.Version ?? ''} libVersion={microSDeckLibVersion} style={{ margin: '8px', fontSize: '11px' }} />
@@ -201,7 +203,7 @@ const Content: VFC<{}> = ({ }) => {
             )
           }
         </PanelSection>
-        {!isMicroSDeckInstalled && microSDeckNoticeHidden && (
+        {hasSdTabs && !isMicroSDeckInstalled && microSDeckNoticeHidden && (
           <Focusable onActivate={() => { }}>
             <MicroSDeckNotice intallState={microSDeckInstallState} pluginVersion={window.MicroSDeck?.Version ?? ''} libVersion={microSDeckLibVersion} style={{ margin: '8px', fontSize: '11px' }} />
           </Focusable>
