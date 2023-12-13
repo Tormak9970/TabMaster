@@ -84,6 +84,8 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                   pacthedTabs = tablist.flatMap((tabContainer) => {
                     if (tabContainer.filters) {
                       const footer = { ...(tabTemplate!.footer ?? {}), onMenuButton: getShowMenu(tabContainer.id, tabMasterManager), onMenuActionDescription: 'Tab Master' };
+                      
+                      if ((tabContainer as CustomTabContainer).autoHide && (tabContainer as CustomTabContainer).collection.visibleApps.length === 0) return [];
                       return (tabContainer as CustomTabContainer).getActualTab(tabContentComponent, sortingProps, footer, collectionsAppFilterGamepad);
                     } else {
                       return tabs.find(actualTab => {

@@ -104,6 +104,15 @@ export const ModalStyles: VFC<{}> = ({}) => {
         display: flex; 
         justify-content: space-between;
       }
+
+      .autohide-toggle-container .${gamepadDialogClasses.Field} {
+        padding: 10px calc(28px + 1.4vw);
+      }
+
+      .autohide-toggle-container .${gamepadDialogClasses.FieldLabel} {
+        color: #8b929a;
+        font-size: 12px;
+      }
     `}</style>
   );
 }
