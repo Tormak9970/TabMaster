@@ -20,31 +20,24 @@ const FilterSelectModal: VFC<BaseModalProps> = ({ rgOptions, selectedOption, onS
   return (
     <>
       <FilterSelectStyles />
-      <ModalRoot onCancel={closeModal} onEscKeypress={closeModal}>
-        <h1
-          style={{
-            marginBlockEnd: "10px",
-            marginBlockStart: "0px",
-            overflowX: "hidden",
-            fontSize: "1.5em",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Change Filter Type
-        </h1>
-        <div className={`tab-master-filter-select ${mainMenuAppRunningClasses.OverlayAchievements}`}>
-          {rgOptions?.map((option) => {
-
-            return (
-              <FilterSelectElement
-                filterType={option.data}
-                focusable={focusable || selectedOption === option.data}
-                onClick={() => handleSelect(option)}
-              />
-            );
-          })}
-        </div>
-      </ModalRoot>
+      <div className={`tab-master-filter-select`}>
+        <ModalRoot onCancel={closeModal} onEscKeypress={closeModal}>
+          <h1
+            style={{
+              marginBlockEnd: "10px",
+              marginBlockStart: "0px",
+              overflowX: "hidden",
+              fontSize: "1.5em",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Change Filter Type
+          </h1>
+          <div className={mainMenuAppRunningClasses.OverlayAchievements}>
+            {rgOptions?.map(option => <FilterSelectElement filterType={option.data} onClick={() => handleSelect(option)} focusable={focusable || selectedOption === option.data} />)}
+          </div>
+        </ModalRoot>
+      </div>
     </>
   );
 };

@@ -10,7 +10,7 @@ import {
   showModal
 } from "decky-frontend-lib";
 import React, { VFC, Fragment, useState, useMemo } from "react";
-import { FaTag, FaTags, FaUser, FaCompactDisc } from "react-icons/fa6";
+import { FaTag, FaTags, FaUser, FaCompactDisc, FaListCheck, FaSteam } from "react-icons/fa6";
 import { FaUserFriends, FaQuestionCircle } from "react-icons/fa";
 import { MdApps } from "react-icons/md";
 import { IoGameController } from "react-icons/io5";
@@ -27,6 +27,7 @@ import { DateIncludes, DateObj, DatePicker, DateSelection } from '../generic/Dat
 import { EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from '../generic/EnhancedSelector';
 import { IncludeCategories } from "../../lib/Utils";
 import { Slider } from '../generic/Slider';
+import { STEAM_FEATURES_ID_MAP, STEAM_FEATURES_TO_RENDER } from "./SteamFeatures";
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 
 type FilterOptionsProps<T extends FilterType> = {
@@ -187,7 +188,7 @@ const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({ index, s
   for (const gameid of filter.params.games) {
     const game = appsList.find((game) => game.appid === gameid);
 
-    if (game) selected.push({ label: game.display_name, data: gameid });
+    if (game) selected.push({ label: game.display_name, data: { appid: game.appid, appType: game.app_type } });
   }
 
   const dropdownOptions: DropdownOption[] = appsList.map((game: SteamAppOverview) => { return { label: game.display_name, data: { appid: game.appid, appType: game.app_type } }; });
@@ -220,7 +221,7 @@ const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({ index, s
   for (const gameid of filter.params.games) {
     const game = appsList.find((game) => game.appid === gameid);
 
-    if (game) selected.push({ label: game.display_name, data: gameid });
+    if (game) selected.push({ label: game.display_name, data: { appid: game.appid, appType: game.app_type } });
   }
 
   const dropdownOptions: DropdownOption[] = appsList.map((game: SteamAppOverview) => { return { label: game.display_name, data: { appid: game.appid, appType: game.app_type } }; });
@@ -724,6 +725,35 @@ const StreamableFilterOptions: VFC<FilterOptionsProps<'streamable'>> = ({ index,
 };
 
 /**
+ * The options for a cloud save filter.
+ */
+const SteamFeatureFilterOptions: VFC<FilterOptionsProps<'steam features'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  // @ts-ignore
+  const dropdownOptions: DropdownOption[] = STEAM_FEATURES_TO_RENDER.map((featureId: number) => { return { label: STEAM_FEATURES_ID_MAP[featureId.toString()].display_name, data: featureId }; });
+  const selected: DropdownOption[] = filter.params.features.map((featureId: number) => {
+    return {
+      // @ts-ignore
+      label: STEAM_FEATURES_ID_MAP[featureId.toString()].display_name,
+      data: featureId
+    };
+  });
+  const featuresMode = filter.params.mode;
+
+  function onChange(selected: DropdownOption[], mode: LogicalMode) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.features = selected.map((featureEntry) => featureEntry.data as number);
+    updatedFilter.params.mode = mode;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  return ( 
+    <ModeMultiSelect fieldLabel="Selected Features" dropdownLabel="Add a feature" mode={featuresMode} options={dropdownOptions} selected={selected} onChange={onChange} entryLabel="Features" EntryIcon={FaSteam} TriggerIcon={FaListCheck} />
+  );
+};
+
+/**
  * The options for an sd card filter
  */
 const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
@@ -796,6 +826,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <DemoFilterOptions index={index} filter={filterCopy as TabFilterSettings<'demo'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "streamable":
         return <StreamableFilterOptions index={index} filter={filterCopy as TabFilterSettings<'streamable'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "steam features":
+        return <SteamFeatureFilterOptions index={index} filter={filterCopy as TabFilterSettings<'steam features'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "sd card":
         return <SDCardFilterOptions index={index} filter={filterCopy as TabFilterSettings<'sd card'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       default:

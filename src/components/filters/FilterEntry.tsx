@@ -1,21 +1,22 @@
 import { Fragment, VFC, useState } from "react";
 import { FilterDefaultParams, FilterType, TabFilterSettings, canBeInverted } from "./Filters";
-import { DialogButton, Dropdown, Focusable, afterPatch } from "decky-frontend-lib";
-import { FaTrash } from "react-icons/fa";
+import { Dropdown, Focusable, afterPatch } from "decky-frontend-lib";
 import { FilterSelect } from "./FilterSelect";
+import { TrashButton } from '../generic/TrashButton';
 
 type FilterEntryProps = {
   index: number,
   filter: TabFilterSettings<FilterType>,
   containingGroupFilters: TabFilterSettings<FilterType>[],
   setContainingGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>,
+  onFilterDelete(index: number): void,
   shouldFocus: boolean
 };
 
 /**
  * An individual filter for a tab.
  */
-export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGroupFilters, setContainingGroupFilters, shouldFocus }) => {
+export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGroupFilters, setContainingGroupFilters, onFilterDelete, shouldFocus }) => {
   const invertOptions = [
     {
       label: "default",
@@ -54,11 +55,11 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
   function onDelete() {
     const updatedFilters = [...containingGroupFilters];
     updatedFilters.splice(index, 1);
+    onFilterDelete(index);
     setContainingGroupFilters(updatedFilters);
   }
 
   if (filter) {
-
     const filterTypeDropdownElt = (
       <Focusable style={!canBeInverted(filter) ? { width: "calc(100% - 55px)" } : { width: "calc(100% - 185px)" }}>
         <FilterSelect selectedOption={filter.type} onChange={onChange} />
@@ -95,9 +96,7 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
             marginLeft: "10px",
             width: "45px"
           }}>
-            <DialogButton onClick={onDelete} style={{ minWidth: "45px", padding: '10px 16px', minHeight: '40px', display: 'flex' }}>
-              <FaTrash style={{ margin: 'auto', height: '.9em' }}/>
-            </DialogButton>
+            <TrashButton onClick={onDelete} />
           </Focusable>
         </Focusable>
       </div>

@@ -60,58 +60,60 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
   };
 
   return (
-    <ModalRoot onCancel={closeModal} onEscKeypress={closeModal}>
+    <div className="tab-master-list-search-modal">
       <ListSearchModalStyles />
-      <DialogBody className="tab-master-list-search-modal">
-        <DialogControlsSection>
-          <Focusable flow-children="right" style={{ display: "flex" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minWidth: "unset",
-                width: "40px",
-                borderRadius: "unset",
-                margin: "0",
-                padding: "10px",
-                paddingLeft: "0px"
-              }}
-            >
-              <FaMagnifyingGlass />
-            </div>
-            <div style={{ width: "100%" }}>
-              <TextField
-                value={query}
-                onChange={(e) => { setQuery(e.target.value); }}
-                style={{ height: "100%" }}
-              />
-            </div>
-          </Focusable>
-        </DialogControlsSection>
-        <DialogControlsSection style={{ marginTop: "1em" }}>
-          <PanelSection title={`${entryLabel} - ${filteredList.length}`}>
-            <Focusable
-              style={{ display: "flex", gap: "4px", flexDirection: "column", height: "48.7vh", overflow: "scroll" }}
-            >
-              <AutoSizer>
-                {/* @ts-ignore */}
-                {({ height, width }) => (
-                  <List
-                    width={width}
-                    height={height}
-                    itemCount={filteredList.length}
-                    itemSize={44}
-                  >
-                    {ListEntry}
-                  </List>
-                )}
-              </AutoSizer>
+      <ModalRoot onCancel={closeModal} onEscKeypress={closeModal}>
+        <DialogBody>
+          <DialogControlsSection>
+            <Focusable flow-children="right" style={{ display: "flex" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: "unset",
+                  width: "40px",
+                  borderRadius: "unset",
+                  margin: "0",
+                  padding: "10px",
+                  paddingLeft: "0px"
+                }}
+              >
+                <FaMagnifyingGlass />
+              </div>
+              <div style={{ width: "100%" }}>
+                <TextField
+                  value={query}
+                  onChange={(e) => { setQuery(e.target.value); }}
+                  style={{ height: "100%" }}
+                />
+              </div>
             </Focusable>
-          </PanelSection>
-        </DialogControlsSection>
-      </DialogBody>
-    </ModalRoot>
+          </DialogControlsSection>
+          <DialogControlsSection style={{ marginTop: "1em" }}>
+            <PanelSection title={`${entryLabel} - ${filteredList.length}`}>
+              <Focusable
+                style={{ display: "flex", gap: "4px", flexDirection: "column", height: "48.7vh", overflow: "scroll" }}
+              >
+                <AutoSizer>
+                  {/* @ts-ignore */}
+                  {({ height, width }) => (
+                    <List
+                      width={width}
+                      height={height}
+                      itemCount={filteredList.length}
+                      itemSize={44}
+                    >
+                      {ListEntry}
+                    </List>
+                  )}
+                </AutoSizer>
+              </Focusable>
+            </PanelSection>
+          </DialogControlsSection>
+        </DialogBody>
+      </ModalRoot>
+    </div>
   );
 };
 

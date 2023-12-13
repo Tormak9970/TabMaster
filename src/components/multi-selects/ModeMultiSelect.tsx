@@ -6,18 +6,29 @@ import { MultiSelectProps } from "./MultiSelect";
 import { ListSearchTrigger } from "../modals/ListSearchModal";
 import { IconType } from "react-icons/lib";
 
-export interface ModeMultiSelectProps extends Omit<MultiSelectProps, 'onChange' | 'determineEntryIcon'> {
+interface ModeMultiSelectPropsGeneric extends Omit<MultiSelectProps, 'onChange' | 'determineEntryIcon'> {
   entryLabel: string,
   mode: LogicalMode,
-  EntryIcon: IconType,
   TriggerIcon: IconType,
   onChange?: (selected:DropdownOption[], mode: LogicalMode) => void
 }
 
+interface ModeMultiSelectPropsDetermined extends ModeMultiSelectPropsGeneric {
+  determineEntryIcon: (entry: any) => IconType,
+  EntryIcon?: never
+}
+
+interface ModeMultiSelectPropsStatic extends ModeMultiSelectPropsGeneric {
+  EntryIcon: IconType,
+  determineEntryIcon?: never
+}
+
+export type ModeMultiSelectProps = ModeMultiSelectPropsDetermined | ModeMultiSelectPropsStatic;
+
 /**
  * A component for multi select dropdown menus that supports modes.
  */
-export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps, entryLabel, EntryIcon, TriggerIcon }) => {
+export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, fieldLabel, dropdownLabel, mode = "and", onChange = () => {}, maxOptions, fieldProps, entryLabel, determineEntryIcon, EntryIcon, TriggerIcon }) => {
   const [ sel, setSel ] = useState(selected);
   const [ available, setAvailable ] = useState(options.filter((opt) => !selected.includes(opt)));
   const [ innerMode, setInnerMode ] = useState(mode);
@@ -48,7 +59,7 @@ export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, f
 
   const onModeChange = (option: DropdownOption) => {
     setInnerMode(option.data);
-    onChange(sel, innerMode);
+    onChange(sel, option.data);
   }
 
   const onSelectedChange = (option: DropdownOption) => {
@@ -79,7 +90,7 @@ export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, f
                   labelOverride={dropdownSelected.label!}
                   disabled={available.length == 0 || (!!maxOptions && selected.length == maxOptions)}
                   TriggerIcon={TriggerIcon}
-                  determineEntryIcon={() => EntryIcon}
+                  determineEntryIcon={(entry) => { return determineEntryIcon ? determineEntryIcon(entry) : EntryIcon}}
                 />
               </Focusable>
               <Focusable style={{

@@ -90,6 +90,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                       
                       //if MicroSDeck isn't installed don't display any tabs that depend on it; return empty array for flat map
                       if (!isMicroSDeckInstalled && (tabContainer as CustomTabContainer).dependsOnMicroSDeck) return [];
+                      if ((tabContainer as CustomTabContainer).autoHide && (tabContainer as CustomTabContainer).collection.visibleApps.length === 0) return [];
                       return (tabContainer as CustomTabContainer).getActualTab(tabContentComponent, sortingProps, footer, collectionsAppFilterGamepad);
                     } else {
                       return tabs.find(actualTab => {

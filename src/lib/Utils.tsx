@@ -4,6 +4,7 @@ import { Fragment } from 'react';
 import { FaSteam } from 'react-icons/fa6';
 import { FaSdCard } from 'react-icons/fa';
 import { CustomTabContainer } from '../components/CustomTabContainer';
+import { GamepadUIAudio, SFXPath } from './GamepadUIAudio';
 
 /**
  * Waits for a condition to be true.
@@ -235,4 +236,12 @@ export function filtersHaveType(filters: TabFilterSettings<FilterType>[], ...fil
  */
 export function getTabIcon(tabContainer: TabContainer, microSDeckDisabled?: boolean) {
   return tabContainer.filters ? ((tabContainer as CustomTabContainer).dependsOnMicroSDeck ? <FaSdCard fill={microSDeckDisabled ? '#92939b61' : 'currentColor'} /> : <Fragment />) : <FaSteam />
+}
+
+/**
+ * Plays audio url while respecting whether user has ui sounds enabled/ disabled
+ *  @param path Audio url 
+ */
+export function playUISound(path: SFXPath) {
+  if (settingsStore?.m_ClientSettings?.enable_ui_sounds) GamepadUIAudio.AudioPlaybackManager.PlayAudioURL(path);
 }

@@ -28,7 +28,7 @@ export const MultiSelect:VFC<MultiSelectProps> = ({ options, selected, fieldLabe
   const [ dropdownSelected, setDropdownSelected ] = useState({ label: dropdownLabel, data: "" });
 
   useEffect(() => {
-    const avail = options.filter((opt) => !sel.some((selOpt) => selOpt.data === opt.data));
+    const avail = options.filter((opt) => !sel.some((selOpt) => JSON.stringify(selOpt.data) === JSON.stringify(opt.data)));
     setAvailable(avail);
     setDropdownSelected({
       label: avail.length == 0 ? "All selected" : (!!maxOptions && sel.length == maxOptions ? "Max selected" : dropdownLabel) as string,

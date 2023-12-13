@@ -1,5 +1,5 @@
 import { PanelSection, PanelSectionRow, Field, ButtonItem, Dropdown, afterPatch, Focusable } from "decky-frontend-lib";
-import { VFC, Fragment, useMemo, useCallback } from "react";
+import { VFC, Fragment, useRef, useEffect } from "react";
 import { FilterEntry } from "./FilterEntry";
 import { FilterOptions } from "./FilterOptions";
 import { TabFilterSettings, FilterType } from "./Filters";
@@ -22,16 +22,25 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
     { label: "Or", data: "or" }
   ];
 
-  //this sets whether filter entry type dropdown should take focus when being rendered, ie when a filter is added 
-  let shouldFocusFilterDropdown = false;
-  const cb = useCallback((() => {
-    let firstCall = true;
-    return () => firstCall ? firstCall = false : true;
-  })(), []);
-  useMemo(() => shouldFocusFilterDropdown = cb(), [groupFilters.length]);
+  let newFilterWasAdded = useRef(false);
+  let deletedFilterIndex = useRef(-1);
+
+  function onAddFilter(): void {
+    newFilterWasAdded.current = true;
+    addFilter();
+  }
+
+  function onFilterDelete(index: number): void {
+    deletedFilterIndex.current = index;
+  }
+
+  useEffect(() => {
+    if (deletedFilterIndex.current !== -1) deletedFilterIndex.current = -1;
+    if (newFilterWasAdded.current) newFilterWasAdded.current = false;
+  });
 
   const element = (
-    <Focusable>
+    <Focusable style={{ marginTop: '24px' }}>
       <PanelSection title="Filters">
         <PanelSectionRow>
           <Field
@@ -53,16 +62,29 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
                 <FilterSectionAccordion
                   index={index}
                   filter={filter}
-                  isOpen={shouldFocusFilterDropdown ? index === groupFilters.length - 1 : !collapseFilters}
+                  isOpen={(newFilterWasAdded.current ? index === groupFilters.length - 1 : !collapseFilters) || ((deletedFilterIndex.current !== -1) && (deletedFilterIndex.current !== groupFilters.length ? index === deletedFilterIndex.current : index === groupFilters.length - 1))}
                 >
-                  <div className="no-sep">
-                    <Field
-                      label="Filter Type"
-                      description={<FilterEntry index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} shouldFocus={shouldFocusFilterDropdown && index === groupFilters.length - 1} />}
-                    />
-                  </div>
                   <div className="no-sep" key={`${filter.type}`}>
-                    <FilterOptions index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />
+                    <div className="no-sep">
+                      <Field
+                        label="Filter Type"
+                        description={
+                          <FilterEntry
+                            index={index}
+                            filter={filter}
+                            containingGroupFilters={groupFilters}
+                            setContainingGroupFilters={setGroupFilters}
+                            onFilterDelete={onFilterDelete}
+                            // * if a new filter was just added, focus the last filter (the new one).
+                            // * or, if a filter was just deleted, if its the last filter, focus the new last one, otherwise focus the correct one.
+                            shouldFocus={(newFilterWasAdded.current && index === groupFilters.length - 1) || ((deletedFilterIndex.current !== -1) && (deletedFilterIndex.current !== groupFilters.length ? index === deletedFilterIndex.current : index === groupFilters.length - 1))}
+                          />
+                        }
+                      />
+                    </div>
+                    <div className="no-sep">
+                      <FilterOptions index={index} filter={filter} containingGroupFilters={groupFilters} setContainingGroupFilters={setGroupFilters} />
+                    </div>
                   </div>
                 </FilterSectionAccordion>
                 {index == groupFilters.length - 1 ? (
@@ -83,7 +105,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
             ) : (
               <Fragment />
             )}
-            <ButtonItem onClick={addFilter} disabled={!canAddFilter}>
+            <ButtonItem onClick={onAddFilter} disabled={!canAddFilter}>
               Add Filter
             </ButtonItem>
           </div>
@@ -93,8 +115,8 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
   );
 
   if (shouldFocusAddButton) {
-    //wrap the whole panel in a focusable and one shot patch it to grab it's navNode and set focus to it's last child
-    //which is the add filter button
+    // * wrap the whole panel in a focusable and one shot patch it to grab it's navNode and set focus to it's last child
+    // * which is the add filter button
     afterPatch(element.type, 'render', (_: any, ret: any) => {
       setTimeout(() => ret.props.value.BFocusLastChild(3), 1);
       return ret;

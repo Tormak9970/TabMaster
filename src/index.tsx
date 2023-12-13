@@ -11,7 +11,6 @@ import {
   RoutePatch,
   ServerAPI,
   showContextMenu,
-  showModal,
   SidebarNavigation,
   staticClasses,
 } from "decky-frontend-lib";
@@ -32,12 +31,12 @@ import { patchLibrary } from "./patches/LibraryPatch";
 import { patchSettings } from "./patches/SettingsPatch";
 
 import { QamStyles } from "./components/styles/QamStyles";
-import { EditableTabSettings, EditTabModal } from "./components/modals/EditTabModal";
+import { showModalNewTab } from "./components/modals/EditTabModal";
 import { TabActionsButton } from "./components/TabActions";
 import { LogController } from "./lib/controllers/LogController";
 import { DocPage } from "./components/docs/DocsPage";
-import { getTabIcon, IncludeCategories } from "./lib/Utils";
 import { PresetMenu } from './components/menus/PresetMenu';
+import { TabListLabel } from './components/TabListLabel';
 import { MicroSDeck } from "@cebbinghaus/microsdeck";
 import { MicroSDeckInstallState, MicroSDeckInterop, microSDeckLibVersion } from './lib/controllers/MicroSDeckInterop';
 import { MicroSDeckNotice } from './components/MicroSDeckNotice';
@@ -53,6 +52,7 @@ declare global {
   let friendStore: FriendStore;
   //* This casing is correct, idk why it doesn't match the others.
   let securitystore: SecurityStore;
+  let settingsStore: SettingsStore;
 }
 
 export type TabIdEntryType = {
@@ -79,27 +79,9 @@ const Content: VFC<{}> = ({ }) => {
     return (<TabActionsButton {...{ tabContainer, tabMasterManager }} />);
   }
 
-  function onAddClicked() {
-    showModal(
-      <EditTabModal
-        onConfirm={(_: any, tabSettings: EditableTabSettings) => {
-          tabMasterManager.createCustomTab(tabSettings.title, visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode, tabSettings.categoriesToInclude);
-        }}
-        tabFilters={[]}
-        tabMasterManager={tabMasterManager}
-        filtersMode="and"
-        categoriesToInclude={IncludeCategories.games}
-      />
-    );
-  }
-
   const entries = visibleTabsList.map((tabContainer) => {
     return {
-      label:
-        <div className="tab-label-cont">
-          <div className="tab-label">{tabContainer.title}</div>
-          {getTabIcon(tabContainer, !isMicroSDeckInstalled)}
-        </div>,
+      label: <TabListLabel tabContainer={tabContainer} microSDeckDisabled={!isMicroSDeckInstalled} />,
       position: tabContainer.position,
       data: { id: tabContainer.id }
     };
@@ -150,7 +132,7 @@ const Content: VFC<{}> = ({ }) => {
         <Field className="no-sep">
           <Focusable style={{ width: "100%", display: "flex" }}>
             <Focusable className="add-tab-btn" style={{ width: "calc(100% - 50px)" }}>
-              <DialogButton onClick={onAddClicked} onOKActionDescription={'Add Tab'}>
+              <DialogButton onClick={() => showModalNewTab(tabMasterManager)} onOKActionDescription={'Add Tab'}>
                 Add Tab
               </DialogButton>
             </Focusable>
@@ -188,12 +170,7 @@ const Content: VFC<{}> = ({ }) => {
             hiddenTabsList.map(tabContainer =>
               <div className="hidden-tab-btn">
                 <ButtonItem
-                  label={
-                    <div className="tab-label-cont">
-                      <div className="tab-label">{tabContainer.title}</div>
-                      {getTabIcon(tabContainer, !isMicroSDeckInstalled)}
-                    </div>
-                  }
+                  label={<TabListLabel tabContainer={tabContainer} microSDeckDisabled={!isMicroSDeckInstalled} />}
                   onClick={() => tabMasterManager.showTab(tabContainer.id)}
                   onOKActionDescription="Unhide tab"
                 >

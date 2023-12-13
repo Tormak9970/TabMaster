@@ -1,5 +1,4 @@
 import {
-  ButtonItem,
   DialogButton,
   Dropdown,
   DropdownOption,
@@ -12,8 +11,8 @@ import { VFC, Fragment, useState, useContext } from "react";
 import { FilterType, TabFilterSettings } from "../filters/Filters";
 import { FixMergeFilterModal } from "../modals/FixMergeFilterModal";
 import { ErrorPanelTabNameContext } from "../../state/ErrorPanelNameContext";
-import { FaTrash } from "react-icons/fa";
 import { DestructiveModal } from '../generic/DestructiveModal';
+import { TrashButton } from '../generic/TrashButton';
 
 type FilterErrorOptionsProps<T extends FilterType> = {
   isMergeGroup: boolean | undefined,
@@ -57,7 +56,7 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
               marginLeft: "10px",
               width: "45px"
             }}>
-              <DialogButton 
+              <TrashButton 
                 onClick={() => {
                   showModal(
                     <DestructiveModal
@@ -68,12 +67,7 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
                     </DestructiveModal>
                   );
                 }}
-                style={{
-                  minWidth: "45px",
-                  padding: "10px"
-                }}>
-                <FaTrash />
-              </DialogButton>
+              />
             </Focusable>
           </Focusable>
         </div>
@@ -142,7 +136,7 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ isMerg
             marginLeft: "10px",
             width: "45px"
           }}>
-            <ButtonItem
+            <TrashButton
               onClick={() => {
                 showModal(
                   <DestructiveModal
@@ -153,9 +147,7 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ isMerg
                   </DestructiveModal>
                 );
               }}
-            >
-              <FaTrash />
-            </ButtonItem>
+            />
           </Focusable>
         </Focusable>
       </div>
@@ -203,7 +195,7 @@ const SDCardFilterErrorOption: VFC<FilterErrorOptionsProps<'sd card'>> = ({ isMe
               marginLeft: "10px",
               width: "45px"
             }}>
-              <DialogButton 
+              <TrashButton
                 onClick={() => {
                   showModal(
                     <DestructiveModal
@@ -214,12 +206,7 @@ const SDCardFilterErrorOption: VFC<FilterErrorOptionsProps<'sd card'>> = ({ isMe
                     </DestructiveModal>
                   );
                 }}
-                style={{
-                  minWidth: "45px",
-                  padding: "10px"
-                }}>
-                <FaTrash />
-              </DialogButton>
+              />
             </Focusable>
           </Focusable>
         </div>

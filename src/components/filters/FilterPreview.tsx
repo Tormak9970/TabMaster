@@ -91,6 +91,10 @@ const StreamableFilterPreview: VFC<FilterPreviewProps<'streamable'>> = ({ filter
   return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.isStreamable ? "yes" : "no"}</div>;
 };
 
+const SteamFeaturesFilterPreview: VFC<FilterPreviewProps<'steam features'>> = ({ filter }) => {
+  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.features.length} {filter.params.features.length == 1 ? "feature" : "features"}{filter.inverted ? " (inverted)" : ""}</div>;
+};
+
 const SDCardFilterPreview: VFC<FilterPreviewProps<'sd card'>> = ({ filter }) => {
   const isInsertCard = !filter.params.card;
   const card = (MicroSDeckInterop.isInstallOk() && window.MicroSDeck?.CardsAndGames.find(([card]) => card.uid === filter.params.card)?.[0].name) || filter.params.card
@@ -137,6 +141,8 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <DemoFilterPreview filter={filter as TabFilterSettings<'demo'>} />;
       case "streamable":
         return <StreamableFilterPreview filter={filter as TabFilterSettings<'streamable'>} />;
+      case "steam features":
+        return <SteamFeaturesFilterPreview filter={filter as TabFilterSettings<'steam features'>} />;
       case "sd card":
         return <SDCardFilterPreview filter={filter as TabFilterSettings<'sd card'>} />;
       default:

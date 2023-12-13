@@ -3,6 +3,8 @@ import { VFC } from "react";
 
 export const modalMargin = '16px + 2.8vw';
 
+// New modal background should be "radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%)"
+
 /**
  * All css styling for TabMaster's modals.
  */
@@ -11,6 +13,10 @@ export const ModalStyles: VFC<{}> = ({}) => {
     <style>{`
       .tab-master-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
         margin-left: 15px;
+      }
+
+      .tab-master-modal-scope .${gamepadDialogClasses.ModalPosition} > .${gamepadDialogClasses.GamepadDialogContent} {
+        background: radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%);
       }
       
       /* The button item */
@@ -76,10 +82,13 @@ export const ModalStyles: VFC<{}> = ({}) => {
       
       /* Focused styles */
       .tab-master-modal-scope .start-focused {
-        background-color: #3d4450 !important;
+        background-color: rgba(255, 255, 255, 0.15);
+        animation-name: gamepaddialog_ItemFocusAnim-darkGrey_2zfa-;
       }
-      .tab-master-modal-scope .filter-start-cont.start-focused {
-        background-color: #3d4450 !important;
+      .tab-master-modal-scope .highlight-on-focus {
+        animation-duration: .5s;
+        animation-fill-mode: forwards;
+        animation-timing-function: cubic-bezier(0.17, 0.45, 0.14, 0.83);
       }
       .tab-master-modal-scope .filter-start-cont.start-focused .filter-line {
         background: #a9a9a9;
@@ -94,6 +103,15 @@ export const ModalStyles: VFC<{}> = ({}) => {
         margin: 5px;
         display: flex; 
         justify-content: space-between;
+      }
+
+      .autohide-toggle-container .${gamepadDialogClasses.Field} {
+        padding: 10px calc(28px + 1.4vw);
+      }
+
+      .autohide-toggle-container .${gamepadDialogClasses.FieldLabel} {
+        color: #8b929a;
+        font-size: 12px;
       }
     `}</style>
   );
