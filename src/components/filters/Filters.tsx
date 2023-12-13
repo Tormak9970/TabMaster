@@ -1,7 +1,8 @@
 import { PluginController } from "../../lib/controllers/PluginController";
 import { DateIncludes, DateObj } from '../generic/DatePickers';
+import { STEAM_FEATURES_ID_MAP } from "./SteamFeatures";
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo' | 'streamable' | 'steam cloud';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo' | 'streamable' | 'steam features';
 
 export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
@@ -18,23 +19,23 @@ type CollectionFilterParams = {
    */
   collection?: SteamCollection['id'];
 };
-type InstalledFilterParams = { installed: boolean; };
-type RegexFilterParams = { regex: string; };
-type FriendsFilterParams = { friends: number[], mode: LogicalMode; };
-type TagsFilterParams = { tags: number[], mode: LogicalMode; };
-type WhitelistFilterParams = { games: number[]; };
-type BlacklistFilterParams = { games: number[]; };
-type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode; };
-type PlatformFilterParams = { platform: SteamPlatform; };
-type DeckCompatFilterParams = { category: number; };
-type ReviewScoreFilterParams = { scoreThreshold: number, condition: ThresholdCondition, type: ReviewScoreType; };
-type TimePlayedFilterParams = { timeThreshold: number, condition: ThresholdCondition, units: TimeUnit; };
-type SizeOnDiskFilterParams = { gbThreshold: number, condition: ThresholdCondition; };
-type ReleaseDateFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition; };
-type LastPlayedFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition; };
-type DemoFilterParams = { isDemo: boolean; };
-type StreamableFilterParams = { isStreamable: boolean; }
-type SteamCloudFilterParams = { hasSupport: boolean; }
+type InstalledFilterParams = { installed: boolean }
+type RegexFilterParams = { regex: string }
+type FriendsFilterParams = { friends: number[], mode: LogicalMode }
+type TagsFilterParams = { tags: number[], mode: LogicalMode }
+type WhitelistFilterParams = { games: number[] }
+type BlacklistFilterParams = { games: number[] }
+type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode };
+type PlatformFilterParams = { platform: SteamPlatform };
+type DeckCompatFilterParams = { category: number };
+type ReviewScoreFilterParams = { scoreThreshold: number, condition: ThresholdCondition, type: ReviewScoreType }
+type TimePlayedFilterParams = { timeThreshold: number, condition: ThresholdCondition, units: TimeUnit }
+type SizeOnDiskFilterParams = { gbThreshold: number, condition: ThresholdCondition }
+type ReleaseDateFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition }
+type LastPlayedFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition }
+type DemoFilterParams = { isDemo: boolean }
+type StreamableFilterParams = { isStreamable: boolean }
+type SteamFeaturesFilterParams = { features: number[], mode: LogicalMode }
 
 export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
@@ -54,7 +55,7 @@ export type FilterParams<T extends FilterType> =
   T extends 'last played' ? LastPlayedFilterParams :
   T extends 'demo' ? DemoFilterParams :
   T extends 'streamable' ? StreamableFilterParams :
-  T extends 'steam cloud' ? SteamCloudFilterParams :
+  T extends 'steam features' ? SteamFeaturesFilterParams :
   never;
 
 export type TabFilterSettings<T extends FilterType> = {
@@ -87,7 +88,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "last played": { date: undefined, condition: 'above' },
   "demo": { isDemo: true },
   "streamable": { isStreamable: true },
-  "steam cloud": { hasSupport: true }
+  "steam features": { features: [], mode: 'and' }
 }
 
 /**
@@ -111,7 +112,7 @@ export const FilterDescriptions: { [filterType in FilterType]: string } = {
   "last played": "Selects apps based on when they were last played.",
   demo: "Selects apps that are/aren't demos.",
   streamable: "Selects apps that can/can't be streamed from another computer.",
-  "steam cloud": "Selects apps that do/don't have Steam Cloud support."
+  "steam features": "Selects apps that support specific Steam Features."
 }
 
 /**
@@ -127,6 +128,7 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "tags":
     case "merge":
     case "deck compatibility":
+    case "steam features":
       return true;
     case "platform":
     case "installed":
@@ -139,7 +141,6 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "last played":
     case "demo":
     case "streamable":
-    case "steam cloud":
       return false;
   }
 }
@@ -168,6 +169,8 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
     case "release date":
     case "last played":
       return (filter as TabFilterSettings<'release date'>).params.date !== undefined || (filter as TabFilterSettings<'release date'>).params.daysAgo !== undefined;
+    case "steam features":
+      return (filter as TabFilterSettings<'steam features'>).params.features.length !== 0;
     case "installed":
     case "platform":
     case "deck compatibility":
@@ -176,7 +179,6 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
     case "size on disk":
     case "demo":
     case "streamable":
-    case "steam cloud":
       return true;
   }
 }
@@ -199,6 +201,16 @@ export function compatCategoryToLabel(category: number): string {
     default:
       return "";
   }
+}
+
+/**
+ * Gets the label for a provided steam feature.
+ * @param feature The feature to get the label for.
+ * @returns The label of the provided feature.
+ */
+export function steamFeatureToLabel(feature: number): string {
+  // @ts-ignore
+  return STEAM_FEATURES_ID_MAP[feature.toString()]?.display_name ?? "Unkown Steam Feature";
 }
 
 /**
@@ -297,7 +309,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "last played":
     case "demo":
     case "streamable":
-    case "steam cloud":
+    case "steam features":
     default:
       return {
         passed: true,
@@ -440,9 +452,12 @@ export class Filter {
       const isStreamable = appOverview.per_client_data.some((clientData) => clientData.client_name !== "This machine" && clientData.installed);
       return params.isStreamable ? isStreamable : !isStreamable;
     },
-    "steam cloud": (params: FilterParams<'steam cloud'>, appOverview: SteamAppOverview) => {
-      // * 23 is the store category for steam cloud support.
-      return params.hasSupport ? appOverview.store_category.includes(23) : !appOverview.store_category.includes(23);
+    "steam features": (params: FilterParams<'steam features'>, appOverview: SteamAppOverview) => {
+      if (params.mode === "and") {
+        return params.features.every((feature: number) => appOverview.store_category.includes(feature));
+      } else {
+        return params.features.some((feature: number) => appOverview.store_category.includes(feature));
+      }
     }
   };
 
