@@ -14,6 +14,8 @@ export class CustomTabContainer implements TabContainer {
   collection: Collection;
   filtersMode: LogicalMode;
   categoriesToInclude: number;
+  autoHide: boolean;
+  dependsOnMicroSDeck: boolean;
 
   /**
    * Creates a new CustomTabContainer.
@@ -23,14 +25,17 @@ export class CustomTabContainer implements TabContainer {
    * @param filterSettingsList The tab's filters.
    * @param filtersMode boolean operator for top level filters
    * @param categoriesToInclude A bit field of which categories should be included in the tab.
+   * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
    */
-  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number) {
+  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean) {
     this.id = id;
     this.title = title;
     this.position = position;
     this.filters = filterSettingsList;
     this.filtersMode = filtersMode;
     this.categoriesToInclude = categoriesToInclude;
+    this.autoHide = autoHide;
+    this.dependsOnMicroSDeck = false;
 
     //@ts-ignore
     this.collection = {
@@ -47,6 +52,7 @@ export class CustomTabContainer implements TabContainer {
     };
 
     this.buildCollection();
+    this.checkMicroSDeckDependency();
   }
 
   getActualTab(TabContentComponent: TabContentComponent, sortingProps: Omit<TabContentProps, 'collection'>, footer: SteamTab['footer'], collectionAppFilter: any): SteamTab {
@@ -104,12 +110,20 @@ export class CustomTabContainer implements TabContainer {
    * @param updatedTabInfo The updated tab settings.
    */
   update(updatedTabInfo: EditableTabSettings) {
-    const { filters, title, filtersMode, categoriesToInclude } = updatedTabInfo;
-    this.title = title;
-    this.filtersMode = filtersMode;
-    this.categoriesToInclude = categoriesToInclude;
-    this.filters = filters;
+    this.title = updatedTabInfo.title;
+    this.filtersMode = updatedTabInfo.filtersMode;
+    this.categoriesToInclude = updatedTabInfo.categoriesToInclude;
+    this.filters = updatedTabInfo.filters;
+    this.autoHide = updatedTabInfo.autoHide;
     this.buildCollection();
+    this.checkMicroSDeckDependency();
+  }
+
+  /**
+   * Checks and sets whether or not the tab has filters that depend on MicroSDeck plugin.
+   */
+  checkMicroSDeckDependency() {
+    this.dependsOnMicroSDeck = this.containsFilterType('sd card');
   }
 
   /**

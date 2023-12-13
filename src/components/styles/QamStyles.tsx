@@ -80,6 +80,13 @@ export const QamStyles: VFC<{}> = ({}) => {
       .tab-master-scope .no-sep .${(gamepadDialogClasses as any).FieldChildrenWithIcon} {
         width: calc(100% - 10px);
       }
+
+      .tab-master-scope .notice-field-cont .${gamepadDialogClasses.Field} {
+        padding-top: 0;
+      }
+      .tab-master-scope .notice-field-cont .${gamepadDialogClasses.FieldLabel} {
+        display: none;
+      }
     `}</style>
   );
 }

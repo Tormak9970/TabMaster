@@ -12,6 +12,7 @@ import { TabMasterManager } from "../state/TabMasterManager";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { LogController } from "../lib/controllers/LogController";
 import { LibraryMenu } from '../components/menus/LibraryMenu';
+import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
 
 /**
  * Patches the Steam library to allow the plugin to change the tabs.
@@ -36,6 +37,8 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
         tabMasterManager.registerRerenderLibraryHandler(() => setRefresh(!refresh));
         return innerPatch.unpatch();
       });
+
+      const isMicroSDeckInstalled = MicroSDeckInterop.isInstallOk(true);
 
       //* This patch always runs twice
       afterPatch(ret1, "type", (_: Record<string, unknown>[], ret2: ReactElement) => {
@@ -84,6 +87,10 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                   pacthedTabs = tablist.flatMap((tabContainer) => {
                     if (tabContainer.filters) {
                       const footer = { ...(tabTemplate!.footer ?? {}), onMenuButton: getShowMenu(tabContainer.id, tabMasterManager), onMenuActionDescription: 'Tab Master' };
+                      
+                      //if MicroSDeck isn't installed don't display any tabs that depend on it; return empty array for flat map
+                      if (!isMicroSDeckInstalled && (tabContainer as CustomTabContainer).dependsOnMicroSDeck) return [];
+                      if ((tabContainer as CustomTabContainer).autoHide && (tabContainer as CustomTabContainer).collection.visibleApps.length === 0) return [];
                       return (tabContainer as CustomTabContainer).getActualTab(tabContentComponent, sortingProps, footer, collectionsAppFilterGamepad);
                     } else {
                       return tabs.find(actualTab => {
@@ -133,7 +140,8 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
 function getShowMenu(id: string, tabMasterManager: TabMasterManager) {
   return () => {
     let menu: { Hide: () => void };
+    const menuElement = <LibraryMenu selectedTabId={id} tabMasterManager={tabMasterManager} closeMenu={() => menu.Hide()}/>;
     //@ts-ignore
-    menu = showContextMenu(<LibraryMenu selectedTabId={id} tabMasterManager={tabMasterManager} closeMenu={() => menu.Hide()}/>);
+    menu = showContextMenu(menuElement);
   }
 }

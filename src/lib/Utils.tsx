@@ -1,5 +1,9 @@
 import { sleep } from 'decky-frontend-lib';
 import { FilterType, TabFilterSettings } from "../components/filters/Filters";
+import { Fragment } from 'react';
+import { FaSteam } from 'react-icons/fa6';
+import { FaSdCard } from 'react-icons/fa';
+import { CustomTabContainer } from '../components/CustomTabContainer';
 import { GamepadUIAudio, SFXPath } from './GamepadUIAudio';
 
 /**
@@ -211,7 +215,7 @@ export function debounce(func:Function, wait:number, immediate?:boolean) {
 /**
  * Recursive function that checks whether an array of TabFilterSettings contains any filters of a specified type.
  * @param filters The array of TabFilterSettings to check in.
- * @param filterType The filter types to check are included.
+ * @param filterTypes The filter types to check are included.
  * @returns Boolean
  */
 export function filtersHaveType(filters: TabFilterSettings<FilterType>[], ...filterTypes: FilterType[] ) {
@@ -222,6 +226,16 @@ export function filtersHaveType(filters: TabFilterSettings<FilterType>[], ...fil
     }
   }
   return false;
+}
+
+/**
+ * Gets the icon if any that's displayed anywhere tabs are listed.
+ * @param tabContainer The tabContaine to get icon for.
+ * @param microSDeckDisabled Whether or not microSDeck icon should be disabled.
+ * @returns The icon element or a fragment.
+ */
+export function getTabIcon(tabContainer: TabContainer, microSDeckDisabled?: boolean) {
+  return tabContainer.filters ? ((tabContainer as CustomTabContainer).dependsOnMicroSDeck ? <FaSdCard fill={microSDeckDisabled ? '#92939b61' : 'currentColor'} /> : <Fragment />) : <FaSteam />
 }
 
 /**

@@ -1,27 +1,19 @@
 import { Fragment, VFC, useEffect, useState } from "react";
-import { Focusable, ModalRoot, showModal } from "decky-frontend-lib";
+import { Focusable, ModalRoot, SingleDropdownOption } from "decky-frontend-lib";
 import { FilterDefaultParams, FilterDescriptions, FilterType } from "./Filters";
 import { capitalizeEachWord } from "../../lib/Utils";
 import { FilterSelectStyles, achievementClasses, mainMenuAppRunningClasses } from "../styles/FilterSelectionStyles";
-import { CustomButton } from '../generic/CustomButton';
 import { IoFilter } from 'react-icons/io5'
+import { MicroSDeckInterop, microSDeckLibVersion } from '../../lib/controllers/MicroSDeckInterop';
+import { BaseModalProps, CustomDropdown } from '../generic/CustomDropdown';
 
-interface FilterSelectModalProps {
-  selectedOption: FilterType,
-  onSelect: (selected: FilterType) => void,
-  closeModal?: () => void;
-}
+const FilterSelectModal: VFC<BaseModalProps> = ({ rgOptions, selectedOption, onSelectOption, closeModal }) => {
+  const [focusable, setFocusable] = useState(false); //this is to briefly (on modal mount) disable focus on all selections except last selected so it is remebered
 
-const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSelect, closeModal }) => {
-  const [focusable, setFocusable] = useState(false);
-  const [selected, setSelected] = useState<FilterType>(selectedOption);
-  const filterTypeOptions = Object.keys(FilterDefaultParams) as FilterType[];
+  useEffect(() => { setTimeout(() => setFocusable(true), 10) }, []);
 
-  useEffect(() => {setTimeout(() => setFocusable(true), 10)}, []);
-
-  function handleSelect(selectedFilter: FilterType) {
-    setSelected(selectedFilter);
-    onSelect(selectedFilter);
+  function handleSelect(option: SingleDropdownOption) {
+    onSelectOption(option);
     closeModal!();
   }
 
@@ -29,7 +21,7 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
     <>
       <FilterSelectStyles />
       <div className={`tab-master-filter-select`}>
-        <ModalRoot onCancel={() => handleSelect(selected)} onEscKeypress={() => handleSelect(selected)}>
+        <ModalRoot onCancel={closeModal} onEscKeypress={closeModal}>
           <h1
             style={{
               marginBlockEnd: "10px",
@@ -42,24 +34,7 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
             Change Filter Type
           </h1>
           <div className={mainMenuAppRunningClasses.OverlayAchievements}>
-            {filterTypeOptions.map((filterType: FilterType) => {
-              return (
-                <Focusable
-                  focusWithinClassName="gpfocuswithin"
-                  onActivate={focusable || selected === filterType ? () => {} : undefined}
-                  style={{ width: "100%", margin: 0, marginBottom: "10px", padding: 0 }}
-                  onOKButton={focusable || selected === filterType ? () => handleSelect(filterType) : undefined}
-                >
-                  <div
-                    className={achievementClasses.AchievementListItemBase}
-                    style={{ display: "flex", flexDirection: "column", padding: "0.5em", height: "60px" }}
-                  >
-                    <div className="entry-label">{capitalizeEachWord(filterType)}</div>
-                    <div className="entry-desc">{FilterDescriptions[filterType]}</div>
-                  </div>
-                </Focusable>
-              );
-            })}
+            {rgOptions?.map(option => <FilterSelectElement filterType={option.data} onClick={() => handleSelect(option)} focusable={focusable || selectedOption === option.data} />)}
           </div>
         </ModalRoot>
       </div>
@@ -67,16 +42,46 @@ const FilterSelectModal: VFC<FilterSelectModalProps> = ({ selectedOption, onSele
   );
 };
 
-async function getFilterSelection(selectedOption: FilterType): Promise<FilterType> {
-  return new Promise<FilterType>((resolve) => {
-    showModal(
-      <FilterSelectModal selectedOption={selectedOption} onSelect={(filterType: FilterType) => {
-        resolve(filterType);
-      }} />
-    )
-  });
+interface FilterSelectElement {
+  filterType: FilterType,
+  focusable: boolean,
+  onClick: (() => void) | undefined;
 }
 
+/**
+ * Individual Filter in the filter selection Modal
+ */
+const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, focusable, onClick }) => {
+  let disabled = false;
+  let requiredMicroSDeckVer = '';
+  if (filterType === 'sd card') {
+    disabled = !MicroSDeckInterop.isInstallOk();
+    const [major, minor, patch] = microSDeckLibVersion.split(/[.+-]/, 3);
+    if (+major > 0) requiredMicroSDeckVer = major + '.x.x';
+    if (+major === 0) requiredMicroSDeckVer = `0.${minor}.${patch}`;
+  }
+  const canFocus = focusable && !disabled;
+
+  return (
+    <Focusable
+      focusWithinClassName="gpfocuswithin"
+      style={{ width: "100%", margin: 0, marginBottom: "10px", padding: 0 }}
+      onActivate={canFocus ? onClick : undefined}
+      onClick={canFocus ? onClick : undefined}
+    >
+      <div
+        className={`${achievementClasses.AchievementListItemBase} ${disabled && "entry-disabled"}`}
+        style={{ display: "flex", flexDirection: "column", padding: "0.5em", height: "60px" }}
+      >
+        <div className="entry-label">
+          {capitalizeEachWord(filterType)}
+          {filterType === 'sd card' && <small style={{ marginLeft: "0.5em", fontSize: "0.5em" }}>{`requires MicroSDeck ${requiredMicroSDeckVer}`}</small>}
+        </div>
+        <div className="entry-desc">{FilterDescriptions[filterType]}</div>
+      </div>
+    </Focusable>
+  );
+}
 
 type FilterSelectProps = {
   selectedOption: FilterType,
@@ -87,26 +92,15 @@ type FilterSelectProps = {
  * Component for handling filter selection.
  */
 export const FilterSelect: VFC<FilterSelectProps> = ({ selectedOption, onChange }) => {
-  const [selected, setSelected] = useState<FilterType>(selectedOption);
-
-  async function showFilterSelection() {
-    const chosenFilter = await getFilterSelection(selected);
-    setSelected(chosenFilter);
-    onChange(chosenFilter);
-  }
+  const filterTypeOptions = Object.keys(FilterDefaultParams).map(filterType => ({ label: capitalizeEachWord(filterType), data: filterType}));
 
   return (
-    <CustomButton style={{ padding: '10px 16px' }} onOKActionDescription={"Change Filter Type"} onOKButton={showFilterSelection} onClick={showFilterSelection}>
-      <div style={{ display: 'flex', overflow: 'hidden' }}>
-        <div style={{ overflow: 'hidden', flex: 'auto' }}>
-          <div style={{ textAlign: 'left', minHeight: '20px' }}>
-            {capitalizeEachWord(selected)}
-          </div>
-        </div>
-        <div style={{ display: 'flex', marginLeft: '1ch', flex: 'none' }}>
-          <IoFilter style={{ margin: 'auto', height: '.9em' }} />
-        </div>
-      </div>
-    </CustomButton>
+    <CustomDropdown
+      useCustomModal={FilterSelectModal}
+      customDropdownIcon={<IoFilter style={{ margin: 'auto', height: '.9em' }} />}
+      onChange={option => option.data !== selectedOption && onChange(option.data)}
+      selectedOption={selectedOption}
+      rgOptions={filterTypeOptions}
+    />
   );
 };

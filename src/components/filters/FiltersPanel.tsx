@@ -40,7 +40,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({ groupFilters, groupLogicM
   });
 
   const element = (
-    <Focusable>
+    <Focusable style={{ marginTop: '24px' }}>
       <PanelSection title="Filters">
         <PanelSectionRow>
           <Field

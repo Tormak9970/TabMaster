@@ -9,7 +9,7 @@ import {
   ToggleField,
   showModal
 } from "decky-frontend-lib";
-import React, { VFC, Fragment, useState } from "react";
+import React, { VFC, Fragment, useState, useMemo } from "react";
 import { FaTag, FaTags, FaUser, FaCompactDisc, FaListCheck, FaSteam } from "react-icons/fa6";
 import { FaUserFriends, FaQuestionCircle } from "react-icons/fa";
 import { MdApps } from "react-icons/md";
@@ -28,6 +28,7 @@ import { EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from 
 import { IncludeCategories } from "../../lib/Utils";
 import { Slider } from '../generic/Slider';
 import { STEAM_FEATURES_ID_MAP, STEAM_FEATURES_TO_RENDER } from "./SteamFeatures";
+import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 
 type FilterOptionsProps<T extends FilterType> = {
   index: number,
@@ -72,7 +73,7 @@ const CollectionFilterOptions: VFC<FilterOptionsProps<'collection'>> = ({ index,
   return (
     <Field
       label="Selected Collection"
-      description={<Dropdown rgOptions={collectionDropdownOptions} selectedOption={(filter as TabFilterSettings<'collection'>).params.id} onChange={onChange} />}
+      description={<Dropdown rgOptions={collectionDropdownOptions} selectedOption={filter.params.id} onChange={onChange} />}
     />
   );
 };
@@ -167,7 +168,7 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({ index, setContaini
     setContainingGroupFilters(updatedFilters);
   }
 
-  return ( 
+  return (
     <ModeMultiSelect fieldLabel="Selected Tags" dropdownLabel="Add a tag" mode={tagsMode} options={dropdownOptions} selected={selected} onChange={onChange} entryLabel="Tags" EntryIcon={FaTag} TriggerIcon={FaTags} />
   );
 };
@@ -247,7 +248,7 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
     filters: [...filter.params.filters],
     mode: filter.params.mode,
   }
-  
+
   const [isEditing, setIsEditing] = useState<boolean>(filter.params.filters.length !== 0);
   const [mergeParams, setMergeParams] = useState<TabFilterSettings<'merge'>['params']>(initialParams);
 
@@ -551,27 +552,27 @@ const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ ind
     <Field label={`Released ${byDaysAgo ? `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${thresholdType === 'above' ? 'later' : 'earlier'}` : `${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}`}
       description={
         <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-          {byDaysAgo ? 
-          <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange}/> :
-          <DatePicker
-            focusDropdowns={true}
-            modalType='simple'
-            buttonContainerStyle={{ flex: 1 }}
-            onChange={onDateChange}
-            dateIncludes={dateIncludes}
-            selectedDate={date}
-            toLocaleStringOptions={{ dateStyle: 'long' }}
-            animate={true}
-            transparencyMode={EnhancedSelectorTransparencyMode.selection}
-            focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
-          />}
+          {byDaysAgo ?
+            <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange} /> :
+            <DatePicker
+              focusDropdowns={true}
+              modalType='simple'
+              buttonContainerStyle={{ flex: 1 }}
+              onChange={onDateChange}
+              dateIncludes={dateIncludes}
+              selectedDate={date}
+              toLocaleStringOptions={{ dateStyle: 'long' }}
+              animate={true}
+              transparencyMode={EnhancedSelectorTransparencyMode.selection}
+              focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
+            />}
           <div style={{ margin: '0 10px' }}>
             <Dropdown
               rgOptions={[
                 { label: 'By Day', data: DateIncludes.dayMonthYear },
                 { label: 'By Month', data: DateIncludes.monthYear },
                 { label: 'By Year', data: DateIncludes.yearOnly },
-                { label: 'By Days Ago', data: 'byDaysAgo'}
+                { label: 'By Days Ago', data: 'byDaysAgo' }
               ]}
               selectedOption={dateIncludes}
               onChange={option => {
@@ -648,27 +649,27 @@ const LastPlayedFilterOptions: VFC<FilterOptionsProps<'last played'>> = ({ index
     <Field label={`Last played ${byDaysAgo ? `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${thresholdType === 'above' ? 'later' : 'earlier'}` : `${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}`}
       description={
         <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-          {byDaysAgo ? 
-          <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange}/> :
-          <DatePicker
-            focusDropdowns={true}
-            modalType='simple'
-            buttonContainerStyle={{ flex: 1 }}
-            onChange={onDateChange}
-            dateIncludes={dateIncludes}
-            selectedDate={date}
-            toLocaleStringOptions={{ dateStyle: 'long' }}
-            animate={true}
-            transparencyMode={EnhancedSelectorTransparencyMode.selection}
-            focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
-          />}
+          {byDaysAgo ?
+            <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange} /> :
+            <DatePicker
+              focusDropdowns={true}
+              modalType='simple'
+              buttonContainerStyle={{ flex: 1 }}
+              onChange={onDateChange}
+              dateIncludes={dateIncludes}
+              selectedDate={date}
+              toLocaleStringOptions={{ dateStyle: 'long' }}
+              animate={true}
+              transparencyMode={EnhancedSelectorTransparencyMode.selection}
+              focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
+            />}
           <div style={{ margin: '0 10px' }}>
             <Dropdown
               rgOptions={[
                 { label: 'By Day', data: DateIncludes.dayMonthYear },
                 { label: 'By Month', data: DateIncludes.monthYear },
                 { label: 'By Year', data: DateIncludes.yearOnly },
-                { label: 'By Days Ago', data: 'byDaysAgo'}
+                { label: 'By Days Ago', data: 'byDaysAgo' }
               ]}
               selectedOption={dateIncludes}
               onChange={option => {
@@ -753,47 +754,82 @@ const SteamFeatureFilterOptions: VFC<FilterOptionsProps<'steam features'>> = ({ 
 };
 
 /**
+ * The options for an sd card filter
+ */
+const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const isMicroSDeckInstalled = useMemo(() => MicroSDeckInterop.isInstallOk(), []);
+  const cardsAndGames = window.MicroSDeck?.CardsAndGames || [];  
+  const dropdownOptions: DropdownOption[] = [
+    {
+      label: "Inserted Card",
+      data: undefined,
+    },
+    {
+      label: "Specific Card",
+      options: cardsAndGames.map(([card]) => { return { label: card.name || card.uid, data: card.uid } })
+    }];
+
+  function onChange({data}: SingleDropdownOption) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.card = data;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  return (
+    <Field
+      label="Micro SD Card"
+      description={<Dropdown rgOptions={dropdownOptions} selectedOption={filter.params.card} onChange={onChange} disabled={!isMicroSDeckInstalled} />}
+    />
+  );
+};
+
+/**
  * The options for an individual filter.
  */
 export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
   if (filter) {
+    const filterCopy = {...filter, params: {...filter.params}}
     switch (filter.type) {
       case "collection":
-        return <CollectionFilterOptions index={index} filter={filter as TabFilterSettings<'collection'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <CollectionFilterOptions index={index} filter={filterCopy as TabFilterSettings<'collection'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "installed":
-        return <InstalledFilterOptions index={index} filter={filter as TabFilterSettings<'installed'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <InstalledFilterOptions index={index} filter={filterCopy as TabFilterSettings<'installed'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "regex":
-        return <RegexFilterOptions index={index} filter={filter as TabFilterSettings<'regex'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <RegexFilterOptions index={index} filter={filterCopy as TabFilterSettings<'regex'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "friends":
-        return <FriendsFilterOptions index={index} filter={filter as TabFilterSettings<'friends'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <FriendsFilterOptions index={index} filter={filterCopy as TabFilterSettings<'friends'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "tags":
-        return <TagsFilterOptions index={index} filter={filter as TabFilterSettings<'tags'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <TagsFilterOptions index={index} filter={filterCopy as TabFilterSettings<'tags'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "whitelist":
-        return <WhitelistFilterOptions index={index} filter={filter as TabFilterSettings<'whitelist'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <WhitelistFilterOptions index={index} filter={filterCopy as TabFilterSettings<'whitelist'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "blacklist":
-        return <BlackListFilterOptions index={index} filter={filter as TabFilterSettings<'blacklist'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <BlackListFilterOptions index={index} filter={filterCopy as TabFilterSettings<'blacklist'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "merge":
-        return <MergeFilterOptions index={index} filter={filter as TabFilterSettings<'merge'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <MergeFilterOptions index={index} filter={filterCopy as TabFilterSettings<'merge'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "platform":
-        return <PlatformFilterOptions index={index} filter={filter as TabFilterSettings<'platform'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <PlatformFilterOptions index={index} filter={filterCopy as TabFilterSettings<'platform'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "deck compatibility":
-        return <DeckCompatFilterOptions index={index} filter={filter as TabFilterSettings<'deck compatibility'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <DeckCompatFilterOptions index={index} filter={filterCopy as TabFilterSettings<'deck compatibility'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "review score":
-        return <ReviewScoreFilterOptions index={index} filter={filter as TabFilterSettings<'review score'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <ReviewScoreFilterOptions index={index} filter={filterCopy as TabFilterSettings<'review score'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "time played":
-        return <TimePlayedFilterOptions index={index} filter={filter as TabFilterSettings<'time played'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <TimePlayedFilterOptions index={index} filter={filterCopy as TabFilterSettings<'time played'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "size on disk":
-        return <SizeOnDiskFilterOptions index={index} filter={filter as TabFilterSettings<'size on disk'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <SizeOnDiskFilterOptions index={index} filter={filterCopy as TabFilterSettings<'size on disk'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "release date":
-        return <ReleaseDateFilterOptions index={index} filter={filter as TabFilterSettings<'release date'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <ReleaseDateFilterOptions index={index} filter={filterCopy as TabFilterSettings<'release date'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "last played":
-        return <LastPlayedFilterOptions index={index} filter={filter as TabFilterSettings<'last played'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <LastPlayedFilterOptions index={index} filter={filterCopy as TabFilterSettings<'last played'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "demo":
-        return <DemoFilterOptions index={index} filter={filter as TabFilterSettings<'demo'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <DemoFilterOptions index={index} filter={filterCopy as TabFilterSettings<'demo'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "streamable":
-        return <StreamableFilterOptions index={index} filter={filter as TabFilterSettings<'streamable'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <StreamableFilterOptions index={index} filter={filterCopy as TabFilterSettings<'streamable'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "steam features":
-        return <SteamFeatureFilterOptions index={index} filter={filter as TabFilterSettings<'steam features'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+        return <SteamFeatureFilterOptions index={index} filter={filterCopy as TabFilterSettings<'steam features'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "sd card":
+        return <SDCardFilterOptions index={index} filter={filterCopy as TabFilterSettings<'sd card'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       default:
         return <Fragment />;
     }

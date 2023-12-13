@@ -2,8 +2,9 @@ import { MenuItem, showModal, Menu, showContextMenu, DialogButton } from "decky-
 import { VFC } from "react"
 import { FaEllipsisH } from "react-icons/fa"
 import { TabMasterManager } from "../state/TabMasterManager"
-import { EditTabModal, EditableTabSettings } from "./modals/EditTabModal"
+import { showModalEditTab } from "./modals/EditTabModal"
 import { DestructiveModal } from './generic/DestructiveModal';
+import { CustomTabContainer } from './CustomTabContainer';
 
 interface TabActionsContextMenuProps {
   tabContainer: TabContainer,
@@ -22,21 +23,7 @@ export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabCont
 
   if (tabContainer.filters) {
     menuItems.unshift(
-      <MenuItem onSelected={() => {
-        showModal(
-          <EditTabModal
-            onConfirm={(tabId: string | undefined, updatedTabSettings: EditableTabSettings) => {
-              tabMasterManager.updateCustomTab(tabId!, updatedTabSettings);
-            }}
-            tabId={tabContainer.id}
-            tabTitle={tabContainer.title}
-            tabFilters={tabContainer.filters!}
-            tabMasterManager={tabMasterManager}
-            filtersMode={tabContainer.filtersMode!}
-            categoriesToInclude={tabContainer.categoriesToInclude!}
-          />
-        )
-      }}>
+      <MenuItem onSelected={() => showModalEditTab(tabContainer as CustomTabContainer, tabMasterManager)}>
         Edit
       </MenuItem>
     );

@@ -122,6 +122,10 @@ export const FilterSelectStyles: VFC<{}> = ({}) => {
         text-align: initial;
       }
 
+      .tab-master-filter-select .entry-disabled {
+        color: #92939B;
+      }
+
       .tab-master-filter-select .entry-desc {
         font-size: 16px;
         text-align: initial;

@@ -50,22 +50,23 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
             <Focusable style={{
               width: "calc(100% - 55px)"
             }}>
-              <Dropdown rgOptions={collectionDropdownOptions} selectedOption={(filter as TabFilterSettings<'collection'>).params.id} onChange={onChange} />
+              <Dropdown rgOptions={collectionDropdownOptions} selectedOption={filter.params.id} onChange={onChange} />
             </Focusable>
             <Focusable style={{
               marginLeft: "10px",
               width: "45px"
             }}>
-              <TrashButton onClick={() => {
-                showModal(
-                  <DestructiveModal
-                    onOK={onFilterDelete}
-                    strTitle="WARNING!"
-                  >
-                    {'Are you sure you want to delete this filter? ' + (numFilters === 1 ? `There are no other filters in this ${isMergeGroup ? 'merge group' : 'tab'}. Deleting it will automatically delete the ${isMergeGroup ? 'merge filter' : 'tab'} as well. ` : '') + `This can't be undone.`}
-                  </DestructiveModal>
-                );
-              }}
+              <TrashButton 
+                onClick={() => {
+                  showModal(
+                    <DestructiveModal
+                      onOK={onFilterDelete}
+                      strTitle="WARNING!"
+                    >
+                      {'Are you sure you want to delete this filter? ' + (numFilters === 1 ? `There are no other filters in this ${isMergeGroup ? 'merge group' : 'tab'}. Deleting it will automatically delete the ${isMergeGroup ? 'merge filter' : 'tab'} as well. ` : '') + `This can't be undone.`}
+                    </DestructiveModal>
+                  );
+                }}
               />
             </Focusable>
           </Focusable>
@@ -154,37 +155,83 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({ isMerg
   )
 }
 
+/**
+ * The error options for an sd card filter.
+ */
+const SDCardFilterErrorOption: VFC<FilterErrorOptionsProps<'sd card'>> = ({ isMergeGroup, numFilters, filter, onFilterUpdate, onFilterDelete }) => {
+  const cardsAndGames = window.MicroSDeck?.CardsAndGames || [];  
+  const dropdownOptions: DropdownOption[] = [
+    {
+      label: "Inserted Card",
+      data: undefined,
+    },
+    {
+      label: "Specific Card",
+      options: cardsAndGames.map(([card]) => { return { label: card.name || card.uid, data: card.uid } })
+    }];
+
+  function onChange({data}: SingleDropdownOption) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.card = data;
+    onFilterUpdate(updatedFilter);
+  }
+
+  return (
+    <Field
+      label="Selected Collection"
+      description={
+        <div className="filter-entry">
+          <Focusable style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "row"
+          }}>
+            <Focusable style={{
+              width: "calc(100% - 55px)"
+            }}>
+              <Dropdown rgOptions={dropdownOptions} selectedOption={filter.params.card} onChange={onChange} />
+            </Focusable>
+            <Focusable style={{
+              marginLeft: "10px",
+              width: "45px"
+            }}>
+              <TrashButton
+                onClick={() => {
+                  showModal(
+                    <DestructiveModal
+                      onOK={onFilterDelete}
+                      strTitle="WARNING!"
+                    >
+                      {'Are you sure you want to delete this filter? ' + (numFilters === 1 ? `There are no other filters in this ${isMergeGroup ? 'merge group' : 'tab'}. Deleting it will automatically delete the ${isMergeGroup ? 'merge filter' : 'tab'} as well. ` : '') + `This can't be undone.`}
+                    </DestructiveModal>
+                  );
+                }}
+              />
+            </Focusable>
+          </Focusable>
+        </div>
+      }
+    />
+  );
+}
 
 /**
  * The error options for an individual filter.
  */
 export const FilterErrorOptions: VFC<FilterErrorOptionsProps<FilterType>> = ({ isMergeGroup, numFilters, filter, mergeErrorEntries, onFilterUpdate, onFilterDelete }) => {
   if (filter) {
+    const filterCopy = {...filter, params: {...filter.params}};
     switch (filter.type) {
       case "collection":
-        return <CollectionFilterErrorOptions isMergeGroup={isMergeGroup} numFilters={numFilters} filter={filter as TabFilterSettings<'collection'>} onFilterUpdate={onFilterUpdate} onFilterDelete={onFilterDelete} />
-      case "installed":
-        throw new Error("FilterErrorOption for installed not implemented!");
-      case "regex":
-        throw new Error("FilterErrorOption for regex not implemented!");
-      case "friends":
-        throw new Error("FilterErrorOption for friends not implemented!");
-      case "tags":
-        throw new Error("FilterErrorOption for tags not implemented!");
-      case "whitelist":
-        throw new Error("FilterErrorOption for whitelist not implemented!");
-      case "blacklist":
-        throw new Error("FilterErrorOption for blacklist not implemented!");
+        return <CollectionFilterErrorOptions isMergeGroup={isMergeGroup} numFilters={numFilters} filter={filterCopy as TabFilterSettings<'collection'>} onFilterUpdate={onFilterUpdate} onFilterDelete={onFilterDelete} />;
       case "merge":
-        return <MergeFilterErrorOptions isMergeGroup={isMergeGroup} numFilters={numFilters} filter={filter as TabFilterSettings<'merge'>} mergeErrorEntries={mergeErrorEntries} onFilterUpdate={onFilterUpdate} onFilterDelete={onFilterDelete} />
-      case "platform":
-        throw new Error("FilterErrorOption for platform not implemented!");
-      case "deck compatibility":
-        throw new Error("FilterErrorOption for deck compatibility not implemented!");
+        return <MergeFilterErrorOptions isMergeGroup={isMergeGroup} numFilters={numFilters} filter={filterCopy as TabFilterSettings<'merge'>} mergeErrorEntries={mergeErrorEntries} onFilterUpdate={onFilterUpdate} onFilterDelete={onFilterDelete} />;
+      case 'sd card': 
+        return <SDCardFilterErrorOption isMergeGroup={isMergeGroup} numFilters={numFilters} filter={filterCopy as TabFilterSettings<'sd card'>} onFilterUpdate={onFilterUpdate} onFilterDelete={onFilterDelete} />;
       default:
-        return <Fragment />
+        throw new Error(`FilterErrorOption for ${filter.type} not implemented!`);
     }
   } else {
-    return <Fragment />
+    return <Fragment />;
   }
 }

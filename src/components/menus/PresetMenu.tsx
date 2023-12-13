@@ -1,33 +1,31 @@
 import { Menu, MenuGroup, MenuItem } from 'decky-frontend-lib';
 import { VFC, Fragment } from 'react';
-import { PresetName, presetKeys } from '../../presets/presets';
+import { presetKeys } from '../../presets/presets';
 import { capitalizeEachWord } from '../../lib/Utils';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { compatCategoryToLabel } from '../filters/Filters';
 
 interface PresetMenuProps {
   tabMasterManager: TabMasterManager;
+  isMicroSDeckInstalled: boolean;
 }
 
-export const PresetMenu: VFC<PresetMenuProps> = ({ tabMasterManager }) => {
+export const PresetMenu: VFC<PresetMenuProps> = ({ tabMasterManager, isMicroSDeckInstalled }) => {
   return <Menu label='Quick Tabs'>
-    <PresetMenuItems tabMasterManager={tabMasterManager} />
+    <PresetMenuItems tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />
   </Menu>;
 };
 
-interface PresetMenuItemsProps {
-  tabMasterManager: TabMasterManager;
-}
+interface PresetMenuItemsProps extends PresetMenuProps { }
 
-export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager }) => {
+export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, isMicroSDeckInstalled }) => {
 
   function getActionDescription(name: string) {
     return { onOKActionDescription: `Create Tab "${name}"` };
   }
 
   return <>
-    {presetKeys.map(name => {
-      const presetName = name as PresetName;
+    {presetKeys.map(presetName => {
       switch (presetName) {
         case 'collection':
           return (
@@ -70,6 +68,22 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager })
               })}
             </MenuGroup>
           );
+        case 'micro sd card':
+            return (
+              <MenuGroup label='Micro SD Card' disabled={!isMicroSDeckInstalled}>
+                <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, 'Inserted Card')} {...getActionDescription('Inserted Card')}>
+                  Inserted Card
+                </MenuItem>
+                <MenuGroup label='Specific Card'>
+                  {window.MicroSDeck?.CardsAndGames.map(([card]) => {
+                    const tabName = card.name || card.uid;
+                    return <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, tabName, card.uid)} {...getActionDescription(tabName)}>
+                      {tabName}
+                    </MenuItem>;
+                  })}
+                </MenuGroup>
+              </MenuGroup>
+            );
         default:
           const tabName = capitalizeEachWord(presetName);
           return (

@@ -4,8 +4,10 @@ import {
   Field,
   Focusable,
   TextField,
+  ToggleField,
   afterPatch,
-  quickAccessControlsClasses
+  quickAccessControlsClasses,
+  showModal
 } from "decky-frontend-lib";
 import { useState, VFC, useEffect, Fragment } from "react";
 import { FilterType, TabFilterSettings, isValidParams } from "../filters/Filters";
@@ -14,8 +16,9 @@ import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabMasterManager } from "../../state/TabMasterManager";
 import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";
-import { capitalizeFirstLetter, getIncludedCategoriesFromBitField, playUISound, updateCategoriesToIncludeBitField } from "../../lib/Utils";
+import { IncludeCategories, capitalizeFirstLetter, getIncludedCategoriesFromBitField, playUISound, updateCategoriesToIncludeBitField } from "../../lib/Utils";
 import { BiSolidDownArrow } from "react-icons/bi";
+import { CustomTabContainer } from '../CustomTabContainer';
 
 export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>;
 
@@ -27,20 +30,22 @@ type EditTabModalProps = {
   tabFilters: TabFilterSettings<FilterType>[],
   tabMasterManager: TabMasterManager,
   filtersMode: LogicalMode,
-  categoriesToInclude: number; //bit field
+  categoriesToInclude: number, //bit field
+  autoHide: boolean
 };
 
 /**
  * The modal for editing and creating custom tabs.
  */
-export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager, filtersMode, categoriesToInclude }) => {
+export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager, filtersMode, categoriesToInclude, autoHide: _autoHide }) => {
   const [name, setName] = useState<string>(tabTitle ?? '');
   const [topLevelFilters, setTopLevelFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
   const [topLevelLogicMode, setTopLevelLogicMode] = useState<LogicalMode>(filtersMode);
   const [catsToInclude, setCatsToInclude] = useState<number>(categoriesToInclude);
   const [canSave, setCanSave] = useState<boolean>(false);
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
-  const [patchInput, setPatchInput] = useState(true);
+  const [patchInput, setPatchInput] = useState<boolean>(true);
+  const [autoHide, setAutoHide] = useState<boolean>(_autoHide);
 
   const nameInputElement = <TextField value={name} onChange={onNameChange} />;
 
@@ -78,7 +83,8 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
         title: name,
         filters: topLevelFilters,
         filtersMode: topLevelLogicMode,
-        categoriesToInclude: catsToInclude
+        categoriesToInclude: catsToInclude,
+        autoHide: autoHide
       };
       onConfirm(tabId, updated);
       closeModal!();
@@ -121,6 +127,9 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
             } />
           </div>
           <IncludeCategoriesPanel categoriesToInclude={catsToInclude} setCategoriesToInclude={setCatsToInclude} />
+          <div className='autohide-toggle-container'>
+            <ToggleField label='Automatically hide tab if empty' checked={autoHide} onChange={checked => setAutoHide(checked)} bottomSeparator='thick'/>
+          </div>
           <FiltersPanel
             groupFilters={topLevelFilters}
             setGroupFilters={setTopLevelFilters}
@@ -161,7 +170,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
 
   return (
     <>
-      <div style={{ marginBottom: "24px" }}>
+      <div >
         <Focusable
           style={{ margin: "0 calc(-12px - 1.4vw)" }}
           onActivate={() => {
@@ -208,12 +217,52 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
       </div>
       <div style={{
         position: "relative",
-        top: "-24px",
         left: "calc(16px - 1.8vw)",
         right: "calc(16px - 1.8vw)",
         height: "1px",
-        background: "#23262e" }}
+        background: "#ffffff1a" }}
       />
     </>
   );
 };
+
+/**
+ * Function to show the EditTabModal when creating a new tab.
+ * @param tabMasterManager TabMasterManager instance.
+ */
+export function showModalNewTab(tabMasterManager: TabMasterManager) {
+    showModal(
+      <EditTabModal
+        onConfirm={(_: any, tabSettings: EditableTabSettings) => {
+          tabMasterManager.createCustomTab(tabSettings.title, tabMasterManager.getTabs().visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode, tabSettings.categoriesToInclude, tabSettings.autoHide);
+        }}
+        tabFilters={[]}
+        tabMasterManager={tabMasterManager}
+        filtersMode="and"
+        categoriesToInclude={IncludeCategories.games}
+        autoHide={false}
+      />
+    );
+}
+
+/**
+ * Function to show the EditTabModal when editing a tab.
+ * @param tabContainer CustomTabContainer to edit.
+ * @param tabMasterManager TabMasterManager instance.
+ */
+export function showModalEditTab(tabContainer: CustomTabContainer, tabMasterManager: TabMasterManager) {
+    showModal(
+      <EditTabModal
+        onConfirm={(tabId: string | undefined, updatedTabSettings: EditableTabSettings) => {
+          tabMasterManager.updateCustomTab(tabId!, updatedTabSettings);
+        }}
+        tabId={tabContainer.id}
+        tabTitle={tabContainer.title}
+        tabFilters={tabContainer.filters}
+        tabMasterManager={tabMasterManager}
+        filtersMode={tabContainer.filtersMode}
+        categoriesToInclude={tabContainer.categoriesToInclude}
+        autoHide={tabContainer.autoHide}
+      />
+    );
+}
