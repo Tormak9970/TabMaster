@@ -105,7 +105,7 @@ export const FilterSelect: VFC<FilterSelectProps> = ({ selectedOption, onChange 
     <CustomDropdown
       useCustomModal={FilterSelectModal}
       customDropdownIcon={<IoFilter style={{ margin: 'auto', height: '.9em' }} />}
-      onChange={option => onChange(option.data)}
+      onChange={option => option.data !== selectedOption && onChange(option.data)}
       selectedOption={selectedOption}
       rgOptions={filterTypeOptions}
     />
