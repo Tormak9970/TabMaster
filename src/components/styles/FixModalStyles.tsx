@@ -10,6 +10,10 @@ export const FixModalStyles: VFC<{}> = ({}) => {
       .tab-master-fix-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
         margin-left: 15px;
       }
+
+      .tab-master-fix-modal-scope .${gamepadDialogClasses.ModalPosition} > .${gamepadDialogClasses.GamepadDialogContent} {
+        background: radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%);
+      }
       
       /* The button item */
       .tab-master-fix-modal-scope .styled-btn {

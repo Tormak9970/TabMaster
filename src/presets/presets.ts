@@ -1,8 +1,7 @@
-import { FilterType, TabFilterSettings, compatCategoryToLabel } from '../components/filters/Filters';
+import { FilterType, TabFilterSettings } from '../components/filters/Filters';
 import { IncludeCategories } from '../lib/Utils';
 
 type TabPreset = {
-  title: string,
   filters: TabFilterSettings<FilterType>[],
   filtersMode: LogicalMode,
   categoriesToInclude: number; //include categories bit field
@@ -12,7 +11,6 @@ const presetDefines = {
 
   collection: (collectionId: string, collectionName: string) => {
     return {
-      title: collectionName,
       filters: [{ type: 'collection', inverted: false, params: { id: collectionId, name: collectionName } }],
       filtersMode: 'and',
       categoriesToInclude: IncludeCategories.games
@@ -21,7 +19,6 @@ const presetDefines = {
 
   'all games': () => {
     return {
-      title: 'All Games',
       filters: [
         { type: 'installed', inverted: false, params: { installed: true } },
         { type: 'installed', inverted: false, params: { installed: false } }
@@ -33,7 +30,6 @@ const presetDefines = {
 
   installation: (installed: boolean) => {
     return {
-      title: installed ? 'Installed' : 'Not Installed',
       filters: [
         { type: 'installed', inverted: false, params: { installed: installed } }
       ],
@@ -44,16 +40,22 @@ const presetDefines = {
 
   'deck compatibility': (compat: number) => {
     return {
-      title: compatCategoryToLabel(compat),
       filters: [{ type: 'deck compatibility', inverted: false, params: { category: compat } }],
       filtersMode: 'and',
       categoriesToInclude: IncludeCategories.games
     };
   },
 
-  music: () => {
+  'platform': (platform: SteamPlatform) => {
     return {
-      title: 'Soundtracks',
+      filters: [{ type: 'platform', inverted: false, params: { platform: platform } }],
+      filtersMode: 'and',
+      categoriesToInclude: IncludeCategories.games
+    };
+  },
+
+  soundtracks: () => {
+    return {
       filters: [
         { type: 'installed', inverted: false, params: { installed: true } },
         { type: 'installed', inverted: false, params: { installed: false } }
@@ -65,7 +67,6 @@ const presetDefines = {
 
   software: () => {
     return {
-      title: 'Software',
       filters: [
         { type: 'installed', inverted: false, params: { installed: true } },
         { type: 'installed', inverted: false, params: { installed: false } }
@@ -73,16 +74,23 @@ const presetDefines = {
       filtersMode: 'or',
       categoriesToInclude: IncludeCategories.software
     };
+  },
+  'micro sd card': (card?: string) => {
+    return {
+      filters: [
+        { type: 'sd card', inverted: false, params: { card: card } },
+      ],
+      filtersMode: 'or',
+      categoriesToInclude: IncludeCategories.games
+    };
   }
-
 };
 
 export type PresetName = keyof typeof presetDefines;
 export type PresetOptions<Name extends keyof typeof presetDefines> = Parameters<typeof presetDefines[Name]>;
 
-export const presetKeys = Object.keys(presetDefines);
+export const presetKeys = Object.keys(presetDefines) as PresetName[];
 
 export function getPreset<Name extends PresetName>(presetName: Name, ...presetOptions: PresetOptions<Name>) {
   return (presetDefines[presetName] as (...options: any[]) => TabPreset)(...presetOptions);
 }
-

@@ -22,13 +22,14 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, errorEntr
   const [isDeleting, setIsDeleting] = useState(false);
 
   function onChange(filters: (TabFilterSettings<FilterType> | [])[], messages: string[][]) {
-    tab.filters = [...filters];
+    const newTab = { ...tab }
+    newTab.filters = [...filters];
     setFilters(filters);
 
     const passing = messages.every((entry) => entry.length === 0);
     setIsPassing(passing);
     setIsDeleting(filters.flatMap(filter => filter).length === 0);
-    onTabStatusChange(tab, passing);
+    onTabStatusChange(newTab, passing);
   }
 
   return (

@@ -7,6 +7,7 @@ type TabContainer = {
   filters?: TabFilterSettings<FilterType>[] //undefined filters is a default tab else it's a CustomTabContainer
   filtersMode?: LogicalMode //boolean operation combine filters
   categoriesToInclude?: number //a bit field for categories tab should include
+  autoHide?: boolean
 }
 
 interface TabSettings extends TabContainer { }
