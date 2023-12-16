@@ -1,9 +1,8 @@
 import { Button, Focusable } from "decky-frontend-lib"
 import React, { VFC, useState } from "react"
 import { FilterType, TabFilterSettings, isValidParams } from "../filters/Filters"
-import { capitalizeFirstLetter } from "../../lib/Utils"
+import { capitalizeFirstLetter, playUISound } from "../../lib/Utils"
 import { BiSolidDownArrow } from "react-icons/bi"
-import { GamepadUIAudio } from '../../lib/GamepadUIAudio';
 import { FaXmark } from 'react-icons/fa6';
 import { CgCheck } from 'react-icons/cg';
 import { modalMargin } from '../styles/ModalStyles';
@@ -23,13 +22,13 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
 
   function onClick(e: any) {
     e.stopPropagation();
-    GamepadUIAudio.AudioPlaybackManager.PlayAudioURL('/sounds/deck_ui_misc_01.wav');
+    playUISound('/sounds/deck_ui_misc_01.wav');
     setOpen(!open);
   }
 
   return (
     <Focusable style={{ width: "100%", padding: "0" }}>
-      <Focusable className="filter-start-cont" focusClassName="start-focused" focusWithinClassName="start-focused">
+      <Focusable className="filter-start-cont highlight-on-focus" focusClassName="start-focused" focusWithinClassName="start-focused">
         <Button style={{
           width: "100%",
           padding: "0",

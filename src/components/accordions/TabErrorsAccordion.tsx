@@ -2,6 +2,7 @@ import { Button, Focusable } from "decky-frontend-lib";
 import React, { VFC, useState, Fragment } from "react";
 import { BiSolidDownArrow } from "react-icons/bi";
 import { FaCircleCheck, FaCircleExclamation, FaCircleXmark } from "react-icons/fa6";
+import { playUISound } from '../../lib/Utils';
 
 type TabAccordionIconProps = {
   index: number,
@@ -60,6 +61,7 @@ export const TabErrorsAccordion: VFC<TabErrorsAccordionProps> = ({ index, isPass
 
   function onClick(e: any) {
     e.stopPropagation();
+    playUISound('/sounds/deck_ui_misc_01.wav');
     setOpen(!open);
   }
 
