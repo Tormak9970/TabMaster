@@ -16,6 +16,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { BaseModalProps, CustomDropdown } from "../generic/CustomDropdown";
 import { ListSearchModalStyles } from "../styles/ListSearchModalStyles";
+import { BiSolidDownArrow, BiSolidUpArrow } from "react-icons/bi";
 
 export type ListSearchModalProps = {
   rgOptions: SingleDropdownOption[],
@@ -33,10 +34,27 @@ const iconStyles = {
 export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, entryLabel, determineEntryIcon, onSelectOption, closeModal }: ListSearchModalProps) => {
   const [query, setQuery] = useState("");
   const [filteredList, setFilteredList] = useState(list);
+  const [renderTopArrow, setRenderTopArrow] = useState(false);
+  const [renderBottomArrow, setRenderBottomArrow] = useState(true);
 
   useEffect(() => {
     setFilteredList(list.filter((entry) => (entry.label as string).toLowerCase().includes(query.toLowerCase())));
   }, [query]);
+
+  function onItemsRendered({ visibleStartIndex, visibleStopIndex }: { visibleStartIndex: number, visibleStopIndex: number }) {
+    // ! these cause focus issues, doesn't seem worth it to have them.
+    // if (!renderTopArrow && visibleStartIndex !== 0) {
+    //   setRenderTopArrow(true);
+    // } else if (renderTopArrow && visibleStartIndex === 0) {
+    //   setRenderTopArrow(false);
+    // }
+
+    // if (!renderBottomArrow && visibleStopIndex !== list.length - 1) {
+    //   setRenderBottomArrow(true);
+    // } else if (renderBottomArrow && visibleStopIndex === list.length - 1) {
+    //   setRenderBottomArrow(false);
+    // }
+  }
 
   const ListEntry = ({ index, style }: { index: number, style: any}) => {
     const EntryIcon = determineEntryIcon(filteredList[index]);
@@ -92,25 +110,34 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
             </Focusable>
           </DialogControlsSection>
           <DialogControlsSection style={{ marginTop: "1em" }}>
-            <PanelSection title={`${entryLabel} - ${filteredList.length}`}>
-              <Focusable
-                style={{ display: "flex", gap: "4px", flexDirection: "column", height: "48.7vh", overflow: "scroll" }}
-              >
-                <AutoSizer>
-                  {/* @ts-ignore */}
-                  {({ height, width }) => (
-                    <List
-                      width={width}
-                      height={height}
-                      itemCount={filteredList.length}
-                      itemSize={44}
-                    >
-                      {ListEntry}
-                    </List>
-                  )}
-                </AutoSizer>
-              </Focusable>
-            </PanelSection>
+            <div style={{ width: "100%", position: "relative" }}>
+              {/* <div className="more-above-arrow">
+                {renderTopArrow && <BiSolidUpArrow style={{ fontSize: "0.8em", color: "#343945" }} />}
+              </div> */}
+              <PanelSection title={`${entryLabel} - ${filteredList.length}`}>
+                <Focusable
+                  style={{ display: "flex", gap: "4px", flexDirection: "column", height: "48.7vh", overflow: "scroll" }}
+                >
+                  <AutoSizer>
+                    {/* @ts-ignore */}
+                    {({ height, width }) => (
+                      <List
+                        width={width}
+                        height={height}
+                        itemCount={filteredList.length}
+                        itemSize={44}
+                        onItemsRendered={onItemsRendered}
+                      >
+                        {ListEntry}
+                      </List>
+                    )}
+                  </AutoSizer>
+                </Focusable>
+              </PanelSection>
+              {/* <div className="more-below-arrow">
+                {renderBottomArrow && <BiSolidDownArrow style={{ fontSize: "0.8em", color: "#343945" }} />}
+              </div> */}
+            </div>
           </DialogControlsSection>
         </DialogBody>
       </ModalRoot>
