@@ -47,7 +47,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   const [patchInput, setPatchInput] = useState<boolean>(true);
   const [autoHide, setAutoHide] = useState<boolean>(_autoHide);
 
-  const nameInputElement = <TextField value={name} onChange={onNameChange} />;
+  const nameInputElement = <TextField value={name} placeholder="The title for this tab" onChange={onNameChange} />;
 
   //reference to input field class component instance, which has a focus method
   let inputComponentInstance: any;

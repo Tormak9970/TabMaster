@@ -140,7 +140,7 @@ const RegexFilterOptions: VFC<FilterOptionsProps<'regex'>> = ({ index, setContai
   return (
     <Field
       label="Regex"
-      description={<TextField value={filter.params.regex} onChange={onChange} />}
+      description={<TextField value={filter.params.regex} placeholder="Input a Regular Expression" onChange={onChange} />}
     />
   );
 };

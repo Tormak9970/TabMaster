@@ -84,6 +84,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
               <div style={{ width: "100%" }}>
                 <TextField
                   value={query}
+                  placeholder={`Search ${entryLabel}...`}
                   onChange={(e) => { setQuery(e.target.value); }}
                   style={{ height: "100%" }}
                 />
