@@ -10,7 +10,7 @@ import {
   showModal
 } from "decky-frontend-lib";
 import { useState, VFC, useEffect, Fragment } from "react";
-import { FilterType, TabFilterSettings, isValidParams } from "../filters/Filters";
+import { FilterDefaultParams, FilterType, TabFilterSettings, isValidParams } from "../filters/Filters";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
 import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabMasterManager } from "../../state/TabMasterManager";
@@ -99,7 +99,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
     updatedFilters.push({
       type: "collection",
       inverted: false,
-      params: { id: "", name: "" }
+      params: FilterDefaultParams.collection
     });
     setTopLevelFilters(updatedFilters);
   }

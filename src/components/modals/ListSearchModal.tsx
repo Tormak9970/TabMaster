@@ -117,7 +117,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
   );
 };
 
-export type ListSearchTrigger = {
+export type ListSearchTriggerProps = {
   entryLabel: string,
   labelOverride: string,
   options: SingleDropdownOption[],
@@ -127,7 +127,7 @@ export type ListSearchTrigger = {
   disabled: boolean
 }
 
-export function ListSearchTrigger({ entryLabel, labelOverride, options, onChange, TriggerIcon, determineEntryIcon, disabled }: ListSearchTrigger) {
+export function ListSearchTrigger({ entryLabel, labelOverride, options, onChange, TriggerIcon, determineEntryIcon, disabled }: ListSearchTriggerProps) {
   const ModalWrapper: VFC<BaseModalProps> = ({ onSelectOption, rgOptions, closeModal }: BaseModalProps) => {
     return <ListSearchModal entryLabel={entryLabel} rgOptions={rgOptions!} onSelectOption={onSelectOption} determineEntryIcon={determineEntryIcon} closeModal={closeModal} />
   }
@@ -140,6 +140,37 @@ export function ListSearchTrigger({ entryLabel, labelOverride, options, onChange
       onChange={onChange}
       useCustomModal={ModalWrapper}
       disabled={disabled}
+    />
+  );
+}
+
+export type ListSearchDropdownProps = {
+  entryLabel: string,
+  rgOptions: SingleDropdownOption[],
+  selectedOption: any,
+  onChange: (option: SingleDropdownOption) => void,
+  TriggerIcon: IconType,
+  determineEntryIcon: (entry?: any) => IconType,
+  disabled?: boolean
+}
+
+export function ListSearchDropdown({ entryLabel, rgOptions, selectedOption, onChange, TriggerIcon, determineEntryIcon, disabled }: ListSearchDropdownProps) {
+  const [selected, setSelected] = useState<SingleDropdownOption>(rgOptions.find((option: SingleDropdownOption) => option.data === selectedOption)!);
+
+  function onChangeWrapper(data: SingleDropdownOption) {
+    setSelected(data);
+    onChange(data);
+  }
+
+  return (
+    <ListSearchTrigger
+      entryLabel={entryLabel}
+      options={rgOptions}
+      onChange={onChangeWrapper}
+      labelOverride={selected.label as string}
+      disabled={disabled ?? false}
+      TriggerIcon={TriggerIcon}
+      determineEntryIcon={determineEntryIcon}
     />
   );
 }
