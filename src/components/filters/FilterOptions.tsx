@@ -13,8 +13,8 @@ import React, { VFC, Fragment, useState, useMemo } from "react";
 import { FaTag, FaTags, FaUser, FaCompactDisc, FaListCheck, FaSteam } from "react-icons/fa6";
 import { FaUserFriends, FaQuestionCircle } from "react-icons/fa";
 import { MdApps } from "react-icons/md";
-import { IoGameController } from "react-icons/io5";
-import { BsCollectionFill, BsWindow } from "react-icons/bs";
+import { IoGameController, IoGrid } from "react-icons/io5";
+import { BsWindow } from "react-icons/bs";
 import { IconType } from "react-icons/lib";
 
 import { FilterType, ReviewScoreType, TabFilterSettings, ThresholdCondition, TimeUnit, compatCategoryToLabel } from "./Filters";
@@ -100,7 +100,7 @@ const CollectionFilterOptions: VFC<FilterOptionsProps<'collection'>> = ({ index,
           rgOptions={collectionDropdownOptions}
           selectedOption={filter.params.id}
           onChange={onChange}
-          TriggerIcon={BsCollectionFill}
+          TriggerIcon={IoGrid}
           determineEntryIcon={getCollectionIcon}
         />
       }

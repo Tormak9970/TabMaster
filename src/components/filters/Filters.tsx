@@ -1,7 +1,14 @@
+import { IconType } from "react-icons/lib";
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 import { PluginController } from "../../lib/controllers/PluginController";
 import { DateIncludes, DateObj } from '../generic/DatePickers';
 import { STEAM_FEATURES_ID_MAP } from "./SteamFeatures";
+import { FaUserFriends } from "react-icons/fa";
+import { IoGrid } from "react-icons/io5";
+import { SiSteamdeck } from "react-icons/si";
+import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCodeMerge, FaHardDrive, FaListCheck, FaPlay, FaRegClock, FaSdCard, FaSteam, FaTags } from "react-icons/fa6";
+import { BsClockHistory, BsRegex } from "react-icons/bs";
+import { PiListPlusFill } from "react-icons/pi";
 
 export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo' | 'streamable' | 'steam features' | 'sd card';
 
@@ -119,6 +126,31 @@ export const FilterDescriptions: { [filterType in FilterType]: string } = {
   streamable: "Selects apps that can/can't be streamed from another computer.",
   "steam features": "Selects apps that support specific Steam Features.",
   "sd card": "Selects apps that are present on the inserted/specific MicroSD Card"
+}
+
+/**
+ * Dictionary of icons for each filter.
+ */
+export const FilterIcons: { [filterType in FilterType]: IconType } = {
+  collection: IoGrid,
+  installed: FaPlay,
+  regex: BsRegex,
+  friends: FaUserFriends,
+  tags: FaTags,
+  whitelist: PiListPlusFill,
+  blacklist: FaBan,
+  merge: FaCodeMerge,
+  platform: FaSteam,
+  "deck compatibility": SiSteamdeck,
+  "review score": FaAward,
+  "time played": FaRegClock,
+  "size on disk": FaHardDrive,
+  "release date": FaCalendarDays,
+  "last played": BsClockHistory,
+  demo: ,
+  streamable: FaCloudArrowDown,
+  "steam features": FaListCheck,
+  "sd card": FaSdCard
 }
 
 
