@@ -9,7 +9,7 @@ import {
   SingleDropdownOption,
   TextField
 } from "decky-frontend-lib";
-import { VFC, useEffect, useState } from "react";
+import { VFC, useEffect, useMemo, useState } from "react";
 import { IconType } from "react-icons/lib";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -42,21 +42,20 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
   }, [query]);
 
   function onItemsRendered({ visibleStartIndex, visibleStopIndex }: { visibleStartIndex: number, visibleStopIndex: number }) {
-    // ! these cause focus issues, doesn't seem worth it to have them.
-    // if (!renderTopArrow && visibleStartIndex !== 0) {
-    //   setRenderTopArrow(true);
-    // } else if (renderTopArrow && visibleStartIndex === 0) {
-    //   setRenderTopArrow(false);
-    // }
+    if (!renderTopArrow && visibleStartIndex !== 0) {
+      setRenderTopArrow(true);
+    } else if (renderTopArrow && visibleStartIndex === 0) {
+      setRenderTopArrow(false);
+    }
 
-    // if (!renderBottomArrow && visibleStopIndex !== list.length - 1) {
-    //   setRenderBottomArrow(true);
-    // } else if (renderBottomArrow && visibleStopIndex === list.length - 1) {
-    //   setRenderBottomArrow(false);
-    // }
+    if (!renderBottomArrow && visibleStopIndex !== filteredList.length - 1) {
+      setRenderBottomArrow(true);
+    } else if (renderBottomArrow && visibleStopIndex === filteredList.length - 1) {
+      setRenderBottomArrow(false);
+    }
   }
 
-  const ListEntry = ({ index, style }: { index: number, style: any}) => {
+  const ListEntry = useMemo<(props: { index: number, style: any}) => JSX.Element >(() => ({ index, style }) => {
     const EntryIcon = determineEntryIcon(filteredList[index]);
     return (
       <div style={style} className="post">
@@ -75,7 +74,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
         </DialogButton>
       </div>
     );
-  };
+  }, [filteredList]);
 
   return (
     <div className="tab-master-list-search-modal">
@@ -111,9 +110,9 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
           </DialogControlsSection>
           <DialogControlsSection style={{ marginTop: "1em" }}>
             <div style={{ width: "100%", position: "relative" }}>
-              {/* <div className="more-above-arrow">
+              <div className="more-above-arrow">
                 {renderTopArrow && <BiSolidUpArrow style={{ fontSize: "0.8em", color: "#343945" }} />}
-              </div> */}
+              </div>
               <PanelSection title={`${entryLabel} - ${filteredList.length}`}>
                 <Focusable
                   style={{ display: "flex", gap: "4px", flexDirection: "column", height: "48.7vh", overflow: "scroll" }}
@@ -134,9 +133,9 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
                   </AutoSizer>
                 </Focusable>
               </PanelSection>
-              {/* <div className="more-below-arrow">
+              <div className="more-below-arrow">
                 {renderBottomArrow && <BiSolidDownArrow style={{ fontSize: "0.8em", color: "#343945" }} />}
-              </div> */}
+              </div>
             </div>
           </DialogControlsSection>
         </DialogBody>
