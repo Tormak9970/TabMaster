@@ -3,12 +3,12 @@ import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 import { PluginController } from "../../lib/controllers/PluginController";
 import { DateIncludes, DateObj } from '../generic/DatePickers';
 import { STEAM_FEATURES_ID_MAP } from "./SteamFeatures";
-import { FaUserFriends } from "react-icons/fa";
+import { FaCheckCircle, FaHdd, FaSdCard, FaUserFriends } from "react-icons/fa";
 import { IoGrid } from "react-icons/io5";
 import { SiSteamdeck } from "react-icons/si";
-import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCodeMerge, FaHardDrive, FaListCheck, FaPlay, FaRegClock, FaSdCard, FaSteam, FaTags } from "react-icons/fa6";
+import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCompactDisc, FaListCheck, FaPlay, FaRegClock, FaSteam, FaTags } from "react-icons/fa6";
 import { BsClockHistory, BsRegex } from "react-icons/bs";
-import { PiListPlusFill } from "react-icons/pi";
+import { LuCombine } from "react-icons/lu";
 
 export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo' | 'streamable' | 'steam features' | 'sd card';
 
@@ -137,17 +137,17 @@ export const FilterIcons: { [filterType in FilterType]: IconType } = {
   regex: BsRegex,
   friends: FaUserFriends,
   tags: FaTags,
-  whitelist: PiListPlusFill,
+  whitelist: FaCheckCircle,
   blacklist: FaBan,
-  merge: FaCodeMerge,
+  merge: LuCombine,
   platform: FaSteam,
   "deck compatibility": SiSteamdeck,
   "review score": FaAward,
   "time played": FaRegClock,
-  "size on disk": FaHardDrive,
+  "size on disk": FaHdd,
   "release date": FaCalendarDays,
   "last played": BsClockHistory,
-  demo: ,
+  demo: FaCompactDisc,
   streamable: FaCloudArrowDown,
   "steam features": FaListCheck,
   "sd card": FaSdCard

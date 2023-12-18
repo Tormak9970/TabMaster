@@ -1,6 +1,6 @@
-import { Fragment, VFC, useEffect, useState } from "react";
+import { Fragment, VFC, createElement, useEffect, useState } from "react";
 import { Focusable, ModalRoot, SingleDropdownOption } from "decky-frontend-lib";
-import { FilterDefaultParams, FilterDescriptions, FilterType } from "./Filters";
+import { FilterDefaultParams, FilterDescriptions, FilterIcons, FilterType } from "./Filters";
 import { capitalizeEachWord } from "../../lib/Utils";
 import { FilterSelectStyles, achievementClasses, mainMenuAppRunningClasses } from "../styles/FilterSelectionStyles";
 import { IoFilter } from 'react-icons/io5'
@@ -73,9 +73,14 @@ const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, focusable, 
         className={`${achievementClasses.AchievementListItemBase} ${disabled && "entry-disabled"}`}
         style={{ display: "flex", flexDirection: "column", padding: "0.5em", height: "60px" }}
       >
-        <div className="entry-label">
-          {capitalizeEachWord(filterType)}
-          {filterType === 'sd card' && <small style={{ marginLeft: "0.5em", fontSize: "0.5em" }}>{`requires MicroSDeck ${requiredMicroSDeckVer}`}</small>}
+        <div className="entry-label" style={{ display: 'flex', alignItems: 'baseline' }}>
+          <div>
+            {capitalizeEachWord(filterType)}
+          </div>
+          <div style={{ marginLeft: '.8ch', marginRight: '1ch' }}>
+            {createElement(FilterIcons[filterType], { size: '.8em' })}
+          </div>
+          {filterType === 'sd card' && <small style={{ fontSize: "0.5em" }}>{`requires MicroSDeck ${requiredMicroSDeckVer}`}</small>}
         </div>
         <div className="entry-desc">{FilterDescriptions[filterType]}</div>
       </div>
