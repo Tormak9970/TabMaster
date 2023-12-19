@@ -74,11 +74,11 @@ const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, focusable, 
         style={{ display: "flex", flexDirection: "column", padding: "0.5em", height: "60px" }}
       >
         <div className="entry-label" style={{ display: 'flex', alignItems: 'baseline' }}>
+          <div style={{ marginRight: '7px' }}>
+            {createElement(FilterIcons[filterType], { size: '.8em' })}
+          </div>
           <div>
             {capitalizeEachWord(filterType)}
-          </div>
-          <div style={{ marginLeft: '.8ch', marginRight: '1ch' }}>
-            {createElement(FilterIcons[filterType], { size: '.8em' })}
           </div>
           {filterType === 'sd card' && <small style={{ fontSize: "0.5em" }}>{`requires MicroSDeck ${requiredMicroSDeckVer}`}</small>}
         </div>
