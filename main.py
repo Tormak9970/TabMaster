@@ -147,6 +147,19 @@ class Plugin:
     friends_games = Plugin.users_dict[Plugin.user_id]["friendsGames"]  
     log(f"Got {len(friends_games)} friendsGames")
     return friends_games or {}
+  
+  async def get_snapshots(self) -> dict[str, list[str]] | None:
+    """
+    Waits until users_dict is loaded, then returns snapshots
+
+    :return: Users tab visibility snapshots
+    """
+    while Plugin.users_dict is None:
+      await asyncio.sleep(0.1)
+
+    snapshots = Plugin.users_dict[Plugin.user_id]["snapshots"]
+    log(f"Got snapshots {snapshots}")
+    return snapshots or {}
 
   # Plugin settings setters
   async def set_tabs(self, tabs: dict[str, dict]):
@@ -163,6 +176,10 @@ class Plugin:
 
   async def set_friends_games(self, friends_games: dict[str, list[int]]):
     Plugin.users_dict[Plugin.user_id]["friendsGames"] = friends_games
+    await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
+
+  async def set_snapshots(self, snapshots: dict[str, list[str]]):
+    Plugin.users_dict[Plugin.user_id]["snapshots"] = snapshots
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
   async def get_docs(self):

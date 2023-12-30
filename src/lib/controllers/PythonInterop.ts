@@ -1,5 +1,6 @@
 import { ServerAPI } from "decky-frontend-lib";
 import { validateTabs } from "../Utils";
+import { SnapshotDictionary } from '../../state/SnapshotManager';
 
 /**
  * Class for frontend -> backend communication.
@@ -135,8 +136,8 @@ export class PythonInterop {
   }
 
   /**
-   * Gets the store tabs.
-   * @returns A promise resolving to the store tabs.
+   * Gets the store tags.
+   * @returns A promise resolving to the store tags.
    */
   static async getTags(): Promise<TagResponse[] | Error> {
     let result = await PythonInterop.serverAPI.callPluginMethod<{}, TagResponse[]>("get_tags", {});
@@ -179,6 +180,20 @@ export class PythonInterop {
       return new Error(result.result);
     }
   }
+
+  /**
+   * Gets the visible tab snapshots.
+   * @returns A promise resolving the snapshots.
+   */
+      static async getSnapshots(): Promise<SnapshotDictionary | Error> {
+        let result = await PythonInterop.serverAPI.callPluginMethod<{}, SnapshotDictionary>("get_snapshots", {});
+    
+        if (result.success) {
+          return result.result;
+        } else {
+          return new Error(result.result);
+        };
+      }
 
   /**
    * Sets the plugin's tabs.
@@ -250,6 +265,21 @@ export class PythonInterop {
       return new Error(result.result);
     };
   }
+
+  /**
+   * Sets the visible tab snapshots.
+   * @param snapshots The snapshots.
+   * @returns A promise resolving to whether or not the snapshots were successfully set.
+   */
+    static async setSnapshots(snapshots: SnapshotDictionary): Promise<void | Error> {
+      let result = await PythonInterop.serverAPI.callPluginMethod<{ snapshots: SnapshotDictionary }, void>("set_snapshots", { snapshots: snapshots });
+  
+      if (result.success) {
+        return result.result;
+      } else {
+        return new Error(result.result);
+      };
+    }
 
   /**
    * Shows a toast message.

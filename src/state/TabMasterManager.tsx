@@ -9,6 +9,7 @@ import { LogController } from "../lib/controllers/LogController";
 import { PresetName, PresetOptions, getPreset } from '../presets/presets';
 import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
 import { TabErrorController } from '../lib/controllers/TabErrorController';
+import { SnapshotDictionary, SnapshotManager } from './SnapshotManager';
 
 /**
  * Converts a list of filters into a 1D array.
@@ -65,6 +66,8 @@ export class TabMasterManager {
   private tagsReaction: IReactionDisposer | undefined;
 
   private collectionRemoveReaction: IReactionDisposer | undefined;
+
+  public snapshotManager: SnapshotManager | undefined;
 
   /**
    * Creates a new TabMasterManager.
@@ -483,8 +486,6 @@ export class TabMasterManager {
     }
   }
 
-  
-
   /**
    * Loads the user's tabs from the backend.
    */
@@ -520,6 +521,14 @@ export class TabMasterManager {
         if (this.friendsGameMap.size === 0) {
           this.friendsGameMap = res;
         }
+      }
+    });
+    PythonInterop.getSnapshots().then((res: SnapshotDictionary | Error) => {
+      if (res instanceof Error) {
+        LogController.log("TabMaster couldn't load tab visibilty snapshots");
+        LogController.error(res.message);
+      } else {
+        this.snapshotManager = new SnapshotManager(res);
       }
     });
 

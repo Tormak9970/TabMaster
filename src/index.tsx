@@ -13,6 +13,8 @@ import {
   showContextMenu,
   SidebarNavigation,
   staticClasses,
+  GamepadEvent,
+  GamepadButton
 } from "decky-frontend-lib";
 import { VFC, ReactNode, useState } from "react";
 
@@ -41,6 +43,7 @@ import { MicroSDeck } from "@cebbinghaus/microsdeck";
 import { MicroSDeckInstallState, MicroSDeckInterop, microSDeckLibVersion } from './lib/controllers/MicroSDeckInterop';
 import { MicroSDeckNotice } from './components/MicroSDeckNotice';
 import { CustomTabContainer } from './components/CustomTabContainer';
+import { SnapshotMenu } from './components/menus/SnapshotMenu';
 
 declare global {
   let DeckyPluginLoader: { pluginReloadQueue: { name: string; version?: string; }[]; };
@@ -125,7 +128,18 @@ const Content: VFC<{}> = ({ }) => {
         </div>
       )}
       <QamStyles />
-      <Focusable onMenuActionDescription='Open Docs' onMenuButton={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }}>
+      <Focusable
+        actionDescriptionMap={{
+          [GamepadButton.START]: 'Open Docs',
+          [GamepadButton.SELECT]: 'Visibility Snapshots'
+        }}
+        onButtonDown={(evt: GamepadEvent) => {
+          if(evt.detail.button === GamepadButton.SELECT) {
+            showContextMenu(<SnapshotMenu tabMasterManager={tabMasterManager}/>);
+          }
+        }}
+        onMenuButton={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }}
+      >
         <div style={{ margin: "5px", marginTop: "0px" }}>
           Here you can add, re-order, or remove tabs from the library.
         </div>
