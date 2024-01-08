@@ -36,6 +36,14 @@ export class TabProfileManager {
     tabMasterManager.reorderTabs(this.tabProfiles[tabProfileName]);
   }
 
+  onDeleteTab(deletedId: string) {
+    Object.values(this.tabProfiles).forEach(tabs => {
+      const deletedIndex = tabs.findIndex(tabId => tabId === deletedId);
+      if (deletedIndex > -1) tabs.splice(deletedIndex, 1);
+    });
+    this.save();
+  }
+
   /**
    * Saves all changes made to the tab profiles.
    */

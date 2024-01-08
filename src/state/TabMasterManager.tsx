@@ -441,6 +441,8 @@ export class TabMasterManager {
       }
     }
     this.tabsMap.delete(tabId);
+    this.tabProfileManager?.onDeleteTab(tabId);
+    if (!this.tabProfileManager) LogController.error('Attempted to delete a tab before TabProfileManager has been initialized.', 'This should not be possible.');
     this.updateAndSave();
   }
 
@@ -487,12 +489,9 @@ export class TabMasterManager {
   }
 
   /**
-   * Loads the user's tabs from the backend.
+   * Other async load calls that don't need to be waited for when starting the plugin
    */
-  loadTabs = async () => {
-    this.initReactions();
-    const settings = await PythonInterop.getTabs();
-    //* We don't need to wait for these, since if we get the store ones, we don't care about them
+  asyncLoadOther() {
     PythonInterop.getTags().then((res: TagResponse[] | Error) => {
       if (res instanceof Error) {
         LogController.log("TabMaster couldn't load tags settings");
@@ -523,21 +522,30 @@ export class TabMasterManager {
         }
       }
     });
-    PythonInterop.getTabProfiles().then((res: TabProfileDictionary | Error) => {
-      if (res instanceof Error) {
-        LogController.log("TabMaster couldn't load tab profiles");
-        LogController.error(res.message);
-      } else {
-        this.tabProfileManager = new TabProfileManager(res);
-      }
-    });
+  }
+
+  /**
+   * Loads the user's tabs from the backend.
+   */
+  loadTabs = async () => {
+    this.initReactions();
+    const settings = await PythonInterop.getTabs();
+    const profiles = await PythonInterop.getTabProfiles();
+
+    this.asyncLoadOther();
 
     if (settings instanceof Error) {
       LogController.log("TabMaster couldn't load tab settings");
       LogController.error(settings.message);
       return;
     }
+    if (profiles instanceof Error) {
+      LogController.log("TabMaster couldn't load tab profiles");
+      LogController.error(profiles.message);
+      return;
+    }
 
+    this.tabProfileManager = new TabProfileManager(profiles);
     TabErrorController.validateSettingsOnLoad((Object.keys(settings).length > 0) ? settings : defaultTabsSettings, this, this.finishLoadingTabs.bind(this));
   };
 
