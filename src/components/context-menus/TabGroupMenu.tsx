@@ -46,8 +46,8 @@ const TabGroupMenuItems: VFC<TabsGroupMenuProps> = ({ tabMasterManager }) => {
  */
 const OverwriteTabGroupMenu: VFC<TabsGroupMenuProps> = ({ tabMasterManager }) => {
   return (
-    <MenuGroup label='Overwrite Tab Group' disabled={Object.keys(tabMasterManager.tabGroupManager?.snapshots ?? {}).length === 0}>
-      {Object.keys(tabMasterManager.tabGroupManager?.snapshots ?? {}).map(snapshotName => {
+    <MenuGroup label='Overwrite Tab Group' disabled={Object.keys(tabMasterManager.tabGroupManager?.tabGroups ?? {}).length === 0}>
+      {Object.keys(tabMasterManager.tabGroupManager?.tabGroups ?? {}).map(snapshotName => {
         return (
           <MenuItem onClick={() => showModal(<OverwriteTabGroupModal groupName={snapshotName} tabMasterManager={tabMasterManager} />)}>
             {snapshotName}
@@ -63,8 +63,8 @@ const OverwriteTabGroupMenu: VFC<TabsGroupMenuProps> = ({ tabMasterManager }) =>
  */
 const ApplyTabGroupMenu: VFC<TabsGroupMenuProps> = ({ tabMasterManager }) => {
   return (
-    <MenuGroup label='Apply Tab Group' disabled={Object.keys(tabMasterManager.tabGroupManager?.snapshots ?? {}).length === 0}>
-      {Object.keys(tabMasterManager.tabGroupManager?.snapshots ?? {}).map(snapshotName => {
+    <MenuGroup label='Apply Tab Group' disabled={Object.keys(tabMasterManager.tabGroupManager?.tabGroups ?? {}).length === 0}>
+      {Object.keys(tabMasterManager.tabGroupManager?.tabGroups ?? {}).map(snapshotName => {
         return (
           <MenuItem onClick={() => tabMasterManager.tabGroupManager?.apply(snapshotName, tabMasterManager)}>
             {snapshotName}

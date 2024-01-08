@@ -182,18 +182,18 @@ export class PythonInterop {
   }
 
   /**
-   * Gets the visible tab snapshots.
-   * @returns A promise resolving the snapshots.
+   * Gets the user's tab groups.
+   * @returns A promise resolving the user's tab groups.
    */
-      static async getSnapshots(): Promise<TabGroupDictionary | Error> {
-        let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabGroupDictionary>("get_snapshots", {});
-    
-        if (result.success) {
-          return result.result;
-        } else {
-          return new Error(result.result);
-        };
-      }
+  static async getTabGroups(): Promise<TabGroupDictionary | Error> {
+    let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabGroupDictionary>("get_tab_groups", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    };
+  }
 
   /**
    * Sets the plugin's tabs.

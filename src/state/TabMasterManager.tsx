@@ -523,9 +523,9 @@ export class TabMasterManager {
         }
       }
     });
-    PythonInterop.getSnapshots().then((res: TabGroupDictionary | Error) => {
+    PythonInterop.getTabGroups().then((res: TabGroupDictionary | Error) => {
       if (res instanceof Error) {
-        LogController.log("TabMaster couldn't load tab visibilty snapshots");
+        LogController.log("TabMaster couldn't load tab groups");
         LogController.error(res.message);
       } else {
         this.tabGroupManager = new TabGroupManager(res);
