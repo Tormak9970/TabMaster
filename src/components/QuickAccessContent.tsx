@@ -22,12 +22,12 @@ import { QamStyles } from "./styles/QamStyles";
 import { showModalNewTab } from "./modals/EditTabModal";
 import { TabActionsButton } from "./TabActions";
 import { LogController } from "../lib/controllers/LogController";
-import { PresetMenu } from './menus/PresetMenu';
+import { PresetMenu } from './context-menus/PresetMenu';
 import { TabListLabel } from './TabListLabel';
 import { MicroSDeckInstallState, MicroSDeckInterop, microSDeckLibVersion } from '../lib/controllers/MicroSDeckInterop';
 import { MicroSDeckNotice } from './MicroSDeckNotice';
 import { CustomTabContainer } from './CustomTabContainer';
-import { SnapshotMenu } from './menus/SnapshotMenu';
+import { TabGroupsMenu } from './context-menus/TabGroupMenu';
 
 
 export type TabIdEntryType = {
@@ -103,11 +103,11 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
       <Focusable
         actionDescriptionMap={{
           [GamepadButton.START]: 'Open Docs',
-          [GamepadButton.SELECT]: 'Visibility Snapshots'
+          [GamepadButton.SELECT]: 'Manage Tab Groups'
         }}
         onButtonDown={(evt: GamepadEvent) => {
           if(evt.detail.button === GamepadButton.SELECT) {
-            showContextMenu(<SnapshotMenu tabMasterManager={tabMasterManager}/>);
+            showContextMenu(<TabGroupsMenu tabMasterManager={tabMasterManager}/>);
           }
         }}
         onMenuButton={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }}

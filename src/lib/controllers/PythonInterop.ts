@@ -1,6 +1,6 @@
 import { ServerAPI } from "decky-frontend-lib";
 import { validateTabs } from "../Utils";
-import { SnapshotDictionary } from '../../state/SnapshotManager';
+import { TabGroupDictionary } from '../../state/TabGroupManager';
 
 /**
  * Class for frontend -> backend communication.
@@ -185,8 +185,8 @@ export class PythonInterop {
    * Gets the visible tab snapshots.
    * @returns A promise resolving the snapshots.
    */
-      static async getSnapshots(): Promise<SnapshotDictionary | Error> {
-        let result = await PythonInterop.serverAPI.callPluginMethod<{}, SnapshotDictionary>("get_snapshots", {});
+      static async getSnapshots(): Promise<TabGroupDictionary | Error> {
+        let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabGroupDictionary>("get_snapshots", {});
     
         if (result.success) {
           return result.result;
@@ -267,12 +267,12 @@ export class PythonInterop {
   }
 
   /**
-   * Sets the visible tab snapshots.
-   * @param snapshots The snapshots.
-   * @returns A promise resolving to whether or not the snapshots were successfully set.
+   * Sets the tab groups.
+   * @param tabGroups The tab groups.
+   * @returns A promise resolving to whether or not the tab groups were successfully set.
    */
-    static async setSnapshots(snapshots: SnapshotDictionary): Promise<void | Error> {
-      let result = await PythonInterop.serverAPI.callPluginMethod<{ snapshots: SnapshotDictionary }, void>("set_snapshots", { snapshots: snapshots });
+    static async setTabGroups(tabGroups: TabGroupDictionary): Promise<void | Error> {
+      let result = await PythonInterop.serverAPI.callPluginMethod<{ tab_groups: TabGroupDictionary }, void>("set_tab_groups", { tab_groups: tabGroups });
   
       if (result.success) {
         return result.result;

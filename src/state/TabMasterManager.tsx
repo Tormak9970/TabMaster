@@ -9,7 +9,7 @@ import { LogController } from "../lib/controllers/LogController";
 import { PresetName, PresetOptions, getPreset } from '../presets/presets';
 import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
 import { TabErrorController } from '../lib/controllers/TabErrorController';
-import { SnapshotDictionary, SnapshotManager } from './SnapshotManager';
+import { TabGroupDictionary, TabGroupManager } from './TabGroupManager';
 
 /**
  * Converts a list of filters into a 1D array.
@@ -67,7 +67,7 @@ export class TabMasterManager {
 
   private collectionRemoveReaction: IReactionDisposer | undefined;
 
-  public snapshotManager: SnapshotManager | undefined;
+  public tabGroupManager: TabGroupManager | undefined;
 
   /**
    * Creates a new TabMasterManager.
@@ -523,12 +523,12 @@ export class TabMasterManager {
         }
       }
     });
-    PythonInterop.getSnapshots().then((res: SnapshotDictionary | Error) => {
+    PythonInterop.getSnapshots().then((res: TabGroupDictionary | Error) => {
       if (res instanceof Error) {
         LogController.log("TabMaster couldn't load tab visibilty snapshots");
         LogController.error(res.message);
       } else {
-        this.snapshotManager = new SnapshotManager(res);
+        this.tabGroupManager = new TabGroupManager(res);
       }
     });
 

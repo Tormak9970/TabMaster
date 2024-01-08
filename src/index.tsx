@@ -52,8 +52,6 @@ export default definePlugin((serverAPI: ServerAPI) => {
     settingsPatch = patchSettings(serverAPI, tabMasterManager);
   });
 
-  const onWakeUnregister = SteamClient.System.RegisterForOnResumeFromSuspend(PluginController.onWakeFromSleep.bind(PluginController)).unregister;
-
   PythonInterop.getDocs().then((pages: DocPages | Error) => {
     if (pages instanceof Error) {
       LogController.error(pages);
@@ -79,7 +77,6 @@ export default definePlugin((serverAPI: ServerAPI) => {
       serverAPI.routerHook.removeRoute("/tab-master-docs");
 
       loginUnregisterer.unregister();
-      onWakeUnregister();
       PluginController.dismount();
     },
   };

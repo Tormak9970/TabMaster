@@ -54,12 +54,15 @@ interface FilterSelectElement {
 const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, focusable, onClick }) => {
   let disabled = false;
   let requiredMicroSDeckVer = '';
+
   if (filterType === 'sd card') {
     disabled = !MicroSDeckInterop.isInstallOk();
     const [major, minor, patch] = microSDeckLibVersion.split(/[.+-]/, 3);
+    
     if (+major > 0) requiredMicroSDeckVer = major + '.x.x';
     if (+major === 0) requiredMicroSDeckVer = `0.${minor}.${patch}`;
   }
+
   const canFocus = focusable && !disabled;
 
   return (
