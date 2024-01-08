@@ -9,7 +9,7 @@ import { LogController } from "../lib/controllers/LogController";
 import { PresetName, PresetOptions, getPreset } from '../presets/presets';
 import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
 import { TabErrorController } from '../lib/controllers/TabErrorController';
-import { TabGroupDictionary, TabGroupManager } from './TabGroupManager';
+import { TabProfileDictionary, TabProfileManager } from './TabProfileManager';
 
 /**
  * Converts a list of filters into a 1D array.
@@ -67,7 +67,7 @@ export class TabMasterManager {
 
   private collectionRemoveReaction: IReactionDisposer | undefined;
 
-  public tabGroupManager: TabGroupManager | undefined;
+  public tabProfileManager: TabProfileManager | undefined;
 
   /**
    * Creates a new TabMasterManager.
@@ -523,12 +523,12 @@ export class TabMasterManager {
         }
       }
     });
-    PythonInterop.getTabGroups().then((res: TabGroupDictionary | Error) => {
+    PythonInterop.getTabProfiles().then((res: TabProfileDictionary | Error) => {
       if (res instanceof Error) {
-        LogController.log("TabMaster couldn't load tab groups");
+        LogController.log("TabMaster couldn't load tab profiles");
         LogController.error(res.message);
       } else {
-        this.tabGroupManager = new TabGroupManager(res);
+        this.tabProfileManager = new TabProfileManager(res);
       }
     });
 

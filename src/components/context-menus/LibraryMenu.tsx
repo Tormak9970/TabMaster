@@ -10,7 +10,7 @@ import { PresetMenuItems } from './PresetMenu';
 import { CustomTabContainer } from '../CustomTabContainer';
 import { TabListLabel } from '../TabListLabel';
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
-import { TabGroupsSubMenu } from './TabGroupMenu';
+import { TabProfilesSubMenu } from './TabProfileMenu';
 import { TabIdEntryType } from "../QuickAccessContent";
 
 export interface LibraryMenuProps {
@@ -66,7 +66,7 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
       <PresetMenuItems tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />
     </MenuGroup>
     <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
-    <TabGroupsSubMenu tabMasterManager={tabMasterManager}/>
+    <TabProfilesSubMenu tabMasterManager={tabMasterManager}/>
     <MenuGroup label='Reorder Tabs'>
       <Focusable style={{ width: '240px', background: "#23262e", margin: '0' }} className='tab-master-library-menu-reorderable-group' onOKActionDescription=''>
         <ReorderableList<TabIdEntryType>

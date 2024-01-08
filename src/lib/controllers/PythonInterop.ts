@@ -1,6 +1,6 @@
 import { ServerAPI } from "decky-frontend-lib";
 import { validateTabs } from "../Utils";
-import { TabGroupDictionary } from '../../state/TabGroupManager';
+import { TabProfileDictionary } from '../../state/TabProfileManager';
 
 /**
  * Class for frontend -> backend communication.
@@ -182,11 +182,11 @@ export class PythonInterop {
   }
 
   /**
-   * Gets the user's tab groups.
-   * @returns A promise resolving the user's tab groups.
+   * Gets the user's tab profiles.
+   * @returns A promise resolving the user's tab profiles.
    */
-  static async getTabGroups(): Promise<TabGroupDictionary | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabGroupDictionary>("get_tab_groups", {});
+  static async getTabProfiles(): Promise<TabProfileDictionary | Error> {
+    let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabProfileDictionary>("get_tab_profiles", {});
 
     if (result.success) {
       return result.result;
@@ -267,12 +267,12 @@ export class PythonInterop {
   }
 
   /**
-   * Sets the tab groups.
-   * @param tabGroups The tab groups.
-   * @returns A promise resolving to whether or not the tab groups were successfully set.
+   * Sets the user's tab profiles.
+   * @param tabProfiles The tab profiles.
+   * @returns A promise resolving to whether or not the tab profiles were successfully set.
    */
-    static async setTabGroups(tabGroups: TabGroupDictionary): Promise<void | Error> {
-      let result = await PythonInterop.serverAPI.callPluginMethod<{ tab_groups: TabGroupDictionary }, void>("set_tab_groups", { tab_groups: tabGroups });
+    static async setTabProfiles(tabProfiles: TabProfileDictionary): Promise<void | Error> {
+      let result = await PythonInterop.serverAPI.callPluginMethod<{ tab_profiles: TabProfileDictionary }, void>("set_tab_profiles", { tab_profiles: tabProfiles });
   
       if (result.success) {
         return result.result;

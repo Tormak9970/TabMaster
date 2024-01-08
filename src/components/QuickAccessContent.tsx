@@ -27,7 +27,7 @@ import { TabListLabel } from './TabListLabel';
 import { MicroSDeckInstallState, MicroSDeckInterop, microSDeckLibVersion } from '../lib/controllers/MicroSDeckInterop';
 import { MicroSDeckNotice } from './MicroSDeckNotice';
 import { CustomTabContainer } from './CustomTabContainer';
-import { TabGroupsMenu } from './context-menus/TabGroupMenu';
+import { TabProfilesMenu } from './context-menus/TabProfileMenu';
 
 
 export type TabIdEntryType = {
@@ -103,11 +103,11 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
       <Focusable
         actionDescriptionMap={{
           [GamepadButton.START]: 'Open Docs',
-          [GamepadButton.SELECT]: 'Manage Tab Groups'
+          [GamepadButton.SELECT]: 'Manage Tab Profiles'
         }}
         onButtonDown={(evt: GamepadEvent) => {
           if(evt.detail.button === GamepadButton.SELECT) {
-            showContextMenu(<TabGroupsMenu tabMasterManager={tabMasterManager}/>);
+            showContextMenu(<TabProfilesMenu tabMasterManager={tabMasterManager}/>);
           }
         }}
         onMenuButton={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }}

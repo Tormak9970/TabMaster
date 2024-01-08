@@ -148,18 +148,18 @@ class Plugin:
     log(f"Got {len(friends_games)} friendsGames")
     return friends_games or {}
   
-  async def get_tab_groups(self) -> dict[str, list[str]] | None:
+  async def get_tab_profiles(self) -> dict[str, list[str]] | None:
     """
-    Waits until users_dict is loaded, then returns the tab groups
+    Waits until users_dict is loaded, then returns the tab profiles
 
-    :return: User's tab groups
+    :return: User's tab profiles
     """
     while Plugin.users_dict is None:
       await asyncio.sleep(0.1)
 
-    tab_groups = Plugin.users_dict[Plugin.user_id]["tabGroups"]
-    log(f"Got tab groups {tab_groups}")
-    return tab_groups or {}
+    tab_profiles = Plugin.users_dict[Plugin.user_id]["tabProfiles"]
+    log(f"Got tab profiles {tab_profiles}")
+    return tab_profiles or {}
 
   # Plugin settings setters
   async def set_tabs(self, tabs: dict[str, dict]):
@@ -178,8 +178,8 @@ class Plugin:
     Plugin.users_dict[Plugin.user_id]["friendsGames"] = friends_games
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
-  async def set_tab_groups(self, tab_groups: dict[str, list[str]]):
-    Plugin.users_dict[Plugin.user_id]["tabGroups"] = tab_groups
+  async def set_tab_profiles(self, tab_profiles: dict[str, list[str]]):
+    Plugin.users_dict[Plugin.user_id]["tabProfiles"] = tab_profiles
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
   async def get_docs(self):
