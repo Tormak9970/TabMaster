@@ -157,9 +157,10 @@ class Plugin:
     while Plugin.users_dict is None:
       await asyncio.sleep(0.1)
 
-    tab_profiles = Plugin.users_dict[Plugin.user_id]["tabProfiles"]
+    user = Plugin.users_dict[Plugin.user_id]
+    tab_profiles = Plugin.users_dict[Plugin.user_id]["tabProfiles"] if "tabProfiles" in user.keys() else {}
     log(f"Got tab profiles {tab_profiles}")
-    return tab_profiles or {}
+    return tab_profiles
 
   # Plugin settings setters
   async def set_tabs(self, tabs: dict[str, dict]):
