@@ -11,7 +11,7 @@ interface TabsProfilesMenuProps {
  * Context menu for managing Tab Profiles.
  */
 export const TabProfilesMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) => {
-  return <Menu label='Manage Tab Groups'>
+  return <Menu label='Manage Tab Profiles'>
     <TabProfileMenuItems tabMasterManager={tabMasterManager} />
   </Menu>;
 };
@@ -20,7 +20,7 @@ export const TabProfilesMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }
  * Context menu sub-menu for managing Tab Profiles.
  */
 export const TabProfilesSubMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) => {
-  return <MenuGroup label='Manage Tab Groups'>
+  return <MenuGroup label='Manage Tab Profiles'>
     <TabProfileMenuItems tabMasterManager={tabMasterManager} />
   </MenuGroup>;
 };
