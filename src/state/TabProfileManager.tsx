@@ -36,6 +36,15 @@ export class TabProfileManager {
     tabMasterManager.reorderTabs(this.tabProfiles[tabProfileName]);
   }
 
+  delete(tabProfileName: string) {
+    delete this.tabProfiles[tabProfileName];
+    this.save();
+  }
+
+  /**
+   * Removes tab from profiles when it has been deleted
+   * @param deletedId The tab id that is being deleted
+   */
   onDeleteTab(deletedId: string) {
     Object.values(this.tabProfiles).forEach(tabs => {
       const deletedIndex = tabs.findIndex(tabId => tabId === deletedId);
