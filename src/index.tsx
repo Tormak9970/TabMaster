@@ -2,7 +2,6 @@ import {
   definePlugin,
   RoutePatch,
   ServerAPI,
-  staticClasses,
 } from "decky-frontend-lib";
 
 import { TbLayoutNavbarExpand } from "react-icons/tb";
@@ -19,8 +18,9 @@ import { patchSettings } from "./patches/SettingsPatch";
 import { LogController } from "./lib/controllers/LogController";
 import { MicroSDeck } from "@cebbinghaus/microsdeck";
 import { MicroSDeckInterop } from './lib/controllers/MicroSDeckInterop';
-import { QuickAccessContent } from "./components/QuickAccessContent";
+import { QuickAccessContent, QuickAccessTitleView } from "./components/QuickAccessContent";
 import { DocsRouter } from "./components/docs/DocsRouter";
+import { Fragment } from 'react';
 
 declare global {
   let DeckyPluginLoader: { pluginReloadQueue: { name: string; version?: string; }[]; };
@@ -63,9 +63,9 @@ export default definePlugin((serverAPI: ServerAPI) => {
       ));
     }
   });
-
   return {
-    title: <div className={staticClasses.Title}>TabMaster</div>,
+    title: <></>,
+    titleView: <QuickAccessTitleView title="TabMaster" tabMasterManager={tabMasterManager} />,
     content:
       <TabMasterContextProvider tabMasterManager={tabMasterManager}>
         <QuickAccessContent />

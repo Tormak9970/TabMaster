@@ -8,8 +8,7 @@ import {
   ReorderableEntry,
   ReorderableList,
   showContextMenu,
-  GamepadEvent,
-  GamepadButton
+  quickAccessMenuClasses
 } from "decky-frontend-lib";
 import { VFC, useState } from "react";
 
@@ -28,6 +27,7 @@ import { MicroSDeckInstallState, MicroSDeckInterop, microSDeckLibVersion } from 
 import { MicroSDeckNotice } from './MicroSDeckNotice';
 import { CustomTabContainer } from './CustomTabContainer';
 import { TabProfilesMenu } from './context-menus/TabProfileMenu';
+import { TabMasterManager } from '../state/TabMasterManager';
 
 
 export type TabIdEntryType = {
@@ -46,7 +46,7 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
   const { visibleTabsList, hiddenTabsList, tabsMap, tabMasterManager } = useTabMasterContext();
 
   const microSDeckInstallState = MicroSDeckInterop.getInstallState();
-  const isMicroSDeckInstalled =  microSDeckInstallState === MicroSDeckInstallState['good'];
+  const isMicroSDeckInstalled = microSDeckInstallState === MicroSDeckInstallState['good'];
   const hasSdTabs = !!visibleTabsList.find(tabContainer => (tabContainer as CustomTabContainer).dependsOnMicroSDeck);
 
   function TabEntryInteractables({ entry }: TabEntryInteractablesProps) {
@@ -100,18 +100,7 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
         </div>
       )}
       <QamStyles />
-      <Focusable
-        actionDescriptionMap={{
-          [GamepadButton.START]: 'Open Docs',
-          [GamepadButton.SELECT]: 'Manage Tab Profiles'
-        }}
-        onButtonDown={(evt: GamepadEvent) => {
-          if(evt.detail.button === GamepadButton.SELECT) {
-            showContextMenu(<TabProfilesMenu tabMasterManager={tabMasterManager}/>);
-          }
-        }}
-        onMenuButton={() => { Navigation.CloseSideMenus(); Navigation.Navigate("/tab-master-docs"); }}
-      >
+      <Focusable >
         <div style={{ margin: "5px", marginTop: "0px" }}>
           Here you can add, re-order, or remove tabs from the library.
         </div>
@@ -173,5 +162,46 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
         )}
       </Focusable>
     </div>
+  );
+};
+
+export interface QuickAccessTitleViewProps {
+  title: string;
+  tabMasterManager: TabMasterManager;
+}
+
+const buttonStyle = { height: '28px', width: '40px', minWidth: 0, padding: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' };
+
+export const QuickAccessTitleView: VFC<QuickAccessTitleViewProps> = ({ title, tabMasterManager }) => {
+
+  return (
+    <Focusable
+      style={{
+        display: 'flex',
+        padding: '0',
+        flex: 'auto',
+        boxShadow: 'none',
+      }}
+      className={quickAccessMenuClasses.Title}
+    >
+      <div style={{ marginRight: "auto" }}>{title}</div>
+      <DialogButton
+        onOKActionDescription="Manage Tab Profiles"
+        style={buttonStyle}
+        onClick={() => showContextMenu(<TabProfilesMenu tabMasterManager={tabMasterManager} />)}
+      >
+        {/* {profiles icon} */}
+      </DialogButton>
+      <DialogButton
+        onOKActionDescription="Open Docs"
+        style={buttonStyle}
+        onClick={() => {
+          Navigation.CloseSideMenus();
+          Navigation.Navigate("/tab-master-docs");
+        }}
+      >
+        {/* {docs icon} */}
+      </DialogButton>
+    </Focusable>
   );
 };
