@@ -1,7 +1,10 @@
-import { Menu, MenuGroup, MenuItem, showModal } from 'decky-frontend-lib';
-import { VFC, Fragment } from 'react';
+import { Menu, MenuGroup, MenuItem, showModal, GamepadButton, ConfirmModal } from 'decky-frontend-lib';
+import { VFC, Fragment, useState } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { CreateTabProfileModal, OverwriteTabProfileModal } from '../modals/TabProfileModals';
+import { gamepadContextMenuClasses } from '../../lib/GamepadContextMenuClasses';
+import { DestructiveModal } from '../generic/DestructiveModal';
+
 
 interface TabsProfilesMenuProps {
   tabMasterManager: TabMasterManager,
@@ -29,49 +32,40 @@ export const TabProfilesSubMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManage
  * Menu items for the Tab Profiles context menu.
  */
 const TabProfileMenuItems: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) => {
+  const [_refresh, setRefresh] = useState(true);
   return (
     <>
       <MenuItem onClick={() => showModal(<CreateTabProfileModal tabMasterManager={tabMasterManager} />)}>
         Create Profile
       </MenuItem>
-      <OverwriteTabProfileMenu tabMasterManager={tabMasterManager} />
-      {/* <div className={gamepadContextMenuClasses.ContextMenuSeparator} /> */}
-      <ApplyTabProfile tabMasterManager={tabMasterManager} />
+      <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
+      {Object.keys(tabMasterManager.tabProfileManager?.tabProfiles ?? {}).map(profileName => {
+        return (
+          <MenuItem
+            onClick= {() => tabMasterManager.tabProfileManager?.apply(profileName, tabMasterManager)}
+            actionDescriptionMap={{
+              [GamepadButton.OK]: 'Apply Profile',
+              [GamepadButton.SECONDARY]: 'Delete Profile', //X
+              [GamepadButton.OPTIONS]: 'Overwrite Profile', //Y
+            }}
+            onSecondaryButton={() =>
+              showModal(<DestructiveModal
+                onOK={() => {
+                  tabMasterManager.tabProfileManager?.delete(profileName);
+                  setRefresh(cur => !cur);
+                }}
+                strTitle={`Deleting Profile: ${profileName}`}
+              >
+                Are you sure you want to delete this profile?
+              </DestructiveModal>)
+            }
+            onOptionsButton={() => showModal(<OverwriteTabProfileModal profileName={profileName} tabMasterManager={tabMasterManager} />)}
+          >
+            {profileName}
+          </MenuItem>
+        );
+      })}
     </>
-  );
-};
-
-/**
- * The overwrite menu for Tab Profiles.
- */
-const OverwriteTabProfileMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) => {
-  return (
-    <MenuGroup label='Overwrite Tab Profile' disabled={Object.keys(tabMasterManager.tabProfileManager?.tabProfiles ?? {}).length === 0}>
-      {Object.keys(tabMasterManager.tabProfileManager?.tabProfiles ?? {}).map(snapshotName => {
-        return (
-          <MenuItem onClick={() => showModal(<OverwriteTabProfileModal profileName={snapshotName} tabMasterManager={tabMasterManager} />)}>
-            {snapshotName}
-          </MenuItem>
-        );
-      })}
-    </MenuGroup>
-  );
-};
-
-/**
- * The apply menu for Tab Profiles.
- */
-const ApplyTabProfile: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) => {
-  return (
-    <MenuGroup label='Apply Tab Profile' disabled={Object.keys(tabMasterManager.tabProfileManager?.tabProfiles ?? {}).length === 0}>
-      {Object.keys(tabMasterManager.tabProfileManager?.tabProfiles ?? {}).map(snapshotName => {
-        return (
-          <MenuItem onClick={() => tabMasterManager.tabProfileManager?.apply(snapshotName, tabMasterManager)}>
-            {snapshotName}
-          </MenuItem>
-        );
-      })}
-    </MenuGroup>
   );
 };
 
