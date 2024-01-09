@@ -1,8 +1,9 @@
-import { ConfirmModal, Field, TextField, afterPatch, quickAccessControlsClasses } from 'decky-frontend-lib';
-import { VFC, useEffect, useState, Fragment } from 'react';
+import { ConfirmModal, Field, TextField, quickAccessControlsClasses } from 'decky-frontend-lib';
+import { VFC, useState, Fragment, FC } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabProfileModalStyles } from "../styles/TabProfileModalStyles";
+import { TabListLabel } from '../TabListLabel';
 
 export interface CreateTabProfileModalProps {
   tabMasterManager: TabMasterManager,
@@ -12,25 +13,6 @@ export interface CreateTabProfileModalProps {
 export const CreateTabProfileModal: VFC<CreateTabProfileModalProps> = ({ tabMasterManager, closeModal }) => {
   const [name, setName] = useState<string>('');
   const visibleTabs = tabMasterManager.getTabs().visibleTabsList;
-  const [patchInput, setPatchInput] = useState<boolean>(true);
-
-  const nameInputElement = <TextField value={name} placeholder="The name of this tab profile" onChange={onNameChange} />;
-
-  //reference to input field class component instance, which has a focus method
-  let inputComponentInstance: any;
-
-  if (patchInput) {
-    afterPatch(nameInputElement.type.prototype, 'render', function (_: any, ret: any) {
-      //@ts-ignore     get reference to instance
-      inputComponentInstance = this;
-      return ret;
-    }, { singleShot: true });
-  }
-
-  useEffect(() => {
-    inputComponentInstance.Focus();
-    setPatchInput(false);
-  }, []);
 
   function onNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     setName(e?.target.value);
@@ -54,11 +36,21 @@ export const CreateTabProfileModal: VFC<CreateTabProfileModalProps> = ({ tabMast
                 <div style={{ paddingBottom: "6px" }} className={quickAccessControlsClasses.PanelSectionTitle}>
                   Profile Name
                 </div>
-                {nameInputElement}
+                <TextField value={name} placeholder="The name of this tab profile" onChange={onNameChange} />
               </>
             } />
           </div>
-          {visibleTabs.map(tabContainer => <div>{tabContainer.title}</div>)}
+          {/* <ScrollableWindow height='180px' fadePercent={7}> */}
+            <div style={{ padding: '0 20px'}}>
+              {visibleTabs.map(tabContainer => {
+                return (
+                  <TabItem >
+                    <TabListLabel tabContainer={tabContainer} microSDeckDisabled={false} />
+                  </TabItem>
+                );
+              })}
+            </div>
+          {/* </ScrollableWindow> */}
         </ConfirmModal>
       </div>
     </TabMasterContextProvider>
@@ -100,4 +92,22 @@ export const OverwriteTabProfileModal: VFC<OverwriteTabProfileModalProps> = ({ p
     </TabMasterContextProvider>
   );
 };
+
+const TabItem: FC<{}> = ({ children }) => {
+  return (
+    <>
+      <div style={{ padding: '0 15px', height: '28px', display: 'flex', fontSize: 'small' }}>
+        {children}
+      </div>
+      <div
+        style={{
+          height: '2px',
+          background: 'rgba(255,255,255,.1)',
+          flexShrink: '0'
+        }}
+      />
+    </>
+  );
+};
+
 

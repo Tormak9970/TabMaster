@@ -150,7 +150,7 @@ const HiddenItems: VFC<HiddenItemsProps> = ({ hiddenTabsList, isMicroSDeckInstal
           setRefresh(refresh => !refresh);
         }}
       >
-        <TabListLabel tabContainer={tabContainer} microSDeckDisabled={!isMicroSDeckInstalled}/>
+        <TabListLabel tabContainer={tabContainer} microSDeckDisabled={!isMicroSDeckInstalled} />
       </MenuItemNoClose>
     )}
   </>;
