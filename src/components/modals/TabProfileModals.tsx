@@ -4,6 +4,7 @@ import { TabMasterManager } from '../../state/TabMasterManager';
 import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabProfileModalStyles } from "../styles/TabProfileModalStyles";
 import { TabListLabel } from '../TabListLabel';
+import { ScrollableWindow } from '../generic/ScrollableWindow';
 
 export interface CreateTabProfileModalProps {
   tabMasterManager: TabMasterManager,
@@ -40,17 +41,17 @@ export const CreateTabProfileModal: VFC<CreateTabProfileModalProps> = ({ tabMast
               </>
             } />
           </div>
-          {/* <ScrollableWindow height='180px' fadePercent={7}> */}
-            <div style={{ padding: '0 20px'}}>
-              {visibleTabs.map(tabContainer => {
-                return (
+          <div style={{ marginRight: '-4px' }}>
+            <ScrollableWindow height='180px' fadeAmount={'12px'}>
+              <div style={{ padding: '0 20px' }}>
+                {visibleTabs.map(tabContainer =>
                   <TabItem >
                     <TabListLabel tabContainer={tabContainer} microSDeckDisabled={false} />
                   </TabItem>
-                );
-              })}
-            </div>
-          {/* </ScrollableWindow> */}
+                )}
+              </div>
+            </ScrollableWindow>
+          </div>
         </ConfirmModal>
       </div>
     </TabMasterContextProvider>
@@ -77,14 +78,35 @@ export const OverwriteTabProfileModal: VFC<OverwriteTabProfileModalProps> = ({ p
           }}
           onCancel={() => closeModal!()}
         >
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <div>
-              New Tabs:
-              {visibleTabsList.map(tabContainer => <div>{tabContainer.title}</div>)}
+          <div>
+            <div style={{ display: 'flex', flexDirection: 'row', padding: '0 20px', gap: '30px' }}>
+              <div className={quickAccessControlsClasses.PanelSectionTitle} style={{ flex: 1, paddingBottom: 0 }}>
+                New Tabs
+              </div>
+              <div className={quickAccessControlsClasses.PanelSectionTitle} style={{ flex: 1, paddingBottom: 0 }}>
+                Existing Tabs
+              </div>
             </div>
-            <div>
-              Existing Tabs:
-              {existingTabs.map(tabContainer => <div>{tabContainer?.title}</div>)}
+            <div style={{ height: '1.5px', background: '#ffffff1a' }} />
+            <div style={{ marginRight: '-4px' }}>
+              <ScrollableWindow height='200px' fadeAmount={'12px'}>
+                <div style={{ display: 'flex', flexDirection: 'row', padding: '0 20px', gap: '30px' }}>
+                  <div style={{ flex: 1 }}>
+                    {visibleTabsList.map(tabContainer =>
+                      <TabItem >
+                        <TabListLabel tabContainer={tabContainer} microSDeckDisabled={false} />
+                      </TabItem>
+                    )}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    {existingTabs.map(tabContainer =>
+                      <TabItem >
+                        <TabListLabel tabContainer={tabContainer!} microSDeckDisabled={false} />
+                      </TabItem>
+                    )}
+                  </div>
+                </div>
+              </ScrollableWindow>
             </div>
           </div>
         </ConfirmModal>
@@ -94,18 +116,13 @@ export const OverwriteTabProfileModal: VFC<OverwriteTabProfileModalProps> = ({ p
 };
 
 const TabItem: FC<{}> = ({ children }) => {
+
   return (
     <>
       <div style={{ padding: '0 15px', height: '28px', display: 'flex', fontSize: 'small' }}>
         {children}
       </div>
-      <div
-        style={{
-          height: '2px',
-          background: 'rgba(255,255,255,.1)',
-          flexShrink: '0'
-        }}
-      />
+      <div style={{ height: '.5px', background: '#ffffff1a' }} />
     </>
   );
 };
