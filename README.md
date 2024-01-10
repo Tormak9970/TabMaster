@@ -35,27 +35,31 @@ Available Filters:
  - **Last Played** - Selects apps that were last played before/after the provided date.
  - **Demo** - Selects apps that are/aren't demos.
  - **Streamable** - Selects apps that can/can't be streamed from another computer.
+ - **Steam Features** - Selects apps that support specific Steam Features.
+ - **MicroSD Card** - Selects apps that are present on the inserted/specific MicroSD Card.
 
 If you want to see another filter, please open a filter request [here](https://github.com/Tormak9970/TabMaster/issues/new/choose).
 
 Filter Examples:
- - **Collection**<br/><img src="./assets/docs_collection-example.png" width="600" />
- - **Installed**<br/><img src="./assets/docs_installed-example.png" width="600" />
- - **Regex**<br/><img src="./assets/docs_regex-example.png" width="600" />
- - **Friends**<br/><img src="./assets/docs_friends-example.png" width="600" />
- - **Tags**<br/><img src="./assets/docs_tags-example.png" width="600" />
- - **Whitelist**<br/><img src="./assets/docs_whitelist-example.png" width="600" />
- - **Blacklist**<br/><img src="./assets/docs_blacklist-example.png" width="600" />
- - **Merge**<br/><img src="./assets/docs_merge-example.png" width="600" />
- - **Platform**<br/><img src="./assets/docs_platform-example.png" width="600" />
- - **Deck Compatibility**<br/><img src="./assets/docs_deck-compat-example.png" width="600" />
- - **Review Score**<br/><img src="./assets/docs_review-score-example.png" width="600" />
- - **Time Played**<br/><img src="./assets/docs_time-played-example.png" width="600" />
- - **Size on Disk**<br/><img src="./assets/docs_size-on-disk-example.png" width="600" />
- - **Release Date**<br/><img src="./assets/docs_release-date-example.png" width="600" />
- - **Last Played**<br/><img src="./assets/docs_last-played-example.png" width="600" />
- - **Demo**<br/><img src="./assets/docs_demo-example.png" width="600" />
- - **Streamable**<br/><img src="./assets/docs_streamable-example.png" width="600" />
+ - **Collection**<br/><img src="./assets/filters/docs_collection-example.png" width="600" />
+ - **Installed**<br/><img src="./assets/filters/docs_installed-example.png" width="600" />
+ - **Regex**<br/><img src="./assets/filters/docs_regex-example.png" width="600" />
+ - **Friends**<br/><img src="./assets/filters/docs_friends-example.png" width="600" />
+ - **Tags**<br/><img src="./assets/filters/docs_tags-example.png" width="600" />
+ - **Whitelist**<br/><img src="./assets/filters/docs_whitelist-example.png" width="600" />
+ - **Blacklist**<br/><img src="./assets/filters/docs_blacklist-example.png" width="600" />
+ - **Merge**<br/><img src="./assets/filters/docs_merge-example.png" width="600" />
+ - **Platform**<br/><img src="./assets/filters/docs_platform-example.png" width="600" />
+ - **Deck Compatibility**<br/><img src="./assets/filters/docs_deck-compat-example.png" width="600" />
+ - **Review Score**<br/><img src="./assets/filters/docs_review-score-example.png" width="600" />
+ - **Time Played**<br/><img src="./assets/filters/docs_time-played-example.png" width="600" />
+ - **Size on Disk**<br/><img src="./assets/filters/docs_size-on-disk-example.png" width="600" />
+ - **Release Date**<br/><img src="./assets/filters/docs_release-date-example.png" width="600" />
+ - **Last Played**<br/><img src="./assets/filters/docs_last-played-example.png" width="600" />
+ - **Demo**<br/><img src="./assets/filters/docs_demo-example.png" width="600" />
+ - **Streamable**<br/><img src="./assets/filters/docs_streamable-example.png" width="600" />
+ - **Steam Features**<br/><img src="./assets/filters/docs_steam-features-example.png" width="600" />
+ - **MicroSD Card**<br/><img src="./assets/filters/docs_microsd-card-example.png" width="600" />
 
 
 # Using the plugin
