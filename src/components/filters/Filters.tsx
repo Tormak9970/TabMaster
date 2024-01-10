@@ -125,7 +125,7 @@ export const FilterDescriptions: { [filterType in FilterType]: string } = {
   demo: "Selects apps that are/aren't demos.",
   streamable: "Selects apps that can/can't be streamed from another computer.",
   "steam features": "Selects apps that support specific Steam Features.",
-  "sd card": "Selects apps that are present on the inserted/specific MicroSD Card"
+  "sd card": "Selects apps that are present on the inserted/specific MicroSD Card."
 }
 
 /**

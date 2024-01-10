@@ -55,6 +55,8 @@ This is where you can add new tabs to your library. You can find the various opt
 
 **Include** - The types of apps to include (defaults to games).
 
+**Auto Hide** - Whether this tab should automatically be hidden from the library when it has no games (this preserves the order of the tabs, unlike hiding it manually).
+
 **Logic Mode** - Two modes, `And` (apps must match all filters) and `Or` (apps must match at least one filter).
 
 **Filters** - The filters for this tab. More details on these can be found on the next page.
