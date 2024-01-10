@@ -12,7 +12,7 @@ import {
 } from "decky-frontend-lib";
 import { VFC, useState } from "react";
 
-import { FaCircleExclamation } from "react-icons/fa6";
+import { FaBook, FaCircleExclamation, FaBookmark } from "react-icons/fa6";
 import { PiListPlusBold } from "react-icons/pi";
 
 import { useTabMasterContext } from "../state/TabMasterContext";
@@ -190,7 +190,7 @@ export const QuickAccessTitleView: VFC<QuickAccessTitleViewProps> = ({ title, ta
         style={buttonStyle}
         onClick={() => showContextMenu(<TabProfilesMenu tabMasterManager={tabMasterManager} />)}
       >
-        {/* {profiles icon} */}
+        <FaBookmark size='0.9em' />
       </DialogButton>
       <DialogButton
         onOKActionDescription="Open Docs"
@@ -200,7 +200,7 @@ export const QuickAccessTitleView: VFC<QuickAccessTitleViewProps> = ({ title, ta
           Navigation.Navigate("/tab-master-docs");
         }}
       >
-        {/* {docs icon} */}
+        <FaBook size='0.9em'/>
       </DialogButton>
     </Focusable>
   );
