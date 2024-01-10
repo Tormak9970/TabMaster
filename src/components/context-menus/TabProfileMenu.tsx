@@ -1,4 +1,4 @@
-import { Menu, MenuGroup, MenuItem, showModal, GamepadButton, ConfirmModal } from 'decky-frontend-lib';
+import { Menu, MenuGroup, MenuItem, showModal, GamepadButton } from 'decky-frontend-lib';
 import { VFC, Fragment, useState } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { CreateTabProfileModal, OverwriteTabProfileModal } from '../modals/TabProfileModals';

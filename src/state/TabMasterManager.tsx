@@ -227,14 +227,20 @@ export class TabMasterManager {
     }
 
     if (tagLocalizationMap) {
-      this.allStoreTags = Array.from(tagLocalizationMap.entries()).map(([tag, entry]) => {
-        return {
-          tag: tag,
-          string: entry.value
-        };
-      });
-      
-      PythonInterop.setTags(this.allStoreTags);
+      const tagEntriesArray = Array.from(tagLocalizationMap.entries());
+
+      if (tagEntriesArray[0][1].value || tagEntriesArray[0][1].value_) {
+        this.allStoreTags = tagEntriesArray.map(([tag, entry]) => {
+          return {
+            tag: tag,
+            string: entry.value ?? entry.value_
+          };
+        });
+
+        PythonInterop.setTags(this.allStoreTags);
+      } else {
+        LogController.error("Failed to get store tags. Both entry.value and entry.value_ were undefined");
+      }
     } else {
       LogController.error("Failed to get store tags. Both _data and data_ were undefined");
     }
