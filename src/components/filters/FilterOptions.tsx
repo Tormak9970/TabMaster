@@ -315,13 +315,12 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
       <ButtonItem onClick={onClick}>
         {(isEditing ? "Edit" : "Create") + " Merge Group"}
       </ButtonItem>
+      <div style={{ marginTop: "7px" }}><b>Merge Mode</b> - {mergeParams.mode}</div>
+      <div style={{ marginTop: "7px", fontWeight: "bold" }}>Filters:</div>
       <div className="merge-filter-entries">
-        {mergeParams.filters.map((filter, index) => (
-          <div className="merge-filter-entry-container">
+        {mergeParams.filters.map((filter) => (
+          <div style={{ marginTop: "3px" }}>
             <FilterPreview filter={filter} />
-            <div>
-              {index !== mergeParams.filters.length - 1 && mergeParams.mode}
-            </div>
           </div>
         ))}
       </div>
