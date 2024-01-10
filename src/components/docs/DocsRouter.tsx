@@ -43,6 +43,7 @@ export const DocsRouter: VFC<DocsRouterProps> = ({ docs }) => {
         docPages["Overview"],
         docPages["Tabs"],
         docPages["Filters"],
+        docPages["Tab Profiles"],
         docPages["The Fix System"]
       ]}
     />

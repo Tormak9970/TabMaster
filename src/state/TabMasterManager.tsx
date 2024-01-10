@@ -9,7 +9,7 @@ import { LogController } from "../lib/controllers/LogController";
 import { PresetName, PresetOptions, getPreset } from '../presets/presets';
 import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
 import { TabErrorController } from '../lib/controllers/TabErrorController';
-import { TabProfileDictionary, TabProfileManager } from './TabProfileManager';
+import { TabProfileManager } from './TabProfileManager';
 
 /**
  * Converts a list of filters into a 1D array.
