@@ -5,6 +5,7 @@ import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabProfileModalStyles } from "../styles/TabProfileModalStyles";
 import { TabListLabel } from '../TabListLabel';
 import { ScrollableWindow } from '../generic/ScrollableWindow';
+import { DestructiveModal } from '../generic/DestructiveModal';
 
 export interface CreateTabProfileModalProps {
   tabMasterManager: TabMasterManager,
@@ -70,7 +71,7 @@ export const OverwriteTabProfileModal: VFC<OverwriteTabProfileModalProps> = ({ p
     <TabMasterContextProvider tabMasterManager={tabMasterManager}>
       <TabProfileModalStyles />
       <div className="tab-master-tab-profile-modal-scope">
-        <ConfirmModal
+        <DestructiveModal
           strTitle={`Overwriting Profile: ${profileName}`}
           onOK={() => {
             tabMasterManager.tabProfileManager?.write(profileName, visibleTabsList.map(tabContainer => tabContainer.id));
@@ -109,7 +110,7 @@ export const OverwriteTabProfileModal: VFC<OverwriteTabProfileModalProps> = ({ p
               </ScrollableWindow>
             </div>
           </div>
-        </ConfirmModal>
+        </DestructiveModal>
       </div>
     </TabMasterContextProvider>
   );
