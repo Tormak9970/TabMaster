@@ -75,7 +75,7 @@ function getCollectionIcon(entry: any): IconType {
  * The options for a collection filter.
  */
 const CollectionFilterOptions: VFC<FilterOptionsProps<'collection'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
-  const collectionDropdownOptions: SingleDropdownOption[] = collectionStore.userCollections.map((collection: SteamCollection) => {
+  const collectionDropdownOptions: SingleDropdownOption[] = collectionStore.userCollections.concat([{ displayName: 'Hidden', id: 'hidden'}] as any).map((collection: SteamCollection) => {
     return {
       label: collection.displayName,
       data: collection.id

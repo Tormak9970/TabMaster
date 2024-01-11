@@ -30,7 +30,7 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, i
         case 'collection':
           return (
             <MenuGroup label='Collection'>
-              {collectionStore.userCollections.map(({ displayName, id }: { displayName: string; id: string; }) =>
+              {collectionStore.userCollections.concat([{ displayName: 'Hidden', id: 'hidden'}] as any).map(({ displayName, id }: { displayName: string; id: string; }) =>
                 <MenuItem onClick={() => tabMasterManager.createPresetTab(presetName, displayName, id, displayName)} {...getActionDescription(displayName)}>
                   {displayName}
                 </MenuItem>

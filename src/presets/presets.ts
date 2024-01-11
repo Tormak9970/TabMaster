@@ -10,10 +10,12 @@ type TabPreset = {
 const presetDefines = {
 
   collection: (collectionId: string, collectionName: string) => {
+    let include = IncludeCategories.games;
+    if (collectionId === 'hidden') include |= (IncludeCategories.music | IncludeCategories.software | IncludeCategories.hidden); 
     return {
       filters: [{ type: 'collection', inverted: false, params: { id: collectionId, name: collectionName } }],
       filtersMode: 'and',
-      categoriesToInclude: IncludeCategories.games
+      categoriesToInclude: include
     };
   },
 
