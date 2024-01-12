@@ -11,7 +11,7 @@ import { ReactElement, useEffect, useState } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { LogController } from "../lib/controllers/LogController";
-import { LibraryMenu } from '../components/menus/LibraryMenu';
+import { LibraryMenu } from '../components/context-menus/LibraryMenu';
 import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
 
 /**
@@ -87,11 +87,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                   pacthedTabs = tablist.flatMap((tabContainer) => {
                     if (tabContainer.filters) {
                       const footer = { ...(tabTemplate!.footer ?? {}), onMenuButton: getShowMenu(tabContainer.id, tabMasterManager), onMenuActionDescription: 'Tab Master' };
-                      
-                      //if MicroSDeck isn't installed don't display any tabs that depend on it; return empty array for flat map
-                      if (!isMicroSDeckInstalled && (tabContainer as CustomTabContainer).dependsOnMicroSDeck) return [];
-                      if ((tabContainer as CustomTabContainer).autoHide && (tabContainer as CustomTabContainer).collection.visibleApps.length === 0) return [];
-                      return (tabContainer as CustomTabContainer).getActualTab(tabContentComponent, sortingProps, footer, collectionsAppFilterGamepad);
+                      return (tabContainer as CustomTabContainer).getActualTab(tabContentComponent, sortingProps, footer, collectionsAppFilterGamepad, isMicroSDeckInstalled) || [];
                     } else {
                       return tabs.find(actualTab => {
                         if (actualTab.id === tabContainer.id) {

@@ -1,5 +1,6 @@
 import { ServerAPI } from "decky-frontend-lib";
 import { validateTabs } from "../Utils";
+import { TabProfileDictionary } from '../../state/TabProfileManager';
 
 /**
  * Class for frontend -> backend communication.
@@ -135,8 +136,8 @@ export class PythonInterop {
   }
 
   /**
-   * Gets the store tabs.
-   * @returns A promise resolving to the store tabs.
+   * Gets the store tags.
+   * @returns A promise resolving to the store tags.
    */
   static async getTags(): Promise<TagResponse[] | Error> {
     let result = await PythonInterop.serverAPI.callPluginMethod<{}, TagResponse[]>("get_tags", {});
@@ -178,6 +179,20 @@ export class PythonInterop {
     } else {
       return new Error(result.result);
     }
+  }
+
+  /**
+   * Gets the user's tab profiles.
+   * @returns A promise resolving the user's tab profiles.
+   */
+  static async getTabProfiles(): Promise<TabProfileDictionary | Error> {
+    let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabProfileDictionary>("get_tab_profiles", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    };
   }
 
   /**
@@ -250,6 +265,21 @@ export class PythonInterop {
       return new Error(result.result);
     };
   }
+
+  /**
+   * Sets the user's tab profiles.
+   * @param tabProfiles The tab profiles.
+   * @returns A promise resolving to whether or not the tab profiles were successfully set.
+   */
+    static async setTabProfiles(tabProfiles: TabProfileDictionary): Promise<void | Error> {
+      let result = await PythonInterop.serverAPI.callPluginMethod<{ tab_profiles: TabProfileDictionary }, void>("set_tab_profiles", { tab_profiles: tabProfiles });
+  
+      if (result.success) {
+        return result.result;
+      } else {
+        return new Error(result.result);
+      };
+    }
 
   /**
    * Shows a toast message.

@@ -1,104 +1,131 @@
-import { Fragment, VFC } from "react";
-import { FilterType, TabFilterSettings, compatCategoryToLabel } from "./Filters";
+import { Fragment, VFC, createElement } from "react";
+import { FilterIcons, FilterType, TabFilterSettings, compatCategoryToLabel } from "./Filters";
 import { dateToLabel } from '../generic/DatePickers';
 import { capitalizeEachWord } from '../../lib/Utils';
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
+
+type FilterPreviewGenericProps = {
+  filter: TabFilterSettings<FilterType>,
+  displayData: string | undefined,
+  isInverted?: boolean
+};
+
+const FilterPreviewGeneric: VFC<FilterPreviewGenericProps> = ({ filter, displayData, isInverted }) => {
+  return (
+    <div style={{ display: "flex" }}>
+      <div style={{ marginRight: '7px' }}>
+        {createElement(FilterIcons[filter.type], { size: '.8em' })}
+      </div>
+      <div>
+        <b>{capitalizeEachWord(filter.type)}</b>{' - ' + displayData + (isInverted ? " (inverted)" : "")}
+      </div>
+    </div>
+  );
+}
 
 type FilterPreviewProps<T extends FilterType> = {
   filter: TabFilterSettings<T>;
 };
 
-
 const CollectionFilterPreview: VFC<FilterPreviewProps<'collection'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.name ?? filter.params.id}{filter.inverted ? " (inverted)" : ""}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={filter.params.name ?? filter.params.id} isInverted={filter.inverted} />;
 };
 
 const InstalledFilterPreview: VFC<FilterPreviewProps<'installed'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.installed ? "yes" : "no"}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={filter.params.installed ? "yes" : "no"} />;
 };
 
 const RegexFilterPreview: VFC<FilterPreviewProps<'regex'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.regex}{filter.inverted ? " (inverted)" : ""}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={filter.params.regex} isInverted={filter.inverted} />;
 };
 
 const FriendsFilterPreview: VFC<FilterPreviewProps<'friends'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.friends.length} {filter.params.friends.length == 1 ? "friend" : "friends"}{filter.inverted ? " (inverted)" : ""}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={`${filter.params.friends.length} ${filter.params.friends.length == 1 ? "friend" : "friends"}`} isInverted={filter.inverted} />;
 };
 
 const TagsFilterPreview: VFC<FilterPreviewProps<'tags'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.tags.length} {filter.params.tags.length == 1 ? "tag" : "tags"}{filter.inverted ? " (inverted)" : ""}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={`${filter.params.tags.length} ${filter.params.tags.length == 1 ? "tag" : "tags"}`} isInverted={filter.inverted} />;
 };
 
 const WhitelistFilterPreview: VFC<FilterPreviewProps<'whitelist'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.games.length} whitelisted</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={`${filter.params.games.length} whitelisted`} />;
 };
 
 const BlackListFilterPreview: VFC<FilterPreviewProps<'blacklist'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.games.length} blacklisted</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={`${filter.params.games.length} blacklisted`} />;
 };
 
 const MergeFilterPreview: VFC<FilterPreviewProps<'merge'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.filters.length} grouped filters{filter.inverted ? " (inverted)" : ""}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={`${filter.params.filters.length} grouped filters`} isInverted={filter.inverted} />;
 };
 
 const PlatformFilterPreview: VFC<FilterPreviewProps<'platform'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.platform === "steam" ? "Steam" : "Non Steam"}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={filter.params.platform === "steam" ? "Steam" : "Non Steam"} />;
 };
 
 const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{compatCategoryToLabel(filter.params.category)}{filter.inverted ? " (inverted)" : ""}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={compatCategoryToLabel(filter.params.category)} isInverted={filter.inverted} />;
 };
 
 const ReviewScoreFilterPreview: VFC<FilterPreviewProps<'review score'>> = ({ filter }) => {
   const { scoreThreshold, condition, type } = filter.params;
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{type === 'metacritic' ? `Metacritic of ${scoreThreshold} or ${condition === 'above' ? 'higher' : 'lower'}` : `At ${condition === 'above' ? 'least' : 'most'} ${scoreThreshold}% positive Steam reviews`}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={type === 'metacritic' ? `Metacritic of ${scoreThreshold} or ${condition === 'above' ? 'higher' : 'lower'}` : `At ${condition === 'above' ? 'least' : 'most'} ${scoreThreshold}% positive Steam reviews`} />;
 };
 
 const TimePlayedFilterPreview: VFC<FilterPreviewProps<'time played'>> = ({ filter }) => {
   const { timeThreshold, condition, units } = filter.params;
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${timeThreshold} ${timeThreshold === 1 ? units.slice(0, -1) : units} or ${condition === 'above' ? 'more' : 'less'}`}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={`${timeThreshold} ${timeThreshold === 1 ? units.slice(0, -1) : units} or ${condition === 'above' ? 'more' : 'less'}`} />;
 };
 
 const SizeOnDiskFilterPreview: VFC<FilterPreviewProps<'size on disk'>> = ({ filter }) => {
   const { gbThreshold, condition } = filter.params;
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${gbThreshold} GB or ${condition === 'above' ? 'more' : 'less'}`}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={`${gbThreshold} GB or ${condition === 'above' ? 'more' : 'less'}`} />;
 };
 
 const ReleaseDateFilterPreview: VFC<FilterPreviewProps<'release date'>> = ({ filter }) => {
+  let displayData: string;
+
   if (filter.params.date) {
     const { day, month, year } = filter.params.date;
-    return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, { dateStyle: 'long' })}`}</div>;
+    displayData = `${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, { dateStyle: 'long' })}`;
   } else {
     const daysAgo = filter.params.daysAgo;
-    return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${filter.params.condition === 'above' ? 'later' : 'earlier'}`}</div>;
+    displayData = `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${filter.params.condition === 'above' ? 'later' : 'earlier'}`;
   }
+
+  return <FilterPreviewGeneric filter={filter} displayData={displayData} />;
 };
 
 const LastPlayedFilterPreview: VFC<FilterPreviewProps<'last played'>> = ({ filter }) => {
+  let displayData: string;
+
   if (filter.params.date) {
     const { day, month, year } = filter.params.date;
-    return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, { dateStyle: 'long' })}`}</div>;
+   displayData = `${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, { dateStyle: 'long' })}`;
   } else {
     const daysAgo = filter.params.daysAgo;
-    return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{`${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${filter.params.condition === 'above' ? 'later' : 'earlier'}`}</div>;
+    displayData = `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${filter.params.condition === 'above' ? 'later' : 'earlier'}`;
   }
+
+  return <FilterPreviewGeneric filter={filter} displayData={displayData} />;
 };
+
 const DemoFilterPreview: VFC<FilterPreviewProps<'demo'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.isDemo ? "yes" : "no"}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={filter.params.isDemo ? "yes" : "no"} />;
 };
 
 const StreamableFilterPreview: VFC<FilterPreviewProps<'streamable'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.isStreamable ? "yes" : "no"}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={filter.params.isStreamable ? "yes" : "no"} />;
 };
 
 const SteamFeaturesFilterPreview: VFC<FilterPreviewProps<'steam features'>> = ({ filter }) => {
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{filter.params.features.length} {filter.params.features.length == 1 ? "feature" : "features"}{filter.inverted ? " (inverted)" : ""}</div>;
+  return <FilterPreviewGeneric filter={filter} displayData={`${filter.params.features.length} ${filter.params.features.length == 1 ? "feature" : "features"}`} isInverted={filter.inverted} />;
 };
 
 const SDCardFilterPreview: VFC<FilterPreviewProps<'sd card'>> = ({ filter }) => {
   const isInsertCard = !filter.params.card;
-  const card = (MicroSDeckInterop.isInstallOk() && window.MicroSDeck?.CardsAndGames.find(([card]) => card.uid === filter.params.card)?.[0].name) || filter.params.card
-  return <div className="merge-filter-entry">{capitalizeEachWord(filter.type) + ' - '}{isInsertCard ? 'Inserted Card' : card}{filter.inverted ? " (inverted)" : ""}</div>;
+  const card = (MicroSDeckInterop.isInstallOk() && window.MicroSDeck?.CardsAndGames.find(([card]) => card.uid === filter.params.card)?.[0].name) || filter.params.card;
+  return <FilterPreviewGeneric filter={filter} displayData={isInsertCard ? 'Inserted Card' : card} isInverted={filter.inverted} />;
 }
 
 /**

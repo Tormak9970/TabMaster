@@ -90,7 +90,7 @@ export const ModeMultiSelect:VFC<ModeMultiSelectProps> = ({ options, selected, f
                   labelOverride={dropdownSelected.label!}
                   disabled={available.length == 0 || (!!maxOptions && selected.length == maxOptions)}
                   TriggerIcon={TriggerIcon}
-                  determineEntryIcon={(entry) => { return determineEntryIcon ? determineEntryIcon(entry) : EntryIcon}}
+                  determineEntryIcon={(entry) => { return (determineEntryIcon ? determineEntryIcon(entry) : EntryIcon) as IconType }}
                 />
               </Focusable>
               <Focusable style={{

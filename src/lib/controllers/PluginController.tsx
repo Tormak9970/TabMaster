@@ -46,6 +46,8 @@ export class PluginController {
 
   private static steamController: SteamController;
 
+  private static onWakeSub: Unregisterer;
+
   /**
    * Sets the plugin's serverAPI.
    * @param server The serverAPI to use.
@@ -79,6 +81,8 @@ export class PluginController {
    */
   static async init(): Promise<void> {
     LogController.log("PluginController initialized.");
+
+    this.onWakeSub = this.steamController.registerForOnResumeFromSuspend(this.onWakeFromSleep.bind(this));
     
     // @ts-ignore
     return new Promise(async (resolve, reject) => {
@@ -121,7 +125,10 @@ export class PluginController {
    * Function to run when the plugin dismounts.
    */
   static dismount(): void {
+    if (this.onWakeSub) this.onWakeSub.unregister();
+
     this.tabMasterManager.disposeReactions();
+
     LogController.log("PluginController dismounted.");
   }
 }

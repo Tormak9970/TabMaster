@@ -13,7 +13,7 @@ import React, { VFC, Fragment, useState, useMemo } from "react";
 import { FaTag, FaTags, FaUser, FaCompactDisc, FaListCheck, FaSteam } from "react-icons/fa6";
 import { FaUserFriends, FaQuestionCircle } from "react-icons/fa";
 import { MdApps } from "react-icons/md";
-import { IoGameController } from "react-icons/io5";
+import { IoGameController, IoGrid } from "react-icons/io5";
 import { BsWindow } from "react-icons/bs";
 import { IconType } from "react-icons/lib";
 
@@ -29,6 +29,7 @@ import { IncludeCategories } from "../../lib/Utils";
 import { Slider } from '../generic/Slider';
 import { STEAM_FEATURES_ID_MAP, STEAM_FEATURES_TO_RENDER } from "./SteamFeatures";
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
+import { ListSearchDropdown } from "../modals/ListSearchModal";
 
 type FilterOptionsProps<T extends FilterType> = {
   index: number,
@@ -55,11 +56,31 @@ function getAppIconType(entry: any): IconType {
   }
 }
 
+
+/**
+ * Gets an entry icon for a collection based on if its user made.
+ * @param entry The collection entry.
+ * @returns The icon for the collection.
+ */
+function getCollectionIcon(entry: any): IconType {
+  const collection = collectionStore.userCollections.find((collection: SteamCollection) => collection.id === entry.data);
+  if (collection?.bIsEditable) {
+    return FaUser;
+  } else {
+    return FaSteam;
+  }
+}
+
 /**
  * The options for a collection filter.
  */
 const CollectionFilterOptions: VFC<FilterOptionsProps<'collection'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
-  const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map((collection: { displayName: string; id: string; }) => { return { label: collection.displayName, data: collection.id }; });
+  const collectionDropdownOptions: SingleDropdownOption[] = collectionStore.userCollections.concat([{ displayName: 'Hidden', id: 'hidden'}] as any).map((collection: SteamCollection) => {
+    return {
+      label: collection.displayName,
+      data: collection.id
+    };
+  });
 
   function onChange(data: SingleDropdownOption) {
     const updatedFilter = { ...filter };
@@ -73,7 +94,16 @@ const CollectionFilterOptions: VFC<FilterOptionsProps<'collection'>> = ({ index,
   return (
     <Field
       label="Selected Collection"
-      description={<Dropdown rgOptions={collectionDropdownOptions} selectedOption={filter.params.id} onChange={onChange} />}
+      description={
+        <ListSearchDropdown
+          entryLabel="Collections"
+          rgOptions={collectionDropdownOptions}
+          selectedOption={filter.params.id}
+          onChange={onChange}
+          TriggerIcon={IoGrid}
+          determineEntryIcon={getCollectionIcon}
+        />
+      }
     />
   );
 };
@@ -110,7 +140,7 @@ const RegexFilterOptions: VFC<FilterOptionsProps<'regex'>> = ({ index, setContai
   return (
     <Field
       label="Regex"
-      description={<TextField value={filter.params.regex} onChange={onChange} />}
+      description={<TextField value={filter.params.regex} placeholder="Input a Regular Expression" onChange={onChange} />}
     />
   );
 };
@@ -285,13 +315,12 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({ index, filter, c
       <ButtonItem onClick={onClick}>
         {(isEditing ? "Edit" : "Create") + " Merge Group"}
       </ButtonItem>
+      <div style={{ marginTop: "7px" }}><b>Merge Mode</b> - {mergeParams.mode}</div>
+      <div style={{ marginTop: "7px", fontWeight: "bold" }}>Filters:</div>
       <div className="merge-filter-entries">
-        {mergeParams.filters.map((filter, index) => (
-          <div className="merge-filter-entry-container">
+        {mergeParams.filters.map((filter) => (
+          <div style={{ marginTop: "3px" }}>
             <FilterPreview filter={filter} />
-            <div>
-              {index !== mergeParams.filters.length - 1 && mergeParams.mode}
-            </div>
           </div>
         ))}
       </div>

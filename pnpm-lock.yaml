@@ -5,11 +5,11 @@ dependencies:
     specifier: 0.9.8-8cc660c
     version: 0.9.8-8cc660c
   mobx:
-    specifier: ^5.15.7
-    version: 5.15.7
+    specifier: ^6.12.0
+    version: 6.12.0
   react-icons:
-    specifier: ^4.10.1
-    version: 4.10.1
+    specifier: ^4.12.0
+    version: 4.12.0
   react-virtualized-auto-sizer:
     specifier: ^1.0.20
     version: 1.0.20
@@ -1541,8 +1541,8 @@ packages:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
     dev: true
 
-  /mobx@5.15.7:
-    resolution: {integrity: sha512-wyM3FghTkhmC+hQjyPGGFdpehrcX1KOXsDuERhfK2YbJemkUhEB+6wzEN639T21onxlfYBmriA1PFnvxTUhcKw==}
+  /mobx@6.12.0:
+    resolution: {integrity: sha512-Mn6CN6meXEnMa0a5u6a5+RKrqRedHBhZGd15AWLk9O6uFY4KYHzImdt8JI8WODo1bjTSRnwXhJox+FCUZhCKCQ==}
     dev: false
 
   /neo-async@2.6.2:
@@ -1696,8 +1696,8 @@ packages:
       safe-buffer: 5.2.1
     dev: true
 
-  /react-icons@4.10.1:
-    resolution: {integrity: sha512-/ngzDP/77tlCfqthiiGNZeYFACw85fUjZtLbedmJ5DTlNDIwETxhwBzdOJ21zj4iJdvc0J3y7yOsX3PpxAJzrw==}
+  /react-icons@4.12.0:
+    resolution: {integrity: sha512-IBaDuHiShdZqmfc/TwHu6+d6k2ltNCf3AszxNmjJc1KUfXdEeRJOKyNvLmAHaarhzGmTSVygNdyu8/opXv2gaw==}
     peerDependencies:
       react: '*'
     peerDependenciesMeta:
