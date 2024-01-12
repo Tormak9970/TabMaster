@@ -98,13 +98,6 @@ export const ModalStyles: VFC<{}> = ({}) => {
         color: #a9a9a9;
       }
 
-      /* merge entries */
-      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry-container {
-        margin: 5px;
-        display: flex; 
-        justify-content: space-between;
-      }
-
       .autohide-toggle-container .${gamepadDialogClasses.Field} {
         padding: 10px calc(28px + 1.4vw);
       }

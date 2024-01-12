@@ -55,7 +55,10 @@ export class CustomTabContainer implements TabContainer {
     this.checkMicroSDeckDependency();
   }
 
-  getActualTab(TabContentComponent: TabContentComponent, sortingProps: Omit<TabContentProps, 'collection'>, footer: SteamTab['footer'], collectionAppFilter: any): SteamTab {
+  getActualTab(TabContentComponent: TabContentComponent, sortingProps: Omit<TabContentProps, 'collection'>, footer: SteamTab['footer'], collectionAppFilter: any, isMicroSDeckInstalled: boolean): SteamTab | null {
+    if (!isMicroSDeckInstalled && this.dependsOnMicroSDeck) return null;
+    if (this.autoHide && this.collection.visibleApps.length === 0) return null;
+    
     return {
       title: this.title,
       id: this.id,

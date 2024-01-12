@@ -1,7 +1,6 @@
 import { Menu, MenuItem, showModal, Focusable, MenuGroup, ReorderableEntry, ReorderableList, MenuItemProps } from 'decky-frontend-lib';
 import { FC, Fragment, VFC, useState } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
-import { TabIdEntryType } from '../..';
 import { TabMasterContextProvider, useTabMasterContext } from '../../state/TabMasterContext';
 import { showModalEditTab, showModalNewTab } from '../modals/EditTabModal';
 import { LibraryMenuStyles } from '../styles/LibraryMenuStyles';
@@ -11,6 +10,8 @@ import { PresetMenuItems } from './PresetMenu';
 import { CustomTabContainer } from '../CustomTabContainer';
 import { TabListLabel } from '../TabListLabel';
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
+import { TabProfilesSubMenu } from './TabProfileMenu';
+import { TabIdEntryType } from "../QuickAccessContent";
 
 export interface LibraryMenuProps {
   closeMenu: () => void;
@@ -65,6 +66,7 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
       <PresetMenuItems tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />
     </MenuGroup>
     <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
+    <TabProfilesSubMenu tabMasterManager={tabMasterManager}/>
     <MenuGroup label='Reorder Tabs'>
       <Focusable style={{ width: '240px', background: "#23262e", margin: '0' }} className='tab-master-library-menu-reorderable-group' onOKActionDescription=''>
         <ReorderableList<TabIdEntryType>
@@ -148,7 +150,7 @@ const HiddenItems: VFC<HiddenItemsProps> = ({ hiddenTabsList, isMicroSDeckInstal
           setRefresh(refresh => !refresh);
         }}
       >
-        <TabListLabel tabContainer={tabContainer} microSDeckDisabled={!isMicroSDeckInstalled}/>
+        <TabListLabel tabContainer={tabContainer} microSDeckDisabled={!isMicroSDeckInstalled} />
       </MenuItemNoClose>
     )}
   </>;

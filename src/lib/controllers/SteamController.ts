@@ -70,6 +70,15 @@ export class SteamController {
   }
 
   /**
+   * Register a function for when the Steamdeck resumes from sleep.
+   * @param callback The callback to register.
+   * @returns A function that unsubscribes the callback.
+   */
+  registerForOnResumeFromSuspend(callback: () => void): Unregisterer {
+    return SteamClient.System.RegisterForOnResumeFromSuspend(callback);
+  }
+
+  /**
    * Gets the localized tags from a list of ids.
    * @param tags The list of tag ids.
    * @return A promise resolving to a list of localized tags.

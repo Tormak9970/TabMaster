@@ -9,6 +9,7 @@ import { LogController } from "../lib/controllers/LogController";
 import { PresetName, PresetOptions, getPreset } from '../presets/presets';
 import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
 import { TabErrorController } from '../lib/controllers/TabErrorController';
+import { TabProfileManager } from './TabProfileManager';
 
 /**
  * Converts a list of filters into a 1D array.
@@ -65,6 +66,8 @@ export class TabMasterManager {
   private tagsReaction: IReactionDisposer | undefined;
 
   private collectionRemoveReaction: IReactionDisposer | undefined;
+
+  public tabProfileManager: TabProfileManager | undefined;
 
   /**
    * Creates a new TabMasterManager.
@@ -218,14 +221,29 @@ export class TabMasterManager {
    * @param storeTagLocalizationMap The store tag localization map.
    */
   private storeTagReaction(storeTagLocalizationMap: StoreTagLocalizationMap) {
-    this.allStoreTags = Array.from(storeTagLocalizationMap._data.entries()).map(([tag, entry]) => {
-      return {
-        tag: tag,
-        string: entry.value
-      };
-    });
+    let tagLocalizationMap = storeTagLocalizationMap._data;
+    if (!tagLocalizationMap && storeTagLocalizationMap.data_) {
+      tagLocalizationMap = storeTagLocalizationMap.data_
+    }
 
-    PythonInterop.setTags(this.allStoreTags);
+    if (tagLocalizationMap) {
+      const tagEntriesArray = Array.from(tagLocalizationMap.entries());
+
+      if (tagEntriesArray[0][1].value || tagEntriesArray[0][1].value_) {
+        this.allStoreTags = tagEntriesArray.map(([tag, entry]) => {
+          return {
+            tag: tag,
+            string: entry.value ?? entry.value_
+          };
+        });
+
+        PythonInterop.setTags(this.allStoreTags);
+      } else {
+        LogController.error("Failed to get store tags. Both entry.value and entry.value_ were undefined");
+      }
+    } else {
+      LogController.error("Failed to get store tags. Both _data and data_ were undefined");
+    }
   }
 
   /**
@@ -429,6 +447,8 @@ export class TabMasterManager {
       }
     }
     this.tabsMap.delete(tabId);
+    this.tabProfileManager?.onDeleteTab(tabId);
+    if (!this.tabProfileManager) LogController.error('Attempted to delete a tab before TabProfileManager has been initialized.', 'This should not be possible.');
     this.updateAndSave();
   }
 
@@ -474,15 +494,10 @@ export class TabMasterManager {
     }
   }
 
-  
-
   /**
-   * Loads the user's tabs from the backend.
+   * Other async load calls that don't need to be waited for when starting the plugin
    */
-  loadTabs = async () => {
-    this.initReactions();
-    const settings = await PythonInterop.getTabs();
-    //* We don't need to wait for these, since if we get the store ones, we don't care about them
+  asyncLoadOther() {
     PythonInterop.getTags().then((res: TagResponse[] | Error) => {
       if (res instanceof Error) {
         LogController.log("TabMaster couldn't load tags settings");
@@ -513,13 +528,30 @@ export class TabMasterManager {
         }
       }
     });
+  }
+
+  /**
+   * Loads the user's tabs from the backend.
+   */
+  loadTabs = async () => {
+    this.initReactions();
+    const settings = await PythonInterop.getTabs();
+    const profiles = await PythonInterop.getTabProfiles();
+
+    this.asyncLoadOther();
 
     if (settings instanceof Error) {
       LogController.log("TabMaster couldn't load tab settings");
       LogController.error(settings.message);
       return;
     }
+    if (profiles instanceof Error) {
+      LogController.log("TabMaster couldn't load tab profiles");
+      LogController.error(profiles.message);
+      return;
+    }
 
+    this.tabProfileManager = new TabProfileManager(profiles);
     TabErrorController.validateSettingsOnLoad((Object.keys(settings).length > 0) ? settings : defaultTabsSettings, this, this.finishLoadingTabs.bind(this));
   };
 

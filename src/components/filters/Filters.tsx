@@ -1,7 +1,14 @@
+import { IconType } from "react-icons/lib";
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 import { PluginController } from "../../lib/controllers/PluginController";
 import { DateIncludes, DateObj } from '../generic/DatePickers';
 import { STEAM_FEATURES_ID_MAP } from "./SteamFeatures";
+import { FaCheckCircle, FaHdd, FaSdCard, FaUserFriends } from "react-icons/fa";
+import { IoGrid } from "react-icons/io5";
+import { SiSteamdeck } from "react-icons/si";
+import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCompactDisc, FaListCheck, FaPlay, FaRegClock, FaSteam, FaTags } from "react-icons/fa6";
+import { BsClockHistory, BsRegex } from "react-icons/bs";
+import { LuCombine } from "react-icons/lu";
 
 export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo' | 'streamable' | 'steam features' | 'sd card';
 
@@ -75,7 +82,7 @@ type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOv
  * Checking and settings defaults in component is unnecessary
  */
 export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
-  "collection": { id: "", name: "" },
+  "collection": { id: "favorite", name: "Favorites" },
   "installed": { installed: true },
   "regex": { regex: "" },
   "friends": { friends: [], mode: 'and' },
@@ -118,7 +125,32 @@ export const FilterDescriptions: { [filterType in FilterType]: string } = {
   demo: "Selects apps that are/aren't demos.",
   streamable: "Selects apps that can/can't be streamed from another computer.",
   "steam features": "Selects apps that support specific Steam Features.",
-  "sd card": "Selects apps that are present on the inserted/specific MicroSD Card"
+  "sd card": "Selects apps that are present on the inserted/specific MicroSD Card."
+}
+
+/**
+ * Dictionary of icons for each filter.
+ */
+export const FilterIcons: { [filterType in FilterType]: IconType } = {
+  collection: IoGrid,
+  installed: FaPlay,
+  regex: BsRegex,
+  friends: FaUserFriends,
+  tags: FaTags,
+  whitelist: FaCheckCircle,
+  blacklist: FaBan,
+  merge: LuCombine,
+  platform: FaSteam,
+  "deck compatibility": SiSteamdeck,
+  "review score": FaAward,
+  "time played": FaRegClock,
+  "size on disk": FaHdd,
+  "release date": FaCalendarDays,
+  "last played": BsClockHistory,
+  demo: FaCompactDisc,
+  streamable: FaCloudArrowDown,
+  "steam features": FaListCheck,
+  "sd card": FaSdCard
 }
 
 

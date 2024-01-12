@@ -1,6 +1,6 @@
-import { Fragment, VFC, useEffect, useState } from "react";
+import { Fragment, VFC, createElement, useEffect, useState } from "react";
 import { Focusable, ModalRoot, SingleDropdownOption } from "decky-frontend-lib";
-import { FilterDefaultParams, FilterDescriptions, FilterType } from "./Filters";
+import { FilterDefaultParams, FilterDescriptions, FilterIcons, FilterType } from "./Filters";
 import { capitalizeEachWord } from "../../lib/Utils";
 import { FilterSelectStyles, achievementClasses, mainMenuAppRunningClasses } from "../styles/FilterSelectionStyles";
 import { IoFilter } from 'react-icons/io5'
@@ -54,12 +54,15 @@ interface FilterSelectElement {
 const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, focusable, onClick }) => {
   let disabled = false;
   let requiredMicroSDeckVer = '';
+
   if (filterType === 'sd card') {
     disabled = !MicroSDeckInterop.isInstallOk();
     const [major, minor, patch] = microSDeckLibVersion.split(/[.+-]/, 3);
+    
     if (+major > 0) requiredMicroSDeckVer = major + '.x.x';
     if (+major === 0) requiredMicroSDeckVer = `0.${minor}.${patch}`;
   }
+
   const canFocus = focusable && !disabled;
 
   return (
@@ -73,9 +76,14 @@ const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, focusable, 
         className={`${achievementClasses.AchievementListItemBase} ${disabled && "entry-disabled"}`}
         style={{ display: "flex", flexDirection: "column", padding: "0.5em", height: "60px" }}
       >
-        <div className="entry-label">
-          {capitalizeEachWord(filterType)}
-          {filterType === 'sd card' && <small style={{ marginLeft: "0.5em", fontSize: "0.5em" }}>{`requires MicroSDeck ${requiredMicroSDeckVer}`}</small>}
+        <div className="entry-label" style={{ display: 'flex', alignItems: 'baseline' }}>
+          <div style={{ marginRight: '7px' }}>
+            {createElement(FilterIcons[filterType], { size: '.8em' })}
+          </div>
+          <div>
+            {capitalizeEachWord(filterType)}
+          </div>
+          {filterType === 'sd card' && <small style={{ fontSize: "0.5em" }}>{`requires MicroSDeck ${requiredMicroSDeckVer}`}</small>}
         </div>
         <div className="entry-desc">{FilterDescriptions[filterType]}</div>
       </div>

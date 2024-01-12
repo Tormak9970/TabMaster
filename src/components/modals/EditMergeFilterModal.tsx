@@ -2,7 +2,7 @@ import { ConfirmModal } from "decky-frontend-lib";
 import { VFC, useState, Fragment, useEffect } from "react";
 import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";
-import { TabFilterSettings, FilterType } from "../filters/Filters";
+import { TabFilterSettings, FilterType, FilterDefaultParams } from "../filters/Filters";
 import { isValidParams } from "../filters/Filters";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
 
@@ -40,7 +40,7 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({ closeModa
     updatedFilters.push({
       type: "collection",
       inverted: false,
-      params: { id: "", name: "" }
+      params: FilterDefaultParams.collection
     });
 
     setGroupFilters(updatedFilters);
