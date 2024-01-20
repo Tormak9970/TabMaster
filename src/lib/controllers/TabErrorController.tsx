@@ -47,8 +47,11 @@ export class TabErrorController {
           onConfirm={(editedTabSettings: TabSettingsDictionary) => {
             for (const tab of Object.values(editedTabSettings)) {
               if (tabsToFix.has(tab.id)) {
-                if (tab.filters!.length === 0) tabMasterManager.deleteTab(tab.id);
-                else tabMasterManager.updateCustomTab(tab.id, tab as EditableTabSettings);
+                if (tab.filters!.length === 0) {
+                  tabMasterManager.deleteTab(tab.id);
+                } else {
+                  tabMasterManager.updateCustomTab(tab.id, tab as EditableTabSettings);
+                }
               }
             }
 
@@ -70,8 +73,11 @@ export class TabErrorController {
    */
   private static processQueue = (tabMasterManager: TabMasterManager) => {
     const validationSet = this.validationQueue.splice(0, this.validationQueue.length);
-    if (validationSet.length > 0) this.validateInternal(validationSet, tabMasterManager);
-    else this.validationLock = false;
+    if (validationSet.length > 0) {
+      this.validateInternal(validationSet, tabMasterManager);
+    } else {
+      this.validationLock = false;
+    }
   }
 
   /**
@@ -131,7 +137,7 @@ export class TabErrorController {
           onConfirm={(editedTabSettings: TabSettingsDictionary) => {
             const tabsToDelete: string[] = [];
             for (const tab of Object.values(editedTabSettings)) {
-              if (tabsToFix.has(tab.id) && tab.filters!.length === 0) tabsToDelete.push();
+              if (tabsToFix.has(tab.id) && tab.filters!.length === 0) tabsToDelete.push(tab.id);
             }
 
             finishLoading(editedTabSettings);
