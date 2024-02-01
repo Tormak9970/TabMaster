@@ -79,33 +79,31 @@ export class CustomTabContainer implements TabContainer {
    * Builds the list of apps for this tab.
    */
   buildCollection() {
-    if (this.position > -1) { 
-      const {hidden, ...catsToIncludeObj} = getIncludedCategoriesFromBitField(this.categoriesToInclude);
-      const visibility = hidden ? "allApps" : "visibleApps";
-      let listToFilter: SteamAppOverview[] = [];
-      
-      for (const key in catsToIncludeObj) {
-        const category = key as keyof typeof catsToIncludeObj;
-        if (catsToIncludeObj[category]) listToFilter = listToFilter.concat(collectionStore.appTypeCollectionMap.get(`type-${category}`)![visibility]);
-      }
-    
-      const appsList = listToFilter.filter(appItem => {
-        if (this.filtersMode === 'and') {
-          return this.filters.every(filterSettings => Filter.run(filterSettings, appItem));
-        } else {
-          return this.filters.some(filterSettings => Filter.run(filterSettings, appItem));
-        }
-      });
+    const { hidden, ...catsToIncludeObj } = getIncludedCategoriesFromBitField(this.categoriesToInclude);
+    const visibility = hidden ? "allApps" : "visibleApps";
+    let listToFilter: SteamAppOverview[] = [];
 
-      this.collection.allApps = appsList;
-      this.collection.visibleApps = [...appsList];
-
-      const allAppsMap = collectionStore.allAppsCollection.apps;
-      const appMap = new Map<AppId, SteamAppOverview>();
-      appsList.forEach((appItem: SteamAppOverview) => appMap.set(appItem.appid, allAppsMap.get(appItem.appid)!));
-
-      this.collection.apps = appMap;
+    for (const key in catsToIncludeObj) {
+      const category = key as keyof typeof catsToIncludeObj;
+      if (catsToIncludeObj[category]) listToFilter = listToFilter.concat(collectionStore.appTypeCollectionMap.get(`type-${category}`)![visibility]);
     }
+
+    const appsList = listToFilter.filter(appItem => {
+      if (this.filtersMode === 'and') {
+        return this.filters.every(filterSettings => Filter.run(filterSettings, appItem));
+      } else {
+        return this.filters.some(filterSettings => Filter.run(filterSettings, appItem));
+      }
+    });
+
+    this.collection.allApps = appsList;
+    this.collection.visibleApps = [...appsList];
+
+    const allAppsMap = collectionStore.allAppsCollection.apps;
+    const appMap = new Map<AppId, SteamAppOverview>();
+    appsList.forEach((appItem: SteamAppOverview) => appMap.set(appItem.appid, allAppsMap.get(appItem.appid)!));
+
+    this.collection.apps = appMap;
   }
 
   /**
