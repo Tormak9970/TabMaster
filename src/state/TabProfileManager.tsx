@@ -1,3 +1,4 @@
+import { CustomTabContainer } from '../components/CustomTabContainer';
 import { PythonInterop } from '../lib/controllers/PythonInterop';
 import { TabMasterManager } from './TabMasterManager';
 
@@ -32,7 +33,13 @@ export class TabProfileManager {
    * @param tabMasterManager The plugin manager.
    */
   apply(tabProfileName: string, tabMasterManager: TabMasterManager) {
-    tabMasterManager.getTabs().tabsMap.forEach(tabContainer => tabContainer.position = -1);
+    const { visibleTabsList, hiddenTabsList } = tabMasterManager.getTabs();
+    hiddenTabsList.forEach(tabContainer => {
+      if (tabContainer.filters && (tabContainer as CustomTabContainer).collection.allApps === undefined) {
+        (tabContainer as CustomTabContainer).buildCollection();
+      }
+    });
+    visibleTabsList.forEach(tabContainer => tabContainer.position = -1);
     tabMasterManager.reorderTabs(this.tabProfiles[tabProfileName]);
   }
 

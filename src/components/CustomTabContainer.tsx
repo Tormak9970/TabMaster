@@ -51,7 +51,9 @@ export class CustomTabContainer implements TabContainer {
       id: this.id
     };
 
-    this.buildCollection();
+    if (this.position > -1) {
+      this.buildCollection();
+    }
     this.checkMicroSDeckDependency();
   }
 
