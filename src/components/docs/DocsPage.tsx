@@ -1,8 +1,6 @@
 import { VFC, Fragment } from "react";
-
 import MarkDownIt from "markdown-it";
-import { ModalPosition, Panel, ScrollPanelGroup } from "./Scrollable";
-import { gamepadDialogClasses } from "decky-frontend-lib";
+import { Focusable, gamepadDialogClasses, ModalPosition, ScrollPanelGroup } from "decky-frontend-lib";
 
 const mdIt = new MarkDownIt({
   html: true
@@ -51,13 +49,18 @@ export const DocPage: VFC<{ content: string }> = ({ content }) => {
       `}</style>
       <div className="tab-master-docs">
         <ModalPosition >
-          <Panel style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
-            <ScrollPanelGroup focusable={false} style={{ flex: 1, minHeight: 0, padding: "12px" }} scrollPaddingTop={32}>
-              <Panel focusable={true} noFocusRing={true} >
+          <Focusable style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
+            <ScrollPanelGroup
+              //@ts-ignore
+              focusable={false}
+              style={{ flex: 1, minHeight: 0, padding: "12px" }}
+              scrollPaddingTop={32}
+            >
+              <Focusable onActivate={() => {}} noFocusRing={true} >
                 <div dangerouslySetInnerHTML={{ __html: mdIt.render(content) }} />
-              </Panel>
+              </Focusable>
             </ScrollPanelGroup>
-          </Panel>
+          </Focusable>
         </ModalPosition>
       </div>
     </>

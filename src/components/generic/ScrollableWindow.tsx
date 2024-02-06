@@ -1,6 +1,5 @@
-import { GamepadButton, gamepadDialogClasses, scrollPanelClasses } from 'decky-frontend-lib';
+import { GamepadButton, gamepadDialogClasses, scrollPanelClasses, ModalPosition, ScrollPanelGroup, Focusable } from 'decky-frontend-lib';
 import { FC, Fragment, useRef } from 'react';
-import { ModalPosition, Panel, ScrollPanelGroup } from '../docs/Scrollable';
 import { useIsOverflowing } from '../../hooks/useIsOverflowing';
 
 export interface ScrollableWindowProps {
@@ -15,16 +14,23 @@ export const ScrollableWindow: FC<ScrollableWindowProps> = ({ height, fadeAmount
   const isOverflowing = useIsOverflowing(scrollPanelRef);
 
   const panel = (
-    <ScrollPanelGroup ref={scrollPanelRef} focusable={false} style={{ flex: 1, minHeight: 0 }}>
-      <Panel
-        focusable={isOverflowing}
+    <ScrollPanelGroup
+      //@ts-ignore
+      ref={scrollPanelRef}
+      focusable={false}
+      style={{ flex: 1, minHeight: 0 }}
+    >
+      <Focusable
         noFocusRing={true}
         actionDescriptionMap={{
           [GamepadButton.DIR_UP]: 'Scroll Up',
           [GamepadButton.DIR_DOWN]: 'Scroll Down'
-        }}>
+        }}
+        //@ts-ignore
+        focusable={isOverflowing}
+      >
         {children}
-      </Panel>
+      </Focusable>
     </ScrollPanelGroup>
   );
 
