@@ -51,7 +51,7 @@
     "@types/react-window": "^1.8.5",
     "@types/uuid": "^9.0.2",
     "@types/webpack": "^5.28.1",
-    "decky-frontend-lib": "^3.21.8",
+    "decky-frontend-lib": "^3.24.5",
     "husky": "^8.0.3",
     "markdown-it": "^13.0.1",
     "rollup": "^2.79.1",

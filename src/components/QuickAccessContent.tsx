@@ -107,20 +107,20 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
         <Field className="no-sep">
           <Focusable style={{ width: "100%", display: "flex" }}>
             <Focusable className="add-tab-btn" style={{ width: "calc(100% - 50px)" }}>
-              <DialogButton onClick={() => showModalNewTab(tabMasterManager)} onOKActionDescription={'Add Tab'}>
+              <DialogButton disabled={!tabMasterManager.hasSettingsLoaded} onClick={() => showModalNewTab(tabMasterManager)} onOKActionDescription={'Add Tab'}>
                 Add Tab
               </DialogButton>
             </Focusable>
-            {tabMasterManager.hasSettingsLoaded &&
-              <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
-                <DialogButton
-                  style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center", marginRight: "8px" }}
-                  onOKActionDescription={'Add Quick Tab'}
-                  onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />)}
-                >
-                  <PiListPlusBold size='1.4em' />
-                </DialogButton>
-              </Focusable>}
+            <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
+              <DialogButton
+                disabled={!tabMasterManager.hasSettingsLoaded}
+                style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center", marginRight: "8px" }}
+                onOKActionDescription={'Add Quick Tab'}
+                onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />)}
+              >
+                <PiListPlusBold size='1.4em' />
+              </DialogButton>
+              </Focusable>
           </Focusable>
         </Field>
         <PanelSection title="Tabs">
@@ -186,6 +186,7 @@ export const QuickAccessTitleView: VFC<QuickAccessTitleViewProps> = ({ title, ta
     >
       <div style={{ marginRight: "auto" }}>{title}</div>
       <DialogButton
+        disabled={!tabMasterManager.hasSettingsLoaded}
         onOKActionDescription="Manage Tab Profiles"
         style={buttonStyle}
         onClick={() => showContextMenu(<TabProfilesMenu tabMasterManager={tabMasterManager} />)}
