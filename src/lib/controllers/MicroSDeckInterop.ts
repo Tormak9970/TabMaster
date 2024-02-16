@@ -109,8 +109,8 @@ export class MicroSDeckInterop {
 
       if (isNaN(pluginVerMajor) || isNaN(pluginVerMinor) || isNaN(pluginVerPatch) || isNaN(libVerMajor) || isNaN(libVerMinor) || isNaN(libVerPatch)) return MicroSDeckInstallState['ver unknown'];
       if (pluginVerMajor === 0 && libVerMajor === 0) {
-        if (pluginVerMinor > libVerMinor || pluginVerPatch > libVerPatch) return MicroSDeckInstallState['ver too high'];
-        if (pluginVerMinor < libVerMinor || pluginVerPatch < libVerPatch) return MicroSDeckInstallState['ver too low'];
+        if (pluginVerMinor > libVerMinor) return MicroSDeckInstallState['ver too high'];
+        if (pluginVerMinor < libVerMinor) return MicroSDeckInstallState['ver too low'];
         return MicroSDeckInstallState['good'];
       }
       
