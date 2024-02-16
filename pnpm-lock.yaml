@@ -1,9 +1,13 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@cebbinghaus/microsdeck':
-    specifier: 0.9.8-8cc660c
-    version: 0.9.8-8cc660c
+    specifier: 0.10.0-edd7525
+    version: 0.10.0-edd7525
   mobx:
     specifier: ^6.12.0
     version: 6.12.0
@@ -115,8 +119,8 @@ packages:
       regenerator-runtime: 0.14.0
     dev: false
 
-  /@cebbinghaus/microsdeck@0.9.8-8cc660c:
-    resolution: {integrity: sha512-rfxlRRVF8fTIGxUQf81KT5NUwjfz/ofvyaGsctOGE4LVUF4javAlqIVnPiNgmSAjH/C7mrIE5SUkWNT/ve2bhw==}
+  /@cebbinghaus/microsdeck@0.10.0-edd7525:
+    resolution: {integrity: sha512-QPB37kOIz9xU7M00Q0Ee5nkbT5V6Z1eFh55UxR+esWnlzJqViDmC0rJ7d7PpZtnd+s/6CCvGPd1v4zO0oUZ4OA==}
     dependencies:
       semver: 7.5.4
     dev: false
@@ -2299,7 +2303,3 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
