@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@cebbinghaus/microsdeck':
     specifier: 0.9.8-8cc660c
@@ -72,6 +76,9 @@ devDependencies:
   rollup:
     specifier: ^2.79.1
     version: 2.79.1
+  rollup-plugin-codegen:
+    specifier: ^1.0.0
+    version: 1.0.0
   rollup-plugin-import-assets:
     specifier: ^1.1.1
     version: 1.1.1(rollup@2.79.1)
@@ -1816,6 +1823,11 @@ packages:
       supports-preserve-symlinks-flag: 1.0.0
     dev: true
 
+  /rollup-plugin-codegen@1.0.0:
+    resolution: {integrity: sha512-dDGSP/I/y6BemGaOZoeUZVfjFi6Ky9uMGuFurJVZV08s0Q11qXLPTsMqvy1zmxPJptH2yV9PV7ruBwxQc03TmA==}
+    engines: {node: '>=14.0'}
+    dev: true
+
   /rollup-plugin-import-assets@1.1.1(rollup@2.79.1):
     resolution: {integrity: sha512-u5zJwOjguTf2N+wETq2weNKGvNkuVc1UX/fPgg215p5xPvGOaI6/BTc024E9brvFjSQTfIYqgvwogQdipknu1g==}
     peerDependencies:
@@ -2299,7 +2311,3 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false

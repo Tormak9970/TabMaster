@@ -22,9 +22,6 @@ class Plugin:
   users_dict: dict[str, dict] = None
   tags: list[dict] = None
 
-  docsDirPath = f"{decky_plugin.DECKY_PLUGIN_DIR}/docs"
-  docs = {}
-
   settings: SettingsManager
 
   async def logMessage(self, message, level):
@@ -182,14 +179,6 @@ class Plugin:
   async def set_tab_profiles(self, tab_profiles: dict[str, list[str]]):
     Plugin.users_dict[Plugin.user_id]["tabProfiles"] = tab_profiles
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
-
-  async def get_docs(self):
-    for docsFileName in os.listdir(self.docsDirPath):
-      with open(os.path.join(self.docsDirPath, docsFileName), 'r') as docFile:
-        docName = docsFileName.replace("_", " ").replace(".md", "")
-        self.docs[docName] = "".join(docFile.readlines())
-
-    return self.docs
 
   async def read(self) -> None:
     """

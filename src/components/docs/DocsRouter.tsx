@@ -4,6 +4,9 @@ import { VFC, ReactNode } from "react";
 import { MdNumbers } from "react-icons/md";
 import { DocPage } from "./DocsPage";
 
+//@ts-ignore
+import docs from "./docs.codegen";
+
 type DocRouteEntry = {
   title: string,
   content: ReactNode,
@@ -16,14 +19,11 @@ type DocRoutes = {
   [pageName: string]: DocRouteEntry;
 };
 
-type DocsRouterProps = {
-  docs: DocPages;
-};
 
 /**
  * The documentation pages router for TabMaster.
  */
-export const DocsRouter: VFC<DocsRouterProps> = ({ docs }) => {
+export const DocsRouter: VFC = () => {
   const docPages: DocRoutes = {};
   Object.entries(docs).map(([pageName, doc]) => {
     docPages[pageName] = {
