@@ -52,17 +52,11 @@ export default definePlugin((serverAPI: ServerAPI) => {
     settingsPatch = patchSettings(serverAPI, tabMasterManager);
   });
 
-  PythonInterop.getDocs().then((pages: DocPages | Error) => {
-    if (pages instanceof Error) {
-      LogController.error(pages);
-    } else {
-      serverAPI.routerHook.addRoute("/tab-master-docs", () => (
-        <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-          <DocsRouter docs={pages} />
-        </TabMasterContextProvider>
-      ));
-    }
-  });
+  serverAPI.routerHook.addRoute("/tab-master-docs", () => (
+    <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+      <DocsRouter docs={pages} />
+    </TabMasterContextProvider>
+  ));
   return {
     title: <></>,
     titleView: <QuickAccessTitleView title="TabMaster" tabMasterManager={tabMasterManager} />,
