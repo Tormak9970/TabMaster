@@ -2,7 +2,7 @@
 const { readdirSync, readFileSync, fil } = require('fs');
 const { parse, join } = require('path');
 
-const docsDir = join(__dirname, '../../../defaults/docs');
+const docsDir = join(__dirname, './plugin-docs');
 
 const docFiles = readdirSync(docsDir).filter(file => file.endsWith(".md"));
 const docs = {};

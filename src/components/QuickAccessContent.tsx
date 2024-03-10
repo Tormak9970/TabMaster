@@ -144,11 +144,8 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
           {
             hiddenTabsList.map(tabContainer =>
               <div className="hidden-tab-btn">
-                <ButtonItem
-                  label={<TabListLabel tabContainer={tabContainer} microSDeckDisabled={!isMicroSDeckInstalled} />}
-                  onClick={() => tabMasterManager.showTab(tabContainer.id)}
-                  onOKActionDescription="Unhide tab"
-                >
+                {/* @ts-ignore */}
+                <ButtonItem label={<TabListLabel tabContainer={tabContainer} microSDeckDisabled={!isMicroSDeckInstalled} />} onClick={() => tabMasterManager.showTab(tabContainer.id)} onOKActionDescription="Unhide tab">
                   Show
                 </ButtonItem>
               </div>

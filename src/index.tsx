@@ -15,7 +15,6 @@ import { TabMasterManager } from "./state/TabMasterManager";
 import { patchLibrary } from "./patches/LibraryPatch";
 import { patchSettings } from "./patches/SettingsPatch";
 
-import { LogController } from "./lib/controllers/LogController";
 import { MicroSDeck } from "@cebbinghaus/microsdeck";
 import { MicroSDeckInterop } from './lib/controllers/MicroSDeckInterop';
 import { QuickAccessContent, QuickAccessTitleView } from "./components/QuickAccessContent";
@@ -54,7 +53,7 @@ export default definePlugin((serverAPI: ServerAPI) => {
 
   serverAPI.routerHook.addRoute("/tab-master-docs", () => (
     <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-      <DocsRouter docs={pages} />
+      <DocsRouter />
     </TabMasterContextProvider>
   ));
   return {
