@@ -489,7 +489,8 @@ const TimePlayedFilterOptions: VFC<FilterOptionsProps<'time played'>> = ({ index
  * The options for a size on disk filter.
  */
 const SizeOnDiskFilterOptions: VFC<FilterOptionsProps<'size on disk'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
-  const [value, setValue] = useState<number>(filter.params.gbThreshold);
+  const [value, setValue] = useState<string>(filter.params.gbThreshold.toString());
+  const [numericValue, setNumericValue] = useState<number>(filter.params.gbThreshold);
   const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
 
   function updateFilter(threshold: number, threshType: ThresholdCondition) {
@@ -501,22 +502,29 @@ const SizeOnDiskFilterOptions: VFC<FilterOptionsProps<'size on disk'>> = ({ inde
     setContainingGroupFilters(updatedFilters);
   }
 
-  function onSliderChange(value: number) {
-    updateFilter(value, thresholdType);
-    setValue(value);
+  function onSliderChange(e: React.ChangeEvent<HTMLInputElement>) {
+    let parsedValue = 0;
+    if (e?.target.value !== "" && !isNaN(parseFloat(e?.target.value))) {
+      parsedValue = parseFloat(e?.target.value);
+    }
+    
+    updateFilter(parsedValue, thresholdType);
+    setNumericValue(parsedValue);
+
+    setValue(e?.target.value);
   }
 
   function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition; }) {
-    updateFilter(value, threshType);
+    updateFilter(numericValue, threshType);
     setThresholdType(threshType);
   }
 
   return (
     <Field
-      label={`${value} GB or ${thresholdType === 'above' ? 'more' : 'less'} on disk`}
+      label={`${numericValue < 1 ? numericValue * 1000 : value} ${numericValue < 1 ? 'MB' : 'GB'} or ${thresholdType === 'above' ? 'more' : 'less'} on disk`}
       description={
-        <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-          <Slider value={value} min={0} max={200} onChange={onSliderChange} />
+        <Focusable style={{ display: 'flex', flexDirection: 'row' }} className="size-on-disk-row">
+          <TextField value={value} onChange={onSliderChange} />
           <div style={{ marginLeft: '12px' }}>
             <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
           </div>

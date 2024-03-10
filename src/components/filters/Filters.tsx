@@ -211,12 +211,13 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
       return (filter as TabFilterSettings<'release date'>).params.date !== undefined || (filter as TabFilterSettings<'release date'>).params.daysAgo !== undefined;
     case "steam features":
       return (filter as TabFilterSettings<'steam features'>).params.features.length !== 0;
+    case "size on disk":
+      return (filter as TabFilterSettings<'size on disk'>).params.gbThreshold !== 0;
     case "installed":
     case "platform":
     case "deck compatibility":
     case "review score":
     case "time played":
-    case "size on disk":
     case "demo":
     case "streamable":
     case "sd card":
@@ -352,6 +353,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
         errors: passed ? [] : ["Couldn't find the selected card in the list of known cards."]
       };
     }
+    case "size on disk":
     case "regex":
     case "friends":
     case "tags":
@@ -362,7 +364,6 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "deck compatibility":
     case "review score":
     case "time played":
-    case "size on disk":
     case "release date":
     case "last played":
     case "demo":
