@@ -33,6 +33,7 @@ declare global {
   //* This casing is correct, idk why it doesn't match the others.
   let securitystore: SecurityStore;
   let settingsStore: SettingsStore;
+  let appAchievementProgressCache: AppAchievementProgressCache;
 }
 
 
