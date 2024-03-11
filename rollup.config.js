@@ -5,6 +5,7 @@ import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
 import importAssets from 'rollup-plugin-import-assets';
+import codegen from 'rollup-plugin-codegen';
 
 import { name } from "./plugin.json";
 
@@ -14,8 +15,9 @@ const production = process.env.NODE_ENV !== 'development';
 export default defineConfig({
   input: './src/index.tsx',
   plugins: [
-    commonjs(),
     nodeResolve({ preferBuiltins: false, browser: true }),
+    codegen(),
+    commonjs(),
     typescript({ sourceMap: !production, inlineSources: !production }),
     json(),
     replace({

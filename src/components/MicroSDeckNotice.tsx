@@ -13,17 +13,17 @@ export const MicroSDeckNotice: VFC<MicroSDeckNoticeProps> = ({ intallState, plug
   let recommendation = '';
   
   switch (intallState) {
-    case MicroSDeckInstallState['ver too low']:
-    case MicroSDeckInstallState['ver too high']:
+    case MicroSDeckInstallState.VERSION_TOO_LOW:
+    case MicroSDeckInstallState.VERSION_TOO_HIGH:
       problem = `a version mismatch was detected.
       TabMaster expects version ${libVersion}, but version ${pluginVersion} is installed.`
-      recommendation = intallState === MicroSDeckInstallState['ver too low'] ? 'Please update MicroSDeck to specified version.' : 'Please update TabMaster if available or install specified version of MicroSDeck.'
+      recommendation = intallState === MicroSDeckInstallState.VERSION_TOO_LOW ? 'Please update MicroSDeck to specified version.' : 'Please update TabMaster if available or install specified version of MicroSDeck.'
       break
-    case MicroSDeckInstallState['ver unknown']:
+    case MicroSDeckInstallState.VERSION_UNKOWN:
       problem = `TabMaster couldn't correctly determine which version it expects or which version is installed.`;
       recommendation = 'Please try updating TabMaster or MicroSDeck.';
       break
-    case MicroSDeckInstallState['not installed']:
+    case MicroSDeckInstallState.NOT_INSTALLED:
       problem = 'it is not installed.';
       recommendation = 'Please install MicroSDeck for these tabs to work.';
   }

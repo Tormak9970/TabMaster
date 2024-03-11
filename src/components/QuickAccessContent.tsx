@@ -46,7 +46,7 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
   const { visibleTabsList, hiddenTabsList, tabsMap, tabMasterManager } = useTabMasterContext();
 
   const microSDeckInstallState = MicroSDeckInterop.getInstallState();
-  const isMicroSDeckInstalled = microSDeckInstallState === MicroSDeckInstallState['good'];
+  const isMicroSDeckInstalled = microSDeckInstallState === MicroSDeckInstallState.VERSION_COMPATIBLE;
   const hasSdTabs = !!visibleTabsList.find(tabContainer => (tabContainer as CustomTabContainer).dependsOnMicroSDeck);
 
   function TabEntryInteractables({ entry }: TabEntryInteractablesProps) {
@@ -144,11 +144,8 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
           {
             hiddenTabsList.map(tabContainer =>
               <div className="hidden-tab-btn">
-                <ButtonItem
-                  label={<TabListLabel tabContainer={tabContainer} microSDeckDisabled={!isMicroSDeckInstalled} />}
-                  onClick={() => tabMasterManager.showTab(tabContainer.id)}
-                  onOKActionDescription="Unhide tab"
-                >
+                {/* @ts-ignore */}
+                <ButtonItem label={<TabListLabel tabContainer={tabContainer} microSDeckDisabled={!isMicroSDeckInstalled} />} onClick={() => tabMasterManager.showTab(tabContainer.id)} onOKActionDescription="Unhide tab">
                   Show
                 </ButtonItem>
               </div>

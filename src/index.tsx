@@ -15,7 +15,6 @@ import { TabMasterManager } from "./state/TabMasterManager";
 import { patchLibrary } from "./patches/LibraryPatch";
 import { patchSettings } from "./patches/SettingsPatch";
 
-import { LogController } from "./lib/controllers/LogController";
 import { MicroSDeck } from "@cebbinghaus/microsdeck";
 import { MicroSDeckInterop } from './lib/controllers/MicroSDeckInterop';
 import { QuickAccessContent, QuickAccessTitleView } from "./components/QuickAccessContent";
@@ -33,6 +32,7 @@ declare global {
   //* This casing is correct, idk why it doesn't match the others.
   let securitystore: SecurityStore;
   let settingsStore: SettingsStore;
+  let appAchievementProgressCache: AppAchievementProgressCache;
 }
 
 
@@ -52,17 +52,11 @@ export default definePlugin((serverAPI: ServerAPI) => {
     settingsPatch = patchSettings(serverAPI, tabMasterManager);
   });
 
-  PythonInterop.getDocs().then((pages: DocPages | Error) => {
-    if (pages instanceof Error) {
-      LogController.error(pages);
-    } else {
-      serverAPI.routerHook.addRoute("/tab-master-docs", () => (
-        <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-          <DocsRouter docs={pages} />
-        </TabMasterContextProvider>
-      ));
-    }
-  });
+  serverAPI.routerHook.addRoute("/tab-master-docs", () => (
+    <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+      <DocsRouter />
+    </TabMasterContextProvider>
+  ));
   return {
     title: <></>,
     titleView: <QuickAccessTitleView title="TabMaster" tabMasterManager={tabMasterManager} />,

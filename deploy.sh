@@ -60,8 +60,4 @@ done
 echo "[TASK]: Copying frontend..."
 scpDirRecursive "./dist" "$deck_home_dir/dist"
 
-#? Copy default files
-echo "[TASK]: Copying defaults..."
-scpDirRecursive "./defaults" "$deck_home_dir"
-
 echo "[DONE]"
