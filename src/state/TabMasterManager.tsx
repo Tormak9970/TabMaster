@@ -64,6 +64,7 @@ export class TabMasterManager {
 
   private friendsReaction: IReactionDisposer | undefined;
   private tagsReaction: IReactionDisposer | undefined;
+  private achievementsReaction: IReactionDisposer | undefined;
 
   private collectionRemoveReaction: IReactionDisposer | undefined;
 
@@ -89,40 +90,44 @@ export class TabMasterManager {
   }
 
   private initReactions(): void {
-    //* subscribe to changes to all games
+    // * subscribe to changes to all games
     this.allGamesReaction = reaction(() => collectionStore.GetCollection("type-games").allApps, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 600 });
 
-    //* subscribe to when visible favorites change
+    // * subscribe to when visible favorites change
     this.favoriteReaction = reaction(() => collectionStore.GetCollection('favorite').allApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this));
 
-    //*subscribe to when visible soundtracks change
+    // *subscribe to when visible soundtracks change
     this.soundtrackReaction = reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged.bind(this));
 
-    //*subscribe to when installed games change
+    // *subscribe to when installed games change
     this.installedReaction = reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this));
 
-    //* subscribe to game hide or show
+    // * subscribe to game hide or show
     this.hiddenReaction = reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 50 });
 
-    //* subscribe to non-steam games if they exist
+    // * subscribe to non-steam games if they exist
     if (collectionStore.GetCollection('desk-desktop-apps')) {
       this.nonSteamReaction = reaction(() => collectionStore.GetCollection('desk-desktop-apps').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this));
     }
 
-    //* subscribe for when collections are deleted
+    // * subscribe for when collections are deleted
     this.collectionRemoveReaction = reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this));
 
     this.handleUserCollectionRemove(collectionStore.userCollections.length); //* this loads the collection ids for the first time.
 
-    //* subscribe to user's friendlist updates
+    // * subscribe to user's friendlist updates
     this.friendsReaction = reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
 
     this.handleFriendsReaction(friendStore.allFriends);
 
-    //* subscribe to store tag list changes
+    // * subscribe to store tag list changes
     this.tagsReaction = reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 });
 
     this.storeTagReaction(appStore.m_mapStoreTagLocalization);
+
+
+    // * subscribe to achievement cache changes
+    this.achievementsReaction = reaction(() => appAchievementProgressCache.m_achievementProgress.mapCache.size, this.handleAchievementsReaction.bind(this));
 
     MicroSDeckInterop.initEventHandlers({change: this.handleMicroSDeckChange.bind(this)});
   }
@@ -317,6 +322,21 @@ export class TabMasterManager {
   }
 
   /**
+   * Handles updating state when the the achievement cache changes.
+   * @param _size The size of the achievements map.
+   */
+  private handleAchievementsReaction(_size: number) {
+    this.visibleTabsList.forEach(tabContainer => {
+      if (tabContainer.filters) {
+        const tab = tabContainer as CustomTabContainer;
+        if (tab.containsFilterType('achievements')) {
+          tab.buildCollection();
+        }
+      }
+    });
+  }
+
+  /**
    * Checks for tabs with filters that are based on time ago and rebuilds their collections.
    */
   buildTimeBasedFilterTabs() {
@@ -356,6 +376,8 @@ export class TabMasterManager {
 
     if (this.friendsReaction) this.friendsReaction();
     if (this.tagsReaction) this.tagsReaction();
+    
+    if (this.achievementsReaction) this.achievementsReaction();
 
     if (this.collectionRemoveReaction) this.collectionRemoveReaction();
   }
