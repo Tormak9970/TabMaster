@@ -46,4 +46,4 @@ Here's what you need to know:
 
 # Pull Requests
 
-PRs should follow commitlint conventions as well
+PRs should follow commitlint conventions as well. If there is one feature or bug fix, the title should be about that. If there are multiple, it should summarize them.
