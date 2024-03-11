@@ -3,14 +3,14 @@ import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 import { PluginController } from "../../lib/controllers/PluginController";
 import { DateIncludes, DateObj } from '../generic/DatePickers';
 import { STEAM_FEATURES_ID_MAP } from "./SteamFeatures";
-import { FaCheckCircle, FaHdd, FaSdCard, FaUserFriends } from "react-icons/fa";
+import { FaCheckCircle, FaHdd, FaSdCard, FaTrophy, FaUserFriends } from "react-icons/fa";
 import { IoGrid } from "react-icons/io5";
 import { SiSteamdeck } from "react-icons/si";
 import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCompactDisc, FaListCheck, FaPlay, FaRegClock, FaSteam, FaTags } from "react-icons/fa6";
 import { BsClockHistory, BsRegex } from "react-icons/bs";
 import { LuCombine } from "react-icons/lu";
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo' | 'streamable' | 'steam features' | 'sd card';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo' | 'streamable' | 'steam features' | 'achievements' | 'sd card';
 
 export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
@@ -27,23 +27,24 @@ type CollectionFilterParams = {
    */
   collection?: SteamCollection['id'];
 };
-type InstalledFilterParams = { installed: boolean; };
-type RegexFilterParams = { regex: string; };
-type FriendsFilterParams = { friends: number[], mode: LogicalMode; };
-type TagsFilterParams = { tags: number[], mode: LogicalMode; };
-type WhitelistFilterParams = { games: number[]; };
-type BlacklistFilterParams = { games: number[]; };
-type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode; };
-type PlatformFilterParams = { platform: SteamPlatform; };
-type DeckCompatFilterParams = { category: number; };
-type ReviewScoreFilterParams = { scoreThreshold: number, condition: ThresholdCondition, type: ReviewScoreType; };
-type TimePlayedFilterParams = { timeThreshold: number, condition: ThresholdCondition, units: TimeUnit; };
-type SizeOnDiskFilterParams = { gbThreshold: number, condition: ThresholdCondition; };
-type ReleaseDateFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition; };
-type LastPlayedFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition; };
-type DemoFilterParams = { isDemo: boolean; };
-type StreamableFilterParams = { isStreamable: boolean; };
+type InstalledFilterParams = { installed: boolean };
+type RegexFilterParams = { regex: string };
+type FriendsFilterParams = { friends: number[], mode: LogicalMode };
+type TagsFilterParams = { tags: number[], mode: LogicalMode };
+type WhitelistFilterParams = { games: number[] };
+type BlacklistFilterParams = { games: number[] };
+type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode };
+type PlatformFilterParams = { platform: SteamPlatform };
+type DeckCompatFilterParams = { category: number };
+type ReviewScoreFilterParams = { scoreThreshold: number, condition: ThresholdCondition, type: ReviewScoreType };
+type TimePlayedFilterParams = { timeThreshold: number, condition: ThresholdCondition, units: TimeUnit };
+type SizeOnDiskFilterParams = { gbThreshold: number, condition: ThresholdCondition };
+type ReleaseDateFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition };
+type LastPlayedFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition };
+type DemoFilterParams = { isDemo: boolean };
+type StreamableFilterParams = { isStreamable: boolean };
 type SteamFeaturesFilterParams = { features: number[], mode: LogicalMode };
+type AchievementsFilterParams = { completionPercentage: number, condition: ThresholdCondition }
 type SdCardParams = { card: undefined | string }; //use undefined for currently inserted card
 
 export type FilterParams<T extends FilterType> =
@@ -65,6 +66,7 @@ export type FilterParams<T extends FilterType> =
   T extends 'demo' ? DemoFilterParams :
   T extends 'streamable' ? StreamableFilterParams :
   T extends 'steam features' ? SteamFeaturesFilterParams :
+  T extends 'achievements' ? AchievementsFilterParams :
   T extends 'sd card' ? SdCardParams :
   never;
 
@@ -100,6 +102,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "demo": { isDemo: true },
   "streamable": { isStreamable: true },
   "steam features": { features: [], mode: 'and' },
+  "achievements": { completionPercentage: 10, condition: 'above' },
   "sd card": { card: undefined }
 }
 
@@ -124,6 +127,7 @@ export const FilterDescriptions: { [filterType in FilterType]: string } = {
   "last played": "Selects apps based on when they were last played.",
   demo: "Selects apps that are/aren't demos.",
   streamable: "Selects apps that can/can't be streamed from another computer.",
+  achievements: "Selects apps based on their completion percentage.",
   "steam features": "Selects apps that support specific Steam Features.",
   "sd card": "Selects apps that are present on the inserted/specific MicroSD Card."
 }
@@ -150,6 +154,7 @@ export const FilterIcons: { [filterType in FilterType]: IconType } = {
   demo: FaCompactDisc,
   streamable: FaCloudArrowDown,
   "steam features": FaListCheck,
+  achievements: FaTrophy,
   "sd card": FaSdCard
 }
 
@@ -180,6 +185,7 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "release date":
     case "last played":
     case "demo":
+    case "achievements":
     case "streamable":
       return false;
   }
@@ -220,6 +226,7 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
     case "time played":
     case "demo":
     case "streamable":
+    case "achievements":
     case "sd card":
       return true;
   }
@@ -369,6 +376,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "demo":
     case "streamable":
     case "steam features":
+    case "achievements":
     default:
       return {
         passed: true,
@@ -517,6 +525,10 @@ export class Filter {
       } else {
         return params.features.some((feature: number) => appOverview.store_category.includes(feature));
       }
+    },
+    'achievements': (params: FilterParams<'achievements'>, appOverview: SteamAppOverview) => {
+      const percentage = appAchievementProgressCache.GetAchievementProgress(appOverview.appid);
+      return params.condition === 'above' ? percentage >= params.completionPercentage : percentage <= params.completionPercentage;
     },
     'sd card': (params: FilterParams<'sd card'>, appOverview: SteamAppOverview) => {
       const card = params.card === undefined ? window.MicroSDeck?.CurrentCardAndGames : window.MicroSDeck?.CardsAndGames?.find(([card]) => card.uid == params.card);

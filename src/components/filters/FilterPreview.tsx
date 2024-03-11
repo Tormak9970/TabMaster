@@ -122,6 +122,11 @@ const SteamFeaturesFilterPreview: VFC<FilterPreviewProps<'steam features'>> = ({
   return <FilterPreviewGeneric filter={filter} displayData={`${filter.params.features.length} ${filter.params.features.length == 1 ? "feature" : "features"}`} isInverted={filter.inverted} />;
 };
 
+const AchievementsFilterPreview: VFC<FilterPreviewProps<'achievements'>> = ({ filter }) => {
+  const { completionPercentage, condition } = filter.params;
+  return <FilterPreviewGeneric filter={filter} displayData={`${completionPercentage}% or ${condition === 'above' ? 'more' : 'less'} achievements completed`} />;
+};
+
 const SDCardFilterPreview: VFC<FilterPreviewProps<'sd card'>> = ({ filter }) => {
   const isInsertCard = !filter.params.card;
   const card = (MicroSDeckInterop.isInstallOk() && window.MicroSDeck?.CardsAndGames.find(([card]) => card.uid === filter.params.card)?.[0].name) || filter.params.card;
@@ -170,6 +175,8 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <StreamableFilterPreview filter={filter as TabFilterSettings<'streamable'>} />;
       case "steam features":
         return <SteamFeaturesFilterPreview filter={filter as TabFilterSettings<'steam features'>} />;
+      case "achievements":
+        return <AchievementsFilterPreview filter={filter as TabFilterSettings<'achievements'>} />
       case "sd card":
         return <SDCardFilterPreview filter={filter as TabFilterSettings<'sd card'>} />;
       default:
