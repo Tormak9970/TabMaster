@@ -489,7 +489,8 @@ const TimePlayedFilterOptions: VFC<FilterOptionsProps<'time played'>> = ({ index
  * The options for a size on disk filter.
  */
 const SizeOnDiskFilterOptions: VFC<FilterOptionsProps<'size on disk'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
-  const [value, setValue] = useState<number>(filter.params.gbThreshold);
+  const [value, setValue] = useState<string>(filter.params.gbThreshold.toString());
+  const [numericValue, setNumericValue] = useState<number>(filter.params.gbThreshold);
   const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
 
   function updateFilter(threshold: number, threshType: ThresholdCondition) {
@@ -501,22 +502,29 @@ const SizeOnDiskFilterOptions: VFC<FilterOptionsProps<'size on disk'>> = ({ inde
     setContainingGroupFilters(updatedFilters);
   }
 
-  function onSliderChange(value: number) {
-    updateFilter(value, thresholdType);
-    setValue(value);
+  function onSliderChange(e: React.ChangeEvent<HTMLInputElement>) {
+    let parsedValue = 0;
+    if (e?.target.value !== "" && !isNaN(parseFloat(e?.target.value))) {
+      parsedValue = parseFloat(e?.target.value);
+    }
+    
+    updateFilter(parsedValue, thresholdType);
+    setNumericValue(parsedValue);
+
+    setValue(e?.target.value);
   }
 
   function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition; }) {
-    updateFilter(value, threshType);
+    updateFilter(numericValue, threshType);
     setThresholdType(threshType);
   }
 
   return (
     <Field
-      label={`${value} GB or ${thresholdType === 'above' ? 'more' : 'less'} on disk`}
+      label={`${numericValue < 1 ? numericValue * 1000 : value} ${numericValue < 1 ? 'MB' : 'GB'} or ${thresholdType === 'above' ? 'more' : 'less'} on disk`}
       description={
-        <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-          <Slider value={value} min={0} max={200} onChange={onSliderChange} />
+        <Focusable style={{ display: 'flex', flexDirection: 'row' }} className="size-on-disk-row">
+          <TextField value={value} onChange={onSliderChange} />
           <div style={{ marginLeft: '12px' }}>
             <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
           </div>
@@ -783,6 +791,46 @@ const SteamFeatureFilterOptions: VFC<FilterOptionsProps<'steam features'>> = ({ 
 };
 
 /**
+ * The options for a achievements filter.
+ */
+const AchievementsFilterOptions: VFC<FilterOptionsProps<'achievements'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const [value, setValue] = useState<number>(filter.params.completionPercentage);
+  const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
+
+  function updateFilter(threshold: number, threshType: ThresholdCondition) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.completionPercentage = threshold;
+    updatedFilter.params.condition = threshType;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  function onSliderChange(value: number) {
+    updateFilter(value, thresholdType);
+    setValue(value);
+  }
+
+  function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition; }) {
+    updateFilter(value, threshType);
+    setThresholdType(threshType);
+  }
+
+  return (
+    <Field
+      label={`${value}% or ${thresholdType === 'above' ? 'more' : 'less'} achievements completed`}
+      description={
+        <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
+          <Slider value={value} min={1} max={100} onChange={onSliderChange} />
+          <div style={{ marginLeft: '12px' }}>
+            <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
+          </div>
+        </Focusable>}
+    />
+  );
+};
+
+/**
  * The options for an sd card filter
  */
 const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
@@ -857,6 +905,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <StreamableFilterOptions index={index} filter={filterCopy as TabFilterSettings<'streamable'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "steam features":
         return <SteamFeatureFilterOptions index={index} filter={filterCopy as TabFilterSettings<'steam features'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "achievements":
+        return <AchievementsFilterOptions index={index} filter={filterCopy as TabFilterSettings<'achievements'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "sd card":
         return <SDCardFilterOptions index={index} filter={filterCopy as TabFilterSettings<'sd card'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       default:

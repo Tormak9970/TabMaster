@@ -79,7 +79,7 @@ const TimePlayedFilterPreview: VFC<FilterPreviewProps<'time played'>> = ({ filte
 
 const SizeOnDiskFilterPreview: VFC<FilterPreviewProps<'size on disk'>> = ({ filter }) => {
   const { gbThreshold, condition } = filter.params;
-  return <FilterPreviewGeneric filter={filter} displayData={`${gbThreshold} GB or ${condition === 'above' ? 'more' : 'less'}`} />;
+  return <FilterPreviewGeneric filter={filter} displayData={`${gbThreshold < 1 ? gbThreshold * 1000 : gbThreshold} ${gbThreshold < 1 ? 'MB' : 'GB'} or ${condition === 'above' ? 'more' : 'less'}`} />;
 };
 
 const ReleaseDateFilterPreview: VFC<FilterPreviewProps<'release date'>> = ({ filter }) => {
@@ -120,6 +120,11 @@ const StreamableFilterPreview: VFC<FilterPreviewProps<'streamable'>> = ({ filter
 
 const SteamFeaturesFilterPreview: VFC<FilterPreviewProps<'steam features'>> = ({ filter }) => {
   return <FilterPreviewGeneric filter={filter} displayData={`${filter.params.features.length} ${filter.params.features.length == 1 ? "feature" : "features"}`} isInverted={filter.inverted} />;
+};
+
+const AchievementsFilterPreview: VFC<FilterPreviewProps<'achievements'>> = ({ filter }) => {
+  const { completionPercentage, condition } = filter.params;
+  return <FilterPreviewGeneric filter={filter} displayData={`${completionPercentage}% or ${condition === 'above' ? 'more' : 'less'} achievements completed`} />;
 };
 
 const SDCardFilterPreview: VFC<FilterPreviewProps<'sd card'>> = ({ filter }) => {
@@ -170,6 +175,8 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <StreamableFilterPreview filter={filter as TabFilterSettings<'streamable'>} />;
       case "steam features":
         return <SteamFeaturesFilterPreview filter={filter as TabFilterSettings<'steam features'>} />;
+      case "achievements":
+        return <AchievementsFilterPreview filter={filter as TabFilterSettings<'achievements'>} />
       case "sd card":
         return <SDCardFilterPreview filter={filter as TabFilterSettings<'sd card'>} />;
       default:

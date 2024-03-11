@@ -24,6 +24,7 @@
    - Demo
    - Streamable
    - Steam Features
+   - Achievements
    - MicroSD Card (Requires MicroSDeck)
 
 <br/>
@@ -286,6 +287,19 @@ Filters apps based on if they can be streamed or not.
 
 **Example:**<br/>
 <img title="Steam Features Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_steam-features-example.png" />
+
+<br/>
+
+#### Achievements
+**Options:**<br/>
+`percentage` - The desired achievement percentage completion of apps to include.
+`greater/less` - Whether to include apps that have an achievement completion percentage greater than or equal to the provided percentage, or less than or equal to it.
+
+**Behavior:**<br/>
+Filters apps based on their achievement completion percentage.
+
+**Example:**<br/>
+<img title="Achievements Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_achievements-example.png" />
 
 <br/>
 

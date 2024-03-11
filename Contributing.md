@@ -43,3 +43,7 @@ Here's what you need to know:
    - docs - changes to the documentation
    - refactor - refactoring
  - when writing a good commit message, keep it short. You can always add details in the commit description
+
+# Pull Requests
+
+PRs should follow commitlint conventions as well. If there is one feature or bug fix, the title should be about that. If there are multiple, it should summarize them.

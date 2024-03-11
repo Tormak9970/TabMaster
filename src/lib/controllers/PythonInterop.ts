@@ -98,20 +98,6 @@ export class PythonInterop {
       return new Error(result.result);
     }
   }
-  
-  /**
-   * Gets the plugin's docs.
-   * @returns A promise resolving to the plugin's docs.
-   */
-  static async getDocs(): Promise<DocPages | Error> {
-    const result = await this.serverAPI.callPluginMethod<{}, DocPages>("get_docs", {});
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
-    }
-  }
 
   /**
    * Gets the plugin's tabs.

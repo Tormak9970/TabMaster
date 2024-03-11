@@ -7,11 +7,11 @@ import { version } from '@cebbinghaus/microsdeck/package.json';
 export const microSDeckLibVersion = version;
 
 export enum MicroSDeckInstallState {
-  'not installed',
-  'ver too low',
-  'ver too high',
-  'ver unknown',
-  'good'
+  NOT_INSTALLED,
+  VERSION_TOO_LOW,
+  VERSION_TOO_HIGH,
+  VERSION_UNKOWN,
+  VERSION_COMPATIBLE
 }
 
 export class MicroSDeckInterop {
@@ -75,7 +75,7 @@ export class MicroSDeckInterop {
    */
   static getInstallState(runChangeHandlerIfNewInstance?: boolean) {
     if (!window.MicroSDeck) {
-      return MicroSDeckInstallState['not installed'];
+      return MicroSDeckInstallState.NOT_INSTALLED;
     } else {
       
       //MicroSDeck has been reinstalled or reloaded
@@ -95,7 +95,7 @@ export class MicroSDeckInterop {
    * @returns boolean
    */
   static isInstallOk(runChangeHandlerIfNewInstance?: boolean) {
-    return this.getInstallState(runChangeHandlerIfNewInstance) === MicroSDeckInstallState['good'];
+    return this.getInstallState(runChangeHandlerIfNewInstance) === MicroSDeckInstallState.VERSION_COMPATIBLE;
   }
 
   /**
@@ -107,18 +107,18 @@ export class MicroSDeckInterop {
       const [pluginVerMajor, pluginVerMinor, pluginVerPatch] = window.MicroSDeck!.Version.split(/[.+-]/, 3).map(str => +str);
       const [libVerMajor, libVerMinor, libVerPatch] = microSDeckLibVersion.split(/[.+-]/, 3).map(str => +str);
 
-      if (isNaN(pluginVerMajor) || isNaN(pluginVerMinor) || isNaN(pluginVerPatch) || isNaN(libVerMajor) || isNaN(libVerMinor) || isNaN(libVerPatch)) return MicroSDeckInstallState['ver unknown'];
+      if (isNaN(pluginVerMajor) || isNaN(pluginVerMinor) || isNaN(pluginVerPatch) || isNaN(libVerMajor) || isNaN(libVerMinor) || isNaN(libVerPatch)) return MicroSDeckInstallState.VERSION_UNKOWN;
       if (pluginVerMajor === 0 && libVerMajor === 0) {
-        if (pluginVerMinor > libVerMinor || pluginVerPatch > libVerPatch) return MicroSDeckInstallState['ver too high'];
-        if (pluginVerMinor < libVerMinor || pluginVerPatch < libVerPatch) return MicroSDeckInstallState['ver too low'];
-        return MicroSDeckInstallState['good'];
+        if (pluginVerMinor > libVerMinor) return MicroSDeckInstallState.VERSION_TOO_HIGH;
+        if (pluginVerMinor < libVerMinor) return MicroSDeckInstallState.VERSION_TOO_LOW;
+        return MicroSDeckInstallState.VERSION_COMPATIBLE;
       }
       
-      if (pluginVerMajor > libVerMajor) return MicroSDeckInstallState['ver too high'];
-      if (pluginVerMajor < libVerMajor) return MicroSDeckInstallState['ver too low'];
-      return MicroSDeckInstallState['good'];
+      if (pluginVerMajor > libVerMajor) return MicroSDeckInstallState.VERSION_TOO_HIGH;
+      if (pluginVerMajor < libVerMajor) return MicroSDeckInstallState.VERSION_TOO_LOW;
+      return MicroSDeckInstallState.VERSION_COMPATIBLE;
     } else {
-      return MicroSDeckInstallState['ver too low']; //* version is so old it doesn't have the Version prop.
+      return MicroSDeckInstallState.VERSION_TOO_LOW; //* version is so old it doesn't have the Version prop.
     }
   }
 }
