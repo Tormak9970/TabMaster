@@ -25,7 +25,10 @@ type DocRoutes = {
  */
 export const DocsRouter: VFC = () => {
   const docPages: DocRoutes = {};
+
   Object.entries(docs).map(([pageName, doc]) => {
+    pageName = pageName.replace(/_/g, " ");
+    
     docPages[pageName] = {
       title: pageName,
       content: <DocPage content={doc} />,

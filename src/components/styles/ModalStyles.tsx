@@ -98,6 +98,11 @@ export const ModalStyles: VFC<{}> = ({}) => {
         color: #a9a9a9;
       }
 
+      /* Filter Option styles */
+      .tab-master-modal-scope .size-on-disk-row > div:first-child {
+        flex-grow: 1;
+      }
+
       .autohide-toggle-container .${gamepadDialogClasses.Field} {
         padding: 10px calc(28px + 1.4vw);
       }
