@@ -1,6 +1,6 @@
 {
   "name": "tabmaster",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "description": "Gives you full control over your Steam library! Support for customizing, adding, and hiding Library Tabs.",
   "scripts": {
     "build": "shx rm -rf dist && rollup -c",
