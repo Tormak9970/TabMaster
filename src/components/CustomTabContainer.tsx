@@ -1,7 +1,7 @@
 import { EditableTabSettings } from "./modals/EditTabModal";
 import { TabFilterSettings, FilterType, Filter } from "./filters/Filters";
-import { gamepadTabbedPageClasses } from "../GamepadTabbedPageClasses";
 import { filtersHaveType, getIncludedCategoriesFromBitField } from "../lib/Utils";
+import { gamepadTabbedPageClasses } from "decky-frontend-lib";
 
 /**
  * Wrapper for injecting custom tabs.
