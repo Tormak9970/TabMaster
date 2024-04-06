@@ -173,6 +173,7 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "merge":
     case "deck compatibility":
     case "steam features":
+    case "achievements":
     case "sd card":
       return true;
     case "platform":
@@ -185,7 +186,6 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "release date":
     case "last played":
     case "demo":
-    case "achievements":
     case "streamable":
       return false;
   }

@@ -821,7 +821,7 @@ const AchievementsFilterOptions: VFC<FilterOptionsProps<'achievements'>> = ({ in
       label={`${value}% or ${thresholdType === 'above' ? 'more' : 'less'} achievements completed`}
       description={
         <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-          <Slider value={value} min={1} max={100} onChange={onSliderChange} />
+          <Slider value={value} min={0} max={100} onChange={onSliderChange} />
           <div style={{ marginLeft: '12px' }}>
             <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
           </div>
