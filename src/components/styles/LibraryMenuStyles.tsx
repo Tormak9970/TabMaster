@@ -1,5 +1,5 @@
+import { gamepadContextMenuClasses } from "decky-frontend-lib";
 import { VFC } from 'react';
-import { gamepadContextMenuClasses } from '../../lib/GamepadContextMenuClasses';
 
 /**
  * CSS styling for the Library Context Menu part of TabMaster.

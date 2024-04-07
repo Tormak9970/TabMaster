@@ -1,11 +1,10 @@
-import { Menu, MenuItem, showModal, Focusable, MenuGroup, ReorderableEntry, ReorderableList, MenuItemProps } from 'decky-frontend-lib';
+import { Menu, MenuItem, showModal, Focusable, MenuGroup, ReorderableEntry, ReorderableList, MenuItemProps, gamepadContextMenuClasses } from 'decky-frontend-lib';
 import { FC, Fragment, VFC, useState } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { TabMasterContextProvider, useTabMasterContext } from '../../state/TabMasterContext';
 import { showModalEditTab, showModalNewTab } from '../modals/EditTabModal';
 import { LibraryMenuStyles } from '../styles/LibraryMenuStyles';
 import { DestructiveModal } from '../generic/DestructiveModal';
-import { gamepadContextMenuClasses } from '../../lib/GamepadContextMenuClasses';
 import { PresetMenuItems } from './PresetMenu';
 import { CustomTabContainer } from '../CustomTabContainer';
 import { TabListLabel } from '../TabListLabel';
