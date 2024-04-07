@@ -1,8 +1,8 @@
 import { Fragment, VFC, createElement, useEffect, useState } from "react";
-import { Focusable, ModalRoot, SingleDropdownOption } from "decky-frontend-lib";
+import { achievementClasses, Focusable, mainMenuAppRunningClasses, ModalRoot, SingleDropdownOption } from "decky-frontend-lib";
 import { FilterDefaultParams, FilterDescriptions, FilterIcons, FilterType } from "./Filters";
 import { capitalizeEachWord } from "../../lib/Utils";
-import { FilterSelectStyles, achievementClasses, mainMenuAppRunningClasses } from "../styles/FilterSelectionStyles";
+import { FilterSelectStyles } from "../styles/FilterSelectionStyles";
 import { IoFilter } from 'react-icons/io5'
 import { MicroSDeckInterop, microSDeckLibVersion } from '../../lib/controllers/MicroSDeckInterop';
 import { BaseModalProps, CustomDropdown } from '../generic/CustomDropdown';
