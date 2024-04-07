@@ -1,8 +1,7 @@
-import { Menu, MenuGroup, MenuItem, showModal, GamepadButton } from 'decky-frontend-lib';
+import { Menu, MenuGroup, MenuItem, showModal, GamepadButton, gamepadContextMenuClasses } from 'decky-frontend-lib';
 import { VFC, Fragment, useState } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { CreateTabProfileModal, OverwriteTabProfileModal } from '../modals/TabProfileModals';
-import { gamepadContextMenuClasses } from '../../lib/GamepadContextMenuClasses';
 import { DestructiveModal } from '../generic/DestructiveModal';
 
 
