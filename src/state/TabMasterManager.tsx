@@ -226,26 +226,17 @@ export class TabMasterManager {
    * @param storeTagLocalizationMap The store tag localization map.
    */
   private storeTagReaction(storeTagLocalizationMap: StoreTagLocalizationMap) {
-    let tagLocalizationMap = storeTagLocalizationMap._data;
-    if (!tagLocalizationMap && storeTagLocalizationMap.data_) {
-      tagLocalizationMap = storeTagLocalizationMap.data_
-    }
+    if (storeTagLocalizationMap) {
+      const tagEntriesArray = Array.from(storeTagLocalizationMap.entries());
 
-    if (tagLocalizationMap) {
-      const tagEntriesArray = Array.from(tagLocalizationMap.entries());
+      this.allStoreTags = tagEntriesArray.map(([_, entry]) => {
+        return {
+          tag: entry.tagid,
+          string: entry.name
+        };
+      });
 
-      if (tagEntriesArray[0][1].value || tagEntriesArray[0][1].value_) {
-        this.allStoreTags = tagEntriesArray.map(([tag, entry]) => {
-          return {
-            tag: tag,
-            string: entry.value ?? entry.value_
-          };
-        });
-
-        PythonInterop.setTags(this.allStoreTags);
-      } else {
-        LogController.error("Failed to get store tags. Both entry.value and entry.value_ were undefined");
-      }
+      PythonInterop.setTags(this.allStoreTags);
     } else {
       LogController.error("Failed to get store tags. Both _data and data_ were undefined");
     }
