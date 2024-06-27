@@ -20,7 +20,7 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
       }
       
       afterPatch(ret1, 'type', (_: any, ret2: any) => {
-        const homeElement = ret2?.props?.children?.props?.pages?.find((obj: any) => obj.route === '/settings/home')?.content?.props?.children[1];
+        const homeElement = ret2?.props?.children?.props?.pages?.find((obj: any) => obj.route === '/settings/home')?.content?.props?.children?.[1];
         if (homeElement === undefined) {
           LogController.raiseError("Couldn't find home element to patch in settings");
           return ret2;
