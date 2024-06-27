@@ -64,7 +64,7 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
 
   return (
     <div className="tab-master-scope">
-      {LogController.errorFlag && <div style={{ padding: '0 15px', marginBottom: '40px' }}>
+      {LogController.errorFlag && <Focusable style={{ padding: '0 15px', marginBottom: '40px' }} onActivate={() => {}}>
         <h3>
           <FaCircleExclamation style={{ height: '.8em', marginRight: '5px' }} fill="red" />
           Tab Master encountered an error
@@ -80,7 +80,7 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
           <br />
           for support.
         </div>
-      </div>}
+      </Focusable>}
       {hasSdTabs && !isMicroSDeckInstalled && !microSDeckNoticeHidden && (
         <div className='notice-field-cont' style={{ paddingBottom: '10px' }}>
           <Field>
