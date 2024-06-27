@@ -728,6 +728,23 @@ const LastPlayedFilterOptions: VFC<FilterOptionsProps<'last played'>> = ({ index
 };
 
 /**
+ * The options for a family sharing filter.
+ */
+const FamilySharingFilterOptions: VFC<FilterOptionsProps<'family sharing'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  function onChange(checked: boolean) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.isFamilyShared = checked ?? false;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  return (
+    <ToggleField label="Is from a family member?" checked={filter.params.isFamilyShared} onChange={onChange} />
+  );
+};
+
+/**
  * The options for a demo filter.
  */
 const DemoFilterOptions: VFC<FilterOptionsProps<'demo'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
@@ -899,6 +916,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <ReleaseDateFilterOptions index={index} filter={filterCopy as TabFilterSettings<'release date'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "last played":
         return <LastPlayedFilterOptions index={index} filter={filterCopy as TabFilterSettings<'last played'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "family sharing":
+        return <FamilySharingFilterOptions index={index} filter={filterCopy as TabFilterSettings<'family sharing'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "demo":
         return <DemoFilterOptions index={index} filter={filterCopy as TabFilterSettings<'demo'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "streamable":

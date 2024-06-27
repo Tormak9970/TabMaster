@@ -32,8 +32,6 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
         }
 
         afterPatch(homeElement, 'type', (_: any, ret3: any) => {
-          console.log('ret 3', ret3);
-
           const buttonElementContainer = ret3?.props?.children?.find((elt: React.ReactElement) => {
             return elt?.type?.toString?.().includes('HomeSettings');
           });

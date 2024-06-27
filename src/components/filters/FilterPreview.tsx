@@ -110,6 +110,10 @@ const LastPlayedFilterPreview: VFC<FilterPreviewProps<'last played'>> = ({ filte
   return <FilterPreviewGeneric filter={filter} displayData={displayData} />;
 };
 
+const FamilySharingFilterPreview: VFC<FilterPreviewProps<'family sharing'>> = ({ filter }) => {
+  return <FilterPreviewGeneric filter={filter} displayData={filter.params.isFamilyShared ? "yes" : "no"} />;
+};
+
 const DemoFilterPreview: VFC<FilterPreviewProps<'demo'>> = ({ filter }) => {
   return <FilterPreviewGeneric filter={filter} displayData={filter.params.isDemo ? "yes" : "no"} />;
 };
@@ -169,6 +173,8 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <ReleaseDateFilterPreview filter={filter as TabFilterSettings<'release date'>} />;
       case "last played":
         return <LastPlayedFilterPreview filter={filter as TabFilterSettings<'last played'>} />;
+      case "family sharing":
+        return <FamilySharingFilterPreview filter={filter as TabFilterSettings<'family sharing'>} />;
       case "demo":
         return <DemoFilterPreview filter={filter as TabFilterSettings<'demo'>} />;
       case "streamable":

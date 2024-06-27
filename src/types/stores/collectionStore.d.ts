@@ -7,6 +7,7 @@ type CollectionStore = {
   userCollections: SteamCollection[],
   allGamesCollection: Collection,
   deckDesktopApps: Collection | null,
+  sharedLibrariesCollections: Collection[],
   userCollections: Collection[],
   localGamesCollection: Collection,
   allAppsCollection: Collection,

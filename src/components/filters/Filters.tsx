@@ -6,11 +6,11 @@ import { STEAM_FEATURES_ID_MAP } from "./SteamFeatures";
 import { FaCheckCircle, FaHdd, FaSdCard, FaTrophy, FaUserFriends } from "react-icons/fa";
 import { IoGrid } from "react-icons/io5";
 import { SiSteamdeck } from "react-icons/si";
-import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCompactDisc, FaListCheck, FaPlay, FaRegClock, FaSteam, FaTags } from "react-icons/fa6";
+import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCompactDisc, FaListCheck, FaPlay, FaRegClock, FaSteam, FaTags, FaUserPlus } from "react-icons/fa6";
 import { BsClockHistory, BsRegex } from "react-icons/bs";
 import { LuCombine } from "react-icons/lu";
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'demo' | 'streamable' | 'steam features' | 'achievements' | 'sd card';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'family sharing' | 'demo' | 'streamable' | 'steam features' | 'achievements' | 'sd card';
 
 export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
@@ -41,6 +41,7 @@ type TimePlayedFilterParams = { timeThreshold: number, condition: ThresholdCondi
 type SizeOnDiskFilterParams = { gbThreshold: number, condition: ThresholdCondition };
 type ReleaseDateFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition };
 type LastPlayedFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition };
+type FamilySharingFilterParams = { isFamilyShared: boolean };
 type DemoFilterParams = { isDemo: boolean };
 type StreamableFilterParams = { isStreamable: boolean };
 type SteamFeaturesFilterParams = { features: number[], mode: LogicalMode };
@@ -63,6 +64,7 @@ export type FilterParams<T extends FilterType> =
   T extends 'size on disk' ? SizeOnDiskFilterParams :
   T extends 'release date' ? ReleaseDateFilterParams :
   T extends 'last played' ? LastPlayedFilterParams :
+  T extends 'family sharing' ? FamilySharingFilterParams :
   T extends 'demo' ? DemoFilterParams :
   T extends 'streamable' ? StreamableFilterParams :
   T extends 'steam features' ? SteamFeaturesFilterParams :
@@ -99,6 +101,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "size on disk": { gbThreshold: 10, condition: 'above' },
   "release date": { date: undefined, condition: 'above' },
   "last played": { date: undefined, condition: 'above' },
+  "family sharing": { isFamilyShared: true },
   "demo": { isDemo: true },
   "streamable": { isStreamable: true },
   "steam features": { features: [], mode: 'and' },
@@ -125,6 +128,7 @@ export const FilterDescriptions: { [filterType in FilterType]: string } = {
   "size on disk": "Selects apps based on their install size.",
   "release date": "Selects apps based on their release date.",
   "last played": "Selects apps based on when they were last played.",
+  "family sharing": "Selects apps that are/aren't shared from family members.",
   demo: "Selects apps that are/aren't demos.",
   streamable: "Selects apps that can/can't be streamed from another computer.",
   achievements: "Selects apps based on their completion percentage.",
@@ -151,6 +155,7 @@ export const FilterIcons: { [filterType in FilterType]: IconType } = {
   "size on disk": FaHdd,
   "release date": FaCalendarDays,
   "last played": BsClockHistory,
+  "family sharing": FaUserPlus,
   demo: FaCompactDisc,
   streamable: FaCloudArrowDown,
   "steam features": FaListCheck,
@@ -186,6 +191,7 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "release date":
     case "last played":
     case "demo":
+    case "family sharing":
     case "streamable":
       return false;
   }
@@ -225,6 +231,7 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
     case "review score":
     case "time played":
     case "demo":
+    case "family sharing":
     case "streamable":
     case "achievements":
     case "sd card":
@@ -374,6 +381,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "release date":
     case "last played":
     case "demo":
+    case "family sharing":
     case "streamable":
     case "steam features":
     case "achievements":
@@ -511,6 +519,12 @@ export class Filter {
           lastPlayedTimeMs >= new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - params.daysAgo!).getTime() :
           lastPlayedTimeMs < new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1 - params.daysAgo!).getTime();
       }
+    },
+    'family sharing': (params: FilterParams<'family sharing'>, appOverview: SteamAppOverview) => {
+      const isInSharedCollection = collectionStore.sharedLibrariesCollections.some((collection) => {
+        return collection.allApps.includes(appOverview);
+      });
+      return params.isFamilyShared ? isInSharedCollection : !isInSharedCollection;
     },
     demo: (params: FilterParams<'demo'>, appOverview: SteamAppOverview) => {
       return params.isDemo ? appOverview.app_type === 8 : appOverview.app_type !== 8;
