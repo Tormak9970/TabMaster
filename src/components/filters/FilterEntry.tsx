@@ -1,20 +1,22 @@
 import { Fragment, VFC, useState } from "react";
 import { FilterDefaultParams, FilterType, TabFilterSettings, canBeInverted } from "./Filters";
-import { ButtonItem, Dropdown, Focusable } from "decky-frontend-lib";
-import { FaTrash } from "react-icons/fa";
+import { Dropdown, Focusable, afterPatch } from "decky-frontend-lib";
+import { FilterSelect } from "./FilterSelect";
+import { TrashButton } from '../generic/TrashButton';
 
 type FilterEntryProps = {
   index: number,
   filter: TabFilterSettings<FilterType>,
   containingGroupFilters: TabFilterSettings<FilterType>[],
-  setContainingGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
-}
+  setContainingGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>,
+  onFilterDelete(index: number): void,
+  shouldFocus: boolean
+};
 
 /**
  * An individual filter for a tab.
  */
-export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGroupFilters, setContainingGroupFilters }) => {
-  const filterTypeOptions = Object.keys(FilterDefaultParams).map(type => { return { label: type, data: type } });
+export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGroupFilters, setContainingGroupFilters, onFilterDelete, shouldFocus }) => {
   const invertOptions = [
     {
       label: "default",
@@ -26,22 +28,21 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
     }
   ];
 
-  const [ isInverted, setIsInverted ] = useState(filter.inverted);
+  const [isInverted, setIsInverted] = useState(filter.inverted);
 
-  //* new filter is made with default params
-  function onChange(data: {data: FilterType}) {
+  function onChange(selectedType: FilterType) {
     const updatedFilter = {
-      type: data.data,
+      type: selectedType,
       inverted: isInverted,
-      params: {...FilterDefaultParams[data.data]}
-    }
+      params: {...FilterDefaultParams[selectedType]}
+    };
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
     setContainingGroupFilters(updatedFilters);
   }
 
-  function onInvertedChange(data: { data: boolean }) {
-    const updatedFilter = { ...filter }
+  function onInvertedChange(data: { data: boolean; }) {
+    const updatedFilter = { ...filter };
     updatedFilter.inverted = data.data;
 
     const updatedFilters = [...containingGroupFilters];
@@ -54,10 +55,25 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
   function onDelete() {
     const updatedFilters = [...containingGroupFilters];
     updatedFilters.splice(index, 1);
+    onFilterDelete(index);
     setContainingGroupFilters(updatedFilters);
   }
 
   if (filter) {
+    const filterTypeDropdownElt = (
+      <Focusable style={!canBeInverted(filter) ? { width: "calc(100% - 55px)" } : { width: "calc(100% - 185px)" }}>
+        <FilterSelect selectedOption={filter.type} onChange={onChange} />
+      </Focusable>
+    );
+
+    //single shot patch the filter type dropdown to get it's navNode and tell it to take focus on first render
+    if (shouldFocus) {
+      afterPatch(filterTypeDropdownElt.type, 'render', (_: any, ret: any) => {
+        setTimeout(() => ret.props.value.BTakeFocus(3), 1);
+        return ret;
+      }, { singleShot: true });
+    }
+
     return (
       <div className="filter-entry">
         <Focusable style={{
@@ -65,19 +81,9 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
           display: "flex",
           flexDirection: "row"
         }}>
-          {!canBeInverted(filter) ? (
-            <Focusable style={{
-              width: "calc(100% - 55px)"
-            }}>
-              <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
-            </Focusable>
-          ) : (
+          {!canBeInverted(filter) ? filterTypeDropdownElt : (
             <>
-              <Focusable style={{
-                width: "calc(100% - 185px)"
-              }}>
-                <Dropdown rgOptions={filterTypeOptions} selectedOption={filter.type} onChange={onChange} />
-              </Focusable>
+              {filterTypeDropdownElt}
               <Focusable style={{
                 marginLeft: "10px",
                 width: "120px"
@@ -90,16 +96,14 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
             marginLeft: "10px",
             width: "45px"
           }}>
-            <ButtonItem onClick={onDelete}>
-              <FaTrash />
-            </ButtonItem>
+            <TrashButton onClick={onDelete} />
           </Focusable>
         </Focusable>
       </div>
-    )
+    );
   } else {
     return (
       <Fragment />
     );
   }
-}
+};

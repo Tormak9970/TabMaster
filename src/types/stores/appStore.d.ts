@@ -1,12 +1,11 @@
 // Types for the global appStore
 
 type StoreTagLocalizationEntry = {
-  value: string //? This is the string of the tag
+  tagid: number;
+  name: string;
 }
 
-type StoreTagLocalizationMap = {
-  _data: Map<number, StoreTagLocalizationEntry>
-}
+type StoreTagLocalizationMap = Map<number, StoreTagLocalizationEntry>;
 
 type AppStore = {
   GetAppOverviewByAppID: (appId: number) => SteamAppOverview | null;

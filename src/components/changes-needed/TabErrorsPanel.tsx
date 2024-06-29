@@ -2,8 +2,9 @@ import { VFC, useState } from "react";
 import { TabErrorsAccordion } from "../accordions/TabErrorsAccordion";
 import { FilterType, TabFilterSettings } from "../filters/Filters";
 import { ErroredFiltersPanel } from "./ErroredFiltersPanel";
-import { ButtonItem, ConfirmModal, showModal } from "decky-frontend-lib";
+import { ButtonItem, showModal } from "decky-frontend-lib";
 import { ErrorPanelTabNameContext } from "../../state/ErrorPanelNameContext";
+import { DestructiveModal } from '../generic/DestructiveModal';
 
 type TabErrorsPanelProps = {
   index: number,
@@ -21,13 +22,14 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, errorEntr
   const [isDeleting, setIsDeleting] = useState(false);
 
   function onChange(filters: (TabFilterSettings<FilterType> | [])[], messages: string[][]) {
-    tab.filters = [...filters];
+    const newTab = { ...tab }
+    newTab.filters = [...filters];
     setFilters(filters);
 
     const passing = messages.every((entry) => entry.length === 0);
     setIsPassing(passing);
     setIsDeleting(filters.flatMap(filter => filter).length === 0);
-    onTabStatusChange(tab, passing);
+    onTabStatusChange(newTab, passing);
   }
 
   return (
@@ -43,14 +45,12 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, errorEntr
         <ButtonItem
           onClick={() => {
             showModal(
-              <ConfirmModal
-                className={'tab-master-destructive-modal'}
+              <DestructiveModal
                 onOK={() => onChange([], [[]])}
-                bDestructiveWarning={true}
                 strTitle="WARNING!"
               >
                 Are you sure you want to delete this Tab? This can't be undone.
-              </ConfirmModal>
+              </DestructiveModal>
             );
           }}
         >

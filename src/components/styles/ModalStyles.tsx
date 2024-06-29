@@ -1,6 +1,10 @@
 import { gamepadDialogClasses } from "decky-frontend-lib";
 import { VFC } from "react";
 
+export const modalMargin = '16px + 2.8vw';
+
+// New modal background should be "radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%)"
+
 /**
  * All css styling for TabMaster's modals.
  */
@@ -9,6 +13,10 @@ export const ModalStyles: VFC<{}> = ({}) => {
     <style>{`
       .tab-master-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
         margin-left: 15px;
+      }
+
+      .tab-master-modal-scope .${gamepadDialogClasses.ModalPosition} > .${gamepadDialogClasses.GamepadDialogContent} {
+        background: radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%);
       }
       
       /* The button item */
@@ -19,6 +27,9 @@ export const ModalStyles: VFC<{}> = ({}) => {
         display: none;
       }
       .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildren} {
+        width: 100%;
+      }
+      .tab-master-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldChildrenWithIcon} {
         width: 100%;
       }
 
@@ -36,6 +47,14 @@ export const ModalStyles: VFC<{}> = ({}) => {
         padding: 10px;
         min-width: 45px;
       }
+      .tab-master-modal-scope .name-field .${gamepadDialogClasses.Field} {
+        padding-bottom: 16px;
+        padding-top: 0px;
+      }
+      .tab-master-modal-scope .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
+        left: 1vw;
+        right: 1vw;
+      }
 
       .tab-master-modal-scope .no-sep .${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after,
       .tab-master-modal-scope .no-sep.${gamepadDialogClasses.Field}.${gamepadDialogClasses.WithBottomSeparatorStandard}::after {
@@ -44,48 +63,53 @@ export const ModalStyles: VFC<{}> = ({}) => {
 
       /* Filter section start */
       .tab-master-modal-scope .filter-start-cont {
-        width: 114%;
-        margin-left: -40px;
+        margin-left: calc((${modalMargin}) * -1);
+        margin-right: calc((${modalMargin}) * -1);
         padding: 0;
 
         font-size: 14px;
       }
       .tab-master-modal-scope .filter-start-cont .filter-line {
         height: 2px;
-        flex-grow: 1;
         
         background: #23262e;
       }
+      .tab-master-modal-scope .filter-start-cont .filter-accordion-arrow,
       .tab-master-modal-scope .filter-start-cont .filter-label {
         margin: 0px 5px;
         color: #343945;
       }
       
       /* Focused styles */
-      .tab-master-modal-scope .filter-start-cont.start-focused {
-        background-color: #3d4450 !important;
+      .tab-master-modal-scope .start-focused {
+        background-color: rgba(255, 255, 255, 0.15);
+        animation-name: gamepaddialog_ItemFocusAnim-darkGrey_2zfa-;
+      }
+      .tab-master-modal-scope .highlight-on-focus {
+        animation-duration: .5s;
+        animation-fill-mode: forwards;
+        animation-timing-function: cubic-bezier(0.17, 0.45, 0.14, 0.83);
       }
       .tab-master-modal-scope .filter-start-cont.start-focused .filter-line {
         background: #a9a9a9;
       }
+      .tab-master-modal-scope .filter-start-cont.start-focused .filter-accordion-arrow,
       .tab-master-modal-scope .filter-start-cont.start-focused .filter-label {
         color: #a9a9a9;
       }
 
-      /* merge entries */
-      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
-        margin: 5px;
+      /* Filter Option styles */
+      .tab-master-modal-scope .size-on-disk-row > div:first-child {
+        flex-grow: 1;
       }
 
-      /* red buttons on destructive modals, matches steams */
-      .tab-master-destructive-modal button.${gamepadDialogClasses.Button}.DialogButton.gpfocus.Primary {
-        background: #de3618;
-        color: #fff
+      .autohide-toggle-container .${gamepadDialogClasses.Field} {
+        padding: 10px calc(28px + 1.4vw);
       }
 
-      /* merge entries */
-      .tab-master-modal-scope .merge-filter-entries .merge-filter-entry {
-        margin: 5px;
+      .autohide-toggle-container .${gamepadDialogClasses.FieldLabel} {
+        color: #8b929a;
+        font-size: 12px;
       }
     `}</style>
   );

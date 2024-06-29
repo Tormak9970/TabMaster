@@ -10,6 +10,10 @@ export const FixModalStyles: VFC<{}> = ({}) => {
       .tab-master-fix-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
         margin-left: 15px;
       }
+
+      .tab-master-fix-modal-scope .${gamepadDialogClasses.ModalPosition} > .${gamepadDialogClasses.GamepadDialogContent} {
+        background: radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%);
+      }
       
       /* The button item */
       .tab-master-fix-modal-scope .styled-btn {
@@ -19,6 +23,9 @@ export const FixModalStyles: VFC<{}> = ({}) => {
         display: none;
       }
       .tab-master-fix-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildren} {
+        width: 100%;
+      }
+      .tab-master-fix-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldChildrenWithIcon} {
         width: 100%;
       }
 
@@ -60,12 +67,6 @@ export const FixModalStyles: VFC<{}> = ({}) => {
       /* merge entries */
       .tab-master-fix-modal-scope .merge-filter-entries .merge-filter-entry {
         margin: 5px;
-      }
-
-      /* red buttons on destructive modals, matches steams */
-      .tab-master-destructive-modal button.${gamepadDialogClasses.Button}.DialogButton.gpfocus.Primary {
-        background: #de3618;
-        color: #fff
       }
 
       /* Error Accordion styles */

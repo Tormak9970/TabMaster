@@ -1,13 +1,15 @@
 import { EditableTabSettings } from "../components/modals/EditTabModal";
-import { TabFilterSettings, FilterType, validateFilter } from "../components/filters/Filters";
+import { TabFilterSettings, FilterType, Filter } from "../components/filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { CustomTabContainer } from "../components/CustomTabContainer";
 import { v4 as uuidv4 } from "uuid";
 import { IReactionDisposer, reaction } from "mobx";
 import { defaultTabsSettings, getNonBigIntUserId } from "../lib/Utils";
 import { LogController } from "../lib/controllers/LogController";
-import { showModal } from "decky-frontend-lib";
-import { FixTabErrorsModalRoot } from "../components/modals/FixTabErrorsModal";
+import { PresetName, PresetOptions, getPreset } from '../presets/presets';
+import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
+import { TabErrorController } from '../lib/controllers/TabErrorController';
+import { TabProfileManager } from './TabProfileManager';
 
 /**
  * Converts a list of filters into a 1D array.
@@ -49,6 +51,8 @@ export class TabMasterManager {
 
   public eventBus = new EventTarget();
 
+  public microSDeckInstalled: boolean = false;
+
   private allGamesReaction: IReactionDisposer | undefined;
   private favoriteReaction: IReactionDisposer | undefined;
   private soundtrackReaction: IReactionDisposer | undefined;
@@ -60,8 +64,11 @@ export class TabMasterManager {
 
   private friendsReaction: IReactionDisposer | undefined;
   private tagsReaction: IReactionDisposer | undefined;
+  private achievementsReaction: IReactionDisposer | undefined;
 
   private collectionRemoveReaction: IReactionDisposer | undefined;
+
+  public tabProfileManager: TabProfileManager | undefined;
 
   /**
    * Creates a new TabMasterManager.
@@ -71,41 +78,58 @@ export class TabMasterManager {
     this.tabsMap = new Map<string, TabContainer>();
   }
 
+  private handleMicroSDeckChange() {
+    if (!this.hasLoaded) return;
+
+    const microSDeckTabs: string[] = [];
+    for (let tab of this.tabsMap.values()) {
+      if ((tab as CustomTabContainer).dependsOnMicroSDeck) microSDeckTabs.push(tab.id);
+    }
+
+    TabErrorController.validateTabs(microSDeckTabs, this, true);
+  }
+
   private initReactions(): void {
-    //* subscribe to changes to all games
+    // * subscribe to changes to all games
     this.allGamesReaction = reaction(() => collectionStore.GetCollection("type-games").allApps, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 600 });
 
-    //* subscribe to when visible favorites change
+    // * subscribe to when visible favorites change
     this.favoriteReaction = reaction(() => collectionStore.GetCollection('favorite').allApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this));
 
-    //*subscribe to when visible soundtracks change
+    // *subscribe to when visible soundtracks change
     this.soundtrackReaction = reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged.bind(this));
 
-    //*subscribe to when installed games change
+    // *subscribe to when installed games change
     this.installedReaction = reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this));
 
-    //* subscribe to game hide or show
+    // * subscribe to game hide or show
     this.hiddenReaction = reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 50 });
 
-    //* subscribe to non-steam games if they exist
+    // * subscribe to non-steam games if they exist
     if (collectionStore.GetCollection('desk-desktop-apps')) {
       this.nonSteamReaction = reaction(() => collectionStore.GetCollection('desk-desktop-apps').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this));
     }
 
-    //* subscribe for when collections are deleted
+    // * subscribe for when collections are deleted
     this.collectionRemoveReaction = reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this));
 
     this.handleUserCollectionRemove(collectionStore.userCollections.length); //* this loads the collection ids for the first time.
 
-    //* subscribe to user's friendlist updates
+    // * subscribe to user's friendlist updates
     this.friendsReaction = reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
 
     this.handleFriendsReaction(friendStore.allFriends);
 
-    //* subscribe to store tag list changes
+    // * subscribe to store tag list changes
     this.tagsReaction = reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 });
 
     this.storeTagReaction(appStore.m_mapStoreTagLocalization);
+
+
+    // * subscribe to achievement cache changes
+    this.achievementsReaction = reaction(() => appAchievementProgressCache.m_achievementProgress.mapCache.size, this.handleAchievementsReaction.bind(this));
+
+    MicroSDeckInterop.initEventHandlers({change: this.handleMicroSDeckChange.bind(this)});
   }
 
   /**
@@ -155,7 +179,7 @@ export class TabMasterManager {
   /**
    * Handles rebuilding tabs when a collection changes.
    */
-  private rebuildCustomTabsOnCollectionChange() {
+  private async rebuildCustomTabsOnCollectionChange() {
     if (!this.hasLoaded) return;
 
     this.visibleTabsList.forEach((tabContainer) => {
@@ -173,7 +197,7 @@ export class TabMasterManager {
     const userCollections = collectionStore.userCollections;
 
     if (newLength < this.userCollectionIds.length && this.hasLoaded) {
-      let showFixNeeded = false;
+      let validateTabs = false;
       const collectionsInUse = Object.keys(this.collectionReactions);
       const currentUserCollectionIds = userCollections.map((collection) => collection.id);
 
@@ -181,7 +205,7 @@ export class TabMasterManager {
         const isIncluded = currentUserCollectionIds.includes(id);
 
         if (!isIncluded && collectionsInUse.includes(id)) {
-          showFixNeeded = true;
+          validateTabs = true;
           this.collectionReactions[id]();
           delete this.collectionReactions[id];
         }
@@ -189,45 +213,7 @@ export class TabMasterManager {
         return isIncluded;
       });
 
-      if (showFixNeeded) {
-        const tabsSettings = Object.fromEntries(this.tabsMap.entries());
-        const tabsToFix = this.checkForBrokenFilters(tabsSettings);
-
-        if (tabsToFix.size > 0) {
-          LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
-          showModal(
-            <FixTabErrorsModalRoot
-              onConfirm={(editedTabSettings: TabSettingsDictionary) => {
-                for (const fixedTab of Object.values(editedTabSettings)) {
-                  if (tabsToFix.has(fixedTab.id)) {
-                    const tabContainer = fixedTab as CustomTabContainer;
-
-                    if (tabContainer.filters.length === 0) {
-                      this.deleteTab(tabContainer.id);
-                    } else {
-
-                      const asEditableSettings: EditableTabSettings = {
-                        title: tabContainer.title,
-                        filters: tabContainer.filters,
-                        filtersMode: tabContainer.filtersMode,
-                        includesHidden: tabContainer.includesHidden
-                      };
-
-                      this.updateCustomTab(tabContainer.id, asEditableSettings);
-
-                      const flatFilters = flattenFilters(tabContainer.filters);
-                      this.addCollectionReactionsForFilters(flatFilters);
-                    }
-                  }
-                }
-              }}
-              tabs={tabsSettings}
-              erroredFiltersMap={tabsToFix}
-              tabMasterManager={this}
-            />
-          );
-        }
-      }
+      if (validateTabs) TabErrorController.validateTabs(Array.from(this.tabsMap.keys()), this);
     } else {
       for (const userCollection of userCollections) {
         if (!this.userCollectionIds.includes(userCollection.id)) this.userCollectionIds.push(userCollection.id);
@@ -240,14 +226,20 @@ export class TabMasterManager {
    * @param storeTagLocalizationMap The store tag localization map.
    */
   private storeTagReaction(storeTagLocalizationMap: StoreTagLocalizationMap) {
-    this.allStoreTags = Array.from(storeTagLocalizationMap._data.entries()).map(([tag, entry]) => {
-      return {
-        tag: tag,
-        string: entry.value
-      };
-    });
+    if (storeTagLocalizationMap) {
+      const tagEntriesArray = Array.from(storeTagLocalizationMap.entries());
 
-    PythonInterop.setTags(this.allStoreTags);
+      this.allStoreTags = tagEntriesArray.map(([_, entry]) => {
+        return {
+          tag: entry.tagid,
+          string: entry.name
+        };
+      });
+
+      PythonInterop.setTags(this.allStoreTags);
+    } else {
+      LogController.error("Failed to get store tags. Both _data and data_ were undefined");
+    }
   }
 
   /**
@@ -321,6 +313,42 @@ export class TabMasterManager {
   }
 
   /**
+   * Handles updating state when the the achievement cache changes.
+   * @param _size The size of the achievements map.
+   */
+  private handleAchievementsReaction(_size: number) {
+    this.visibleTabsList.forEach(tabContainer => {
+      if (tabContainer.filters) {
+        const tab = tabContainer as CustomTabContainer;
+        if (tab.containsFilterType('achievements')) {
+          tab.buildCollection();
+        }
+      }
+    });
+  }
+
+  /**
+   * Checks for tabs with filters that are based on time ago and rebuilds their collections.
+   */
+  buildTimeBasedFilterTabs() {
+    this.visibleTabsList.forEach(tabContainer => {
+      if (tabContainer.filters) {
+        const tab = tabContainer as CustomTabContainer;
+        if (tab.containsFilterType('last played', 'release date')) {
+          if (!tab.containsFilterType('merge')) {
+            //@ts-ignore
+            if (tab.filters.find(filter => filter.params.daysAgo !== undefined)) {
+              tab.buildCollection();
+            }
+          } else {
+            tab.buildCollection();
+          }
+        }
+      }
+    });
+  }
+
+  /**
    * Handles cleaning up all reactions.
    */
   disposeReactions(): void {
@@ -339,6 +367,8 @@ export class TabMasterManager {
 
     if (this.friendsReaction) this.friendsReaction();
     if (this.tagsReaction) this.tagsReaction();
+    
+    if (this.achievementsReaction) this.achievementsReaction();
 
     if (this.collectionRemoveReaction) this.collectionRemoveReaction();
   }
@@ -430,6 +460,8 @@ export class TabMasterManager {
       }
     }
     this.tabsMap.delete(tabId);
+    this.tabProfileManager?.onDeleteTab(tabId);
+    if (!this.tabProfileManager) LogController.error('Attempted to delete a tab before TabProfileManager has been initialized.', 'This should not be possible.');
     this.updateAndSave();
   }
 
@@ -439,13 +471,19 @@ export class TabMasterManager {
    * @param position The position of the tab.
    * @param filterSettingsList The list of filters for the tab.
    * @param filtersMode The logic mode for these filters.
-   * @param includesHidden Whether or not this tab includes hidden games.
+   * @param categoriesToInclude A bit field of which categories should be included in the tab.
+   * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
    */
-  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, includesHidden: boolean) {
+  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean) {
     const id = uuidv4();
     this.addCollectionReactionsForFilters(flattenFilters(filterSettingsList));
-    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode, includesHidden));
+    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode, categoriesToInclude, autoHide));
     this.updateAndSave();
+  }
+
+  createPresetTab<Name extends PresetName>(presetName: Name, tabTitle: string, ...options: PresetOptions<Name>) {
+    const { filters, filtersMode, categoriesToInclude } = getPreset(presetName, ...options);
+    this.createCustomTab(tabTitle, this.visibleTabsList.length, filters, filtersMode, categoriesToInclude, false);
   }
 
   /**
@@ -470,52 +508,12 @@ export class TabMasterManager {
   }
 
   /**
-   * Checks the provided tabsSettings for broken filters.
-   * @param tabsSettings The tabsSettings to check.
-   * @returns A map of tabIds to broken filters.
+   * Other async load calls that don't need to be waited for when starting the plugin
    */
-  private checkForBrokenFilters(tabsSettings: TabSettingsDictionary): Map<string, FilterErrorEntry[]> {
-    const tabsToFix = new Map<string, FilterErrorEntry[]>();
-
-    for (const [id, tabSetting] of Object.entries(tabsSettings)) {
-      if (tabSetting.filters) {
-        const tabErroredFilters: FilterErrorEntry[] = [];
-
-        for (let i = 0; i < tabSetting.filters.length; i++) {
-          const filter = tabSetting.filters[i];
-          const filterValidated = validateFilter(filter);
-
-          if (!filterValidated.passed) {
-            let entry: FilterErrorEntry = {
-              filterIdx: i,
-              errors: filterValidated.errors
-            };
-
-            if (filterValidated.mergeErrorEntries) entry.mergeErrorEntries = filterValidated.mergeErrorEntries;
-
-            tabErroredFilters.push(entry);
-          }
-        }
-
-        if (tabErroredFilters.length > 0) {
-          tabsToFix.set(id, tabErroredFilters);
-        }
-      }
-    }
-
-    return tabsToFix;
-  }
-
-  /**
-   * Loads the user's tabs from the backend.
-   */
-  loadTabs = async () => {
-    this.initReactions();
-    const settings = await PythonInterop.getTabs();
-    //* We don't need to wait for these, since if we get the store ones, we don't care about them
+  asyncLoadOther() {
     PythonInterop.getTags().then((res: TagResponse[] | Error) => {
       if (res instanceof Error) {
-        LogController.log("TabMaster couldn't load tags settings");
+        LogController.raiseError(`Error loading tags \n ${res.message}`)
       } else {
         if (this.allStoreTags.length === 0) {
           this.allStoreTags = res;
@@ -524,7 +522,7 @@ export class TabMasterManager {
     });
     PythonInterop.getFriends().then((res: FriendEntry[] | Error) => {
       if (res instanceof Error) {
-        LogController.log("TabMaster couldn't load friends settings");
+        LogController.raiseError(`Error loading friends \n ${res.message}`)
       } else {
         if (this.currentUsersFriends.length === 0) {
           this.currentUsersFriends = res;
@@ -533,44 +531,39 @@ export class TabMasterManager {
     });
     PythonInterop.getFriendsGames().then((res: Map<number, number[]> | Error) => {
       if (res instanceof Error) {
-        LogController.log("TabMaster couldn't load friends games settings");
+        LogController.raiseError(`Error loading friends games \n ${res.message}`)
       } else {
         if (this.friendsGameMap.size === 0) {
           this.friendsGameMap = res;
         }
       }
     });
+  }
 
-    if (settings instanceof Error) {
-      LogController.log("TabMaster couldn't load tab settings");
-      return;
-    }
+  /**
+   * Loads the user's tabs from the backend.
+   */
+  loadTabs = async () => {
+    this.initReactions();
+    const settings = await PythonInterop.getTabs();
+    const profiles = await PythonInterop.getTabProfiles();
 
-    const tabsSettings = Object.keys(settings).length > 0 ? settings : { ...defaultTabsSettings };
-    const tabsToFix = this.checkForBrokenFilters(tabsSettings);
-
-    if (tabsToFix.size > 0) {
-      LogController.warn(`There were ${tabsToFix.size} tabs that failed validation!`);
-      showModal(
-        <FixTabErrorsModalRoot
-          onConfirm={(editedTabSettings: TabSettingsDictionary) => {
-            const tabsToDelete: string[] = [];
-            for (const fixedTab of Object.values(editedTabSettings)) {
-              if (tabsToFix.has(fixedTab.id) && fixedTab.filters!.length === 0) {
-                tabsToDelete.push(fixedTab.id);
-              }
-            }
-
-            this.finishLoadingTabs(editedTabSettings);
-            tabsToDelete.forEach(tabId => this.deleteTab(tabId));
-          }}
-          tabs={tabsSettings}
-          erroredFiltersMap={tabsToFix}
-          tabMasterManager={this}
-        />
-      );
-    } else {
-      this.finishLoadingTabs(tabsSettings);
+    this.asyncLoadOther();
+    try {
+      if (settings instanceof Error) {
+        throw new Error(`Error loading tab settings \n ${settings.message}`)
+      }
+      if (profiles instanceof Error) {
+        throw new Error(`Error loading tab profiles \n ${profiles.message}`)
+      }
+      
+      this.tabProfileManager = new TabProfileManager(profiles);
+      TabErrorController.validateSettingsOnLoad((Object.keys(settings).length > 0) ? settings : defaultTabsSettings, this, this.finishLoadingTabs.bind(this));
+    
+    } catch(e) {
+      if(e instanceof Error) {
+        LogController.raiseError(`Encountered an error while loading \n ${e.message}`)
+      }
     }
   };
 
@@ -598,8 +591,9 @@ export class TabMasterManager {
     }
 
     for (const keyId in tabsSettings) {
-      const { id, title, filters, position, filtersMode, includesHidden } = tabsSettings[keyId];
-      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!, includesHidden!) : this.addDefaultTabContainer(tabsSettings[keyId]);
+      const { id, title, filters: _filters, position, filtersMode, categoriesToInclude, autoHide } = tabsSettings[keyId];
+      const filters = Filter.removeUnknownTypes(_filters)
+      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!, categoriesToInclude!, autoHide!) : this.addDefaultTabContainer(tabsSettings[keyId]);
 
       if (favoritesOriginalIndex !== null && favoritesOriginalIndex > -1 && tabContainer.position > favoritesOriginalIndex) {
         tabContainer.position--;
@@ -669,8 +663,16 @@ export class TabMasterManager {
     const allTabsSettings: TabSettingsDictionary = {};
 
     this.tabsMap.forEach(tabContainer => {
-      const tabSettings = tabContainer.filters ?
-        { id: tabContainer.id, title: tabContainer.title, position: tabContainer.position, filters: tabContainer.filters, filtersMode: (tabContainer as CustomTabContainer).filtersMode, includesHidden: (tabContainer as CustomTabContainer).includesHidden }
+      const tabSettings: TabSettings = tabContainer.filters ?
+        { 
+          id: tabContainer.id,
+          title: tabContainer.title,
+          position: tabContainer.position,
+          filters: tabContainer.filters,
+          filtersMode: (tabContainer as CustomTabContainer).filtersMode,
+          categoriesToInclude: (tabContainer as CustomTabContainer).categoriesToInclude,
+          autoHide: (tabContainer as CustomTabContainer).autoHide
+        }
         : tabContainer;
 
       allTabsSettings[tabContainer.id] = tabSettings;
@@ -684,11 +686,12 @@ export class TabMasterManager {
    * @param title The title of the tab.
    * @param position The position of the tab.
    * @param filterSettingsList The tab's filters.
-   * @param includesHidden Whether this tab should include hidden games.
+   * @param categoriesToInclude A bit field of which categories should be included in the tab.
+   * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
    * @returns A tab container for this tab.
    */
-  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, includesHidden: boolean) {
-    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode, includesHidden);
+  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean) {
+    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode, categoriesToInclude, autoHide);
     this.tabsMap.set(tabId, tabContainer);
     return tabContainer;
   }
@@ -725,9 +728,25 @@ export class TabMasterManager {
   }
 
   /**
-   * Dispatches event to update context provider
+   * Dispatches event to update context provider and rerenders library component.
    */
   private update() {
     this.eventBus.dispatchEvent(new Event("stateUpdate"));
+    this.rerenderLibrary();
+  }
+
+  /**
+   * Method that will be used to force library to rerender. Assigned later in the library patch.
+   */
+  private rerenderLibrary() {
+
+  }
+
+  /**
+   * Assigns the callback that will be used to rerender the library.
+   * @param handler The callback that will cause the library to rerender.
+   */
+  registerRerenderLibraryHandler(handler: () => void) {
+    this.rerenderLibrary = handler;
   }
 }

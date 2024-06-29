@@ -1,6 +1,7 @@
 import { EditableTabSettings } from "./modals/EditTabModal";
 import { TabFilterSettings, FilterType, Filter } from "./filters/Filters";
-import { gamepadTabbedPageClasses } from "../GamepadTabbedPageClasses";
+import { filtersHaveType, getIncludedCategoriesFromBitField } from "../lib/Utils";
+import { gamepadTabbedPageClasses } from "decky-frontend-lib";
 
 /**
  * Wrapper for injecting custom tabs.
@@ -12,7 +13,9 @@ export class CustomTabContainer implements TabContainer {
   filters: TabFilterSettings<FilterType>[];
   collection: Collection;
   filtersMode: LogicalMode;
-  includesHidden: boolean;
+  categoriesToInclude: number;
+  autoHide: boolean;
+  dependsOnMicroSDeck: boolean;
 
   /**
    * Creates a new CustomTabContainer.
@@ -21,14 +24,19 @@ export class CustomTabContainer implements TabContainer {
    * @param position The position of the tab.
    * @param filterSettingsList The tab's filters.
    * @param filtersMode boolean operator for top level filters
+   * @param categoriesToInclude A bit field of which categories should be included in the tab.
+   * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
    */
-  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, includesHidden: boolean) {
+  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean) {
     this.id = id;
     this.title = title;
     this.position = position;
     this.filters = filterSettingsList;
     this.filtersMode = filtersMode;
-    this.includesHidden = includesHidden;
+    this.categoriesToInclude = categoriesToInclude;
+    this.autoHide = autoHide;
+    this.dependsOnMicroSDeck = false;
+
     //@ts-ignore
     this.collection = {
       AsDeletableCollection: () => null,
@@ -43,10 +51,16 @@ export class CustomTabContainer implements TabContainer {
       id: this.id
     };
 
-    this.buildCollection();
+    if (this.position > -1) {
+      this.buildCollection();
+    }
+    this.checkMicroSDeckDependency();
   }
 
-  getActualTab(TabContentComponent: TabContentComponent, sortingProps: Omit<TabContentProps, 'collection'>, footer: SteamTab['footer'], collectionAppFilter: any): SteamTab {
+  getActualTab(TabContentComponent: TabContentComponent, sortingProps: Omit<TabContentProps, 'collection'>, footer: SteamTab['footer'], collectionAppFilter: any, isMicroSDeckInstalled: boolean): SteamTab | null {
+    if (!isMicroSDeckInstalled && this.dependsOnMicroSDeck) return null;
+    if (this.autoHide && this.collection.visibleApps.length === 0) return null;
+    
     return {
       title: this.title,
       id: this.id,
@@ -64,46 +78,33 @@ export class CustomTabContainer implements TabContainer {
   }
 
   /**
-   * Hides an app from this tab.
-   * @param appId The id of the app to hide.
-   */
-  //unused in current implementation
-  // hideAppFromList(appId: AppId) {
-  //   const appItemIndex = this.collection.visibleApps.findIndex((appItem: SteamAppOverview) => appItem.appid === appId);
-  //   if (appItemIndex >= 0) this.collection.visibleApps.splice(appItemIndex, 1);
-  // }
-
-  /**
-   * Unhides an app from this tab.
-   * @param appId The id of the app to show.
-   */
-  //unused in current implementation
-  // unhideAppFromList(appId: AppId) {
-  //   this.collection.visibleApps.push(collectionStore.allAppsCollection.apps.get(appId)!);
-  // }
-
-  /**
-   * Builds the list of games for this tab.
+   * Builds the list of apps for this tab.
    */
   buildCollection() {
-    if (this.position > -1) {
-      const appsList = collectionStore.appTypeCollectionMap.get('type-games')![this.includesHidden ? "allApps" : "visibleApps"].filter(appItem => {
-        if (this.filtersMode === 'and') {
-          return this.filters.every(filterSettings => Filter.run(filterSettings, appItem, this.includesHidden));
-        } else {
-          return this.filters.some(filterSettings => Filter.run(filterSettings, appItem, this.includesHidden));
-        }
-      });
+    const { hidden, ...catsToIncludeObj } = getIncludedCategoriesFromBitField(this.categoriesToInclude);
+    const visibility = hidden ? "allApps" : "visibleApps";
+    let listToFilter: SteamAppOverview[] = [];
 
-      this.collection.allApps = appsList;
-      this.collection.visibleApps = [...appsList];
-
-      const allAppsMap = collectionStore.allAppsCollection.apps;
-      const appMap = new Map<AppId, SteamAppOverview>();
-      appsList.forEach((appItem: SteamAppOverview) => appMap.set(appItem.appid, allAppsMap.get(appItem.appid)!));
-
-      this.collection.apps = appMap;
+    for (const key in catsToIncludeObj) {
+      const category = key as keyof typeof catsToIncludeObj;
+      if (catsToIncludeObj[category]) listToFilter = listToFilter.concat(collectionStore.appTypeCollectionMap.get(`type-${category}`)![visibility]);
     }
+
+    const appsList = listToFilter.filter(appItem => {
+      if (this.filtersMode === 'and') {
+        return this.filters.every(filterSettings => Filter.run(filterSettings, appItem));
+      } else {
+        return this.filters.some(filterSettings => Filter.run(filterSettings, appItem));
+      }
+    });
+
+    this.collection.allApps = appsList;
+    this.collection.visibleApps = [...appsList];
+
+    const appMap = new Map<AppId, SteamAppOverview>();
+    appsList.forEach((appItem: SteamAppOverview) => appMap.set(appItem.appid, appItem));
+
+    this.collection.apps = appMap;
   }
 
   /**
@@ -111,11 +112,28 @@ export class CustomTabContainer implements TabContainer {
    * @param updatedTabInfo The updated tab settings.
    */
   update(updatedTabInfo: EditableTabSettings) {
-    const { filters, title, filtersMode, includesHidden } = updatedTabInfo;
-    this.title = title;
-    this.filtersMode = filtersMode;
-    this.includesHidden = includesHidden;
-    this.filters = filters;
+    this.title = updatedTabInfo.title;
+    this.filtersMode = updatedTabInfo.filtersMode;
+    this.categoriesToInclude = updatedTabInfo.categoriesToInclude;
+    this.filters = updatedTabInfo.filters;
+    this.autoHide = updatedTabInfo.autoHide;
     this.buildCollection();
+    this.checkMicroSDeckDependency();
+  }
+
+  /**
+   * Checks and sets whether or not the tab has filters that depend on MicroSDeck plugin.
+   */
+  checkMicroSDeckDependency() {
+    this.dependsOnMicroSDeck = this.containsFilterType('sd card');
+  }
+
+  /**
+   * Checks if the tabs filters contain any specified filter types, including those nested within a merge filter.
+   * @param filterTypes The filter types to check for.
+   * @returns Boolean
+   */
+  containsFilterType(...filterTypes: FilterType[]) {
+    return filtersHaveType(this.filters, ...filterTypes);
   }
 }

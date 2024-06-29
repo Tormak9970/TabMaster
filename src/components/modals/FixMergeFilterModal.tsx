@@ -1,10 +1,11 @@
 import { ConfirmModal, showModal } from "decky-frontend-lib"
-import { VFC, useState } from "react"
+import { VFC, useState, Fragment } from "react"
 import { TabFilterSettings, FilterType } from "../filters/Filters"
 import { PythonInterop } from "../../lib/controllers/PythonInterop"
 import { ErroredFiltersPanel } from "../changes-needed/ErroredFiltersPanel"
 import { ErrorPanelTabNameContext } from "../../state/ErrorPanelNameContext"
 import { FixModalStyles } from "../styles/FixModalStyles"
+import { DestructiveModal } from '../generic/DestructiveModal';
 
 interface FixMergeFilterModalProps {
   mergeParams: TabFilterSettings<'merge'>['params'],
@@ -35,7 +36,6 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({ mergeParams
       const newMergeParams = {
         filters: filters.flatMap(filter => filter),
         mode: mergeParams.mode,
-        includesHidden: mergeParams.includesHidden
       }
 
       setIsPassingOuter(true);
@@ -47,37 +47,37 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({ mergeParams
   }
 
   return (
-    <ConfirmModal
-      onOK={() => {
-        showModal(
-          <ConfirmModal
-            className={'tab-master-destructive-modal'}
-            onOK={onOkButton}
-            bDestructiveWarning={true}
-            strTitle="WARNING!"
-          >
-            Are you sure you want save these fixes to this merge group? This can't be can't be changed later.
-          </ConfirmModal>
-        );
-      }}
-      bOKDisabled={!isPassing}
-      strOKButtonText={"Save Changes"}
-      onCancel={closeModal}
-      strCancelButtonText={"Discard Changes"}
-      strTitle={`Fix Merge Group in Tab ${tabName}`}
-    >
+    <>
       <FixModalStyles />
       <div className="tab-master-fix-modal-scope">
-        {isPassing && <div>All errors have been resolved.</div>}
-        <ErrorPanelTabNameContext.Provider value={tabName}>
-          <ErroredFiltersPanel
-            isMergeGroup={true}
-            filters={filters}
-            errorEntries={mergeErrorEntries}
-            onChange={onChange}
-          />
-        </ErrorPanelTabNameContext.Provider>
+        <ConfirmModal
+          onOK={() => {
+            showModal(
+              <DestructiveModal
+                onOK={onOkButton}
+                strTitle="WARNING!"
+              >
+                Are you sure you want save these fixes to this merge group? This can't be can't be changed later.
+              </DestructiveModal>
+            );
+          }}
+          bOKDisabled={!isPassing}
+          strOKButtonText={"Save Changes"}
+          onCancel={closeModal}
+          strCancelButtonText={"Discard Changes"}
+          strTitle={`Fix Merge Group in Tab ${tabName}`}
+        >
+          {isPassing && <div>All errors have been resolved.</div>}
+          <ErrorPanelTabNameContext.Provider value={tabName}>
+            <ErroredFiltersPanel
+              isMergeGroup={true}
+              filters={filters}
+              errorEntries={mergeErrorEntries}
+              onChange={onChange}
+            />
+          </ErrorPanelTabNameContext.Provider>
+        </ConfirmModal>
       </div>
-    </ConfirmModal>
+    </>
   )
 }

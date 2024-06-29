@@ -1,8 +1,9 @@
 import asyncio
 import os
+import json
 import decky_plugin
 from settings import SettingsManager
-from typing import TypeVar, Dict, List
+from typing import TypeVar
 
 
 def log(txt):
@@ -17,14 +18,9 @@ def error(txt):
 Initialized = False
 
 class Plugin:
-
-  tabs: Dict[str, dict] = None
-  tags: List[dict] = None
-  friends: List[dict] = None
-  friends_games: Dict[str, List[int]] = None
-
-  docsDirPath = f"/home/{decky_plugin.DECKY_USER}/homebrew/plugins/TabMaster/docs"
-  docs = {}
+  user_id: str = None
+  users_dict: dict[str, dict] = None
+  tags: list[dict] = None
 
   settings: SettingsManager
 
@@ -37,19 +33,81 @@ class Plugin:
       error(message)
 
   # Plugin settings getters
-  async def get_tabs(self) -> Dict[str, dict] | None:
+  async def get_users_dict(self) -> dict[str, dict] | None:
     """
-    Waits until tabs is loaded, then returns the tabs
+    Waits until users_dict is loaded, then returns users_dict
+
+    :return: The users dictionary
+    """
+    while Plugin.users_dict is None:
+      await asyncio.sleep(0.1)
+      
+    # log(f"Got users_dict {Plugin.settings_dict}")
+    return Plugin.users_dict
+  
+  async def remove_legacy_settings(self):
+    Plugin.del_setting(self, "tabs")
+    Plugin.del_setting(self, "friends")
+    Plugin.del_setting(self, "friendsGames")
+    
+    log("Legacy settings removal complete.")
+    pass
+
+  async def migrate_legacy_settings(self):
+    tabs = await Plugin.get_setting(self, "tabs", {})
+    friends = await Plugin.get_setting(self, "friends", [])
+    friends_games = await Plugin.get_setting(self, "friendsGames", {})
+
+    for tabId in tabs:
+      tab = tabs[tabId]
+      if "includesHidden" in tab:
+        tab["categoriesToInclude"] = 17 if tab["includesHidden"] == True else 1
+        del tab["includesHidden"]
+
+    Plugin.users_dict[Plugin.user_id] = {
+      "tabs": tabs,
+      "friends": friends,
+      "friendsGames": friends_games
+    }
+    await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
+    await Plugin.remove_legacy_settings(self)
+
+    log("Legacy settings migration complete.")
+    pass
+  
+  async def set_active_user_id(self, user_id: str) -> bool:
+    log(f"active user id: {user_id}")
+    Plugin.user_id = user_id
+    
+    while Plugin.users_dict is None:
+      await asyncio.sleep(0.1)
+
+    if not user_id in Plugin.users_dict.keys():
+      log(f"User {user_id} had no settings.")
+
+      Plugin.users_dict[user_id] = {
+        "tabs": {},
+        "friends": [],
+        "friendsGames": {}
+      }
+      await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
+
+    return "tabs" in Plugin.settings.settings.keys()
+  
+  async def get_tabs(self) -> dict[str, dict] | None:
+    """
+    Waits until tabs are loaded, then returns the tabs
 
     :return: The tabs
     """
-    while Plugin.tabs is None:
+    while Plugin.users_dict is None:
       await asyncio.sleep(0.1)
-      
-    log(f"Got tabs {Plugin.tabs}")
-    return Plugin.tabs
+    
+    tabs = Plugin.users_dict[Plugin.user_id]["tabs"]
+    log(f"Got tabs {tabs}")
+    return tabs or {}
 
-  async def get_tags(self) -> List[dict] | None:
+  async def get_tags(self) -> list[dict] | None:
     """
     Waits until tags is loaded, then returns the tags
 
@@ -57,68 +115,78 @@ class Plugin:
     """
     while Plugin.tags is None:
       await asyncio.sleep(0.1)
-      
-    log(f"Got tags {Plugin.tags}")
+    
+    log(f"Got {len(Plugin.tags)} tags")
     return Plugin.tags
 
-  async def get_friends(self) -> List[dict] | None:
+  async def get_friends(self) -> list[dict] | None:
     """
     Waits until friends is loaded, then returns the friends
 
     :return: The friends
     """
-    while Plugin.friends is None:
+    while Plugin.users_dict is None:
       await asyncio.sleep(0.1)
       
-    log(f"Got friends {Plugin.friends}")
-    return Plugin.friends
+    friends = Plugin.users_dict[Plugin.user_id]["friends"]
+    log(f"Got {len(friends)} friends")
+    return friends or []
 
-  async def get_friends_games(self) -> Dict[int, List[int]] | None:
+  async def get_friends_games(self) -> dict[int, list[int]] | None:
     """
     Waits until friends_games is loaded, then returns the friends_games
 
     :return: The friends_games
     """
-    while Plugin.friends_games is None:
+    while Plugin.users_dict is None:
       await asyncio.sleep(0.1)
-      
-    log(f"Got friends_games {Plugin.friends_games}")
-    return Plugin.friends_games
+
+    friends_games = Plugin.users_dict[Plugin.user_id]["friendsGames"]  
+    log(f"Got {len(friends_games)} friendsGames")
+    return friends_games or {}
+  
+  async def get_tab_profiles(self) -> dict[str, list[str]] | None:
+    """
+    Waits until users_dict is loaded, then returns the tab profiles
+
+    :return: User's tab profiles
+    """
+    while Plugin.users_dict is None:
+      await asyncio.sleep(0.1)
+
+    user = Plugin.users_dict[Plugin.user_id]
+    tab_profiles = Plugin.users_dict[Plugin.user_id]["tabProfiles"] if "tabProfiles" in user.keys() else {}
+    log(f"Got tab profiles {tab_profiles}")
+    return tab_profiles
 
   # Plugin settings setters
-  async def set_tabs(self, tabs: Dict[str, dict]):
-    Plugin.tabs = tabs
-    await Plugin.set_setting(self, "tabs", Plugin.tabs)
+  async def set_tabs(self, tabs: dict[str, dict]):
+    Plugin.users_dict[Plugin.user_id]["tabs"] = tabs
+    await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
-  async def set_tags(self, tags: List[dict]):
+  async def set_tags(self, tags: list[dict]):
     Plugin.tags = tags
     await Plugin.set_setting(self, "tags", Plugin.tags)
 
-  async def set_friends(self, friends: List[dict]):
-    Plugin.friends = friends
-    await Plugin.set_setting(self, "friends", Plugin.friends)
+  async def set_friends(self, friends: list[dict]):
+    Plugin.users_dict[Plugin.user_id]["friends"] = friends
+    await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
-  async def set_friends_games(self, friends_games: Dict[str, List[int]]):
-    Plugin.friends_games = friends_games
-    await Plugin.set_setting(self, "friendsGames", Plugin.friends_games)
+  async def set_friends_games(self, friends_games: dict[str, list[int]]):
+    Plugin.users_dict[Plugin.user_id]["friendsGames"] = friends_games
+    await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
-  async def get_docs(self):
-    for docsFileName in os.listdir(self.docsDirPath):
-      with open(os.path.join(self.docsDirPath, docsFileName), 'r') as docFile:
-        docName = docsFileName.replace("_", " ").replace(".md", "")
-        self.docs[docName] = "".join(docFile.readlines())
-
-    return self.docs
+  async def set_tab_profiles(self, tab_profiles: dict[str, list[str]]):
+    Plugin.users_dict[Plugin.user_id]["tabProfiles"] = tab_profiles
+    await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
   async def read(self) -> None:
     """
     Reads the json from disk
     """
     Plugin.settings.read()
-    Plugin.tabs = await Plugin.get_setting(self, "tabs", {})
+    Plugin.users_dict = await Plugin.get_setting(self, "usersDict", {})
     Plugin.tags = await Plugin.get_setting(self, "tags", [])
-    Plugin.friends = await Plugin.get_setting(self, "friends", [])
-    Plugin.friends_games = await Plugin.get_setting(self, "friendsGames", {})
 
   T = TypeVar("T")
 
@@ -143,6 +211,14 @@ class Plugin:
     """
     Plugin.settings.setSetting(key, value)
     return value
+  
+  def del_setting(self, key) -> None:
+    """
+    Deletes the specified setting in the json
+    """
+    del Plugin.settings.settings[key]
+    Plugin.settings.commit()
+    pass
 
   # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
   async def _main(self):

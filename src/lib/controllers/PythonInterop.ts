@@ -1,5 +1,6 @@
 import { ServerAPI } from "decky-frontend-lib";
 import { validateTabs } from "../Utils";
+import { TabProfileDictionary } from '../../state/TabProfileManager';
 
 /**
  * Class for frontend -> backend communication.
@@ -25,7 +26,7 @@ export class PythonInterop {
    * @param message The message to log.
    */
   static async log(message: String): Promise<void> {
-    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 2 });
+    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 0 });
   }
 
   /**
@@ -45,11 +46,51 @@ export class PythonInterop {
   }
   
   /**
-   * Gets the plugin's docs.
-   * @returns A promise resolving to the plugin's docs.
+   * Gets the plugin's users dictionary.
+   * @returns A promise resolving to the plugin's users dictionary.
    */
-  static async getDocs(): Promise<DocPages | Error> {
-    const result = await this.serverAPI.callPluginMethod<{}, DocPages>("get_docs", {});
+  static async getUsersDict(): Promise<UsersDict | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, UsersDict>("get_users_dict", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+  
+  /**
+   * Sends the active user's steamID to the backend.
+   * @returns A promise resolving to the plugin's users dictionary.
+   */
+  static async setActiveSteamId(userId: string): Promise<boolean | Error> {
+    const result = await this.serverAPI.callPluginMethod<{ user_id: string }, boolean>("set_active_user_id", { user_id: userId});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+
+  /**
+   * Removes any legacy settings fields that may be present in the settings file.
+   */
+  static async removeLegacySettings(): Promise<void | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, void>("remove_legacy_settings", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+
+  /**
+   * Migrates a legacy user to use the new settings system.
+   */
+  static async migrateLegacySettings(): Promise<void | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, void>("migrate_legacy_settings", {});
 
     if (result.success) {
       return result.result;
@@ -81,8 +122,8 @@ export class PythonInterop {
   }
 
   /**
-   * Gets the store tabs.
-   * @returns A promise resolving to the store tabs.
+   * Gets the store tags.
+   * @returns A promise resolving to the store tags.
    */
   static async getTags(): Promise<TagResponse[] | Error> {
     let result = await PythonInterop.serverAPI.callPluginMethod<{}, TagResponse[]>("get_tags", {});
@@ -99,7 +140,7 @@ export class PythonInterop {
    * @returns A promise resolving to the cached user friends.
    */
   static async getFriends(): Promise<FriendEntry[] | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{}, FriendEntry[]>("get_friends", []);
+    let result = await PythonInterop.serverAPI.callPluginMethod<{}, FriendEntry[]>("get_friends", {});
 
     if (result.success) {
       return result.result;
@@ -124,6 +165,20 @@ export class PythonInterop {
     } else {
       return new Error(result.result);
     }
+  }
+
+  /**
+   * Gets the user's tab profiles.
+   * @returns A promise resolving the user's tab profiles.
+   */
+  static async getTabProfiles(): Promise<TabProfileDictionary | Error> {
+    let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabProfileDictionary>("get_tab_profiles", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    };
   }
 
   /**
@@ -196,6 +251,21 @@ export class PythonInterop {
       return new Error(result.result);
     };
   }
+
+  /**
+   * Sets the user's tab profiles.
+   * @param tabProfiles The tab profiles.
+   * @returns A promise resolving to whether or not the tab profiles were successfully set.
+   */
+    static async setTabProfiles(tabProfiles: TabProfileDictionary): Promise<void | Error> {
+      let result = await PythonInterop.serverAPI.callPluginMethod<{ tab_profiles: TabProfileDictionary }, void>("set_tab_profiles", { tab_profiles: tabProfiles });
+  
+      if (result.success) {
+        return result.result;
+      } else {
+        return new Error(result.result);
+      };
+    }
 
   /**
    * Shows a toast message.

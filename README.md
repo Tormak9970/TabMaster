@@ -18,18 +18,48 @@ Features Include:<br/>
  - Reordering default and custom tabs
 
 Available Filters:
- - **Collections**: add games in a collection to the tab
-   - **Multiple**: will restrict it to games in all specified collections
- - **Regex**: filters game titles using a [regex](https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285) (for testing, use [this website](https://regexr.com/))
- - **Installed**: filters games by if they are installed or not
- - **Friends**: filters games by if they are owned by a friend as well
-   - **Multiple**: depending on mode, either game must be owned by all friends, or at least 1 friend
-   - **Mode**: "and" means all friends must own, "or" means any
- - **Tags**: filters games by if they have a given tag associated with them
-   - **Multiple**: depending on mode, either game must have all tags, or at least 1 tag
-   - **Mode**: "and" means must have all tags, "or" means any
+ - **Collection** - Selects apps that are in a certain Steam Collection.
+ - **Installed** - Selects apps that are installed/uninstalled.
+ - **Regex** - Selects apps whose titles match a [regular expression](https://medium.com/factory-mind/regex-tutorial-a-simple-cheatsheet-by-examples-649dc1c3f285) (for testing, use [this website](https://regexr.com/)).
+ - **Friends** - Selects apps that are also owned by any/all listed friends.
+ - **Tags** - Selects apps that have any/all specific tags.
+ - **Whitelist** - Selects apps that are added to the list.
+ - **Blacklist** - Selects apps that are not added to the list.
+ - **Merge** - Selects apps that pass a subgroup of filters.
+ - **Platform** - Selects Steam or non-Steam apps.
+ - **Deck Compatibility** - Selects apps that have a specific Steam Deck compatibilty status.
+ - **Review Score** - Selects apps that are greater/less than the provided metacritic/steam review score.
+ - **Time Played** - Selects apps that have a play time greater/less than the provided time.
+ - **Size on Disk** - Selects apps that have an install size greater/less than the provided size.
+ - **Release Date** - Selects apps that were released before/after the provided date.
+ - **Last Played** - Selects apps that were last played before/after the provided date.
+ - **Demo** - Selects apps that are/aren't demos.
+ - **Streamable** - Selects apps that can/can't be streamed from another computer.
+ - **Steam Features** - Selects apps that support specific Steam Features.
+ - **MicroSD Card** - Selects apps that are present on the inserted/specific MicroSD Card.
 
-If you want to see another filter, please open a filter request [here]().
+If you want to see another filter, please open a filter request [here](https://github.com/Tormak9970/TabMaster/issues/new/choose).
+
+Filter Examples:
+ - **Collection**<br/><img src="./assets/filters/docs_collection-example.png" width="600" />
+ - **Installed**<br/><img src="./assets/filters/docs_installed-example.png" width="600" />
+ - **Regex**<br/><img src="./assets/filters/docs_regex-example.png" width="600" />
+ - **Friends**<br/><img src="./assets/filters/docs_friends-example.png" width="600" />
+ - **Tags**<br/><img src="./assets/filters/docs_tags-example.png" width="600" />
+ - **Whitelist**<br/><img src="./assets/filters/docs_whitelist-example.png" width="600" />
+ - **Blacklist**<br/><img src="./assets/filters/docs_blacklist-example.png" width="600" />
+ - **Merge**<br/><img src="./assets/filters/docs_merge-example.png" width="600" />
+ - **Platform**<br/><img src="./assets/filters/docs_platform-example.png" width="600" />
+ - **Deck Compatibility**<br/><img src="./assets/filters/docs_deck-compat-example.png" width="600" />
+ - **Review Score**<br/><img src="./assets/filters/docs_review-score-example.png" width="600" />
+ - **Time Played**<br/><img src="./assets/filters/docs_time-played-example.png" width="600" />
+ - **Size on Disk**<br/><img src="./assets/filters/docs_size-on-disk-example.png" width="600" />
+ - **Release Date**<br/><img src="./assets/filters/docs_release-date-example.png" width="600" />
+ - **Last Played**<br/><img src="./assets/filters/docs_last-played-example.png" width="600" />
+ - **Demo**<br/><img src="./assets/filters/docs_demo-example.png" width="600" />
+ - **Streamable**<br/><img src="./assets/filters/docs_streamable-example.png" width="600" />
+ - **Steam Features**<br/><img src="./assets/filters/docs_steam-features-example.png" width="600" />
+ - **MicroSD Card**<br/><img src="./assets/filters/docs_microsd-card-example.png" width="600" />
 
 
 # Using the plugin

@@ -13,10 +13,23 @@ declare module "*.jpg" {
   export default content;
 }
 
+declare module "*/docs.codegen" {
+  const content: DocPages;
+  export default content;
+}
+
 type Unregisterer = {
   unregister: () => void;
 }
 
 type DocPages = {
   [key: string]: string
+}
+
+type UsersDict = {
+  [userId: string]: {
+    tabs: TabSettingsDictionary,
+    friends: FriendEntry[],
+    friendsGames: Map<number, number[]>
+  }
 }
