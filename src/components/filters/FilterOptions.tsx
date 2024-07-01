@@ -534,7 +534,7 @@ const SizeOnDiskFilterOptions: VFC<FilterOptionsProps<'size on disk'>> = ({ inde
 };
 
 /**
- * The options for a time played filter.
+ * The options for a release date filter.
  */
 const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const [date, setDate] = useState<DateObj | undefined>(filter.params.date);
@@ -587,6 +587,103 @@ const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ ind
 
   return (
     <Field label={`Released ${byDaysAgo ? `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${thresholdType === 'above' ? 'later' : 'earlier'}` : `${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}`}
+      description={
+        <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
+          {byDaysAgo ?
+            <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange} /> :
+            <DatePicker
+              focusDropdowns={true}
+              modalType='simple'
+              buttonContainerStyle={{ flex: 1 }}
+              onChange={onDateChange}
+              dateIncludes={dateIncludes}
+              selectedDate={date}
+              toLocaleStringOptions={{ dateStyle: 'long' }}
+              animate={true}
+              transparencyMode={EnhancedSelectorTransparencyMode.selection}
+              focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
+            />}
+          <div style={{ margin: '0 10px' }}>
+            <Dropdown
+              rgOptions={[
+                { label: 'By Day', data: DateIncludes.dayMonthYear },
+                { label: 'By Month', data: DateIncludes.monthYear },
+                { label: 'By Year', data: DateIncludes.yearOnly },
+                { label: 'By Days Ago', data: 'byDaysAgo' }
+              ]}
+              selectedOption={dateIncludes}
+              onChange={option => {
+                if (option.data === 'byDaysAgo') {
+                  onByDaysAgoChange(true);
+                } else {
+                  if (byDaysAgo) onByDaysAgoChange(false);
+                  setDateIncludes(option.data);
+                }
+              }}
+            />
+          </div>
+          <div>
+            <Dropdown rgOptions={[{ label: 'Earliest', data: 'above' }, { label: 'Latest', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
+          </div>
+        </Focusable>}
+    />
+  );
+};
+
+/**
+ * The options for a purchase date filter.
+ */
+const PurchaseDateFilterOptions: VFC<FilterOptionsProps<'purchase date'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const [date, setDate] = useState<DateObj | undefined>(filter.params.date);
+  const [dateIncludes, setDateIncludes] = useState<DateIncludes>(filter.params.date ? (filter.params.date.day === undefined ? (filter.params.date.month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear) : DateIncludes.dayMonthYear);
+  const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
+  const [byDaysAgo, setByDaysAgo] = useState(filter.params.daysAgo !== undefined);
+  const [daysAgo, setDaysAgo] = useState<number>(filter.params.daysAgo ?? 30);
+
+  function onDateChange(dateSelection: DateSelection) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.date = dateSelection.data;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setDate(dateSelection.data);
+  }
+
+  function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition; }) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.condition = threshType;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setThresholdType(threshType);
+  }
+
+  function onByDaysAgoChange(byDaysAgo: boolean) {
+    const updatedFilter = { ...filter };
+    if (byDaysAgo) {
+      delete updatedFilter.params.date;
+      updatedFilter.params.daysAgo = daysAgo;
+    } else {
+      delete updatedFilter.params.daysAgo;
+      updatedFilter.params.date = date;
+    }
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setByDaysAgo(byDaysAgo);
+  }
+
+  function onSliderChange(value: number) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.daysAgo = value;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setDaysAgo(value);
+  }
+
+  return (
+    <Field label={`Purchased ${byDaysAgo ? `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${thresholdType === 'above' ? 'later' : 'earlier'}` : `${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}`}
       description={
         <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
           {byDaysAgo ?
@@ -924,6 +1021,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <SizeOnDiskFilterOptions index={index} filter={filterCopy as TabFilterSettings<'size on disk'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "release date":
         return <ReleaseDateFilterOptions index={index} filter={filterCopy as TabFilterSettings<'release date'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "purchase date":
+        return <PurchaseDateFilterOptions index={index} filter={filterCopy as TabFilterSettings<'purchase date'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "last played":
         return <LastPlayedFilterOptions index={index} filter={filterCopy as TabFilterSettings<'last played'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "family sharing":

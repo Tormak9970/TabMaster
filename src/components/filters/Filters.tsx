@@ -3,7 +3,7 @@ import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 import { PluginController } from "../../lib/controllers/PluginController";
 import { DateIncludes, DateObj } from '../generic/DatePickers';
 import { STEAM_FEATURES_ID_MAP } from "./SteamFeatures";
-import { FaCheckCircle, FaHdd, FaSdCard, FaTrophy, FaUserFriends } from "react-icons/fa";
+import { FaCheckCircle, FaHdd, FaSdCard, FaShoppingCart, FaTrophy, FaUserFriends } from "react-icons/fa";
 import { IoGrid } from "react-icons/io5";
 import { SiSteamdeck } from "react-icons/si";
 import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCompactDisc, FaListCheck, FaPlay, FaRegClock, FaSteam, FaTags, FaUserPlus } from "react-icons/fa6";
@@ -11,7 +11,7 @@ import { BsClockHistory, BsRegex } from "react-icons/bs";
 import { LuCombine } from "react-icons/lu";
 import { LogController } from "../../lib/controllers/LogController";
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'family sharing' | 'demo' | 'streamable' | 'steam features' | 'achievements' | 'sd card';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'purchase date' | 'last played' | 'family sharing' | 'demo' | 'streamable' | 'steam features' | 'achievements' | 'sd card';
 
 export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
@@ -41,6 +41,7 @@ type ReviewScoreFilterParams = { scoreThreshold: number, condition: ThresholdCon
 type TimePlayedFilterParams = { timeThreshold: number, condition: ThresholdCondition, units: TimeUnit };
 type SizeOnDiskFilterParams = { gbThreshold: number, condition: ThresholdCondition };
 type ReleaseDateFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition };
+type PurchaseDateFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition };
 type LastPlayedFilterParams = { date?: DateObj, daysAgo?: number, condition: ThresholdCondition };
 type FamilySharingFilterParams = { isFamilyShared: boolean };
 type DemoFilterParams = { isDemo: boolean };
@@ -57,6 +58,8 @@ type AchievementsFilterParams = {
 }
 type SdCardParams = { card: undefined | string }; //use undefined for currently inserted card
 
+// appOverview.rt_purchased_time
+
 export type FilterParams<T extends FilterType> =
   T extends 'collection' ? CollectionFilterParams :
   T extends 'installed' ? InstalledFilterParams :
@@ -72,6 +75,7 @@ export type FilterParams<T extends FilterType> =
   T extends 'time played' ? TimePlayedFilterParams :
   T extends 'size on disk' ? SizeOnDiskFilterParams :
   T extends 'release date' ? ReleaseDateFilterParams :
+  T extends 'purchase date' ? PurchaseDateFilterParams :
   T extends 'last played' ? LastPlayedFilterParams :
   T extends 'family sharing' ? FamilySharingFilterParams :
   T extends 'demo' ? DemoFilterParams :
@@ -109,6 +113,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "time played": { timeThreshold: 60, condition: 'above', units: 'minutes' },
   "size on disk": { gbThreshold: 10, condition: 'above' },
   "release date": { date: undefined, condition: 'above' },
+  "purchase date": { date: undefined, condition: 'above' },
   "last played": { date: undefined, condition: 'above' },
   "family sharing": { isFamilyShared: true },
   "demo": { isDemo: true },
@@ -136,6 +141,7 @@ export const FilterDescriptions: { [filterType in FilterType]: string } = {
   "time played": "Selects apps based on your play time.",
   "size on disk": "Selects apps based on their install size.",
   "release date": "Selects apps based on their release date.",
+  "purchase date": "Selects apps based on when you purchased them.",
   "last played": "Selects apps based on when they were last played.",
   "family sharing": "Selects apps that are/aren't shared from family members.",
   demo: "Selects apps that are/aren't demos.",
@@ -163,6 +169,7 @@ export const FilterIcons: { [filterType in FilterType]: IconType } = {
   "time played": FaRegClock,
   "size on disk": FaHdd,
   "release date": FaCalendarDays,
+  "purchase date": FaShoppingCart,
   "last played": BsClockHistory,
   "family sharing": FaUserPlus,
   demo: FaCompactDisc,
@@ -198,6 +205,7 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "time played":
     case "size on disk":
     case "release date":
+    case "purchase date":
     case "last played":
     case "demo":
     case "family sharing":
@@ -228,6 +236,7 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
     case "merge":
       return (filter as TabFilterSettings<'merge'>).params.filters.length !== 0;
     case "release date":
+    case "purchase date":
     case "last played":
       return (filter as TabFilterSettings<'release date'>).params.date !== undefined || (filter as TabFilterSettings<'release date'>).params.daysAgo !== undefined;
     case "steam features":
@@ -402,6 +411,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "review score":
     case "time played":
     case "release date":
+    case "purchase date":
     case "last played":
     case "demo":
     case "family sharing":
@@ -511,6 +521,36 @@ export class Filter {
         return params.condition === 'above' ?
           releaseTimeMs >= new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - params.daysAgo!).getTime() :
           releaseTimeMs < new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1 - params.daysAgo!).getTime();
+      }
+    },
+    'purchase date': (params: FilterParams<'purchase date'>, appOverview: SteamAppOverview) => {
+      let purchaseTimeMs;
+      if (appOverview.rt_purchased_time) purchaseTimeMs = appOverview.rt_purchased_time * 1000;
+      else return false;
+
+      //by date case
+      if (params.date) {
+        const { day, month, year } = params.date;
+
+        if (params.condition === 'above') {
+          return purchaseTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime();
+        } else {
+          const dateIncludes = day === undefined ? (month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear;
+          switch (dateIncludes) {
+            case DateIncludes.dayMonthYear:
+              return purchaseTimeMs < new Date(year, month! - 1, day! + 1).getTime();
+            case DateIncludes.monthYear:
+              return purchaseTimeMs < new Date(year, month!, 1).getTime();
+            case DateIncludes.yearOnly:
+              return purchaseTimeMs < new Date(year + 1, 0, 1).getTime();
+          }
+        }
+        //by days ago case
+      } else {
+        const today = new Date();
+        return params.condition === 'above' ?
+          purchaseTimeMs >= new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - params.daysAgo!).getTime() :
+          purchaseTimeMs < new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1 - params.daysAgo!).getTime();
       }
     },
     'last played': (params: FilterParams<'last played'>, appOverview: SteamAppOverview) => {

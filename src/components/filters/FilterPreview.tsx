@@ -96,6 +96,20 @@ const ReleaseDateFilterPreview: VFC<FilterPreviewProps<'release date'>> = ({ fil
   return <FilterPreviewGeneric filter={filter} displayData={displayData} />;
 };
 
+const PurchaseDateFilterPreview: VFC<FilterPreviewProps<'purchase date'>> = ({ filter }) => {
+  let displayData: string;
+
+  if (filter.params.date) {
+    const { day, month, year } = filter.params.date;
+    displayData = `${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, { dateStyle: 'long' })}`;
+  } else {
+    const daysAgo = filter.params.daysAgo;
+    displayData = `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${filter.params.condition === 'above' ? 'later' : 'earlier'}`;
+  }
+
+  return <FilterPreviewGeneric filter={filter} displayData={displayData} />;
+};
+
 const LastPlayedFilterPreview: VFC<FilterPreviewProps<'last played'>> = ({ filter }) => {
   let displayData: string;
 
@@ -127,8 +141,8 @@ const SteamFeaturesFilterPreview: VFC<FilterPreviewProps<'steam features'>> = ({
 };
 
 const AchievementsFilterPreview: VFC<FilterPreviewProps<'achievements'>> = ({ filter }) => {
-  const { completionPercentage, condition } = filter.params;
-  return <FilterPreviewGeneric filter={filter} displayData={`${completionPercentage}% or ${condition === 'above' ? 'more' : 'less'} achievements completed`} />;
+  const { threshold, thresholdType, condition } = filter.params;
+  return <FilterPreviewGeneric filter={filter} displayData={`${threshold}${thresholdType === "percent" ? "%" : ""} or ${condition === 'above' ? 'more' : 'less'} achievements completed`} />;
 };
 
 const SDCardFilterPreview: VFC<FilterPreviewProps<'sd card'>> = ({ filter }) => {
@@ -171,6 +185,8 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <SizeOnDiskFilterPreview filter={filter as TabFilterSettings<'size on disk'>} />;
       case "release date":
         return <ReleaseDateFilterPreview filter={filter as TabFilterSettings<'release date'>} />;
+      case "purchase date":
+        return <PurchaseDateFilterPreview filter={filter as TabFilterSettings<'purchase date'>} />;
       case "last played":
         return <LastPlayedFilterPreview filter={filter as TabFilterSettings<'last played'>} />;
       case "family sharing":
