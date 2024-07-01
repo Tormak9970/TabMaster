@@ -113,7 +113,7 @@ export class TabMasterManager {
     // * subscribe for when collections are deleted
     this.collectionRemoveReaction = reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this));
 
-    this.handleUserCollectionRemove(collectionStore.userCollections.length); //* this loads the collection ids for the first time.
+    this.handleUserCollectionRemove(collectionStore.userCollections.length); // * this loads the collection ids for the first time.
 
     // * subscribe to user's friendlist updates
     this.friendsReaction = reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });

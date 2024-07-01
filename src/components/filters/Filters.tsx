@@ -9,6 +9,7 @@ import { SiSteamdeck } from "react-icons/si";
 import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCompactDisc, FaListCheck, FaPlay, FaRegClock, FaSteam, FaTags, FaUserPlus } from "react-icons/fa6";
 import { BsClockHistory, BsRegex } from "react-icons/bs";
 import { LuCombine } from "react-icons/lu";
+import { LogController } from "../../lib/controllers/LogController";
 
 export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'last played' | 'family sharing' | 'demo' | 'streamable' | 'steam features' | 'achievements' | 'sd card';
 
@@ -45,7 +46,15 @@ type FamilySharingFilterParams = { isFamilyShared: boolean };
 type DemoFilterParams = { isDemo: boolean };
 type StreamableFilterParams = { isStreamable: boolean };
 type SteamFeaturesFilterParams = { features: number[], mode: LogicalMode };
-type AchievementsFilterParams = { completionPercentage: number, condition: ThresholdCondition }
+type AchievementsFilterParams = {
+  /** 
+   * @deprecated This is no longer used
+   */
+  completionPercentage?: number,
+  threshold: number,
+  thresholdType: "count" | "percent",
+  condition: ThresholdCondition
+}
 type SdCardParams = { card: undefined | string }; //use undefined for currently inserted card
 
 export type FilterParams<T extends FilterType> =
@@ -105,7 +114,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "demo": { isDemo: true },
   "streamable": { isStreamable: true },
   "steam features": { features: [], mode: 'and' },
-  "achievements": { completionPercentage: 10, condition: 'above' },
+  "achievements": { threshold: 10, thresholdType: "percent", condition: 'above' },
   "sd card": { card: undefined }
 }
 
@@ -367,6 +376,20 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
         errors: passed ? [] : ["Couldn't find the selected card in the list of known cards."]
       };
     }
+    case "achievements": {
+      const achievementsFilter = filter as TabFilterSettings<'achievements'>;
+
+      if (achievementsFilter.params.completionPercentage) {
+        achievementsFilter.params.threshold = achievementsFilter.params.completionPercentage;
+        achievementsFilter.params.thresholdType = "percent";
+        delete achievementsFilter.params.completionPercentage;
+      }
+
+      return {
+        passed: true,
+        errors: []
+      };
+    }
     case "size on disk":
     case "regex":
     case "friends":
@@ -384,7 +407,6 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "family sharing":
     case "streamable":
     case "steam features":
-    case "achievements":
     default:
       return {
         passed: true,
@@ -542,7 +564,20 @@ export class Filter {
     },
     'achievements': (params: FilterParams<'achievements'>, appOverview: SteamAppOverview) => {
       const percentage = appAchievementProgressCache.GetAchievementProgress(appOverview.appid);
-      return params.condition === 'above' ? percentage >= params.completionPercentage : percentage <= params.completionPercentage;
+
+      if (params.thresholdType === "percent") {
+        return params.condition === 'above' ? percentage >= params.threshold : percentage <= params.threshold;
+      } else {
+        const entry = appAchievementProgressCache.m_achievementProgress.mapCache.get(appOverview.appid);
+        
+        if (entry) {
+          const count = entry.unlocked;
+        return params.condition === 'above' ? count >= params.threshold : count <= params.threshold;
+        } else {
+          LogController.error(`Unable to get achievements cache for ${appOverview.appid}`);
+          return false;
+        }
+      }
     },
     'sd card': (params: FilterParams<'sd card'>, appOverview: SteamAppOverview) => {
       const card = params.card === undefined ? window.MicroSDeck?.CurrentCardAndGames : window.MicroSDeck?.CardsAndGames?.find(([card]) => card.uid == params.card);

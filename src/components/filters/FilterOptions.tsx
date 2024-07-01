@@ -811,36 +811,46 @@ const SteamFeatureFilterOptions: VFC<FilterOptionsProps<'steam features'>> = ({ 
  * The options for a achievements filter.
  */
 const AchievementsFilterOptions: VFC<FilterOptionsProps<'achievements'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
-  const [value, setValue] = useState<number>(filter.params.completionPercentage);
-  const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
+  const [value, setValue] = useState<number>(filter.params.threshold);
+  const [thresholdType, setThresholdType] = useState<"percent" | "count">(filter.params.thresholdType);
+  const [thresholdCondition, setThresholdCondition] = useState<ThresholdCondition>(filter.params.condition);
 
-  function updateFilter(threshold: number, threshType: ThresholdCondition) {
+  function updateFilter(threshold: number, threshCondition: ThresholdCondition, threshType: "percent" | "count") {
     const updatedFilter = { ...filter };
-    updatedFilter.params.completionPercentage = threshold;
-    updatedFilter.params.condition = threshType;
+    updatedFilter.params.threshold = threshold;
+    updatedFilter.params.condition = threshCondition;
+    updatedFilter.params.thresholdType = threshType;
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
     setContainingGroupFilters(updatedFilters);
   }
 
   function onSliderChange(value: number) {
-    updateFilter(value, thresholdType);
+    updateFilter(value, thresholdCondition, thresholdType);
     setValue(value);
   }
 
-  function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition; }) {
-    updateFilter(value, threshType);
+  function onThreshConditionChange({ data: threshCondition }: { data: ThresholdCondition; }) {
+    updateFilter(value, threshCondition, thresholdType);
+    setThresholdCondition(threshCondition);
+  }
+
+  function onThreshTypeChange({ data: threshType }: { data: "count" | "percent"; }) {
+    updateFilter(value, thresholdCondition, threshType);
     setThresholdType(threshType);
   }
 
   return (
     <Field
-      label={`${value}% or ${thresholdType === 'above' ? 'more' : 'less'} achievements completed`}
+      label={`${value}${thresholdType === "percent" ? "%" : ""} or ${thresholdCondition === 'above' ? 'more' : 'less'} achievements completed`}
       description={
         <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
           <Slider value={value} min={0} max={100} onChange={onSliderChange} />
           <div style={{ marginLeft: '12px' }}>
-            <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
+            <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdCondition} onChange={onThreshConditionChange} />
+          </div>
+          <div style={{ marginLeft: '12px' }}>
+            <Dropdown rgOptions={[{ label: 'Count', data: 'count' }, { label: 'Percent', data: 'percent' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
           </div>
         </Focusable>}
     />
