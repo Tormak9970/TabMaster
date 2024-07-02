@@ -20,7 +20,7 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
       }
       
       afterPatch(ret1, 'type', (_: any, ret2: any) => {
-        const homeElement = ret2?.props?.children?.props?.pages?.find((obj: any) => obj.route === '/settings/home')?.content?.props?.children[1];
+        const homeElement = ret2?.props?.children?.props?.pages?.find((obj: any) => obj.route === '/settings/home')?.content;
         if (homeElement === undefined) {
           LogController.raiseError("Couldn't find home element to patch in settings");
           return ret2;
@@ -32,8 +32,6 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
         }
 
         afterPatch(homeElement, 'type', (_: any, ret3: any) => {
-          console.log('ret 3', ret3);
-
           const buttonElementContainer = ret3?.props?.children?.find((elt: React.ReactElement) => {
             return elt?.type?.toString?.().includes('HomeSettings');
           });
@@ -44,8 +42,6 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
           }
 
           afterPatch(buttonElementContainer, 'type', (_: any, ret4: any) => {
-            console.log('ret 4', ret4);
-
             //* if ret exists but cannot find onClick then raise error because it is assumed valve has changed something 
             if (ret4 && !ret4.props?.onClick) {
               LogController.raiseError("Couldn't patch button onClick fn in settings");

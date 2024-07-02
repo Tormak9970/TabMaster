@@ -226,26 +226,17 @@ export class TabMasterManager {
    * @param storeTagLocalizationMap The store tag localization map.
    */
   private storeTagReaction(storeTagLocalizationMap: StoreTagLocalizationMap) {
-    let tagLocalizationMap = storeTagLocalizationMap._data;
-    if (!tagLocalizationMap && storeTagLocalizationMap.data_) {
-      tagLocalizationMap = storeTagLocalizationMap.data_
-    }
+    if (storeTagLocalizationMap) {
+      const tagEntriesArray = Array.from(storeTagLocalizationMap.entries());
 
-    if (tagLocalizationMap) {
-      const tagEntriesArray = Array.from(tagLocalizationMap.entries());
+      this.allStoreTags = tagEntriesArray.map(([_, entry]) => {
+        return {
+          tag: entry.tagid,
+          string: entry.name
+        };
+      });
 
-      if (tagEntriesArray[0][1].value || tagEntriesArray[0][1].value_) {
-        this.allStoreTags = tagEntriesArray.map(([tag, entry]) => {
-          return {
-            tag: tag,
-            string: entry.value ?? entry.value_
-          };
-        });
-
-        PythonInterop.setTags(this.allStoreTags);
-      } else {
-        LogController.error("Failed to get store tags. Both entry.value and entry.value_ were undefined");
-      }
+      PythonInterop.setTags(this.allStoreTags);
     } else {
       LogController.error("Failed to get store tags. Both _data and data_ were undefined");
     }
@@ -522,8 +513,7 @@ export class TabMasterManager {
   asyncLoadOther() {
     PythonInterop.getTags().then((res: TagResponse[] | Error) => {
       if (res instanceof Error) {
-        LogController.log("TabMaster couldn't load tags settings");
-        LogController.error(res.message);
+        LogController.raiseError(`Error loading tags \n ${res.message}`)
       } else {
         if (this.allStoreTags.length === 0) {
           this.allStoreTags = res;
@@ -532,8 +522,7 @@ export class TabMasterManager {
     });
     PythonInterop.getFriends().then((res: FriendEntry[] | Error) => {
       if (res instanceof Error) {
-        LogController.log("TabMaster couldn't load friends settings");
-        LogController.error(res.message);
+        LogController.raiseError(`Error loading friends \n ${res.message}`)
       } else {
         if (this.currentUsersFriends.length === 0) {
           this.currentUsersFriends = res;
@@ -542,8 +531,7 @@ export class TabMasterManager {
     });
     PythonInterop.getFriendsGames().then((res: Map<number, number[]> | Error) => {
       if (res instanceof Error) {
-        LogController.log("TabMaster couldn't load friends games settings");
-        LogController.error(res.message);
+        LogController.raiseError(`Error loading friends games \n ${res.message}`)
       } else {
         if (this.friendsGameMap.size === 0) {
           this.friendsGameMap = res;
@@ -561,20 +549,22 @@ export class TabMasterManager {
     const profiles = await PythonInterop.getTabProfiles();
 
     this.asyncLoadOther();
-
-    if (settings instanceof Error) {
-      LogController.log("TabMaster couldn't load tab settings");
-      LogController.error(settings.message);
-      return;
+    try {
+      if (settings instanceof Error) {
+        throw new Error(`Error loading tab settings \n ${settings.message}`)
+      }
+      if (profiles instanceof Error) {
+        throw new Error(`Error loading tab profiles \n ${profiles.message}`)
+      }
+      
+      this.tabProfileManager = new TabProfileManager(profiles);
+      TabErrorController.validateSettingsOnLoad((Object.keys(settings).length > 0) ? settings : defaultTabsSettings, this, this.finishLoadingTabs.bind(this));
+    
+    } catch(e) {
+      if(e instanceof Error) {
+        LogController.raiseError(`Encountered an error while loading \n ${e.message}`)
+      }
     }
-    if (profiles instanceof Error) {
-      LogController.log("TabMaster couldn't load tab profiles");
-      LogController.error(profiles.message);
-      return;
-    }
-
-    this.tabProfileManager = new TabProfileManager(profiles);
-    TabErrorController.validateSettingsOnLoad((Object.keys(settings).length > 0) ? settings : defaultTabsSettings, this, this.finishLoadingTabs.bind(this));
   };
 
   /**

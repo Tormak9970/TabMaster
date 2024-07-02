@@ -101,9 +101,8 @@ export class CustomTabContainer implements TabContainer {
     this.collection.allApps = appsList;
     this.collection.visibleApps = [...appsList];
 
-    const allAppsMap = collectionStore.allAppsCollection.apps;
     const appMap = new Map<AppId, SteamAppOverview>();
-    appsList.forEach((appItem: SteamAppOverview) => appMap.set(appItem.appid, allAppsMap.get(appItem.appid)!));
+    appsList.forEach((appItem: SteamAppOverview) => appMap.set(appItem.appid, appItem));
 
     this.collection.apps = appMap;
   }
