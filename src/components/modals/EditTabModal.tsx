@@ -124,36 +124,38 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
           onOK={onSave}
           strOKButtonText="Save"
         >
-          <div style={{ padding: "4px 16px 1px" }} className="name-field">
-            <Field description={
-              <>
-                <div style={{ paddingBottom: "6px" }} className={quickAccessControlsClasses.PanelSectionTitle}>
-                  Name
-                </div>
-                {nameInputElement}
-              </>
-            } />
-          </div>
-          <IncludeCategoriesPanel categoriesToInclude={catsToInclude} setCategoriesToInclude={setCatsToInclude} />
-          <div className='field-item-container'>
-            <ToggleField label='Automatically hide tab if empty' checked={autoHide} onChange={checked => setAutoHide(checked)} bottomSeparator='thick' />
-            <DropdownItem
-              label='Sort apps by'
-              rgOptions={sortOptions}
-              selectedOption={sortByOverride}
-              onChange={option => setSortByOverride(option.data)}
-              bottomSeparator='thick'
+          <Focusable onMenuButton={onSave} onMenuActionDescription='Save'>
+            <div style={{ padding: "4px 16px 1px" }} className="name-field">
+              <Field description={
+                <>
+                  <div style={{ paddingBottom: "6px" }} className={quickAccessControlsClasses.PanelSectionTitle}>
+                    Name
+                  </div>
+                  {nameInputElement}
+                </>
+              } />
+            </div>
+            <IncludeCategoriesPanel categoriesToInclude={catsToInclude} setCategoriesToInclude={setCatsToInclude} />
+            <div className='field-item-container'>
+              <ToggleField label='Automatically hide tab if empty' checked={autoHide} onChange={checked => setAutoHide(checked)} bottomSeparator='thick' />
+              <DropdownItem
+                label='Sort apps by'
+                rgOptions={sortOptions}
+                selectedOption={sortByOverride}
+                onChange={option => setSortByOverride(option.data)}
+                bottomSeparator='thick'
+              />
+            </div>
+            <FiltersPanel
+              groupFilters={topLevelFilters}
+              setGroupFilters={setTopLevelFilters}
+              addFilter={addFilter}
+              groupLogicMode={topLevelLogicMode}
+              setGroupLogicMode={setTopLevelLogicMode}
+              canAddFilter={canAddFilter}
+              collapseFilters={!!tabTitle}
             />
-          </div>
-          <FiltersPanel
-            groupFilters={topLevelFilters}
-            setGroupFilters={setTopLevelFilters}
-            addFilter={addFilter}
-            groupLogicMode={topLevelLogicMode}
-            setGroupLogicMode={setTopLevelLogicMode}
-            canAddFilter={canAddFilter}
-            collapseFilters={!!tabTitle}
-          />
+          </Focusable>
         </ConfirmModal>
       </div>
     </TabMasterContextProvider>
