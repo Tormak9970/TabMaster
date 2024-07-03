@@ -33,6 +33,7 @@ declare global {
   let securitystore: SecurityStore;
   let settingsStore: SettingsStore;
   let appAchievementProgressCache: AppAchievementProgressCache;
+  let LocalizationManager: LocalizationManager;
 }
 
 

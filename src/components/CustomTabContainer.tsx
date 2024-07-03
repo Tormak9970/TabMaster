@@ -1,7 +1,8 @@
 import { EditableTabSettings } from "./modals/EditTabModal";
 import { TabFilterSettings, FilterType, Filter } from "./filters/Filters";
 import { filtersHaveType, getIncludedCategoriesFromBitField } from "../lib/Utils";
-import { gamepadTabbedPageClasses } from "decky-frontend-lib";
+import { gamepadTabbedPageClasses, showModal } from "decky-frontend-lib";
+import { SortOverrideMessage } from './modals/SortOverrideMessage';
 
 /**
  * Wrapper for injecting custom tabs.
@@ -16,6 +17,7 @@ export class CustomTabContainer implements TabContainer {
   categoriesToInclude: number;
   autoHide: boolean;
   dependsOnMicroSDeck: boolean;
+  sortByOverride: number;
 
   /**
    * Creates a new CustomTabContainer.
@@ -26,8 +28,9 @@ export class CustomTabContainer implements TabContainer {
    * @param filtersMode boolean operator for top level filters
    * @param categoriesToInclude A bit field of which categories should be included in the tab.
    * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
+   * @param sortByOverride The eSortBy number to force use for sorting. -1 ignores override.
    */
-  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean) {
+  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean, sortByOverride: number) {
     this.id = id;
     this.title = title;
     this.position = position;
@@ -36,6 +39,7 @@ export class CustomTabContainer implements TabContainer {
     this.categoriesToInclude = categoriesToInclude;
     this.autoHide = autoHide;
     this.dependsOnMicroSDeck = false;
+    this.sortByOverride = sortByOverride;
 
     //@ts-ignore
     this.collection = {
@@ -57,17 +61,21 @@ export class CustomTabContainer implements TabContainer {
     this.checkMicroSDeckDependency();
   }
 
-  getActualTab(TabContentComponent: TabContentComponent, sortingProps: Omit<TabContentProps, 'collection'>, footer: SteamTab['footer'], collectionAppFilter: any, isMicroSDeckInstalled: boolean): SteamTab | null {
+  getActualTab(TabContentComponent: TabContentComponent, sortingProps: Omit<TabContentProps, 'collection'>, footer: SteamTab['footer'] = {}, collectionAppFilter: any, isMicroSDeckInstalled: boolean): SteamTab | null {
     if (!isMicroSDeckInstalled && this.dependsOnMicroSDeck) return null;
     if (this.autoHide && this.collection.visibleApps.length === 0) return null;
-    
+    const showSortOverride = () => showModal(<SortOverrideMessage eSortBy={this.sortByOverride} />);
+    if (this.sortByOverride !== -1) footer.onOptionsButton = showSortOverride;
+
     return {
       title: this.title,
       id: this.id,
       footer: footer,
       content: <TabContentComponent
         collection={this.collection}
-        {...sortingProps}
+        setSortBy={sortingProps.setSortBy}
+        eSortBy={this.sortByOverride === -1 ? sortingProps.eSortBy : this.sortByOverride}
+        showSortingContextMenu={this.sortByOverride === -1 ? sortingProps.showSortingContextMenu : showSortOverride}
       />,
       renderTabAddon: () => {
         return <span className={gamepadTabbedPageClasses.TabCount}>
@@ -117,6 +125,7 @@ export class CustomTabContainer implements TabContainer {
     this.categoriesToInclude = updatedTabInfo.categoriesToInclude;
     this.filters = updatedTabInfo.filters;
     this.autoHide = updatedTabInfo.autoHide;
+    this.sortByOverride = updatedTabInfo.sortByOverride;
     this.buildCollection();
     this.checkMicroSDeckDependency();
   }
