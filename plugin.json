@@ -1,6 +1,7 @@
 {
   "name": "TabMaster",
   "author": "Travis Lane (Tormak), Jessebofill, & Witherking25",
+  "api_version": 1,
   "flags": ["debug"],
   "publish": {
     "tags": ["Customization", "Library", "Tabs"],

@@ -1,5 +1,5 @@
 import { Fragment, VFC, createElement, useEffect, useState } from "react";
-import { achievementClasses, findModule, Focusable, ModalRoot, SingleDropdownOption } from "decky-frontend-lib";
+import { achievementClasses, findModule, Focusable, ModalRoot, SingleDropdownOption } from "@decky/ui";
 import { FilterDefaultParams, FilterDescriptions, FilterIcons, FilterType } from "./Filters";
 import { capitalizeEachWord } from "../../lib/Utils";
 import { FilterSelectStyles } from "../styles/FilterSelectionStyles";

@@ -1,4 +1,4 @@
-import { gamepadDialogClasses } from "decky-frontend-lib";
+import { gamepadDialogClasses } from "@decky/ui";
 import { VFC } from "react";
 
 // New modal background should be "radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%)"
@@ -23,9 +23,6 @@ export const TabProfileModalStyles: VFC<{}> = ({}) => {
       }
       .tab-master-tab-profile-modal-scope .styled-btn .${gamepadDialogClasses.FieldLabel} {
         display: none;
-      }
-      .tab-master-tab-profile-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildren} {
-        width: 100%;
       }
       .tab-master-tab-profile-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldChildrenWithIcon} {
         width: 100%;

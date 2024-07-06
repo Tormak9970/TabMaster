@@ -8,7 +8,7 @@ import {
   PanelSection,
   SingleDropdownOption,
   TextField
-} from "decky-frontend-lib";
+} from "@decky/ui";
 import { VFC, useEffect, useMemo, useState } from "react";
 import { IconType } from "react-icons/lib";
 import { FixedSizeList as List } from "react-window";

@@ -1,13 +1,8 @@
-import {
-  definePlugin,
-  RoutePatch,
-  ServerAPI,
-} from "decky-frontend-lib";
+import { definePlugin, RoutePatch, routerHook } from "@decky/api";
 
 import { TbLayoutNavbarExpand } from "react-icons/tb";
 
 import { PluginController } from "./lib/controllers/PluginController";
-import { PythonInterop } from "./lib/controllers/PythonInterop";
 
 import { TabMasterContextProvider } from "./state/TabMasterContext";
 import { TabMasterManager } from "./state/TabMasterManager";
@@ -37,23 +32,21 @@ declare global {
 }
 
 
-export default definePlugin((serverAPI: ServerAPI) => {
+export default definePlugin(() => {
   let libraryPatch: RoutePatch;
   let settingsPatch: RoutePatch;
 
-  PythonInterop.setServer(serverAPI);
-
   const tabMasterManager = new TabMasterManager();
-  PluginController.setup(serverAPI, tabMasterManager);
+  PluginController.setup(tabMasterManager);
 
   const loginUnregisterer = PluginController.initOnLogin(async () => {
     await MicroSDeckInterop.waitForLoad();
     await tabMasterManager.loadTabs();
-    libraryPatch = patchLibrary(serverAPI, tabMasterManager);
-    settingsPatch = patchSettings(serverAPI, tabMasterManager);
+    libraryPatch = patchLibrary(tabMasterManager);
+    settingsPatch = patchSettings(tabMasterManager);
   });
 
-  serverAPI.routerHook.addRoute("/tab-master-docs", () => (
+  routerHook.addRoute("/tab-master-docs", () => (
     <TabMasterContextProvider tabMasterManager={tabMasterManager}>
       <DocsRouter />
     </TabMasterContextProvider>
@@ -67,9 +60,9 @@ export default definePlugin((serverAPI: ServerAPI) => {
       </TabMasterContextProvider>,
     icon: <TbLayoutNavbarExpand />,
     onDismount: () => {
-      serverAPI.routerHook.removePatch("/library", libraryPatch);
-      serverAPI.routerHook.removePatch("/settings", settingsPatch);
-      serverAPI.routerHook.removeRoute("/tab-master-docs");
+      routerHook.removePatch("/library", libraryPatch);
+      routerHook.removePatch("/settings", settingsPatch);
+      routerHook.removeRoute("/tab-master-docs");
 
       loginUnregisterer.unregister();
       PluginController.dismount();

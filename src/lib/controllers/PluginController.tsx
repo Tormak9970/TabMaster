@@ -1,4 +1,4 @@
-import { ConfirmModal, ServerAPI, showModal } from "decky-frontend-lib";
+import { ConfirmModal, showModal } from "@decky/ui";
 import { PythonInterop } from "./PythonInterop";
 import { SteamController } from "./SteamController";
 import { LogController } from "./LogController";
@@ -40,8 +40,6 @@ function showDiscardConfirm(okCallback: () => Promise<void>, onCancel: () => Pro
  * Main controller class for the plugin.
  */
 export class PluginController {
-  // @ts-ignore
-  private static server: ServerAPI;
   private static tabMasterManager: TabMasterManager;
 
   private static steamController: SteamController;
@@ -50,10 +48,9 @@ export class PluginController {
 
   /**
    * Sets the plugin's serverAPI.
-   * @param server The serverAPI to use.
+   * @param tabMasterManager The plugin's state management.
    */
-  static setup(server: ServerAPI, tabMasterManager: TabMasterManager): void {
-    this.server = server;
+  static setup(tabMasterManager: TabMasterManager): void {
     this.tabMasterManager = tabMasterManager;
     this.steamController = new SteamController();
   }

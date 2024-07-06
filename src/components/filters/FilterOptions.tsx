@@ -8,7 +8,7 @@ import {
   TextField,
   ToggleField,
   showModal
-} from "decky-frontend-lib";
+} from "@decky/ui";
 import React, { VFC, Fragment, useState, useMemo } from "react";
 import { FaTag, FaTags, FaUser, FaCompactDisc, FaListCheck, FaSteam } from "react-icons/fa6";
 import { FaUserFriends, FaQuestionCircle } from "react-icons/fa";

@@ -1,4 +1,4 @@
-import { Focusable, SingleDropdownOption } from "decky-frontend-lib";
+import { Focusable, SingleDropdownOption } from "@decky/ui";
 import { Fragment, VFC, useEffect, useMemo, useState } from "react";
 import { BiChevronRight } from "react-icons/bi";
 import { SoundEffect } from "../../lib/GamepadUIAudio";

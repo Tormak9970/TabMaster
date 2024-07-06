@@ -1,19 +1,18 @@
 import asyncio
 import os
-import json
-import decky_plugin
+import decky
 from settings import SettingsManager
 from typing import TypeVar
 
 
 def log(txt):
-  decky_plugin.logger.info(txt)
+  decky.logger.info(txt)
 
 def warn(txt):
-  decky_plugin.logger.warn(txt)
+  decky.logger.warn(txt)
 
 def error(txt):
-  decky_plugin.logger.error(txt)
+  decky.logger.error(txt)
 
 Initialized = False
 
@@ -236,7 +235,7 @@ class Plugin:
 
   # Function called first during the unload process, utilize this to handle your plugin being removed
   async def _unload(self):
-    decky_plugin.logger.info("Unloading Tab Master.")
+    decky.logger.info("Unloading Tab Master.")
 
   # Migrations that should be performed before entering `_main()`.
   async def _migration(self):

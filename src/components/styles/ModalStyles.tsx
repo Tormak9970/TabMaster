@@ -1,4 +1,4 @@
-import { gamepadDialogClasses } from "decky-frontend-lib";
+import { gamepadDialogClasses } from "@decky/ui";
 import { VFC } from "react";
 
 export const modalMargin = '16px + 2.8vw';
@@ -26,9 +26,6 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldLabel} {
         display: none;
       }
-      .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildren} {
-        width: 100%;
-      }
       .tab-master-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldChildrenWithIcon} {
         width: 100%;
       }
@@ -41,11 +38,6 @@ export const ModalStyles: VFC<{}> = ({}) => {
       /* The button item label */
       .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.FieldLabel} {
         display: none;
-      }
-      /* The button item */
-      .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.FieldChildren} > button.${gamepadDialogClasses.Button}.DialogButton {
-        padding: 10px;
-        min-width: 45px;
       }
       .tab-master-modal-scope .name-field .${gamepadDialogClasses.Field} {
         padding-bottom: 16px;

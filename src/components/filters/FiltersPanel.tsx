@@ -1,4 +1,4 @@
-import { PanelSection, PanelSectionRow, Field, ButtonItem, Dropdown, afterPatch, Focusable } from "decky-frontend-lib";
+import { PanelSection, PanelSectionRow, Field, ButtonItem, Dropdown, afterPatch, Focusable } from "@decky/ui";
 import { VFC, Fragment, useRef, useEffect } from "react";
 import { FilterEntry } from "./FilterEntry";
 import { FilterOptions } from "./FilterOptions";

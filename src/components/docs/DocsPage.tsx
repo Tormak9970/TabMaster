@@ -1,6 +1,6 @@
 import { VFC, Fragment } from "react";
 import MarkDownIt from "markdown-it";
-import { Focusable, gamepadDialogClasses, ModalPosition, ScrollPanelGroup } from "decky-frontend-lib";
+import { Focusable, gamepadDialogClasses, ModalPosition, ScrollPanelGroup } from "@decky/ui";
 
 const mdIt = new MarkDownIt({
   html: true

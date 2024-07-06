@@ -2,11 +2,10 @@ import {
   afterPatch,
   Patch,
   replacePatch,
-  RoutePatch,
-  ServerAPI,
   showContextMenu,
   wrapReactType
-} from "decky-frontend-lib";
+} from "@decky/ui";
+import { routerHook } from "@decky/api";
 import { ReactElement, useEffect, useState } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { CustomTabContainer } from "../components/CustomTabContainer";
@@ -16,13 +15,12 @@ import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
 
 /**
  * Patches the Steam library to allow the plugin to change the tabs.
- * @param serverAPI The plugin's serverAPI.
  * @param tabMasterManager The plugin's core state manager.
  * @returns A routepatch for the library.
  */
-export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager): RoutePatch => {
+export const patchLibrary = (tabMasterManager: TabMasterManager) => {
   //* This only runs 1 time, which is perfect
-  return serverAPI.routerHook.addPatch("/library", (props: { path: string; children: ReactElement; }) => {
+  return routerHook.addPatch("/library", (props: { path: string; children: ReactElement; }) => {
     afterPatch(props.children, "type", (_: Record<string, unknown>[], ret1: ReactElement) => {
       if (!ret1?.type) {
         LogController.raiseError('Failed to find outer library element to patch');

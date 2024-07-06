@@ -9,7 +9,7 @@ import {
   ReorderableList,
   showContextMenu,
   quickAccessMenuClasses
-} from "decky-frontend-lib";
+} from "@decky/ui";
 import { VFC, useState } from "react";
 
 import { FaBook, FaCircleExclamation, FaBookmark } from "react-icons/fa6";

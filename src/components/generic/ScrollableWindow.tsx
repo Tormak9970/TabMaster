@@ -1,4 +1,4 @@
-import { GamepadButton, gamepadDialogClasses, scrollPanelClasses, ModalPosition, ScrollPanelGroup, Focusable } from 'decky-frontend-lib';
+import { GamepadButton, gamepadDialogClasses, scrollPanelClasses, ModalPosition, ScrollPanelGroup, Focusable } from '@decky/ui';
 import { FC, Fragment, useRef } from 'react';
 import { useIsOverflowing } from '../../hooks/useIsOverflowing';
 

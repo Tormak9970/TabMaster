@@ -10,7 +10,7 @@ import {
   afterPatch,
   quickAccessControlsClasses,
   showModal
-} from "decky-frontend-lib";
+} from "@decky/ui";
 import { useState, VFC, useEffect, Fragment } from "react";
 import { FilterDefaultParams, FilterType, TabFilterSettings, isValidParams } from "../filters/Filters";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";

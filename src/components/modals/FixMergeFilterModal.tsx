@@ -1,4 +1,4 @@
-import { ConfirmModal, showModal } from "decky-frontend-lib"
+import { ConfirmModal, showModal } from "@decky/ui"
 import { VFC, useState, Fragment } from "react"
 import { TabFilterSettings, FilterType } from "../filters/Filters"
 import { PythonInterop } from "../../lib/controllers/PythonInterop"

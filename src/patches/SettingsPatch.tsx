@@ -1,10 +1,11 @@
-import { afterPatch, ConfirmModal, ServerAPI, showModal } from "decky-frontend-lib";
+import { afterPatch, ConfirmModal, showModal } from "@decky/ui";
+import { routerHook } from "@decky/api";
 import { ReactElement } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { LogController } from "../lib/controllers/LogController";
 
-export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager) => {
-  return serverAPI.routerHook.addPatch("/settings", (props: { path: string; children: ReactElement; }) => {
+export const patchSettings = (tabMasterManager: TabMasterManager) => {
+  return routerHook.addPatch("/settings", (props: { path: string; children: ReactElement; }) => {
     afterPatch(props.children, 'type', (_: any, ret1: any) => {
       if (!ret1?.type) {
         LogController.raiseError('Failed to find settings element to patch');

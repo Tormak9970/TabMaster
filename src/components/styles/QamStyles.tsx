@@ -1,4 +1,4 @@
-import { gamepadDialogClasses, quickAccessControlsClasses } from "decky-frontend-lib";
+import { gamepadDialogClasses, quickAccessControlsClasses } from "@decky/ui";
 import { VFC } from "react";
 
 /**
@@ -27,9 +27,6 @@ export const QamStyles: VFC<{}> = ({}) => {
         margin-left: 5px;
       }
 
-      .tab-master-scope .${gamepadDialogClasses.FieldChildren} {
-        margin: 0px 16px;
-      }
       .tab-master-scope .${gamepadDialogClasses.FieldLabel} {
         margin-left: 16px;
       }
@@ -39,9 +36,6 @@ export const QamStyles: VFC<{}> = ({}) => {
       }
       .tab-master-scope .add-tab-btn .${gamepadDialogClasses.FieldLabel} {
         display: none;
-      }
-      .tab-master-scope .add-tab-btn .${gamepadDialogClasses.FieldChildren} {
-        width: calc(100% - 32px);
       }
 
       .tab-master-scope .seperator {
@@ -74,9 +68,6 @@ export const QamStyles: VFC<{}> = ({}) => {
         display: none
       }
 
-      .tab-master-scope .no-sep .${gamepadDialogClasses.FieldChildren} {
-        width: 100%;
-      }
       .tab-master-scope .no-sep .${(gamepadDialogClasses as any).FieldChildrenWithIcon} {
         width: calc(100% - 10px);
       }

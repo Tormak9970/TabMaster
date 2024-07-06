@@ -1,4 +1,4 @@
-import { gamepadContextMenuClasses } from "decky-frontend-lib";
+import { gamepadContextMenuClasses } from "@decky/ui";
 import { VFC } from 'react';
 
 /**

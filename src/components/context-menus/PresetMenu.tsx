@@ -1,4 +1,4 @@
-import { Menu, MenuGroup, MenuItem } from 'decky-frontend-lib';
+import { Menu, MenuGroup, MenuItem } from '@decky/ui';
 import { VFC, Fragment } from 'react';
 import { presetKeys } from '../../presets/presets';
 import { capitalizeEachWord } from '../../lib/Utils';

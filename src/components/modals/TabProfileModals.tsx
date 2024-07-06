@@ -1,4 +1,4 @@
-import { ConfirmModal, Field, TextField, quickAccessControlsClasses } from 'decky-frontend-lib';
+import { ConfirmModal, Field, TextField, quickAccessControlsClasses } from '@decky/ui';
 import { VFC, useState, Fragment, FC } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { TabMasterContextProvider } from "../../state/TabMasterContext";

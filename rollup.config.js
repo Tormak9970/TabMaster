@@ -6,8 +6,9 @@ import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
 import importAssets from 'rollup-plugin-import-assets';
 import codegen from 'rollup-plugin-codegen';
+import externalGlobals from 'rollup-plugin-external-globals';
 
-import { name } from "./plugin.json";
+import manifest from "./plugin.json";
 
 
 const production = process.env.NODE_ENV !== 'development';
@@ -18,6 +19,12 @@ export default defineConfig({
     nodeResolve({ preferBuiltins: false, browser: true }),
     codegen(),
     commonjs(),
+    externalGlobals({
+      react: 'SP_REACT',
+      'react-dom': 'SP_REACTDOM',
+      '@decky/ui': 'DFL',
+      '@decky/manifest': JSON.stringify(manifest)
+    }),
     typescript({ sourceMap: !production, inlineSources: !production }),
     json(),
     replace({
@@ -25,19 +32,14 @@ export default defineConfig({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
     importAssets({
-      publicPath: `http://127.0.0.1:1337/plugins/${name}/`
+      publicPath: `http://127.0.0.1:1337/plugins/${manifest.name}/`
     })
   ],
   context: 'window',
   external: ['react', 'react-dom', 'decky-frontend-lib'],
   output: {
     file: 'dist/index.js',
-    globals: {
-      react: 'SP_REACT',
-      'react-dom': 'SP_REACTDOM',
-      'decky-frontend-lib': 'DFL'
-    },
-    format: 'iife',
+    format: 'esm',
     exports: 'default',
   },
 });

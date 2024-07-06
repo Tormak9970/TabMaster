@@ -1,4 +1,4 @@
-import { gamepadDialogClasses, quickAccessControlsClasses } from "decky-frontend-lib";
+import { gamepadDialogClasses, quickAccessControlsClasses } from "@decky/ui";
 import { VFC } from "react";
 
 /**

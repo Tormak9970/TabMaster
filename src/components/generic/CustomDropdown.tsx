@@ -1,4 +1,4 @@
-import { DropdownProps, SingleDropdownOption, showContextMenu, Menu, MenuItem, showModal } from 'decky-frontend-lib';
+import { DropdownProps, SingleDropdownOption, showContextMenu, Menu, MenuItem, showModal } from '@decky/ui';
 import { ReactElement, VFC, useState, useEffect } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
 import { CustomButtonProps, CustomButton } from './CustomButton';

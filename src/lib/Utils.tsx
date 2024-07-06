@@ -1,4 +1,4 @@
-import { sleep } from 'decky-frontend-lib';
+import { sleep } from '@decky/ui';
 import { FilterType, TabFilterSettings } from "../components/filters/Filters";
 import { Fragment } from 'react';
 import { FaSteam } from 'react-icons/fa6';

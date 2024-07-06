@@ -1,4 +1,4 @@
-import { SliderField, SliderFieldProps, gamepadDialogClasses, gamepadSliderClasses } from 'decky-frontend-lib';
+import { SliderField, SliderFieldProps, gamepadDialogClasses, gamepadSliderClasses } from '@decky/ui';
 import { VFC } from 'react';
 
 export interface SliderProps extends Omit<SliderFieldProps, 'label' | 'description' | 'layout' | 'icon' | 'bottomSeparator' | 'indentLevel' | 'tooltip' | 'showValue' | 'editableValue' | 'valueSuffix'> { }
