@@ -219,13 +219,13 @@ export class PythonInterop {
    * @param tabProfiles The tab profiles.
    * @returns A promise resolving to whether or not the tab profiles were successfully set.
    */
-    static async setTabProfiles(tabProfiles: TabProfileDictionary): Promise<void | Error> {
-      try {
-        return await call<[ tab_profiles: TabProfileDictionary ], void>("set_tab_profiles", tabProfiles);
-      } catch (e: any) {
-        return e;
-      }
+  static async setTabProfiles(tabProfiles: TabProfileDictionary): Promise<void | Error> {
+    try {
+      return await call<[ tab_profiles: TabProfileDictionary ], void>("set_tab_profiles", tabProfiles);
+    } catch (e: any) {
+      return e;
     }
+  }
 
   /**
    * Shows a toast message.
