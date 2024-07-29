@@ -8,6 +8,7 @@ type TabContainer = {
   filtersMode?: LogicalMode //boolean operation combine filters
   categoriesToInclude?: number //a bit field for categories tab should include
   autoHide?: boolean
+  sortByOverride?: number //The eSortBy number to force use for sorting. -1 ignores override.
 }
 
 interface TabSettings extends TabContainer { }

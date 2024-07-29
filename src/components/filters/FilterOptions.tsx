@@ -534,7 +534,7 @@ const SizeOnDiskFilterOptions: VFC<FilterOptionsProps<'size on disk'>> = ({ inde
 };
 
 /**
- * The options for a time played filter.
+ * The options for a release date filter.
  */
 const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
   const [date, setDate] = useState<DateObj | undefined>(filter.params.date);
@@ -587,6 +587,103 @@ const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({ ind
 
   return (
     <Field label={`Released ${byDaysAgo ? `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${thresholdType === 'above' ? 'later' : 'earlier'}` : `${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}`}
+      description={
+        <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
+          {byDaysAgo ?
+            <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange} /> :
+            <DatePicker
+              focusDropdowns={true}
+              modalType='simple'
+              buttonContainerStyle={{ flex: 1 }}
+              onChange={onDateChange}
+              dateIncludes={dateIncludes}
+              selectedDate={date}
+              toLocaleStringOptions={{ dateStyle: 'long' }}
+              animate={true}
+              transparencyMode={EnhancedSelectorTransparencyMode.selection}
+              focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
+            />}
+          <div style={{ margin: '0 10px' }}>
+            <Dropdown
+              rgOptions={[
+                { label: 'By Day', data: DateIncludes.dayMonthYear },
+                { label: 'By Month', data: DateIncludes.monthYear },
+                { label: 'By Year', data: DateIncludes.yearOnly },
+                { label: 'By Days Ago', data: 'byDaysAgo' }
+              ]}
+              selectedOption={dateIncludes}
+              onChange={option => {
+                if (option.data === 'byDaysAgo') {
+                  onByDaysAgoChange(true);
+                } else {
+                  if (byDaysAgo) onByDaysAgoChange(false);
+                  setDateIncludes(option.data);
+                }
+              }}
+            />
+          </div>
+          <div>
+            <Dropdown rgOptions={[{ label: 'Earliest', data: 'above' }, { label: 'Latest', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
+          </div>
+        </Focusable>}
+    />
+  );
+};
+
+/**
+ * The options for a purchase date filter.
+ */
+const PurchaseDateFilterOptions: VFC<FilterOptionsProps<'purchase date'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const [date, setDate] = useState<DateObj | undefined>(filter.params.date);
+  const [dateIncludes, setDateIncludes] = useState<DateIncludes>(filter.params.date ? (filter.params.date.day === undefined ? (filter.params.date.month === undefined ? DateIncludes.yearOnly : DateIncludes.monthYear) : DateIncludes.dayMonthYear) : DateIncludes.dayMonthYear);
+  const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
+  const [byDaysAgo, setByDaysAgo] = useState(filter.params.daysAgo !== undefined);
+  const [daysAgo, setDaysAgo] = useState<number>(filter.params.daysAgo ?? 30);
+
+  function onDateChange(dateSelection: DateSelection) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.date = dateSelection.data;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setDate(dateSelection.data);
+  }
+
+  function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition; }) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.condition = threshType;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setThresholdType(threshType);
+  }
+
+  function onByDaysAgoChange(byDaysAgo: boolean) {
+    const updatedFilter = { ...filter };
+    if (byDaysAgo) {
+      delete updatedFilter.params.date;
+      updatedFilter.params.daysAgo = daysAgo;
+    } else {
+      delete updatedFilter.params.daysAgo;
+      updatedFilter.params.date = date;
+    }
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setByDaysAgo(byDaysAgo);
+  }
+
+  function onSliderChange(value: number) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.daysAgo = value;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+    setDaysAgo(value);
+  }
+
+  return (
+    <Field label={`Purchased ${byDaysAgo ? `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${thresholdType === 'above' ? 'later' : 'earlier'}` : `${dateIncludes === DateIncludes.dayMonthYear ? 'on' : 'in'} or ${thresholdType === 'above' ? 'after' : 'before'}...`}`}
       description={
         <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
           {byDaysAgo ?
@@ -811,36 +908,46 @@ const SteamFeatureFilterOptions: VFC<FilterOptionsProps<'steam features'>> = ({ 
  * The options for a achievements filter.
  */
 const AchievementsFilterOptions: VFC<FilterOptionsProps<'achievements'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
-  const [value, setValue] = useState<number>(filter.params.completionPercentage);
-  const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition);
+  const [value, setValue] = useState<number>(filter.params.threshold);
+  const [thresholdType, setThresholdType] = useState<"percent" | "count">(filter.params.thresholdType);
+  const [thresholdCondition, setThresholdCondition] = useState<ThresholdCondition>(filter.params.condition);
 
-  function updateFilter(threshold: number, threshType: ThresholdCondition) {
+  function updateFilter(threshold: number, threshCondition: ThresholdCondition, threshType: "percent" | "count") {
     const updatedFilter = { ...filter };
-    updatedFilter.params.completionPercentage = threshold;
-    updatedFilter.params.condition = threshType;
+    updatedFilter.params.threshold = threshold;
+    updatedFilter.params.condition = threshCondition;
+    updatedFilter.params.thresholdType = threshType;
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
     setContainingGroupFilters(updatedFilters);
   }
 
   function onSliderChange(value: number) {
-    updateFilter(value, thresholdType);
+    updateFilter(value, thresholdCondition, thresholdType);
     setValue(value);
   }
 
-  function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition; }) {
-    updateFilter(value, threshType);
+  function onThreshConditionChange({ data: threshCondition }: { data: ThresholdCondition; }) {
+    updateFilter(value, threshCondition, thresholdType);
+    setThresholdCondition(threshCondition);
+  }
+
+  function onThreshTypeChange({ data: threshType }: { data: "count" | "percent"; }) {
+    updateFilter(value, thresholdCondition, threshType);
     setThresholdType(threshType);
   }
 
   return (
     <Field
-      label={`${value}% or ${thresholdType === 'above' ? 'more' : 'less'} achievements completed`}
+      label={`${value}${thresholdType === "percent" ? "%" : ""} or ${thresholdCondition === 'above' ? 'more' : 'less'} achievements completed`}
       description={
         <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
           <Slider value={value} min={0} max={100} onChange={onSliderChange} />
           <div style={{ marginLeft: '12px' }}>
-            <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
+            <Dropdown rgOptions={[{ label: 'At least', data: 'above' }, { label: 'At most', data: 'below' }]} selectedOption={thresholdCondition} onChange={onThreshConditionChange} />
+          </div>
+          <div style={{ marginLeft: '12px' }}>
+            <Dropdown rgOptions={[{ label: 'Count', data: 'count' }, { label: 'Percent', data: 'percent' }]} selectedOption={thresholdType} onChange={onThreshTypeChange} />
           </div>
         </Focusable>}
     />
@@ -914,6 +1021,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <SizeOnDiskFilterOptions index={index} filter={filterCopy as TabFilterSettings<'size on disk'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "release date":
         return <ReleaseDateFilterOptions index={index} filter={filterCopy as TabFilterSettings<'release date'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "purchase date":
+        return <PurchaseDateFilterOptions index={index} filter={filterCopy as TabFilterSettings<'purchase date'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "last played":
         return <LastPlayedFilterOptions index={index} filter={filterCopy as TabFilterSettings<'last played'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "family sharing":

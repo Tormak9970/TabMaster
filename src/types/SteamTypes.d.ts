@@ -45,7 +45,7 @@ type SteamTab = {
   content: React.ReactElement<TabContentProps>,
   footer?: {
     onOptionsActionDescription?: string,
-    onOptionsButtion?: () => any,
+    onOptionsButton?: () => any,
     onSecondaryActionDescription?: any, //Returns a reactElement
     onSecondaryButton?: () => any,
     onMenuActionDescription?: string,
@@ -61,3 +61,17 @@ interface TabContentProps {
   setSortBy: (e: any) => void
   showSortingContextMenu: (e: any) => void
 }
+
+type LocalizationManager = {
+  AddTokens: unknown;
+  BLooksLikeToken: (token: string) => boolean;
+  GetELanguageFallbackOrder: unknown;
+  GetPreferredLocales: unknown;
+  GetTokensChangedCallbackList: unknown;
+  InitDirect: unknown;
+  InitFromObjects: unknown;
+  LocalizeIfToken: (token: string, suppressErrors?: boolean) => string | undefined;
+  LocalizeString: (token: string, suppressErrors?: boolean) => string | undefined;
+  LocalizeStringFromFallback: (token: string) => string | undefined;
+  SetPreferredLocales: unknown;
+};

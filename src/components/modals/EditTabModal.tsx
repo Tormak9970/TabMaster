@@ -1,8 +1,10 @@
 import {
   ConfirmModal,
   DialogCheckbox,
+  DropdownItem,
   Field,
   Focusable,
+  SingleDropdownOption,
   TextField,
   ToggleField,
   afterPatch,
@@ -19,6 +21,7 @@ import { FiltersPanel } from "../filters/FiltersPanel";
 import { IncludeCategories, capitalizeFirstLetter, getIncludedCategoriesFromBitField, playUISound, updateCategoriesToIncludeBitField } from "../../lib/Utils";
 import { BiSolidDownArrow } from "react-icons/bi";
 import { CustomTabContainer } from '../CustomTabContainer';
+import { useSortingMenuItems } from '../../hooks/useSortingMenuItems';
 
 export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>;
 
@@ -31,13 +34,15 @@ type EditTabModalProps = {
   tabMasterManager: TabMasterManager,
   filtersMode: LogicalMode,
   categoriesToInclude: number, //bit field
-  autoHide: boolean
+  autoHide: boolean;
+  sortBy: number;
 };
+
 
 /**
  * The modal for editing and creating custom tabs.
  */
-export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager, filtersMode, categoriesToInclude, autoHide: _autoHide }) => {
+export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager, filtersMode, categoriesToInclude, autoHide: _autoHide, sortBy }) => {
   const [name, setName] = useState<string>(tabTitle ?? '');
   const [topLevelFilters, setTopLevelFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
   const [topLevelLogicMode, setTopLevelLogicMode] = useState<LogicalMode>(filtersMode);
@@ -46,6 +51,8 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
   const [patchInput, setPatchInput] = useState<boolean>(true);
   const [autoHide, setAutoHide] = useState<boolean>(_autoHide);
+  const [sortByOverride, setSortByOverride] = useState(sortBy);
+  const sortOptions: SingleDropdownOption[] = useSortingMenuItems([]);
 
   const nameInputElement = <TextField value={name} placeholder="The title for this tab" onChange={onNameChange} />;
 
@@ -84,12 +91,13 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
         filters: topLevelFilters,
         filtersMode: topLevelLogicMode,
         categoriesToInclude: catsToInclude,
-        autoHide: autoHide
+        autoHide: autoHide,
+        sortByOverride: sortByOverride
       };
       onConfirm(tabId, updated);
       closeModal!();
     } else {
-      if(!canAddFilter) PythonInterop.toast("Cannot Save Tab", "Some filters are incomplete");
+      if (!canAddFilter) PythonInterop.toast("Cannot Save Tab", "Some filters are incomplete");
       else PythonInterop.toast("Cannot Save Tab", "Please add a name and at least 1 filter");
     }
   }
@@ -116,29 +124,38 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
           onOK={onSave}
           strOKButtonText="Save"
         >
-          <div style={{ padding: "4px 16px 1px" }} className="name-field">
-            <Field description={
-            <>
-              <div style={{ paddingBottom: "6px" }} className={quickAccessControlsClasses.PanelSectionTitle}>
-                Name
-              </div>
-              {nameInputElement}
-            </>
-            } />
-          </div>
-          <IncludeCategoriesPanel categoriesToInclude={catsToInclude} setCategoriesToInclude={setCatsToInclude} />
-          <div className='autohide-toggle-container'>
-            <ToggleField label='Automatically hide tab if empty' checked={autoHide} onChange={checked => setAutoHide(checked)} bottomSeparator='thick'/>
-          </div>
-          <FiltersPanel
-            groupFilters={topLevelFilters}
-            setGroupFilters={setTopLevelFilters}
-            addFilter={addFilter}
-            groupLogicMode={topLevelLogicMode}
-            setGroupLogicMode={setTopLevelLogicMode}
-            canAddFilter={canAddFilter}
-            collapseFilters={!!tabTitle}
-          />
+          <Focusable onMenuButton={onSave} onMenuActionDescription='Save'>
+            <div style={{ padding: "4px 16px 1px" }} className="name-field">
+              <Field description={
+                <>
+                  <div style={{ paddingBottom: "6px" }} className={quickAccessControlsClasses.PanelSectionTitle}>
+                    Name
+                  </div>
+                  {nameInputElement}
+                </>
+              } />
+            </div>
+            <IncludeCategoriesPanel categoriesToInclude={catsToInclude} setCategoriesToInclude={setCatsToInclude} />
+            <div className='field-item-container'>
+              <ToggleField label='Automatically hide tab if empty' checked={autoHide} onChange={checked => setAutoHide(checked)} bottomSeparator='thick' />
+              <DropdownItem
+                label='Sort apps by'
+                rgOptions={sortOptions}
+                selectedOption={sortByOverride}
+                onChange={option => setSortByOverride(option.data)}
+                bottomSeparator='thick'
+              />
+            </div>
+            <FiltersPanel
+              groupFilters={topLevelFilters}
+              setGroupFilters={setTopLevelFilters}
+              addFilter={addFilter}
+              groupLogicMode={topLevelLogicMode}
+              setGroupLogicMode={setTopLevelLogicMode}
+              canAddFilter={canAddFilter}
+              collapseFilters={!!tabTitle}
+            />
+          </Focusable>
         </ConfirmModal>
       </div>
     </TabMasterContextProvider>
@@ -159,9 +176,9 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
 
   const showHiddenCat = Object.entries(catsToIncludeObj).filter(([cat]) => cat !== 'hidden').some(([_cat, checked]) => checked);
 
-  const getCatLabel = (category: string) => category === 'music' ? 'Soundtracks' : capitalizeFirstLetter(category)
+  const getCatLabel = (category: string) => category === 'music' ? 'Soundtracks' : capitalizeFirstLetter(category);
 
-  let catStrings = []
+  let catStrings = [];
   for (const cat in catsToIncludeObj) {
     const include = catsToIncludeObj[cat as keyof typeof catsToIncludeObj];
 
@@ -186,8 +203,8 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
               <div style={{ padding: "12px 0", float: "left" }} className={quickAccessControlsClasses.PanelSectionTitle}>
                 Include in tab
               </div>
-              <div style={{padding: "12px 40px", flex: "1"}}>
-                {!isOpen && <span style={{ fontSize: "12px", lineHeight: "12px", color: "#8b929a"}}> 
+              <div style={{ padding: "12px 40px", flex: "1" }}>
+                {!isOpen && <span style={{ fontSize: "12px", lineHeight: "12px", color: "#8b929a" }}>
                   {catStrings.join(', ')}
                 </span>}
               </div>
@@ -205,12 +222,12 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
         {isOpen && (
           <div style={{ padding: "10px 18px" }}>
             {Object.entries(catsToIncludeObj).map(([category, shouldInclude]) => {
-              const label = getCatLabel(category)
+              const label = getCatLabel(category);
 
               const onChange = (checked: boolean) => {
                 playUISound(checked ? '/sounds/deck_ui_switch_toggle_on.wav' : '/sounds/deck_ui_switch_toggle_off.wav');
                 setCategoriesToInclude(currentCatsBitField => updateCategoriesToIncludeBitField(currentCatsBitField, { [category]: checked }));
-              }; 
+              };
               return category === 'hidden' && !showHiddenCat ? null : <DialogCheckbox checked={shouldInclude} onChange={onChange} label={label} />;
             })}
           </div>)}
@@ -220,7 +237,8 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
         left: "calc(16px - 1.8vw)",
         right: "calc(16px - 1.8vw)",
         height: "1px",
-        background: "#ffffff1a" }}
+        background: "#ffffff1a"
+      }}
       />
     </>
   );
@@ -231,18 +249,27 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
  * @param tabMasterManager TabMasterManager instance.
  */
 export function showModalNewTab(tabMasterManager: TabMasterManager) {
-    showModal(
-      <EditTabModal
-        onConfirm={(_: any, tabSettings: EditableTabSettings) => {
-          tabMasterManager.createCustomTab(tabSettings.title, tabMasterManager.getTabs().visibleTabsList.length, tabSettings.filters, tabSettings.filtersMode, tabSettings.categoriesToInclude, tabSettings.autoHide);
-        }}
-        tabFilters={[]}
-        tabMasterManager={tabMasterManager}
-        filtersMode="and"
-        categoriesToInclude={IncludeCategories.games}
-        autoHide={false}
-      />
-    );
+  showModal(
+    <EditTabModal
+      onConfirm={(_: any, tabSettings: EditableTabSettings) => {
+        tabMasterManager.createCustomTab(
+          tabSettings.title,
+          tabMasterManager.getTabs().visibleTabsList.length,
+          tabSettings.filters,
+          tabSettings.filtersMode,
+          tabSettings.categoriesToInclude,
+          tabSettings.autoHide,
+          tabSettings.sortByOverride
+        );
+      }}
+      tabFilters={[]}
+      tabMasterManager={tabMasterManager}
+      filtersMode="and"
+      categoriesToInclude={IncludeCategories.games}
+      autoHide={false}
+      sortBy={-1}
+    />
+  );
 }
 
 /**
@@ -251,18 +278,19 @@ export function showModalNewTab(tabMasterManager: TabMasterManager) {
  * @param tabMasterManager TabMasterManager instance.
  */
 export function showModalEditTab(tabContainer: CustomTabContainer, tabMasterManager: TabMasterManager) {
-    showModal(
-      <EditTabModal
-        onConfirm={(tabId: string | undefined, updatedTabSettings: EditableTabSettings) => {
-          tabMasterManager.updateCustomTab(tabId!, updatedTabSettings);
-        }}
-        tabId={tabContainer.id}
-        tabTitle={tabContainer.title}
-        tabFilters={tabContainer.filters}
-        tabMasterManager={tabMasterManager}
-        filtersMode={tabContainer.filtersMode}
-        categoriesToInclude={tabContainer.categoriesToInclude}
-        autoHide={tabContainer.autoHide}
-      />
-    );
+  showModal(
+    <EditTabModal
+      onConfirm={(tabId: string | undefined, updatedTabSettings: EditableTabSettings) => {
+        tabMasterManager.updateCustomTab(tabId!, updatedTabSettings);
+      }}
+      tabId={tabContainer.id}
+      tabTitle={tabContainer.title}
+      tabFilters={tabContainer.filters}
+      tabMasterManager={tabMasterManager}
+      filtersMode={tabContainer.filtersMode}
+      categoriesToInclude={tabContainer.categoriesToInclude}
+      autoHide={tabContainer.autoHide}
+      sortBy={tabContainer.sortByOverride}
+    />
+  );
 }

@@ -113,7 +113,7 @@ export class TabMasterManager {
     // * subscribe for when collections are deleted
     this.collectionRemoveReaction = reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this));
 
-    this.handleUserCollectionRemove(collectionStore.userCollections.length); //* this loads the collection ids for the first time.
+    this.handleUserCollectionRemove(collectionStore.userCollections.length); // * this loads the collection ids for the first time.
 
     // * subscribe to user's friendlist updates
     this.friendsReaction = reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
@@ -473,17 +473,18 @@ export class TabMasterManager {
    * @param filtersMode The logic mode for these filters.
    * @param categoriesToInclude A bit field of which categories should be included in the tab.
    * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
+   * @param sortByOverride The eSortBy number to force use for sorting. -1 ignores override.
    */
-  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean) {
+  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean, sortByOverride: number) {
     const id = uuidv4();
     this.addCollectionReactionsForFilters(flattenFilters(filterSettingsList));
-    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode, categoriesToInclude, autoHide));
+    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode, categoriesToInclude, autoHide, sortByOverride));
     this.updateAndSave();
   }
 
   createPresetTab<Name extends PresetName>(presetName: Name, tabTitle: string, ...options: PresetOptions<Name>) {
     const { filters, filtersMode, categoriesToInclude } = getPreset(presetName, ...options);
-    this.createCustomTab(tabTitle, this.visibleTabsList.length, filters, filtersMode, categoriesToInclude, false);
+    this.createCustomTab(tabTitle, this.visibleTabsList.length, filters, filtersMode, categoriesToInclude, false, -1);
   }
 
   /**
@@ -591,9 +592,9 @@ export class TabMasterManager {
     }
 
     for (const keyId in tabsSettings) {
-      const { id, title, filters: _filters, position, filtersMode, categoriesToInclude, autoHide } = tabsSettings[keyId];
+      const { id, title, filters: _filters, position, filtersMode, categoriesToInclude, autoHide, sortByOverride } = tabsSettings[keyId];
       const filters = Filter.removeUnknownTypes(_filters)
-      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!, categoriesToInclude!, autoHide!) : this.addDefaultTabContainer(tabsSettings[keyId]);
+      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!, categoriesToInclude!, autoHide!, sortByOverride) : this.addDefaultTabContainer(tabsSettings[keyId]);
 
       if (favoritesOriginalIndex !== null && favoritesOriginalIndex > -1 && tabContainer.position > favoritesOriginalIndex) {
         tabContainer.position--;
@@ -671,7 +672,8 @@ export class TabMasterManager {
           filters: tabContainer.filters,
           filtersMode: (tabContainer as CustomTabContainer).filtersMode,
           categoriesToInclude: (tabContainer as CustomTabContainer).categoriesToInclude,
-          autoHide: (tabContainer as CustomTabContainer).autoHide
+          autoHide: (tabContainer as CustomTabContainer).autoHide,
+          sortByOverride: (tabContainer as CustomTabContainer).sortByOverride
         }
         : tabContainer;
 
@@ -688,10 +690,11 @@ export class TabMasterManager {
    * @param filterSettingsList The tab's filters.
    * @param categoriesToInclude A bit field of which categories should be included in the tab.
    * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
+   * @param sortByOverride The eSortBy number to force use for sorting. -1 ignores override.
    * @returns A tab container for this tab.
    */
-  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean) {
-    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode, categoriesToInclude, autoHide);
+  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean, sortByOverride: number = -1) {
+    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode, categoriesToInclude, autoHide, sortByOverride);
     this.tabsMap.set(tabId, tabContainer);
     return tabContainer;
   }

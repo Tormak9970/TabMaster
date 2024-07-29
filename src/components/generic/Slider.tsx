@@ -1,4 +1,4 @@
-import { SliderField, SliderFieldProps, gamepadDialogClasses } from 'decky-frontend-lib';
+import { SliderField, SliderFieldProps, gamepadDialogClasses, gamepadSliderClasses } from 'decky-frontend-lib';
 import { VFC } from 'react';
 
 export interface SliderProps extends Omit<SliderFieldProps, 'label' | 'description' | 'layout' | 'icon' | 'bottomSeparator' | 'indentLevel' | 'tooltip' | 'showValue' | 'editableValue' | 'valueSuffix'> { }
@@ -6,7 +6,7 @@ export interface SliderProps extends Omit<SliderFieldProps, 'label' | 'descripti
 const highlightColor = '#bbc1c94a';
 
 const sliderStyle = `
-  .slider-container.highlight-slider .${gamepadDialogClasses.Field}.gpfocuswithin .gamepadslider_SliderControl_3o137{
+  .slider-container.highlight-slider .${gamepadDialogClasses.Field}.gpfocuswithin .${gamepadSliderClasses.SliderControl} {
     background-color: ${highlightColor};
     box-shadow: 0px 0px 8px 8px ${highlightColor};
     border-radius: 10px;
@@ -18,21 +18,21 @@ const sliderStyle = `
     --field-negative-horizontal-margin: 0
   }
 
-  .slider-container .gamepadslider_SliderControl_3o137 {
+  .slider-container .${gamepadSliderClasses.SliderControl} {
     transition-property: background-color, box-shadow;
     transition-duration: .20s;
     height: 6px;
   }
 
-  .slider-container .gamepadslider_SliderHandle_2yVKj {
+  .slider-container .${gamepadSliderClasses.SliderHandle} {
     top: -8px;
   }
 
-  .slider-container .gamepadslider_SliderNotchTick_Fv1Ht {
+  .slider-container .${gamepadSliderClasses.SliderNotchTick} {
     height: 4px;
   }
 
-  .slider-container .gamepadslider_SliderNotchContainer_2N-a5 {
+  .slider-container .${gamepadSliderClasses.SliderNotchContainer} {
     margin-top: 4px;
   }
 `;
