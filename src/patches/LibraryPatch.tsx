@@ -78,7 +78,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                   return tabs;
                 }
 
-                const tabContentComponent = tabTemplate!.content.type as TabContentComponent;
+                const tabContentComponent = tabTemplate.content.type as TabContentComponent;
 
                 let pacthedTabs: SteamTab[];
 
@@ -86,14 +86,14 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
                   let tablist = tabMasterManager.getTabs().visibleTabsList;
                   pacthedTabs = tablist.flatMap((tabContainer) => {
                     if (tabContainer.filters) {
-                      const footer = { ...(tabTemplate!.footer ?? {}), onMenuButton: getShowMenu(tabContainer.id, tabMasterManager), onMenuActionDescription: 'Tab Master' };
+                      const footer = { ...(tabTemplate.footer ?? {}), onMenuButton: getShowMenu(tabContainer.id, tabMasterManager), onMenuActionDescription: 'Tab Master' };
                       return (tabContainer as CustomTabContainer).getActualTab(tabContentComponent, sortingProps, footer, collectionsAppFilterGamepad, isMicroSDeckInstalled) || [];
                     } else {
                       return tabs.find(actualTab => {
                         if (actualTab.id === tabContainer.id) {
                           if (!actualTab.footer) actualTab.footer = {};
-                          actualTab.footer!.onMenuActionDescription = 'Tab Master';
-                          actualTab.footer!.onMenuButton = getShowMenu(tabContainer.id, tabMasterManager);
+                          actualTab.footer.onMenuActionDescription = 'Tab Master';
+                          actualTab.footer.onMenuButton = getShowMenu(tabContainer.id, tabMasterManager);
                           return true;
                         }
                         return false;

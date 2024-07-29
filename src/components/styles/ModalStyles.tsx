@@ -103,11 +103,11 @@ export const ModalStyles: VFC<{}> = ({}) => {
         flex-grow: 1;
       }
 
-      .autohide-toggle-container .${gamepadDialogClasses.Field} {
+      .field-item-container .${gamepadDialogClasses.Field} {
         padding: 10px calc(28px + 1.4vw);
       }
 
-      .autohide-toggle-container .${gamepadDialogClasses.FieldLabel} {
+      .field-item-container .${gamepadDialogClasses.FieldLabel} {
         color: #8b929a;
         font-size: 12px;
       }
