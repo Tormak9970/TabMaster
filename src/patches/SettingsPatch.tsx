@@ -1,7 +1,12 @@
-import { afterPatch, ConfirmModal, ServerAPI, showModal } from "decky-frontend-lib";
+import { afterPatch, ConfirmModal, findInTree, ServerAPI, showModal } from "decky-frontend-lib";
 import { ReactElement } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { LogController } from "../lib/controllers/LogController";
+
+const findHome = (root: any) => {
+  const filter = (node: any) => node?.type?.toString?.().includes('#HomeSettings_ShowingLess');
+  return findInTree(root, filter, { walkable: ['props', 'children', 'pages', 'content'] });
+};
 
 export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager) => {
   return serverAPI.routerHook.addPatch("/settings", (props: { path: string; children: ReactElement; }) => {
@@ -18,10 +23,15 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
         ret1.type = firstCache;
         return ret1;
       }
-      
+
       afterPatch(ret1, 'type', (_: any, ret2: any) => {
-        const homeElement = ret2?.props?.children?.props?.pages?.find((obj: any) => obj.route === '/settings/home')?.content;
-        if (homeElement === undefined) {
+        //try to get as close to the element using the known path
+        const homePage = ret2?.props?.children?.props?.pages?.find((obj: any) => obj.route === '/settings/home');
+        if (!homePage) LogController.warn('Location of "home" page setting has changed'); //log so we know if valve changes it
+        //if the known path has changed try searching from the top of this element
+        const homeElement = findHome(homePage ?? ret2);
+      
+        if (!homeElement) {
           LogController.raiseError("Couldn't find home element to patch in settings");
           return ret2;
         }
