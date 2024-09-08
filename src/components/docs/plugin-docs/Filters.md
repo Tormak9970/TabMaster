@@ -237,6 +237,20 @@ Filters apps based on their release date.
 
 <br/>
 
+#### Purchase Date
+**Options:**<br/>
+`date` - The desired purchase date of apps to include.
+`time period` - Whether you want to specify only the year, just the month and year, or the day, month, and year.
+`before/after` - Whether to include apps that were purchased before or after the provided date.
+
+**Behavior:**<br/>
+Filters apps based on their purchase date.
+
+**Example:**<br/>
+<img title="Purchase Date Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_purchase-date-example.png" />
+
+<br/>
+
 #### Last Played
 **Options:**<br/>
 `date` - The desired last played date of apps to include.
@@ -248,6 +262,18 @@ Filters apps based on when they were last played.
 
 **Example:**<br/>
 <img title="Last Played Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_last-played-example.png" />
+
+<br/>
+
+#### Family Sharing
+**Options:**<br/>
+`Is from family member` - Whether to only include games that are shared from a family member, or only those that aren't.
+
+**Behavior:**<br/>
+Filters apps based on if they are a shared by a family member or not.
+
+**Example:**<br/>
+<img title="Family Sharing Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_family-sharing-example.png" />
 
 <br/>
 
@@ -292,11 +318,12 @@ Filters apps based on if they can be streamed or not.
 
 #### Achievements
 **Options:**<br/>
-`percentage` - The desired achievement percentage completion of apps to include.
+`percentage` - The desired achievement percentage completion (or count) of apps to include.
 `greater/less` - Whether to include apps that have an achievement completion percentage greater than or equal to the provided percentage, or less than or equal to it.
+`Type` - Whether to use filter by the number of unlocked achievements, or the completion percentage
 
 **Behavior:**<br/>
-Filters apps based on their achievement completion percentage.
+Filters apps based on their achievement completion percentage or count.
 
 **Example:**<br/>
 <img title="Achievements Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_achievements-example.png" />

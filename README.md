@@ -55,10 +55,13 @@ Filter Examples:
  - **Time Played**<br/><img src="./assets/filters/docs_time-played-example.png" width="600" />
  - **Size on Disk**<br/><img src="./assets/filters/docs_size-on-disk-example.png" width="600" />
  - **Release Date**<br/><img src="./assets/filters/docs_release-date-example.png" width="600" />
+ - **Purchase Date**<br/><img src="./assets/filters/docs_pruchase-date-example.png" width="600" />
  - **Last Played**<br/><img src="./assets/filters/docs_last-played-example.png" width="600" />
+ - **Family Sharing**<br/><img src="./assets/filters/docs_family-sharing-example.png" width="600" />
  - **Demo**<br/><img src="./assets/filters/docs_demo-example.png" width="600" />
  - **Streamable**<br/><img src="./assets/filters/docs_streamable-example.png" width="600" />
  - **Steam Features**<br/><img src="./assets/filters/docs_steam-features-example.png" width="600" />
+ - **Achievements**<br/><img src="./assets/filters/docs_achievements-example.png" width="600" />
  - **MicroSD Card**<br/><img src="./assets/filters/docs_microsd-card-example.png" width="600" />
 
 
