@@ -33,7 +33,7 @@ function showDiscardConfirm(okCallback: () => Promise<void>, onCancel: () => Pro
     >
       Are you sure you want to discard the previous settings? This can't be undone.
     </DestructiveModal>
-  )
+  );
 }
 
 /**
@@ -87,6 +87,12 @@ export class PluginController {
     // @ts-ignore
     return new Promise(async (resolve, reject) => {
       const hadLegacySettings = await PythonInterop.setActiveSteamId(getCurrentUserId());
+
+      if (hadLegacySettings instanceof Error) {
+        LogController.raiseError('TabMaster encountered a problem during initialization process.', `PythonInterop.setActiveSteamId returned error: "${hadLegacySettings.message}"`);
+        resolve();
+        return;
+      }
       LogController.log(hadLegacySettings ? "Detected Legacy Settings." : "No Legacy Settings found.");
 
       if (hadLegacySettings) {
