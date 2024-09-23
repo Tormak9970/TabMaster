@@ -59,7 +59,7 @@ export function getNonBigIntUserId(low: number, high: number): number {
 
 export const defaultTabsSettings: TabSettingsDictionary = {
   DeckGames: {
-    id: "DeckGames",
+    id: "GreatOnDeck",
     title: "Great On Deck",
     position: 0,
   },

@@ -113,6 +113,8 @@ export class TabErrorController {
         if (tabErroredFilters.length > 0) {
           tabsToFix.set(id, tabErroredFilters);
         }
+      } else if (tabSetting.id === "DeckGames") {
+        tabSetting.id = "GreatOnDeck";
       }
     }
 
