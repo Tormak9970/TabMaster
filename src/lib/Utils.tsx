@@ -58,7 +58,7 @@ export function getNonBigIntUserId(low: number, high: number): number {
 
 
 export const defaultTabsSettings: TabSettingsDictionary = {
-  DeckGames: {
+  GreatOnDeck: {
     id: "GreatOnDeck",
     title: "Great On Deck",
     position: 0,
@@ -108,7 +108,7 @@ export function validateTabs(tabs: TabSettingsDictionary): boolean {
         return (filter as TabFilterSettings<FilterType>).type !== undefined;
       });
     } else {
-      return Object.keys(defaultTabsSettings).includes(tab.id);
+      return tab.id === "DeckGames" || Object.keys(defaultTabsSettings).includes(tab.id);
     }
   });
 }
