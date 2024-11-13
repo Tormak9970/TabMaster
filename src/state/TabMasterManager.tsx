@@ -260,8 +260,9 @@ export class TabMasterManager {
     PythonInterop.setFriends(this.currentUsersFriends);
 
     Promise.all(this.currentUsersFriends.map((friend: FriendEntry) => {
+      //* pretty sure it returns undefined if friends account is set to private, not sure if we should handle this in the ui
       friendStore.FetchOwnedGames(friend.steamid).then((res) => {
-        this.friendsGameMap.set(friend.steamid, Array.from(res.m_apps));
+        this.friendsGameMap.set(friend.steamid, res ? Array.from(res.setApps) : []);
       });
     })).then(() => {
       PythonInterop.setFriendGames(this.friendsGameMap);
