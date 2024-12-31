@@ -55,7 +55,7 @@ export class SteamController {
    */
   async waitForServicesToInitialize(): Promise<boolean> {
     type WindowEx = Window & { App?: { WaitForServicesInitialized?: () => Promise<boolean> } };
-    const servicesFound = await waitForCondition(20, 250, () => (window as WindowEx).App?.WaitForServicesInitialized != null);
+    const servicesFound = await waitForCondition(20, 250, () => (window as WindowEx).App?.WaitForServicesInitialized != null && !!appAchievementProgressCache.m_achievementProgress);
   
     if (servicesFound) {
       LogController.log(`Services found.`);

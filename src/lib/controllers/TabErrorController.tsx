@@ -128,6 +128,13 @@ export class TabErrorController {
    * @param finishLoading The finish loading function to execute when validation/ error correction is complete.
    */
   static validateSettingsOnLoad(tabsSettings: TabSettingsDictionary, tabMasterManager: TabMasterManager, finishLoading: (editedTabSettings: TabSettingsDictionary) => void) {
+    //Fix old Great On Deck Tab
+    if (tabsSettings.DeckGames) {
+      tabsSettings.GreatOnDeck = tabsSettings.DeckGames;
+      tabsSettings.GreatOnDeck.id = 'GreatOnDeck';
+      delete tabsSettings.DeckGames;
+    }
+
     const tabsToFix = this.checkForBrokenFilters(tabsSettings);
 
     if (tabsToFix.size > 0) {

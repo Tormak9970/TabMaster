@@ -8,7 +8,6 @@ type TabPreset = {
 };
 
 const presetDefines = {
-
   collection: (collectionId: string, collectionName: string) => {
     let include = IncludeCategories.games;
     if (collectionId === 'hidden') include |= (IncludeCategories.music | IncludeCategories.software | IncludeCategories.hidden); 
@@ -77,6 +76,7 @@ const presetDefines = {
       categoriesToInclude: IncludeCategories.software
     };
   },
+
   'micro sd card': (card?: string) => {
     return {
       filters: [
