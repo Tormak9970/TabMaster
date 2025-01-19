@@ -1,4 +1,4 @@
-import { ServerAPI } from "decky-frontend-lib";
+import { FileSelectionType, ServerAPI } from "decky-frontend-lib";
 import { validateTabs } from "../Utils";
 import { TabProfileDictionary } from '../../state/TabProfileManager';
 
@@ -17,6 +17,45 @@ export class PythonInterop {
   }
 
   /**
+   * Gets the user's desktop path.
+   * @returns The path.
+   */
+  static async getUserDesktopPath(): Promise<string | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, string>("get_user_desktop", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+
+  /**
+   * Gets a folder chosen by the user.
+   * @returns The choosen folder.
+   */
+  static async openFolder(): Promise<string | Error> {
+    const startPath = await this.getUserDesktopPath();
+
+    if (startPath instanceof Error) {
+      return startPath;
+    }
+
+    const res = await this.serverAPI.openFilePickerV2(
+      FileSelectionType.FOLDER,
+      startPath,
+      false,
+      true,
+      undefined,
+      undefined,
+      false,
+      false,
+    );
+
+    return res.realpath;
+  }
+
+  /**
    * Gets the interop's serverAPI.
    */
   static get server(): ServerAPI { return this.serverAPI; }
@@ -25,8 +64,22 @@ export class PythonInterop {
    * Logs a message to the plugin's log file and the frontend console.
    * @param message The message to log.
    */
-  static async log(message: String): Promise<void> {
-    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 0 });
+  static async log(message: string): Promise<void> {
+    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("log_message", { message: `[front-end]: ${message}`, level: 0 });
+  }
+  
+  /**
+   * Backs up the plugin's settings to prevent them from being corrupted.
+   * @param destPath The path to copy the settings to.
+   */
+  static async backupSettings(destPath: string): Promise<boolean | Error> {
+    const result = await this.serverAPI.callPluginMethod<{ dest_path: string }, boolean>("backup_settings", { dest_path: destPath + "/settings_backup.json" });
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
   }
 
   /**

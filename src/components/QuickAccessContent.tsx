@@ -12,7 +12,7 @@ import {
 } from "decky-frontend-lib";
 import { VFC, useState } from "react";
 
-import { FaBook, FaCircleExclamation, FaBookmark } from "react-icons/fa6";
+import { FaBook, FaCircleExclamation, FaBookmark, FaArrowUpFromBracket } from "react-icons/fa6";
 import { PiListPlusBold } from "react-icons/pi";
 
 import { useTabMasterContext } from "../state/TabMasterContext";
@@ -28,6 +28,7 @@ import { MicroSDeckNotice } from './MicroSDeckNotice';
 import { CustomTabContainer } from './CustomTabContainer';
 import { TabProfilesMenu } from './context-menus/TabProfileMenu';
 import { TabMasterManager } from '../state/TabMasterManager';
+import { PythonInterop } from "../lib/controllers/PythonInterop";
 
 
 export type TabIdEntryType = {
@@ -52,6 +53,21 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
   function TabEntryInteractables({ entry }: TabEntryInteractablesProps) {
     const tabContainer = tabsMap.get(entry.data!.id)!;
     return (<TabActionsButton {...{ tabContainer, tabMasterManager }} />);
+  }
+
+  const handleBackupPrompt = async () => {
+    const path = await PythonInterop.openFolder();
+    if (path instanceof Error) {
+      LogController.raiseError('TabMaster encountered a problem opening the filepicker.', path.message);
+      return;
+    }
+
+    const success = await PythonInterop.backupSettings(path);
+    if (success) {
+      PythonInterop.toast("Success!", "Settings backup finished.");
+    } else {
+      PythonInterop.toast("Error!", "Settings backup failed.");
+    }
   }
 
   const entries = visibleTabsList.map((tabContainer) => {
@@ -114,13 +130,23 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
             <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
               <DialogButton
                 disabled={!tabMasterManager.hasSettingsLoaded}
-                style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center", marginRight: "8px" }}
+                style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center" }}
                 onOKActionDescription={'Add Quick Tab'}
                 onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />)}
               >
                 <PiListPlusBold size='1.4em' />
               </DialogButton>
-              </Focusable>
+            </Focusable>
+            <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
+              <DialogButton
+                disabled={!tabMasterManager.hasSettingsLoaded}
+                style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center", marginRight: "8px" }}
+                onOKActionDescription={'Backup Settings'}
+                onClick={handleBackupPrompt}
+              >
+                <FaArrowUpFromBracket size='1em' />
+              </DialogButton>
+            </Focusable>
           </Focusable>
         </Field>
         <PanelSection title="Tabs">
