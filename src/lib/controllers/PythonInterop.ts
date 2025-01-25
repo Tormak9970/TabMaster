@@ -1,6 +1,7 @@
 import { FileSelectionType, ServerAPI } from "decky-frontend-lib";
 import { validateTabs } from "../Utils";
 import { TabProfileDictionary } from '../../state/TabProfileManager';
+import { PluginController } from './PluginController';
 
 /**
  * Class for frontend -> backend communication.
@@ -326,9 +327,10 @@ export class PythonInterop {
    * @param message The message of the toast.
    */
   static toast(title: string, message: string): void {
-    return (() => {
+    setTimeout(() => {
+      if (PluginController.isDismounted) return;
       try {
-        return this.serverAPI.toaster.toast({
+        this.serverAPI.toaster.toast({
           title: title,
           body: message,
           duration: 8000,
@@ -336,6 +338,6 @@ export class PythonInterop {
       } catch (e) {
         console.log("Toaster Error", e);
       }
-    })();
+    }, 200)
   }
 }
