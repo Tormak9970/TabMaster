@@ -73,7 +73,7 @@ export class PythonInterop {
    * @param destPath The path to copy the settings to.
    */
   static async backupSettings(destPath: string): Promise<boolean | Error> {
-    const result = await this.serverAPI.callPluginMethod<{ dest_path: string }, boolean>("backup_settings", { dest_path: destPath + "/settings_backup.json" });
+    const result = await this.serverAPI.callPluginMethod<{ dest_path: string }, boolean>("backup_settings", { dest_path: destPath + "/tabmaster_settings_backup.json" });
 
     if (result.success) {
       return result.result;
