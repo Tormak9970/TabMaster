@@ -174,11 +174,7 @@ export class PythonInterop {
   static async getTabs(): Promise<TabSettingsDictionary | Error | null> {
     let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabSettingsDictionary>("get_tabs", {});
     if (result.success) {
-      //* Verify the config data.
-      if (!validateTabStructure(result.result)) {
-
-        return null;
-      }
+      if (!validateTabStructure(result.result))  return null;
 
       return result.result;
     } else {
