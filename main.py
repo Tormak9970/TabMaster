@@ -53,6 +53,21 @@ class Plugin:
       success = False
 
     return success
+  
+  async def backup_default_dir(self, name: str) -> bool:
+    success = True
+    backup = SettingsManager(name=name, settings_directory=os.environ["DECKY_PLUGIN_SETTINGS_DIR"])
+    backup.settings = self.settings.settings
+    try:
+      backup.commit()
+    except:
+      try:
+        os.remove(backup.path)
+      except:
+          pass
+      success = False
+      
+    return success
 
   # Plugin settings getters
   async def get_users_dict(self) -> dict[str, dict] | None:

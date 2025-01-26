@@ -1,7 +1,8 @@
 import { FileSelectionType, ServerAPI } from "decky-frontend-lib";
-import { validateTabs } from "../Utils";
+import { getCompactTimestamp, validateTabStructure } from "../Utils";
 import { TabProfileDictionary } from '../../state/TabProfileManager';
 import { PluginController } from './PluginController';
+import { USER_BACKUP_NAME } from '../../constants';
 
 /**
  * Class for frontend -> backend communication.
@@ -74,14 +75,27 @@ export class PythonInterop {
    * @param destPath The path to copy the settings to.
    */
   static async backupSettings(destPath: string): Promise<boolean | Error> {
-    const result = await this.serverAPI.callPluginMethod<{ dest_path: string }, boolean>("backup_settings", { dest_path: destPath + "/tabmaster_settings_backup.json" });
-
+    const result = await this.serverAPI.callPluginMethod<{ dest_path: string }, boolean>("backup_settings", { dest_path: `${destPath}/${USER_BACKUP_NAME}_${getCompactTimestamp()}.json` });
     if (result.success) {
       return result.result;
     } else {
       return new Error(result.result);
     }
   }
+
+    /**
+   * Backs up the plugin's settings to default settings dir.
+   * @param name The name to give the file.
+   */
+  static async backupDefaultDir(name: string): Promise<boolean | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, boolean>("backup_default_dir", { name: `${name}_${getCompactTimestamp()}` });
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+
 
   /**
    * Logs a warning to the plugin's log file and the frontend console.
@@ -155,18 +169,15 @@ export class PythonInterop {
 
   /**
    * Gets the plugin's tabs.
-   * @returns A promise resolving to the plugin's tabs.
+   * @returns A promise resolving to the plugin's tabs or null when the tab structure fails validation
    */
-  static async getTabs(): Promise<TabSettingsDictionary | Error> {
+  static async getTabs(): Promise<TabSettingsDictionary | Error | null> {
     let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabSettingsDictionary>("get_tabs", {});
-
     if (result.success) {
       //* Verify the config data.
-      if (!validateTabs(result.result)) {
-        PythonInterop.error(`Tabs were corrupted.`);
-        PythonInterop.setTabs({});
-        PythonInterop.toast("Error", "Config corrupted, please restart.");
-        return {};
+      if (!validateTabStructure(result.result)) {
+
+        return null;
       }
 
       return result.result;
@@ -242,7 +253,7 @@ export class PythonInterop {
    */
   static async setTabs(tabs: TabSettingsDictionary): Promise<void | Error> {
     //* Verify the config
-    if (!validateTabs(tabs)) {
+    if (!validateTabStructure(tabs)) {
       PythonInterop.error(`Tabs were corrupted when trying to set.`);
       PythonInterop.toast("Error", "Config corrupted, please restart.");
       return;
