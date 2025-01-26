@@ -1,7 +1,7 @@
 import { EditableTabSettings } from "../components/modals/EditTabModal";
 import { TabFilterSettings, FilterType, Filter } from "../components/filters/Filters";
 import { PythonInterop } from "../lib/controllers/PythonInterop";
-import { CustomTabContainer } from "../components/CustomTabContainer";
+import { CustomTabContainer } from "./CustomTabContainer";
 import { v4 as uuidv4 } from "uuid";
 import { IReactionDisposer, reaction } from "mobx";
 import { defaultTabsSettings, getNonBigIntUserId } from "../lib/Utils";

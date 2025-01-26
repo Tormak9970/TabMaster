@@ -15,20 +15,20 @@ import { VFC, useState } from "react";
 import { FaBook, FaCircleExclamation, FaBookmark, FaArrowUpFromBracket } from "react-icons/fa6";
 import { PiListPlusBold } from "react-icons/pi";
 
-import { useTabMasterContext } from "../state/TabMasterContext";
+import { useTabMasterContext } from "../../state/TabMasterContext";
 
-import { QamStyles } from "./styles/QamStyles";
-import { showModalNewTab } from "./modals/EditTabModal";
-import { TabActionsButton } from "./TabActions";
-import { LogController } from "../lib/controllers/LogController";
-import { PresetMenu } from './context-menus/PresetMenu';
-import { TabListLabel } from './TabListLabel';
-import { MicroSDeckInstallState, MicroSDeckInterop, microSDeckLibVersion } from '../lib/controllers/MicroSDeckInterop';
+import { QamStyles } from "../styles/QamStyles";
+import { showModalNewTab } from "../modals/EditTabModal";
+import { TabActionsButton } from "../other/TabActions";
+import { LogController } from "../../lib/controllers/LogController";
+import { PresetMenu } from '../context-menus/PresetMenu';
+import { TabListLabel } from '../other/TabListLabel';
+import { MicroSDeckInstallState, MicroSDeckInterop, microSDeckLibVersion } from '../../lib/controllers/MicroSDeckInterop';
 import { MicroSDeckNotice } from './MicroSDeckNotice';
-import { CustomTabContainer } from './CustomTabContainer';
-import { TabProfilesMenu } from './context-menus/TabProfileMenu';
-import { TabMasterManager } from '../state/TabMasterManager';
-import { PythonInterop } from "../lib/controllers/PythonInterop";
+import { CustomTabContainer } from '../../state/CustomTabContainer';
+import { TabProfilesMenu } from '../context-menus/TabProfileMenu';
+import { TabMasterManager } from '../../state/TabMasterManager';
+import { PythonInterop } from "../../lib/controllers/PythonInterop";
 
 
 export type TabIdEntryType = {

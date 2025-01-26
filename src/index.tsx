@@ -17,7 +17,7 @@ import { patchSettings } from "./patches/SettingsPatch";
 
 import { MicroSDeck } from "@cebbinghaus/microsdeck";
 import { MicroSDeckInterop } from './lib/controllers/MicroSDeckInterop';
-import { QuickAccessContent, QuickAccessTitleView } from "./components/QuickAccessContent";
+import { QuickAccessContent, QuickAccessTitleView } from "./components/qam/QuickAccessContent";
 import { DocsRouter } from "./components/docs/DocsRouter";
 import { Fragment } from 'react';
 
