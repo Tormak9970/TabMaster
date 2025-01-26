@@ -1,6 +1,6 @@
 {
   "name": "TabMaster",
-  "author": "Travis Lane (Tormak), Jessebofill, & Kernel Panic",
+  "author": "Travis Lane (Tormak), Jesse Bofill, & Kernel Panic",
   "flags": ["debug"],
   "publish": {
     "tags": ["Customization", "Library", "Tabs"],
