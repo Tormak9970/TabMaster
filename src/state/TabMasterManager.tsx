@@ -584,11 +584,7 @@ export class TabMasterManager {
         this.invalidSettingsLoaded.isTrue = true;
         await this.invalidSettingsLoaded.waitForResetConfirmation;
         const res = await PythonInterop.backupDefaultDir(AUTO_BACKUP_NAME);
-        if (res !== true) {
-          Navigation.CloseSideMenus();
-          LogController.raiseError("Couldn't backup settings");
-          return; 
-        }
+        if (res !== true) return LogController.raiseError("Couldn't backup settings");
         settings = {};
       }
 

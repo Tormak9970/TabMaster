@@ -1,6 +1,7 @@
-import { DialogButton, Field } from 'decky-frontend-lib';
+import { DialogButton, Field, showModal } from 'decky-frontend-lib';
 import { FC } from 'react';
 import { FaCircleExclamation } from 'react-icons/fa6';
+import { DestructiveModal } from '../generic/DestructiveModal';
 
 interface InvalidSettingsAlertProps {
   onOk: () => void;
@@ -8,6 +9,14 @@ interface InvalidSettingsAlertProps {
 
 export const InvalidSettingsNotice: FC<InvalidSettingsAlertProps> = ({ onOk, children }) => {
   const confMsg = 'Reset';
+
+  const onConfirm = () => {
+    showModal(
+      <DestructiveModal onOK={onOk} strTitle="Reset Tabs" >
+        Are you sure you want to reset tabs? A backup will be created in ~/homebrew/settings/TabMaster.
+      </DestructiveModal>
+    );
+  };
 
   return (
     <div className='notice-field-cont' style={{ paddingBottom: '10px' }}>
@@ -26,7 +35,7 @@ export const InvalidSettingsNotice: FC<InvalidSettingsAlertProps> = ({ onOk, chi
           </div>
           {children}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <DialogButton style={{ margin: '10px 8px 0px', width: 'auto' }} onClick={onOk} onOKActionDescription={confMsg}>
+            <DialogButton style={{ margin: '10px 8px 0px', width: 'auto' }} onClick={onConfirm} onOKActionDescription={confMsg}>
               {confMsg}
             </DialogButton>
           </div>
