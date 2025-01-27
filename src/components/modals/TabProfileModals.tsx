@@ -3,7 +3,7 @@ import { VFC, useState, Fragment, FC } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabProfileModalStyles } from "../styles/TabProfileModalStyles";
-import { TabListLabel } from '../TabListLabel';
+import { TabListLabel } from '../other/TabListLabel';
 import { ScrollableWindow } from '../generic/ScrollableWindow';
 import { DestructiveModal } from '../generic/DestructiveModal';
 

@@ -1,6 +1,8 @@
-import { ServerAPI } from "decky-frontend-lib";
-import { validateTabs } from "../Utils";
+import { FileSelectionType, ServerAPI } from "decky-frontend-lib";
+import { getCompactTimestamp, validateTabStructure } from "../Utils";
 import { TabProfileDictionary } from '../../state/TabProfileManager';
+import { PluginController } from './PluginController';
+import { USER_BACKUP_NAME } from '../../constants';
 
 /**
  * Class for frontend -> backend communication.
@@ -17,6 +19,45 @@ export class PythonInterop {
   }
 
   /**
+   * Gets the user's desktop path.
+   * @returns The path.
+   */
+  static async getUserDesktopPath(): Promise<string | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, string>("get_user_desktop", {});
+
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+
+  /**
+   * Gets a folder chosen by the user.
+   * @returns The choosen folder.
+   */
+  static async openFolder(): Promise<string | Error> {
+    const startPath = await this.getUserDesktopPath();
+
+    if (startPath instanceof Error) {
+      return startPath;
+    }
+
+    const res = await this.serverAPI.openFilePickerV2(
+      FileSelectionType.FOLDER,
+      startPath,
+      false,
+      true,
+      undefined,
+      undefined,
+      false,
+      false,
+    );
+
+    return res.realpath;
+  }
+
+  /**
    * Gets the interop's serverAPI.
    */
   static get server(): ServerAPI { return this.serverAPI; }
@@ -25,9 +66,36 @@ export class PythonInterop {
    * Logs a message to the plugin's log file and the frontend console.
    * @param message The message to log.
    */
-  static async log(message: String): Promise<void> {
-    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 0 });
+  static async log(message: string): Promise<void> {
+    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("log_message", { message: `[front-end]: ${message}`, level: 0 });
   }
+  
+  /**
+   * Backs up the plugin's settings to prevent them from being corrupted.
+   * @param destPath The path to copy the settings to.
+   */
+  static async backupSettings(destPath: string): Promise<boolean | Error> {
+    const result = await this.serverAPI.callPluginMethod<{ dest_path: string }, boolean>("backup_settings", { dest_path: `${destPath}/${USER_BACKUP_NAME}_${getCompactTimestamp()}.json` });
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+
+    /**
+   * Backs up the plugin's settings to default settings dir.
+   * @param name The name to give the file.
+   */
+  static async backupDefaultDir(name: string): Promise<boolean | Error> {
+    const result = await this.serverAPI.callPluginMethod<{}, boolean>("backup_default_dir", { name: `${name}_${getCompactTimestamp()}` });
+    if (result.success) {
+      return result.result;
+    } else {
+      return new Error(result.result);
+    }
+  }
+
 
   /**
    * Logs a warning to the plugin's log file and the frontend console.
@@ -101,19 +169,12 @@ export class PythonInterop {
 
   /**
    * Gets the plugin's tabs.
-   * @returns A promise resolving to the plugin's tabs.
+   * @returns A promise resolving to the plugin's tabs or null when the tab structure fails validation
    */
-  static async getTabs(): Promise<TabSettingsDictionary | Error> {
+  static async getTabs(): Promise<TabSettingsDictionary | Error | null> {
     let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabSettingsDictionary>("get_tabs", {});
-
     if (result.success) {
-      //* Verify the config data.
-      if (!validateTabs(result.result)) {
-        PythonInterop.error(`Tabs were corrupted.`);
-        PythonInterop.setTabs({});
-        PythonInterop.toast("Error", "Config corrupted, please restart.");
-        return {};
-      }
+      if (!validateTabStructure(result.result))  return null;
 
       return result.result;
     } else {
@@ -188,7 +249,7 @@ export class PythonInterop {
    */
   static async setTabs(tabs: TabSettingsDictionary): Promise<void | Error> {
     //* Verify the config
-    if (!validateTabs(tabs)) {
+    if (!validateTabStructure(tabs)) {
       PythonInterop.error(`Tabs were corrupted when trying to set.`);
       PythonInterop.toast("Error", "Config corrupted, please restart.");
       return;
@@ -273,9 +334,10 @@ export class PythonInterop {
    * @param message The message of the toast.
    */
   static toast(title: string, message: string): void {
-    return (() => {
+    setTimeout(() => {
+      if (PluginController.isDismounted) return;
       try {
-        return this.serverAPI.toaster.toast({
+        this.serverAPI.toaster.toast({
           title: title,
           body: message,
           duration: 8000,
@@ -283,6 +345,6 @@ export class PythonInterop {
       } catch (e) {
         console.log("Toaster Error", e);
       }
-    })();
+    }, 200)
   }
 }

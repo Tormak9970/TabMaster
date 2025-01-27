@@ -9,7 +9,7 @@ import {
 } from "decky-frontend-lib";
 import { ReactElement, useEffect, useState } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
-import { CustomTabContainer } from "../components/CustomTabContainer";
+import { CustomTabContainer } from "../state/CustomTabContainer";
 import { LogController } from "../lib/controllers/LogController";
 import { LibraryMenu } from '../components/context-menus/LibraryMenu';
 import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';

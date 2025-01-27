@@ -24,13 +24,50 @@ class Plugin:
 
   settings: SettingsManager
 
-  async def logMessage(self, message, level):
+  async def log_message(self, message, level):
     if level == 0:
       log(message)
     elif level == 1:
       warn(message)
     elif level == 2:
       error(message)
+
+  async def get_user_desktop(self) -> str:
+    return os.environ["DECKY_USER_HOME"] + "/Desktop"
+
+  async def backup_settings(self, dest_path: str) -> bool:
+    """
+    Waits until users_dict is loaded, then returns users_dict
+
+    :return: The users dictionary
+    """
+    while Plugin.users_dict is None:
+      await asyncio.sleep(0.1)
+
+    success = True
+
+    try:
+      with open(dest_path, 'w', encoding='utf-8') as settings_file:
+        json.dump(self.settings.settings, settings_file, ensure_ascii=False, indent=4)
+    except:
+      success = False
+
+    return success
+  
+  async def backup_default_dir(self, name: str) -> bool:
+    success = True
+    backup = SettingsManager(name=name, settings_directory=os.environ["DECKY_PLUGIN_SETTINGS_DIR"])
+    backup.settings = self.settings.settings
+    try:
+      backup.commit()
+    except:
+      try:
+        os.remove(backup.path)
+      except:
+          pass
+      success = False
+      
+    return success
 
   # Plugin settings getters
   async def get_users_dict(self) -> dict[str, dict] | None:

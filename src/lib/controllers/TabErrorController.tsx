@@ -4,7 +4,7 @@ import { validateFilter } from '../../components/filters/Filters';
 import { FixTabErrorsModalRoot } from '../../components/modals/FixTabErrorsModal';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { EditableTabSettings } from '../../components/modals/EditTabModal';
-import { CustomTabContainer } from '../../components/CustomTabContainer';
+import { CustomTabContainer } from '../../state/CustomTabContainer';
 
 /**
  * Hanldes the tab filter validation process.
