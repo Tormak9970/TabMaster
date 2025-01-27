@@ -20,7 +20,7 @@ import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";
 import { IncludeCategories, capitalizeFirstLetter, getIncludedCategoriesFromBitField, playUISound, updateCategoriesToIncludeBitField } from "../../lib/Utils";
 import { BiSolidDownArrow } from "react-icons/bi";
-import { CustomTabContainer } from '../CustomTabContainer';
+import { CustomTabContainer } from '../../state/CustomTabContainer';
 import { useSortingMenuItems } from '../../hooks/useSortingMenuItems';
 
 export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>;

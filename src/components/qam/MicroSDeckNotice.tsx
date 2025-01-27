@@ -1,5 +1,5 @@
 import { VFC, CSSProperties } from 'react';
-import { MicroSDeckInstallState } from '../lib/controllers/MicroSDeckInterop';
+import { MicroSDeckInstallState } from '../../lib/controllers/MicroSDeckInterop';
 
 interface MicroSDeckNoticeProps {
   intallState: MicroSDeckInstallState,

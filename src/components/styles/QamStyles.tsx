@@ -1,5 +1,7 @@
-import { gamepadDialogClasses, quickAccessControlsClasses } from "decky-frontend-lib";
+import { gamepadDialogClasses, quickAccessControlsClasses, scrollPanelClasses } from "decky-frontend-lib";
 import { VFC } from "react";
+
+ const deckyQamTabClass = 'tab_undefined'
 
 /**
  * All css styling for the Quick Access Menu part of TabMaster.
@@ -7,12 +9,15 @@ import { VFC } from "react";
 export const QamStyles: VFC<{}> = ({}) => {
   return (
     <style>{`
+      .${deckyQamTabClass}.${scrollPanelClasses.ScrollPanel} {
+        scroll-padding: 48px 0px 0px;
+      }
+        
       .tab-master-scope {
         width: inherit;
         height: inherit;
 
         flex: 1 1 1px;
-        scroll-padding: 48px 0px;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;

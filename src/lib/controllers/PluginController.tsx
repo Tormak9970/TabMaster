@@ -47,7 +47,8 @@ export class PluginController {
   private static steamController: SteamController;
 
   private static onWakeSub: Unregisterer;
-
+  static isDismounted: boolean;
+  
   /**
    * Sets the plugin's serverAPI.
    * @param server The serverAPI to use.
@@ -131,6 +132,7 @@ export class PluginController {
    * Function to run when the plugin dismounts.
    */
   static dismount(): void {
+    this.isDismounted = true;
     if (this.onWakeSub) this.onWakeSub.unregister();
 
     this.tabMasterManager.disposeReactions();

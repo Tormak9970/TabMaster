@@ -1,9 +1,5 @@
 import { sleep } from 'decky-frontend-lib';
 import { FilterType, TabFilterSettings } from "../components/filters/Filters";
-import { Fragment } from 'react';
-import { FaSteam } from 'react-icons/fa6';
-import { FaSdCard } from 'react-icons/fa';
-import { CustomTabContainer } from '../components/CustomTabContainer';
 import { GamepadUIAudio, SFXPath } from './GamepadUIAudio';
 
 /**
@@ -100,7 +96,7 @@ export const defaultTabsSettings: TabSettingsDictionary = {
  * @param tabs The tabs to check.
  * @returns True if there were no issues.
  */
-export function validateTabs(tabs: TabSettingsDictionary): boolean {
+export function validateTabStructure(tabs: TabSettingsDictionary): boolean {
   return Object.values(tabs).every((tab: TabSettings) => {
     if (tab.filters) {
       if (!Object.keys(tab).includes("filtersMode")) tab.filtersMode = "and";
@@ -229,19 +225,24 @@ export function filtersHaveType(filters: TabFilterSettings<FilterType>[], ...fil
 }
 
 /**
- * Gets the icon if any that's displayed anywhere tabs are listed.
- * @param tabContainer The tabContaine to get icon for.
- * @param microSDeckDisabled Whether or not microSDeck icon should be disabled.
- * @returns The icon element or a fragment.
- */
-export function getTabIcon(tabContainer: TabContainer, microSDeckDisabled?: boolean) {
-  return tabContainer.filters ? ((tabContainer as CustomTabContainer).dependsOnMicroSDeck ? <FaSdCard fill={microSDeckDisabled ? '#92939b61' : 'currentColor'} /> : <Fragment />) : <FaSteam />
-}
-
-/**
  * Plays audio url while respecting whether user has ui sounds enabled/ disabled
  *  @param path Audio url 
  */
 export function playUISound(path: SFXPath) {
   if (settingsStore?.m_ClientSettings?.enable_ui_sounds) GamepadUIAudio.AudioPlaybackManager.PlayAudioURL(path);
+}
+
+/**
+ * Gets current timestamp in compact form
+ * @returns String "YYMMDD-HHMM"
+ */
+export function getCompactTimestamp() {
+  const now = new Date();
+  const year = String(now.getFullYear()).slice(-2);
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+
+  return `${year}${month}${day}-${hours}${minutes}`;
 }

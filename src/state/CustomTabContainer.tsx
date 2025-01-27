@@ -1,8 +1,8 @@
-import { EditableTabSettings } from "./modals/EditTabModal";
-import { TabFilterSettings, FilterType, Filter } from "./filters/Filters";
+import { EditableTabSettings } from "../components/modals/EditTabModal";
+import { TabFilterSettings, FilterType, Filter } from "../components/filters/Filters";
 import { filtersHaveType, getIncludedCategoriesFromBitField } from "../lib/Utils";
 import { gamepadTabbedPageClasses, showModal } from "decky-frontend-lib";
-import { SortOverrideMessage } from './modals/SortOverrideMessage';
+import { SortOverrideMessage } from '../components/modals/SortOverrideMessage';
 
 /**
  * Wrapper for injecting custom tabs.

@@ -1,4 +1,4 @@
-import { CustomTabContainer } from '../components/CustomTabContainer';
+import { CustomTabContainer } from './CustomTabContainer';
 import { PythonInterop } from '../lib/controllers/PythonInterop';
 import { TabMasterManager } from './TabMasterManager';
 
