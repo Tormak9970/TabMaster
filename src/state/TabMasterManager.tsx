@@ -10,7 +10,6 @@ import { PresetName, PresetOptions, getPreset } from '../presets/presets';
 import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
 import { TabErrorController } from '../lib/controllers/TabErrorController';
 import { TabProfileManager } from './TabProfileManager';
-import { Navigation } from 'decky-frontend-lib';
 import { AUTO_BACKUP_NAME } from '../constants';
 
 /**
@@ -605,6 +604,7 @@ export class TabMasterManager {
   private finishLoadingTabs(tabsSettings: TabSettingsDictionary): void {
     const visibleTabContainers: TabContainer[] = [];
     const hiddenTabContainers: TabContainer[] = [];
+    const existingPositions: TabContainer[] = [];
     const favoritesCollection = collectionStore.GetCollection("favorite");
     const soundtracksCollection = collectionStore.GetCollection('type-music');
     this.userHasVisibleFavorites = favoritesCollection && favoritesCollection.visibleApps.length > 0;
@@ -632,7 +632,7 @@ export class TabMasterManager {
       if (soundtracksOriginalIndex !== null && soundtracksOriginalIndex > -1 && tabContainer.position > soundtracksOriginalIndex) {
         tabContainer.position--;
       }
-      tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer);
+      tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] ? existingPositions.push(tabContainer) : visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer);
 
       if (filters) {
         const flatFilters = flattenFilters(filters);
@@ -640,7 +640,9 @@ export class TabMasterManager {
       }
     }
 
-    this.visibleTabsList = visibleTabContainers;
+    existingPositions.forEach(tabContainer => visibleTabContainers.splice(tabContainer.position, 0, tabContainer));
+    this.visibleTabsList = visibleTabContainers.filter(elt => elt);
+    this.visibleTabsList.forEach((tabContainer, i) => tabContainer.position = i);
     this.hiddenTabsList = hiddenTabContainers;
     this.hasLoaded = true;
 
