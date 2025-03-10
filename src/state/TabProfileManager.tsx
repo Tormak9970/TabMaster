@@ -14,6 +14,11 @@ export class TabProfileManager {
    * @param tabProfiles The existing tab profiles the current user has.
    */
   constructor(tabProfiles: TabProfileDictionary) {
+    Object.values(tabProfiles).forEach((tabs) => tabs.forEach((tabId, index) => {
+      if (tabId === 'DeckGames') {
+        tabs[index] = 'GreatOnDeck';
+      }
+    }));
     this.tabProfiles = tabProfiles;
   }
 
