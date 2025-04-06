@@ -17,7 +17,7 @@ import { IoGameController, IoGrid } from "react-icons/io5";
 import { BsWindow } from "react-icons/bs";
 import { IconType } from "react-icons/lib";
 
-import { FilterType, ReviewScoreType, TabFilterSettings, ThresholdCondition, TimeUnit, compatCategoryToLabel } from "./Filters";
+import { FilterType, ReviewScoreType, SdCardParamType, TabFilterSettings, ThresholdCondition, TimeUnit, compatCategoryToLabel } from "./Filters";
 import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMasterContext";
 import { ModeMultiSelect } from "../multi-selects/ModeMultiSelect";
 import { EditMergeFilterModal } from "../modals/EditMergeFilterModal";
@@ -963,12 +963,17 @@ const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({ index, setCon
   const dropdownOptions: DropdownOption[] = [
     {
       label: "Inserted Card",
-      data: undefined,
+      data: SdCardParamType.INSTALLED,
     },
     {
       label: "Specific Card",
       options: cardsAndGames.map(([card]) => { return { label: card.name || card.uid, data: card.uid } })
-    }];
+    },
+    {
+      label: "Any Card",
+      data: SdCardParamType.ANY
+    }
+  ];
 
   function onChange({data}: SingleDropdownOption) {
     const updatedFilter = { ...filter };
@@ -981,8 +986,8 @@ const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({ index, setCon
   return (
     <Field
       label="Micro SD Card"
-      description={<Dropdown rgOptions={dropdownOptions} selectedOption={filter.params.card} onChange={onChange} disabled={!isMicroSDeckInstalled} />}
-    />
+      description={<Dropdown rgOptions={dropdownOptions} selectedOption={filter.params.card ?? SdCardParamType.INSTALLED} onChange={onChange} disabled={!isMicroSDeckInstalled} />}
+    />                                                                                    //^ back compat for undefined as installed card
   );
 };
 
