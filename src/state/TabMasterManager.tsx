@@ -244,7 +244,7 @@ export class TabMasterManager {
    * @param storeTagLocalizationMap The store tag localization map.
    */
   private storeTagReaction(storeTagLocalizationMap: StoreTagLocalizationMap) {
-    if (storeTagLocalizationMap) {
+    if (storeTagLocalizationMap && typeof storeTagLocalizationMap.entries === 'function') {
       const tagEntriesArray = Array.from(storeTagLocalizationMap.entries());
 
       this.allStoreTags = tagEntriesArray.map(([_, entry]) => {
