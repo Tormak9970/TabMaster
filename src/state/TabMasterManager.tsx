@@ -32,6 +32,10 @@ function flattenFilters(filters: TabFilterSettings<FilterType>[]): TabFilterSett
   return res;
 }
 
+function isDepreciatedStoreMap(storeTagMap: StoreTagLocalizationMap): storeTagMap is DepreciatedStoreTagLocalizationMap {
+  return (storeTagMap as DepreciatedStoreTagLocalizationMap).entries !== undefined;
+}
+
 /**
  * Class that handles TabMaster's core state.
  */
@@ -93,8 +97,6 @@ export class TabMasterManager {
       resolve(0);
     });
   }
-
-
 
   private handleMicroSDeckChange() {
     if (!this.hasLoaded) return;
@@ -245,14 +247,25 @@ export class TabMasterManager {
    */
   private storeTagReaction(storeTagLocalizationMap: StoreTagLocalizationMap) {
     if (storeTagLocalizationMap) {
-      const tagEntriesArray = Array.from(storeTagLocalizationMap.entries());
+      if (isDepreciatedStoreMap(storeTagLocalizationMap)) {
+        const tagEntriesArray = Array.from(storeTagLocalizationMap.entries());
 
-      this.allStoreTags = tagEntriesArray.map(([_, entry]) => {
-        return {
-          tag: entry.tagid,
-          string: entry.name
-        };
-      });
+        this.allStoreTags = tagEntriesArray.map(([_, entry]) => {
+          return {
+            tag: entry.tagid,
+            string: entry.name
+          };
+        });
+      } else {
+        const tagEntriesArray = Object.entries(storeTagLocalizationMap);
+
+        this.allStoreTags = tagEntriesArray.map(([_, entry]) => {
+          return {
+            tag: parseInt(entry[0]),
+            string: entry[1]
+          };
+        });
+      }
 
       PythonInterop.setTags(this.allStoreTags);
     } else {
