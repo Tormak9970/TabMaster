@@ -1,5 +1,5 @@
 import { Fragment, VFC, createElement } from "react";
-import { FilterIcons, FilterType, TabFilterSettings, compatCategoryToLabel } from "./Filters";
+import { FilterIcons, FilterType, SdCardParamType, TabFilterSettings, compatCategoryToLabel } from "./Filters";
 import { dateToLabel } from '../generic/DatePickers';
 import { capitalizeEachWord } from '../../lib/Utils';
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
@@ -146,9 +146,19 @@ const AchievementsFilterPreview: VFC<FilterPreviewProps<'achievements'>> = ({ fi
 };
 
 const SDCardFilterPreview: VFC<FilterPreviewProps<'sd card'>> = ({ filter }) => {
-  const isInsertCard = !filter.params.card;
-  const card = (MicroSDeckInterop.isInstallOk() && window.MicroSDeck?.CardsAndGames.find(([card]) => card.uid === filter.params.card)?.[0].name) || filter.params.card;
-  return <FilterPreviewGeneric filter={filter} displayData={isInsertCard ? 'Inserted Card' : card} isInverted={filter.inverted} />;
+  let label: string;
+  switch (filter.params.card) {
+          case SdCardParamType.ANY:
+            label = "Any";
+            break;
+          case SdCardParamType.INSTALLED:
+          case undefined:
+            label = "Inserted";
+            break;
+          default:
+            label = (MicroSDeckInterop.isInstallOk() && window.MicroSDeck?.CardsAndGames.find(([card]) => card.uid === filter.params.card)?.[0].name) || filter.params.card;
+        }
+  return <FilterPreviewGeneric filter={filter} displayData={label} isInverted={filter.inverted} />;
 }
 
 /**

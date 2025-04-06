@@ -10,12 +10,18 @@ import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCompactDisc, FaList
 import { BsClockHistory, BsRegex } from "react-icons/bs";
 import { LuCombine } from "react-icons/lu";
 import { LogController } from "../../lib/controllers/LogController";
+import { CardAndGames } from '@cebbinghaus/microsdeck';
 
 export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'purchase date' | 'last played' | 'family sharing' | 'demo' | 'streamable' | 'steam features' | 'achievements' | 'sd card';
 
 export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
 export type ReviewScoreType = 'metacritic' | 'steampercent';
+
+export enum SdCardParamType {
+  INSTALLED = 0,
+  ANY
+};
 
 type CollectionFilterParams = {
   id: SteamCollection['id'],
@@ -56,7 +62,7 @@ type AchievementsFilterParams = {
   thresholdType: "count" | "percent",
   condition: ThresholdCondition
 }
-type SdCardParams = { card: undefined | string }; //use undefined for currently inserted card
+type SdCardParams = { card: SdCardParamType | string | undefined }; //inserted card/ any card/ card uid (undefined value is legacy)
 
 // appOverview.rt_purchased_time
 
@@ -120,7 +126,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "streamable": { isStreamable: true },
   "steam features": { features: [], mode: 'and' },
   "achievements": { threshold: 10, thresholdType: "percent", condition: 'above' },
-  "sd card": { card: undefined }
+  "sd card": { card: SdCardParamType.INSTALLED }
 }
 
 /**
@@ -372,7 +378,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       const cardFilter = filter as TabFilterSettings<'sd card'>;
 
       let passed = true;
-      if (MicroSDeckInterop.isInstallOk() && window.MicroSDeck!.Enabled && cardFilter.params.card) {
+      if (MicroSDeckInterop.isInstallOk() && window.MicroSDeck!.Enabled && typeof cardFilter.params.card === 'string') {
         const cardsAndGames = window.MicroSDeck!.CardsAndGames || [];
 
         if (!cardsAndGames.find(([card]) => cardFilter.params.card === card.uid)) {
@@ -620,11 +626,20 @@ export class Filter {
       }
     },
     'sd card': (params: FilterParams<'sd card'>, appOverview: SteamAppOverview) => {
-      const card = params.card === undefined ? window.MicroSDeck?.CurrentCardAndGames : window.MicroSDeck?.CardsAndGames?.find(([card]) => card.uid == params.card);
-
+      const isOnCard = (card: CardAndGames) => !!card[1].find((game) => +game.uid == appOverview.appid);
+      let card: CardAndGames | undefined;
+      switch (params.card) {
+        case SdCardParamType.ANY:
+          return window.MicroSDeck?.CardsAndGames?.find(isOnCard);
+        case SdCardParamType.INSTALLED:
+        case undefined:
+          card = window.MicroSDeck?.CurrentCardAndGames;
+          break;
+        default:
+          card = window.MicroSDeck?.CardsAndGames?.find(([card]) => card.uid == params.card);
+      }
       if (!card) return false;
-
-      return !!card[1].find((game) => +game.uid == appOverview.appid);
+      return isOnCard(card);
     }
   };
 
