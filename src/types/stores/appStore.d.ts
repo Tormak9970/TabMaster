@@ -5,7 +5,10 @@ type StoreTagLocalizationEntry = {
   name: string;
 }
 
-type StoreTagLocalizationMap = Map<number, StoreTagLocalizationEntry>;
+// TODO: remove this once 3.6.22 hits stable
+type DepreciatedStoreTagLocalizationMap = Map<number, StoreTagLocalizationEntry>;
+
+type StoreTagLocalizationMap = DepreciatedStoreTagLocalizationMap | Record<number, string>;
 
 type AppStore = {
   GetAppOverviewByAppID: (appId: number) => SteamAppOverview | null;
