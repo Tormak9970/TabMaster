@@ -259,10 +259,10 @@ export class TabMasterManager {
       } else {
         const tagEntriesArray = Object.entries(storeTagLocalizationMap);
 
-        this.allStoreTags = tagEntriesArray.map(([_, entry]) => {
+        this.allStoreTags = tagEntriesArray.map(([tag, string]) => {
           return {
-            tag: parseInt(entry[0]),
-            string: entry[1]
+            tag: parseInt(tag),
+            string
           };
         });
       }

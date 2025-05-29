@@ -9,7 +9,7 @@ jobs:
   create-release:
     permissions:
       contents: write
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     outputs:
       release_id: ${{ steps.create-release.outputs.result }}
       tag: ${{ steps.create-release.outputs.tag }}
@@ -52,7 +52,7 @@ jobs:
     needs: create-release
     permissions:
       contents: write
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
@@ -161,7 +161,7 @@ jobs:
     needs: [create-release, build-plugin]
     permissions:
       contents: write
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
