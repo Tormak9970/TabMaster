@@ -42,7 +42,7 @@ interface SteamClient {
 type SteamTab = {
   title: string,
   id: string,
-  content: React.ReactElement<TabContentProps>,
+  content: React.ReactElement,
   footer?: {
     onOptionsActionDescription?: string,
     onOptionsButton?: () => any,
@@ -54,8 +54,7 @@ type SteamTab = {
   renderTabAddon: () => any //Returns a reactElement
 }
 
-type TabContentComponent = React.VoidFunctionComponent<TabContentProps>
-interface TabContentProps {
+interface TabAppGridComponentProps {
   collection: Collection
   eSortBy: number
   setSortBy: (e: any) => void

@@ -16,3 +16,7 @@ interface TabSettings extends TabContainer { }
 type TabSettingsDictionary = {
   [tabId: string]: TabSettings
 }
+
+type TabContext = React.Context<{ label: string } | null>
+
+type TabAppGridComponent = React.VoidFunctionComponent<TabAppGridComponentProps>
