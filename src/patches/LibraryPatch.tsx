@@ -24,8 +24,8 @@ let TabAppGridComponent: TabAppGridComponent | undefined;
  * @returns A routepatch for the library.
  */
 export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager): RoutePatch => {
-  //* This only runs 1 time, which is perfect
-  return serverAPI.routerHook.addPatch("/library", (props: { path: string; children: ReactElement; }) => {
+  
+  const patch = (props: { path: string; children: ReactElement; }) => {
     afterPatch(props.children, "type", (_: Record<string, unknown>[], ret1: ReactElement) => {
       if (!ret1?.type) {
         LogController.raiseError('Failed to find outer library element to patch');
@@ -136,7 +136,15 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
     });
 
     return props;
-  });
+  }
+
+  const route = "/library";
+  //if you're decky team seeing this, it's necessary for leftover unremoved patches caused by decky spam loading the plugin when installing from store
+  const existingPatches = [...DeckyPluginLoader.routerHook.routerState._routePatches.get(route) ?? []].filter(existingPatch => patch.toString() === existingPatch.toString());
+  existingPatches.forEach(patch => serverAPI.routerHook.removePatch(route, patch as RoutePatch));
+
+  //* This only runs 1 time, which is perfect
+  return serverAPI.routerHook.addPatch(route, patch);
 };
 
 /**
