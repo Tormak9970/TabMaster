@@ -37,6 +37,7 @@ Available Filters:
  - **Merge** - Selects apps that pass a subgroup of filters.
  - **Platform** - Selects Steam or non-Steam apps.
  - **Deck Compatibility** - Selects apps that have a specific Steam Deck compatibilty status.
+ - **SteamOS Compatibility** - Selects apps that have a specific SteamOS compatibilty status.
  - **Review Score** - Selects apps that are greater/less than the provided metacritic/steam review score.
  - **Time Played** - Selects apps that have a play time greater/less than the provided time.
  - **Size on Disk** - Selects apps that have an install size greater/less than the provided size.
@@ -60,6 +61,7 @@ Filter Examples:
  - **Merge**<br/><img src="./assets/filters/docs_merge-example.png" width="600" />
  - **Platform**<br/><img src="./assets/filters/docs_platform-example.png" width="600" />
  - **Deck Compatibility**<br/><img src="./assets/filters/docs_deck-compat-example.png" width="600" />
+ - **SteamOS Compatibility**<br/><img src="./assets/filters/docs_steamos-compat-example.png" width="600" />
  - **Review Score**<br/><img src="./assets/filters/docs_review-score-example.png" width="600" />
  - **Time Played**<br/><img src="./assets/filters/docs_time-played-example.png" width="600" />
  - **Size on Disk**<br/><img src="./assets/filters/docs_size-on-disk-example.png" width="600" />

@@ -165,6 +165,7 @@ type SteamAppOverview = {
   status_percentage: number,
   store_category: number[],
   store_tag: number[],
+  steam_hw_compat_category_packed: number,
 }
 
 type SteamShortcut = {
