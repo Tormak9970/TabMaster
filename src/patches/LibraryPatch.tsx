@@ -14,6 +14,7 @@ import { CustomTabContainer } from "../state/CustomTabContainer";
 import { LogController } from "../lib/controllers/LogController";
 import { LibraryMenu } from '../components/context-menus/LibraryMenu';
 import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
+import { addPatch } from '../lib/Utils';
 
 let TabAppGridComponent: TabAppGridComponent | undefined;
 
@@ -24,8 +25,8 @@ let TabAppGridComponent: TabAppGridComponent | undefined;
  * @returns A routepatch for the library.
  */
 export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager): RoutePatch => {
-  //* This only runs 1 time, which is perfect
-  return serverAPI.routerHook.addPatch("/library", (props: { path: string; children: ReactElement; }) => {
+  
+  return addPatch("/library", (props: { path: string; children: ReactElement; }) => {
     afterPatch(props.children, "type", (_: Record<string, unknown>[], ret1: ReactElement) => {
       if (!ret1?.type) {
         LogController.raiseError('Failed to find outer library element to patch');
@@ -136,7 +137,8 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
     });
 
     return props;
-  });
+  },
+  serverAPI)
 };
 
 /**

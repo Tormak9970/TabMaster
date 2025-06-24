@@ -1,4 +1,4 @@
-import { sleep } from 'decky-frontend-lib';
+import { RoutePatch, ServerAPI, sleep } from 'decky-frontend-lib';
 import { FilterType, TabFilterSettings } from "../components/filters/Filters";
 import { GamepadUIAudio, SFXPath } from './GamepadUIAudio';
 
@@ -245,4 +245,14 @@ export function getCompactTimestamp() {
   const minutes = String(now.getMinutes()).padStart(2, '0');
 
   return `${year}${month}${day}-${hours}${minutes}`;
+}
+
+/**
+ * Ensures to remove leftover patch instances before continuing to add patch
+ */
+export function addPatch(route: string, patch: RoutePatch, serverAPI: ServerAPI) {
+    //if you're decky team seeing this, it's necessary for leftover unremoved patches caused by decky spam loading the plugin when installing from store
+    const existingPatches = [...DeckyPluginLoader.routerHook.routerState._routePatches.get(route) ?? []].filter(existingPatch => patch.toString() === existingPatch.toString());
+    existingPatches.forEach(patch => serverAPI.routerHook.removePatch(route, patch as RoutePatch));
+    return serverAPI.routerHook.addPatch(route, patch);
 }
