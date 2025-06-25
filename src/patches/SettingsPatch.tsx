@@ -2,6 +2,7 @@ import { afterPatch, ConfirmModal, findInTree, ServerAPI, showModal } from "deck
 import { ReactElement } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { LogController } from "../lib/controllers/LogController";
+import { addPatch } from '../lib/Utils';
 
 const findHome = (root: any) => {
   const filter = (node: any) => node?.type?.toString?.().includes('#HomeSettings_ShowingLess');
@@ -9,7 +10,7 @@ const findHome = (root: any) => {
 };
 
 export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager) => {
-  return serverAPI.routerHook.addPatch("/settings", (props: { path: string; children: ReactElement; }) => {
+  return addPatch("/settings", (props: { path: string; children: ReactElement; }) => {
     afterPatch(props.children, 'type', (_: any, ret1: any) => {
       if (!ret1?.type) {
         LogController.raiseError('Failed to find settings element to patch');
@@ -100,5 +101,6 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
     });
 
     return props;
-  });
+  },
+  serverAPI);
 };

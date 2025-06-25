@@ -5,18 +5,22 @@ import { DateIncludes, DateObj } from '../generic/DatePickers';
 import { STEAM_FEATURES_ID_MAP } from "./SteamFeatures";
 import { FaCheckCircle, FaHdd, FaSdCard, FaShoppingCart, FaTrophy, FaUserFriends } from "react-icons/fa";
 import { IoGrid } from "react-icons/io5";
-import { SiSteamdeck } from "react-icons/si";
+import { SiSteam, SiSteamdeck } from "react-icons/si";
 import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCompactDisc, FaListCheck, FaPlay, FaRegClock, FaSteam, FaTags, FaUserPlus } from "react-icons/fa6";
 import { BsClockHistory, BsRegex } from "react-icons/bs";
 import { LuCombine } from "react-icons/lu";
 import { LogController } from "../../lib/controllers/LogController";
 import { CardAndGames } from '@cebbinghaus/microsdeck';
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'purchase date' | 'last played' | 'family sharing' | 'demo' | 'streamable' | 'steam features' | 'achievements' | 'sd card';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'steamos compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'purchase date' | 'last played' | 'family sharing' | 'demo' | 'streamable' | 'steam features' | 'achievements' | 'sd card';
 
 export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
 export type ReviewScoreType = 'metacritic' | 'steampercent';
+
+function getSteamOSCompatCategory(app: SteamAppOverview) {
+    return app.steam_hw_compat_category_packed >> 4 & 3 || 0;
+}
 
 export enum SdCardParamType {
   INSTALLED = 0,
@@ -43,6 +47,7 @@ type BlacklistFilterParams = { games: number[] };
 type MergeFilterParams = { filters: TabFilterSettings<FilterType>[], mode: LogicalMode };
 type PlatformFilterParams = { platform: SteamPlatform };
 type DeckCompatFilterParams = { category: number };
+type SteamOSCompatFilterParams = { category: number };
 type ReviewScoreFilterParams = { scoreThreshold: number, condition: ThresholdCondition, type: ReviewScoreType };
 type TimePlayedFilterParams = { timeThreshold: number, condition: ThresholdCondition, units: TimeUnit };
 type SizeOnDiskFilterParams = { gbThreshold: number, condition: ThresholdCondition };
@@ -77,6 +82,7 @@ export type FilterParams<T extends FilterType> =
   T extends 'merge' ? MergeFilterParams :
   T extends 'platform' ? PlatformFilterParams :
   T extends 'deck compatibility' ? DeckCompatFilterParams :
+  T extends 'steamos compatibility' ? SteamOSCompatFilterParams :
   T extends 'review score' ? ReviewScoreFilterParams :
   T extends 'time played' ? TimePlayedFilterParams :
   T extends 'size on disk' ? SizeOnDiskFilterParams :
@@ -115,6 +121,7 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "merge": { filters: [], mode: 'and' },
   "platform": { platform: "steam" },
   "deck compatibility": { category: 3 },
+  "steamos compatibility": { category: 2 },
   "review score": { scoreThreshold: 50, condition: 'above', type: 'metacritic' },
   "time played": { timeThreshold: 60, condition: 'above', units: 'minutes' },
   "size on disk": { gbThreshold: 10, condition: 'above' },
@@ -143,6 +150,7 @@ export const FilterDescriptions: { [filterType in FilterType]: string } = {
   merge: "Selects apps that pass a subgroup of filters.",
   platform: "Selects Steam or non-Steam apps.",
   "deck compatibility": "Selects apps that have a specific Steam Deck compatibilty status.",
+  "steamos compatibility": "Selects apps that have a specific SteamOS compatibilty status.",
   "review score": "Selects apps based on their metacritic/steam review score.",
   "time played": "Selects apps based on your play time.",
   "size on disk": "Selects apps based on their install size.",
@@ -171,6 +179,7 @@ export const FilterIcons: { [filterType in FilterType]: IconType } = {
   merge: LuCombine,
   platform: FaSteam,
   "deck compatibility": SiSteamdeck,
+  "steamos compatibility": SiSteam,
   "review score": FaAward,
   "time played": FaRegClock,
   "size on disk": FaHdd,
@@ -199,6 +208,7 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "tags":
     case "merge":
     case "deck compatibility":
+    case "steamos compatibility":
     case "steam features":
     case "achievements":
     case "sd card":
@@ -252,6 +262,7 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
     case "installed":
     case "platform":
     case "deck compatibility":
+    case "steamos compatibility":
     case "review score":
     case "time played":
     case "demo":
@@ -278,6 +289,24 @@ export function compatCategoryToLabel(category: number): string {
       return "Playable";
     case 3:
       return "Verified";
+    default:
+      return "";
+  }
+}
+
+/**
+ * Gets the label for a provided SteamOS verified category.
+ * @param category The category to get the label for.
+ * @returns The label of the provided category.
+ */
+export function steamOSCompatCategoryToLabel(category: number): string {
+  switch (category) {
+    case 0:
+      return "Unknown";
+    case 1:
+      return "Unsupported";
+    case 2:
+      return "Compatible";
     default:
       return "";
   }
@@ -414,6 +443,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     case "blacklist":
     case "platform":
     case "deck compatibility":
+    case "steamos compatibility":
     case "review score":
     case "time played":
     case "release date":
@@ -486,6 +516,9 @@ export class Filter {
     },
     "deck compatibility": (params: FilterParams<'deck compatibility'>, appOverview: SteamAppOverview) => {
       return appOverview.steam_deck_compat_category === params.category;
+    },
+    "steamos compatibility": (params: FilterParams<'steamos compatibility'>, appOverview: SteamAppOverview) => {
+      return getSteamOSCompatCategory(appOverview) === params.category;
     },
     'review score': (params: FilterParams<'review score'>, appOverview: SteamAppOverview) => {
       const score = params.type === 'metacritic' ? appOverview.metacritic_score : appOverview.review_percentage;
