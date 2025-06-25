@@ -17,7 +17,7 @@ import { IoGameController, IoGrid } from "react-icons/io5";
 import { BsWindow } from "react-icons/bs";
 import { IconType } from "react-icons/lib";
 
-import { FilterType, ReviewScoreType, SdCardParamType, TabFilterSettings, ThresholdCondition, TimeUnit, compatCategoryToLabel } from "./Filters";
+import { FilterType, ReviewScoreType, SdCardParamType, TabFilterSettings, ThresholdCondition, TimeUnit, compatCategoryToLabel, steamOSCompatCategoryToLabel } from "./Filters";
 import { TabMasterContextProvider, useTabMasterContext } from "../../state/TabMasterContext";
 import { ModeMultiSelect } from "../multi-selects/ModeMultiSelect";
 import { EditMergeFilterModal } from "../modals/EditMergeFilterModal";
@@ -373,6 +373,30 @@ const DeckCompatFilterOptions: VFC<FilterOptionsProps<'deck compatibility'>> = (
     <Field
       label="Selected Compatibility"
       description={<Dropdown rgOptions={dropdownOptions} selectedOption={(filter as TabFilterSettings<'deck compatibility'>).params.category} onChange={onChange} />}
+    />
+  );
+};
+
+/**
+ * The options for a deck compatibility filter.
+ */
+const SteamOSCompatFilterOptions: VFC<FilterOptionsProps<'steamos compatibility'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const dropdownOptions: DropdownOption[] = [0, 1, 2].map((level) => {
+    return { label: steamOSCompatCategoryToLabel(level), data: level };
+  });
+
+  function onChange(selected: DropdownOption) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.category = selected.data;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  return (
+    <Field
+      label="Selected Compatibility"
+      description={<Dropdown rgOptions={dropdownOptions} selectedOption={(filter as TabFilterSettings<'steamos compatibility'>).params.category} onChange={onChange} />}
     />
   );
 };
@@ -1018,6 +1042,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <PlatformFilterOptions index={index} filter={filterCopy as TabFilterSettings<'platform'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "deck compatibility":
         return <DeckCompatFilterOptions index={index} filter={filterCopy as TabFilterSettings<'deck compatibility'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case "steamos compatibility":
+        return <SteamOSCompatFilterOptions index={index} filter={filterCopy as TabFilterSettings<'steamos compatibility'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "review score":
         return <ReviewScoreFilterOptions index={index} filter={filterCopy as TabFilterSettings<'review score'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "time played":

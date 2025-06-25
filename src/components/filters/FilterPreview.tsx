@@ -1,5 +1,5 @@
 import { Fragment, VFC, createElement } from "react";
-import { FilterIcons, FilterType, SdCardParamType, TabFilterSettings, compatCategoryToLabel } from "./Filters";
+import { FilterIcons, FilterType, SdCardParamType, TabFilterSettings, compatCategoryToLabel, steamOSCompatCategoryToLabel } from "./Filters";
 import { dateToLabel } from '../generic/DatePickers';
 import { capitalizeEachWord } from '../../lib/Utils';
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
@@ -65,6 +65,10 @@ const PlatformFilterPreview: VFC<FilterPreviewProps<'platform'>> = ({ filter }) 
 
 const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = ({ filter }) => {
   return <FilterPreviewGeneric filter={filter} displayData={compatCategoryToLabel(filter.params.category)} isInverted={filter.inverted} />;
+};
+
+const SteamOSCompatFilterPreview: VFC<FilterPreviewProps<'steamos compatibility'>> = ({ filter }) => {
+  return <FilterPreviewGeneric filter={filter} displayData={steamOSCompatCategoryToLabel(filter.params.category)} isInverted={filter.inverted} />;
 };
 
 const ReviewScoreFilterPreview: VFC<FilterPreviewProps<'review score'>> = ({ filter }) => {
@@ -187,6 +191,8 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <PlatformFilterPreview filter={filter as TabFilterSettings<'platform'>} />;
       case "deck compatibility":
         return <DeckCompatFilterPreview filter={filter as TabFilterSettings<'deck compatibility'>} />;
+      case "steamos compatibility":
+        return <SteamOSCompatFilterPreview filter={filter as TabFilterSettings<'steamos compatibility'>} />;
       case "review score":
         return <ReviewScoreFilterPreview filter={filter as TabFilterSettings<'review score'>} />;
       case "time played":

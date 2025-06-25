@@ -22,7 +22,7 @@ import { DocsRouter } from "./components/docs/DocsRouter";
 import { Fragment } from 'react';
 
 declare global {
-  let DeckyPluginLoader: { pluginReloadQueue: { name: string; version?: string; }[]; };
+  let DeckyPluginLoader: DeckyLoader;
   var MicroSDeck: MicroSDeck | undefined;
   var SteamClient: SteamClient;
   let collectionStore: CollectionStore;

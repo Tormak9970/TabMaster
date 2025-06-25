@@ -6,6 +6,7 @@ import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
 import importAssets from 'rollup-plugin-import-assets';
 import codegen from 'rollup-plugin-codegen';
+import polyfillNode from 'rollup-plugin-polyfill-node';
 
 import { name } from "./plugin.json";
 
@@ -15,6 +16,7 @@ const production = process.env.NODE_ENV !== 'development';
 export default defineConfig({
   input: './src/index.tsx',
   plugins: [
+    polyfillNode(),
     nodeResolve({ preferBuiltins: false, browser: true }),
     codegen(),
     commonjs(),

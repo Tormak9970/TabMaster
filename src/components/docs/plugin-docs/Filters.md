@@ -12,6 +12,7 @@
    - Blacklist
    - Platform
    - Deck Compatibility
+   - SteamOS Compatibility
    - Regex
    - Merge
    - Platform
@@ -179,6 +180,19 @@ Filters apps based on their Steam Deck compatability.
 
 **Example:**<br/>
 <img title="Deck Compat Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_deck-compat-example.png" />
+
+<br/>
+
+#### SteamOS Compatability
+**Options:**<br/>
+`compatability level` - The desired compatability level, either "Compatible", "Unsupported", or "Unkown".
+`inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
+
+**Behavior:**<br/>
+Filters apps based on their SteamOS Deck compatability.
+
+**Example:**<br/>
+<img title="SteamOS Compat Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_SteamOS-compat-example.png" />
 
 <br/>
 
