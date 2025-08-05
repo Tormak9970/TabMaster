@@ -133,6 +133,12 @@ export class TabMasterManager {
     // * subscribe to achievement cache changes
     this.addDisposer(reaction(() => appAchievementProgressCache.m_achievementProgress.mapCache.size, this.handleAchievementsReaction.bind(this)));
 
+    //* subscribe to app close for time played updates
+    this.addDisposer(SteamClient.GameSessions.RegisterForAppLifetimeNotifications(
+      (e) => !e.bRunning && // skip if game is running
+        Array.from(this.tabsMap.values()).find(tabContainer => tabContainer.filters && (tabContainer as CustomTabContainer).containsFilterType('time played')) && //skip if no time played filters exist
+        setTimeout(() => { this.rebuildCustomTabs(); this.update(); }, 3500)).unregister); //add slight dealy because sometimes app playtime runs 1 min behind
+
     this.handleFriendsReaction(friendStore.allFriends);
     this.storeTagReaction(appStore.m_mapStoreTagLocalization);
     MicroSDeckInterop.initEventHandlers({ change: this.handleMicroSDeckChange.bind(this) });
