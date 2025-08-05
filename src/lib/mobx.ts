@@ -1,4 +1,5 @@
 import { findModuleChild } from 'decky-frontend-lib';
+import { LogController } from './controllers/LogController';
 
 const mobxReactionFilter = (mod: any) => {
   if (!mod || typeof mod !== "object") return;
@@ -15,4 +16,7 @@ const mobxReactionFilter = (mod: any) => {
   }
 };
 
-export const reaction = findModuleChild(mobxReactionFilter) as typeof import("mobx").reaction;
+const res = findModuleChild(mobxReactionFilter);
+if (!res) LogController.raiseError('Could not find mobx.reaction')
+
+export const reaction = (res || (() => {})) as typeof import("mobx").reaction;
