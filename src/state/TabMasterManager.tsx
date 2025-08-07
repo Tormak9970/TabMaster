@@ -3,7 +3,6 @@ import { TabFilterSettings, FilterType, Filter } from "../components/filters/Fil
 import { PythonInterop } from "../lib/controllers/PythonInterop";
 import { CustomTabContainer } from "./CustomTabContainer";
 import { v4 as uuidv4 } from "uuid";
-import { IReactionDisposer, reaction } from "mobx";
 import { defaultTabsSettings, getNonBigIntUserId } from "../lib/Utils";
 import { LogController } from "../lib/controllers/LogController";
 import { PresetName, PresetOptions, getPreset } from '../presets/presets';
@@ -11,6 +10,7 @@ import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
 import { TabErrorController } from '../lib/controllers/TabErrorController';
 import { TabProfileManager } from './TabProfileManager';
 import { AUTO_BACKUP_NAME } from '../constants';
+import { reaction } from '../lib/mobx';
 
 /**
  * Converts a list of filters into a 1D array.
@@ -58,20 +58,8 @@ export class TabMasterManager {
 
   public microSDeckInstalled: boolean = false;
 
-  private allGamesReaction: IReactionDisposer | undefined;
-  private favoriteReaction: IReactionDisposer | undefined;
-  private soundtrackReaction: IReactionDisposer | undefined;
-  private installedReaction: IReactionDisposer | undefined;
-  private hiddenReaction: IReactionDisposer | undefined;
-  private nonSteamReaction: IReactionDisposer | undefined;
-
-  private collectionReactions: { [collectionId: string]: IReactionDisposer; } = {};
-
-  private friendsReaction: IReactionDisposer | undefined;
-  private tagsReaction: IReactionDisposer | undefined;
-  private achievementsReaction: IReactionDisposer | undefined;
-
-  private collectionRemoveReaction: IReactionDisposer | undefined;
+  private disposers: (() => void)[] = [];
+  private collectionDisposers: { [collectionId: string]: () => void; } = {};
 
   public tabProfileManager: TabProfileManager | undefined;
   public invalidSettingsLoaded: {
@@ -79,6 +67,7 @@ export class TabMasterManager {
     confirmReset: () => Promise<void>;
     waitForResetConfirmation: Promise<any>;
   };
+
 
   /**
    * Creates a new TabMasterManager.
@@ -111,44 +100,47 @@ export class TabMasterManager {
 
   private initReactions(): void {
     // * subscribe to changes to all games
-    this.allGamesReaction = reaction(() => collectionStore.GetCollection("type-games").allApps, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 600 });
+    this.addDisposer(reaction(() => collectionStore.GetCollection("type-games").allApps, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 600 }));
 
     // * subscribe to when visible favorites change
-    this.favoriteReaction = reaction(() => collectionStore.GetCollection('favorite').allApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this));
+    this.addDisposer(reaction(() => collectionStore.GetCollection('favorite').allApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this)));
 
     // *subscribe to when visible soundtracks change
-    this.soundtrackReaction = reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged.bind(this));
+    this.addDisposer(reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged.bind(this)));
 
     // *subscribe to when installed games change
-    this.installedReaction = reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this));
+    this.addDisposer(reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this)));
 
     // * subscribe to game hide or show
-    this.hiddenReaction = reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 50 });
+    this.addDisposer(reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 50 }));
 
     // * subscribe to non-steam games if they exist
     if (collectionStore.GetCollection('desk-desktop-apps')) {
-      this.nonSteamReaction = reaction(() => collectionStore.GetCollection('desk-desktop-apps').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this));
+      this.addDisposer(reaction(() => collectionStore.GetCollection('desk-desktop-apps').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this)));
     }
 
     // * subscribe for when collections are deleted
-    this.collectionRemoveReaction = reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this));
+    this.addDisposer(reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this)));
 
     this.handleUserCollectionRemove(collectionStore.userCollections.length); // * this loads the collection ids for the first time.
 
     // * subscribe to user's friendlist updates
-    this.friendsReaction = reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 });
-
-    this.handleFriendsReaction(friendStore.allFriends);
+    this.addDisposer(reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 }));
 
     // * subscribe to store tag list changes
-    this.tagsReaction = reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 });
-
-    this.storeTagReaction(appStore.m_mapStoreTagLocalization);
-
+    this.addDisposer(reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 }));
 
     // * subscribe to achievement cache changes
-    this.achievementsReaction = reaction(() => appAchievementProgressCache.m_achievementProgress.mapCache.size, this.handleAchievementsReaction.bind(this));
+    this.addDisposer(reaction(() => appAchievementProgressCache.m_achievementProgress.mapCache.size, this.handleAchievementsReaction.bind(this)));
 
+    //* subscribe to app close for time played updates
+    this.addDisposer(SteamClient.GameSessions.RegisterForAppLifetimeNotifications(
+      (e) => !e.bRunning && // skip if game is running
+        Array.from(this.tabsMap.values()).find(tabContainer => tabContainer.filters && (tabContainer as CustomTabContainer).containsFilterType('time played')) && //skip if no time played filters exist
+        setTimeout(() => { this.rebuildCustomTabs(); this.update(); }, 3500)).unregister); //add slight dealy because sometimes app playtime runs 1 min behind
+
+    this.handleFriendsReaction(friendStore.allFriends);
+    this.storeTagReaction(appStore.m_mapStoreTagLocalization);
     MicroSDeckInterop.initEventHandlers({ change: this.handleMicroSDeckChange.bind(this) });
   }
 
@@ -199,7 +191,15 @@ export class TabMasterManager {
   /**
    * Handles rebuilding tabs when a collection changes.
    */
-  private async rebuildCustomTabsOnCollectionChange() {
+  private rebuildCustomTabsOnCollectionChange() {
+    if (!this.hasLoaded) return;
+    this.rebuildCustomTabs();
+  }
+
+  /**
+   * Handles rebuilding tabs when a collection changes.
+   */
+  private rebuildCustomTabs() {
     if (!this.hasLoaded) return;
 
     this.visibleTabsList.forEach((tabContainer) => {
@@ -218,7 +218,7 @@ export class TabMasterManager {
 
     if (newLength < this.userCollectionIds.length && this.hasLoaded) {
       let validateTabs = false;
-      const collectionsInUse = Object.keys(this.collectionReactions);
+      const collectionsInUse = Object.keys(this.collectionDisposers);
       const currentUserCollectionIds = userCollections.map((collection) => collection.id);
 
       this.userCollectionIds = this.userCollectionIds.filter((id) => {
@@ -226,8 +226,8 @@ export class TabMasterManager {
 
         if (!isIncluded && collectionsInUse.includes(id)) {
           validateTabs = true;
-          this.collectionReactions[id]();
-          delete this.collectionReactions[id];
+          this.collectionDisposers[id]();
+          delete this.collectionDisposers[id];
         }
 
         return isIncluded;
@@ -381,28 +381,20 @@ export class TabMasterManager {
   }
 
   /**
+   * Push a callback function to be called on cleanup
+   */
+  addDisposer(disposer: () => void) {
+    this.disposers.push(disposer);
+  }
+
+  /**
    * Handles cleaning up all reactions.
    */
   disposeReactions(): void {
-    if (this.allGamesReaction) this.allGamesReaction();
-    if (this.favoriteReaction) this.favoriteReaction();
-    if (this.soundtrackReaction) this.soundtrackReaction();
-    if (this.installedReaction) this.installedReaction();
-    if (this.hiddenReaction) this.hiddenReaction();
-    if (this.nonSteamReaction) this.nonSteamReaction();
-
-    if (this.collectionReactions) {
-      for (const reaction of Object.values(this.collectionReactions)) {
-        reaction();
-      }
+    this.disposers.forEach(disposer => disposer());
+    for (const disposer of Object.values(this.collectionDisposers)) {
+      disposer();
     }
-
-    if (this.friendsReaction) this.friendsReaction();
-    if (this.tagsReaction) this.tagsReaction();
-
-    if (this.achievementsReaction) this.achievementsReaction();
-
-    if (this.collectionRemoveReaction) this.collectionRemoveReaction();
   }
 
   /**
@@ -530,9 +522,9 @@ export class TabMasterManager {
       for (const collectionFilter of collectionFilters) {
         const collectionId: string = (collectionFilter as TabFilterSettings<"collection">).params.id;
 
-        if (!this.collectionReactions[collectionId]) {
+        if (!this.collectionDisposers[collectionId]) {
           //* subscribe to user collection updates
-          this.collectionReactions[collectionId] = reaction(() => collectionStore.GetCollection(collectionId).allApps.length, () => {
+          this.collectionDisposers[collectionId] = reaction(() => collectionStore.GetCollection(collectionId).allApps.length, () => {
             this.rebuildCustomTabsOnCollectionChange();
           });
         }
