@@ -11,7 +11,7 @@ interface SteamClient {
   FamilySharing: any,
   FriendSettings: any,
   Friends: any,
-  GameSessions: GameSession,
+  GameSessions: GameSessions,
   Input: any,
   InstallFolder: any,
   Installs: Installs,
