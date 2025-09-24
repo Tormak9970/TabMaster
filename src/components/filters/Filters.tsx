@@ -631,7 +631,7 @@ export class Filter {
       return params.isDemo ? appOverview.app_type === 8 : appOverview.app_type !== 8;
     },
     streamable: (params: FilterParams<'streamable'>, appOverview: SteamAppOverview) => {
-      const isStreamable = appOverview.per_client_data.some((clientData) => clientData.client_name !== "This machine" && clientData.installed);
+      const isStreamable = appOverview.per_client_data.some((clientData) => clientData.client_name !== "This machine" && clientData.client_name !== "" && clientData.installed);
       return params.isStreamable ? isStreamable : !isStreamable;
     },
     "steam features": (params: FilterParams<'steam features'>, appOverview: SteamAppOverview) => {
