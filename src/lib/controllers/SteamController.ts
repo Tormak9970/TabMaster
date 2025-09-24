@@ -1,3 +1,4 @@
+import { sleepManager } from '../SleepManager';
 import { waitForCondition } from "../Utils";
 import { LogController } from "./LogController";
 
@@ -75,7 +76,12 @@ export class SteamController {
    * @returns A function that unsubscribes the callback.
    */
   registerForOnResumeFromSuspend(callback: () => void): Unregisterer {
-    return SteamClient.System.RegisterForOnResumeFromSuspend(callback);
+    const register = SteamClient.System.RegisterForOnResumeFromSuspend?.bind(SteamClient.System) ?? sleepManager?.RegisterForNotifyResumeFromSuspend;
+    if (!register) {
+      LogController.raiseError("Couldn't find resume from suspend registerer");
+      return { unregister: () => {} };
+    }
+    return register(callback);
   }
 
   /**
