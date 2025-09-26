@@ -61,7 +61,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
       <div style={style} className="post">
         <DialogButton
           key={`${filteredList[index].label}`}
-          style={{ borderRadius: "unset", margin: "0", padding: "10px" }}
+          style={{ borderRadius: "unset", margin: "0", padding: "10px", scrollMarginTop: "0" }}
           onClick={() => {
             onSelectOption(filteredList[index]);
             closeModal!();
@@ -126,6 +126,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
                         itemCount={filteredList.length}
                         itemSize={44}
                         onItemsRendered={onItemsRendered}
+                        overscanCount={10}
                       >
                         {ListEntry}
                       </List>
