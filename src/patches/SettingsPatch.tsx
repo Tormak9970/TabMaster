@@ -1,4 +1,4 @@
-import { afterPatch, ConfirmModal, findInTree, ServerAPI, showModal } from "decky-frontend-lib";
+import { afterPatch, ConfirmModal, findInReactTree, findInTree, ServerAPI, showModal } from "decky-frontend-lib";
 import { ReactElement } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { LogController } from "../lib/controllers/LogController";
@@ -43,7 +43,7 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
         }
 
         afterPatch(homeElement, 'type', (_: any, ret3: any) => {
-          const buttonElementContainer = ret3?.props?.children?.find((elt: React.ReactElement) => {
+          const buttonElementContainer = findInReactTree(ret3, (elt: React.ReactElement) => {
             return elt?.type?.toString?.().includes('HomeSettings');
           });
 

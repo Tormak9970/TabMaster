@@ -33,7 +33,7 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
   function onChange(selectedType: FilterType) {
     const updatedFilter = {
       type: selectedType,
-      inverted: isInverted,
+      inverted: false,
       params: {...FilterDefaultParams[selectedType]}
     };
     const updatedFilters = [...containingGroupFilters];
@@ -88,7 +88,7 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
                 marginLeft: "10px",
                 width: "120px"
               }}>
-                <Dropdown rgOptions={invertOptions} selectedOption={filter.inverted} onChange={onInvertedChange} />
+                <Dropdown rgOptions={invertOptions} selectedOption={isInverted} onChange={onInvertedChange} />
               </Focusable>
             </>
           )}
