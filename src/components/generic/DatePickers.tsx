@@ -1,4 +1,4 @@
-import { ConfirmModal, Focusable, SingleDropdownOption, quickAccessMenuClasses } from 'decky-frontend-lib';
+import { ConfirmModal, Focusable, SingleDropdownOption, quickAccessMenuClasses } from '@decky/ui';
 import { ReactElement, VFC, useMemo, useState, Fragment, useEffect } from 'react';
 import { TbCalendarEvent } from 'react-icons/tb';
 import { EnhancedSelector, EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from './EnhancedSelector';

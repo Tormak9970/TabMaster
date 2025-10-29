@@ -1,4 +1,4 @@
-import { SidebarNavigation } from "decky-frontend-lib";
+import { SidebarNavigation } from "@decky/ui";
 import { VFC, ReactNode } from "react";
 
 import { MdNumbers } from "react-icons/md";

@@ -1,4 +1,4 @@
-import { showModal } from 'decky-frontend-lib';
+import { showModal } from '@decky/ui';
 import { LogController } from './LogController';
 import { validateFilter } from '../../components/filters/Filters';
 import { FixTabErrorsModalRoot } from '../../components/modals/FixTabErrorsModal';

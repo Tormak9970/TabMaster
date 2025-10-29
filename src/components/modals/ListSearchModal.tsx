@@ -10,7 +10,7 @@ import {
   TextField,
   GamepadEvent,
   GamepadButton
-} from "decky-frontend-lib";
+} from "@decky/ui";
 import { VFC, useEffect, useMemo, useRef, useState } from "react";
 import { IconType } from "react-icons/lib";
 import { FixedSizeList as List } from "react-window";

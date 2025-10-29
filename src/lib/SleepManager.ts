@@ -1,4 +1,4 @@
-import { findModuleChild } from 'decky-frontend-lib';
+import { findModuleChild } from '@decky/ui';
 
 interface SleepManager {
   RegisterForNotifyResumeFromSuspend: (cb: () => void) => Unregisterer;

@@ -3,11 +3,10 @@ import {
   findInReactTree,
   Patch,
   replacePatch,
-  RoutePatch,
-  ServerAPI,
   showContextMenu,
   wrapReactType
-} from "decky-frontend-lib";
+} from "@decky/ui";
+import { RoutePatch } from "@decky/api";
 import { ReactElement, useEffect, useState } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { CustomTabContainer } from "../state/CustomTabContainer";
@@ -24,7 +23,7 @@ let TabAppGridComponent: TabAppGridComponent | undefined;
  * @param tabMasterManager The plugin's core state manager.
  * @returns A routepatch for the library.
  */
-export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager): RoutePatch => {
+export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => {
   
   return addPatch("/library", (props: { path: string; children: ReactElement; }) => {
     afterPatch(props.children, "type", (_: Record<string, unknown>[], ret1: ReactElement) => {
@@ -137,8 +136,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
     });
 
     return props;
-  },
-  serverAPI)
+  })
 };
 
 /**
