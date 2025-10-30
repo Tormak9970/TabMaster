@@ -74,7 +74,7 @@ export class PythonInterop {
    * @param message The message to log.
    */
   static async log(message: String): Promise<void> {
-    await call<[message: string, level: number], boolean>("logMessage", `[front-end]: ${message}`, 0);
+    await call<[message: string, level: number], boolean>("log_message", `[front-end]: ${message}`, 0);
   }
 
   /**
@@ -82,7 +82,7 @@ export class PythonInterop {
    * @param message The message to log.
    */
   static async warn(message: string): Promise<void> {
-    await call<[message: string, level: number], boolean>("logMessage", `[front-end]: ${message}`, 1);
+    await call<[message: string, level: number], boolean>("log_message", `[front-end]: ${message}`, 1);
   }
 
   /**
@@ -90,7 +90,7 @@ export class PythonInterop {
    * @param message The message to log.
    */
   static async error(message: string): Promise<void> {
-    await call<[message: string, level: number], boolean>("logMessage", `[front-end]: ${message}`, 2);
+    await call<[message: string, level: number], boolean>("log_message", `[front-end]: ${message}`, 2);
   }
   
   /**
