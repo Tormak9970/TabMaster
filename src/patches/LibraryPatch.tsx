@@ -59,7 +59,8 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
 
           //* This runs once for every outer run
           innerPatch = replacePatch(ret2.type, 'type', (args) => {
-            const hooks = (window.SP_REACT as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentDispatcher.current;
+            const hooks = (window.SP_REACT as any)?.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED?.ReactCurrentDispatcher?.current ||
+              Object.values((window.SP_REACT as any)?.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE).find((p: any) => p?.useEffect);
             const realUseMemo = hooks.useMemo;
 
             //* deps contains useful variables from within the orignal component that we otherwise wouldn't be able to get
