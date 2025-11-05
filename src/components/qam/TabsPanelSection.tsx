@@ -1,4 +1,4 @@
-import { PanelSection, ReorderableList, ReorderableEntry, ButtonItem } from 'decky-frontend-lib';
+import { PanelSection, ReorderableList, ReorderableEntry, ButtonItem } from '@decky/ui';
 import { VFC, Fragment } from 'react';
 import { TabIdEntryType } from './QuickAccessContent';
 import { TabActionsButton } from '../other/TabActions';

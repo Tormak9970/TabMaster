@@ -1,4 +1,4 @@
-import { Focusable, ModalPosition, GamepadButton, ScrollPanelGroup, gamepadDialogClasses, scrollPanelClasses, FooterLegendProps } from "decky-frontend-lib";
+import { Focusable, ModalPosition, GamepadButton, ScrollPanelGroup, gamepadDialogClasses, scrollPanelClasses, FooterLegendProps } from "@decky/ui";
 import { FC, Fragment, useLayoutEffect, useRef, useState } from "react";
 
 export interface ScrollableWindowProps extends FooterLegendProps {

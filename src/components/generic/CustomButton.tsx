@@ -1,4 +1,4 @@
-import { FocusableProps, Focusable, DialogButton } from "decky-frontend-lib";
+import { FocusableProps, Focusable, DialogButton } from "@decky/ui";
 import { ReactNode, FC, useState } from "react";
 import { SoundEffect, SFXPath } from "../../lib/GamepadUIAudio";
 import { playUISound } from '../../lib/Utils';

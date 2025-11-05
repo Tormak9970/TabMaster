@@ -1,7 +1,8 @@
 {
   "name": "tabmaster",
-  "version": "2.11.0",
+  "version": "2.11.2",
   "description": "Gives you full control over your Steam library! Support for customizing, adding, and hiding Library Tabs.",
+  "type": "module",
   "scripts": {
     "build": "shx rm -rf dist && rollup -c",
     "watch": "rollup -c -w",
@@ -40,23 +41,19 @@
   "devDependencies": {
     "@commitlint/cli": "^17.8.1",
     "@commitlint/config-conventional": "^17.8.1",
-    "@rollup/plugin-commonjs": "^21.1.0",
-    "@rollup/plugin-json": "^4.1.0",
+    "@decky/api": "^1.1.2",
+    "@decky/rollup": "^1.0.1",
+    "@decky/ui": "^4.11.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
-    "@rollup/plugin-replace": "^4.0.0",
-    "@rollup/plugin-typescript": "^8.5.0",
     "@types/lodash": "^4.17.19",
     "@types/markdown-it": "^12.2.3",
     "@types/react": "16.14.0",
     "@types/react-window": "^1.8.8",
     "@types/uuid": "^9.0.8",
     "@types/webpack": "^5.28.5",
-    "decky-frontend-lib": "^3.25.0",
     "husky": "^8.0.3",
     "markdown-it": "^13.0.2",
-    "rollup": "^2.79.2",
-    "rollup-plugin-codegen": "^1.0.0",
-    "rollup-plugin-import-assets": "^1.1.1",
+    "rollup-plugin-codegen": "^2.1.0",
     "rollup-plugin-polyfill-node": "^0.13.0",
     "shx": "^0.3.4",
     "tslib": "^2.6.1",
@@ -74,8 +71,7 @@
     "peerDependencyRules": {
       "ignoreMissing": [
         "react",
-        "react-dom",
-        "decky-frontend-lib"
+        "react-dom"
       ]
     }
   }

@@ -1,34 +1,22 @@
-import { FileSelectionType, ServerAPI } from "decky-frontend-lib";
 import { getCompactTimestamp, validateTabStructure } from "../Utils";
 import { TabProfileDictionary } from '../../state/TabProfileManager';
 import { PluginController } from './PluginController';
 import { USER_BACKUP_NAME } from '../../constants';
+import { call, FileSelectionType, openFilePicker, toaster } from '@decky/api';
 
 /**
  * Class for frontend -> backend communication.
  */
 export class PythonInterop {
-  private static serverAPI: ServerAPI;
-
-  /**
-   * Sets the interop's severAPI.
-   * @param serv The ServerAPI for the interop to use.
-   */
-  static setServer(serv: ServerAPI): void {
-    this.serverAPI = serv;
-  }
-
   /**
    * Gets the user's desktop path.
    * @returns The path.
    */
   static async getUserDesktopPath(): Promise<string | Error> {
-    const result = await this.serverAPI.callPluginMethod<{}, string>("get_user_desktop", {});
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
+    try {
+      return await call<[], string>("get_user_desktop");
+    } catch (e: any) {
+      return e;
     }
   }
 
@@ -43,7 +31,7 @@ export class PythonInterop {
       return startPath;
     }
 
-    const res = await this.serverAPI.openFilePickerV2(
+    const res = await openFilePicker(
       FileSelectionType.FOLDER,
       startPath,
       false,
@@ -56,30 +44,16 @@ export class PythonInterop {
 
     return res.realpath;
   }
-
-  /**
-   * Gets the interop's serverAPI.
-   */
-  static get server(): ServerAPI { return this.serverAPI; }
-
-  /**
-   * Logs a message to the plugin's log file and the frontend console.
-   * @param message The message to log.
-   */
-  static async log(message: string): Promise<void> {
-    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("log_message", { message: `[front-end]: ${message}`, level: 0 });
-  }
   
   /**
    * Backs up the plugin's settings to prevent them from being corrupted.
    * @param destPath The path to copy the settings to.
    */
   static async backupSettings(destPath: string): Promise<boolean | Error> {
-    const result = await this.serverAPI.callPluginMethod<{ dest_path: string }, boolean>("backup_settings", { dest_path: `${destPath}/${USER_BACKUP_NAME}_${getCompactTimestamp()}.json` });
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
+    try {
+      return await call<[dest_path: string], boolean>("backup_settings", `${destPath}/${USER_BACKUP_NAME}_${getCompactTimestamp()}.json`);
+    } catch(e: any) {
+      return e;
     }
   }
 
@@ -88,21 +62,27 @@ export class PythonInterop {
    * @param name The name to give the file.
    */
   static async backupDefaultDir(name: string): Promise<boolean | Error> {
-    const result = await this.serverAPI.callPluginMethod<{}, boolean>("backup_default_dir", { name: `${name}_${getCompactTimestamp()}` });
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
+    try {
+      return await call<[name: string], boolean>("backup_default_dir", `${name}_${getCompactTimestamp()}`);
+    } catch (e: any) {
+      return e;
     }
   }
 
+  /**
+   * Logs a message to the plugin's log file and the frontend console.
+   * @param message The message to log.
+   */
+  static async log(message: String): Promise<void> {
+    await call<[message: string, level: number], boolean>("log_message", `[front-end]: ${message}`, 0);
+  }
 
   /**
    * Logs a warning to the plugin's log file and the frontend console.
    * @param message The message to log.
    */
   static async warn(message: string): Promise<void> {
-    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 1 });
+    await call<[message: string, level: number], boolean>("log_message", `[front-end]: ${message}`, 1);
   }
 
   /**
@@ -110,7 +90,7 @@ export class PythonInterop {
    * @param message The message to log.
    */
   static async error(message: string): Promise<void> {
-    await this.serverAPI.callPluginMethod<{ message: string, level: number }, boolean>("logMessage", { message: `[front-end]: ${message}`, level: 2 });
+    await call<[message: string, level: number], boolean>("log_message", `[front-end]: ${message}`, 2);
   }
   
   /**
@@ -118,12 +98,10 @@ export class PythonInterop {
    * @returns A promise resolving to the plugin's users dictionary.
    */
   static async getUsersDict(): Promise<UsersDict | Error> {
-    const result = await this.serverAPI.callPluginMethod<{}, UsersDict>("get_users_dict", {});
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
+    try {
+      return await call<[], UsersDict>("get_users_dict");
+    } catch (e: any) {
+      return e;
     }
   }
   
@@ -132,12 +110,10 @@ export class PythonInterop {
    * @returns A promise resolving to the plugin's users dictionary.
    */
   static async setActiveSteamId(userId: string): Promise<boolean | Error> {
-    const result = await this.serverAPI.callPluginMethod<{ user_id: string }, boolean>("set_active_user_id", { user_id: userId});
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
+    try {
+      return await call<[ user_id: string ], boolean>("set_active_user_id", userId);
+    } catch (e: any) {
+      return e;
     }
   }
 
@@ -145,12 +121,10 @@ export class PythonInterop {
    * Removes any legacy settings fields that may be present in the settings file.
    */
   static async removeLegacySettings(): Promise<void | Error> {
-    const result = await this.serverAPI.callPluginMethod<{}, void>("remove_legacy_settings", {});
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
+    try {
+      return await call<[], void>("remove_legacy_settings");
+    } catch (e: any) {
+      return e;
     }
   }
 
@@ -158,12 +132,10 @@ export class PythonInterop {
    * Migrates a legacy user to use the new settings system.
    */
   static async migrateLegacySettings(): Promise<void | Error> {
-    const result = await this.serverAPI.callPluginMethod<{}, void>("migrate_legacy_settings", {});
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
+    try {
+      return await call<[], void>("migrate_legacy_settings");
+    } catch (e: any) {
+      return e;
     }
   }
 
@@ -172,13 +144,14 @@ export class PythonInterop {
    * @returns A promise resolving to the plugin's tabs or null when the tab structure fails validation
    */
   static async getTabs(): Promise<TabSettingsDictionary | Error | null> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabSettingsDictionary>("get_tabs", {});
-    if (result.success) {
-      if (!validateTabStructure(result.result))  return null;
+    try {
+      const result = await call<[], TabSettingsDictionary>("get_tabs");
 
-      return result.result;
-    } else {
-      return new Error(result.result);
+      if (!validateTabStructure(result))  return null;
+
+      return result;
+    } catch (e: any) {
+      return e;
     }
   }
 
@@ -187,12 +160,10 @@ export class PythonInterop {
    * @returns A promise resolving to the store tags.
    */
   static async getTags(): Promise<TagResponse[] | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{}, TagResponse[]>("get_tags", {});
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
+    try {
+      return await call<[], TagResponse[]>("get_tags");
+    } catch (e: any) {
+      return e;
     }
   }
 
@@ -201,12 +172,10 @@ export class PythonInterop {
    * @returns A promise resolving to the cached user friends.
    */
   static async getFriends(): Promise<FriendEntry[] | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{}, FriendEntry[]>("get_friends", {});
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
+    try {
+      return await call<[], FriendEntry[]>("get_friends");
+    } catch (e: any) {
+      return e;
     }
   }
 
@@ -215,16 +184,16 @@ export class PythonInterop {
    * @returns A promise resolving to the cached friends games.
    */
   static async getFriendsGames(): Promise<Map<number, number[]> | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{}, { [id: string]: number[] }>("get_friends_games", {});
+    try {
+      const results = await call<[], { [id: string]: number[] }>("get_friends_games");
 
-    if (result.success) {
-      const adjustedGames: [number, number[]][] = Object.entries(result.result).map(([id, ownedGames]) => {
+      const adjustedGames: [number, number[]][] = Object.entries(results).map(([id, ownedGames]) => {
         return [parseInt(id), ownedGames];
       });
 
       return new Map<number, number[]>(adjustedGames);
-    } else {
-      return new Error(result.result);
+    } catch (e: any) {
+      return e;
     }
   }
 
@@ -233,13 +202,11 @@ export class PythonInterop {
    * @returns A promise resolving the user's tab profiles.
    */
   static async getTabProfiles(): Promise<TabProfileDictionary | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{}, TabProfileDictionary>("get_tab_profiles", {});
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
-    };
+    try {
+      return await call<[], TabProfileDictionary>("get_tab_profiles");
+    } catch (e: any) {
+      return e;
+    }
   }
 
   /**
@@ -255,48 +222,42 @@ export class PythonInterop {
       return;
     }
 
-    let result = await PythonInterop.serverAPI.callPluginMethod<{ tabs: TabSettingsDictionary, }, void>("set_tabs", { tabs: tabs });
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
-    };
+    try {
+      return await call<[ tabs: TabSettingsDictionary ], void>("set_tabs", tabs);
+    } catch (e: any) {
+      return e;
+    }
   }
 
   /**
    * Sets the store tags.
-   * @param tabs The store tags.
+   * @param tags The store tags.
    * @returns A promise resolving to whether or not the tags were successfully set.
    */
   static async setTags(tags: TagResponse[]): Promise<void | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{ tags: TagResponse[], }, void>("set_tags", { tags: tags });
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
-    };
+    try {
+      return await call<[ tags: TagResponse[] ], void>("set_tags", tags);
+    } catch (e: any) {
+      return e;
+    }
   }
 
   /**
    * Sets the user's friends.
-   * @param tabs The user's friends.
+   * @param friends The user's friends.
    * @returns A promise resolving to whether or not the friends were successfully set.
    */
   static async setFriends(friends: FriendEntry[]): Promise<void | Error> {
-    let result = await PythonInterop.serverAPI.callPluginMethod<{ friends: FriendEntry[], }, void>("set_friends", { friends: friends });
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
-    };
+    try {
+      return await call<[ friends: FriendEntry[] ], void>("set_friends", friends);
+    } catch (e: any) {
+      return e;
+    }
   }
 
   /**
    * Sets the user's friends' games.
-   * @param tabs The user's friend's games.
+   * @param friendsGames The user's friend's games.
    * @returns A promise resolving to whether or not the friends' games were successfully set.
    */
   static async setFriendGames(friendsGames: Map<number, number[]>): Promise<void | Error> {
@@ -304,13 +265,11 @@ export class PythonInterop {
       return [id.toString(), gamesOwned];
     }));
 
-    let result = await PythonInterop.serverAPI.callPluginMethod<{ friends_games: { [id: string]: number[] }, }, void>("set_friends_games", { friends_games: serializedGames });
-
-    if (result.success) {
-      return result.result;
-    } else {
-      return new Error(result.result);
-    };
+    try {
+      return await call<[ friends_games: { [id: string]: number[] } ], void>("set_friends_games", serializedGames);
+    } catch (e: any) {
+      return e;
+    }
   }
 
   /**
@@ -318,15 +277,13 @@ export class PythonInterop {
    * @param tabProfiles The tab profiles.
    * @returns A promise resolving to whether or not the tab profiles were successfully set.
    */
-    static async setTabProfiles(tabProfiles: TabProfileDictionary): Promise<void | Error> {
-      let result = await PythonInterop.serverAPI.callPluginMethod<{ tab_profiles: TabProfileDictionary }, void>("set_tab_profiles", { tab_profiles: tabProfiles });
-  
-      if (result.success) {
-        return result.result;
-      } else {
-        return new Error(result.result);
-      };
+  static async setTabProfiles(tabProfiles: TabProfileDictionary): Promise<void | Error> {
+    try {
+      return await call<[ tab_profiles: TabProfileDictionary ], void>("set_tab_profiles", tabProfiles);
+    } catch (e: any) {
+      return e;
     }
+  }
 
   /**
    * Shows a toast message.
@@ -337,7 +294,7 @@ export class PythonInterop {
     setTimeout(() => {
       if (PluginController.isDismounted) return;
       try {
-        this.serverAPI.toaster.toast({
+        toaster.toast({
           title: title,
           body: message,
           duration: 8000,

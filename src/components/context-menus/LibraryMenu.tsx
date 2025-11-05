@@ -1,4 +1,4 @@
-import { Menu, MenuItem, showModal, Focusable, MenuGroup, ReorderableEntry, ReorderableList, MenuItemProps, gamepadContextMenuClasses } from 'decky-frontend-lib';
+import { Menu, MenuItem, showModal, Focusable, MenuGroup, ReorderableEntry, ReorderableList, MenuItemProps, gamepadContextMenuClasses } from '@decky/ui';
 import { FC, Fragment, VFC, useState } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { TabMasterContextProvider, useTabMasterContext } from '../../state/TabMasterContext';
