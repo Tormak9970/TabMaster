@@ -53,6 +53,7 @@
     "@types/webpack": "^5.28.5",
     "husky": "^8.0.3",
     "markdown-it": "^13.0.2",
+    "rollup": "^2.79.2",
     "rollup-plugin-codegen": "^2.1.0",
     "rollup-plugin-polyfill-node": "^0.13.0",
     "shx": "^0.3.4",
