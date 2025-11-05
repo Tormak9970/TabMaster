@@ -1,4 +1,4 @@
-import { Button, Focusable } from "decky-frontend-lib"
+import { Button, Focusable } from '@decky/ui';
 import React, { VFC, useState } from "react"
 import { FilterType, TabFilterSettings, isValidParams } from "../filters/Filters"
 import { capitalizeFirstLetter, playUISound } from "../../lib/Utils"

@@ -1,4 +1,4 @@
-import { ConfirmModal, ServerAPI, showModal } from "decky-frontend-lib";
+import { ConfirmModal, showModal } from "@decky/ui";
 import { PythonInterop } from "./PythonInterop";
 import { SteamController } from "./SteamController";
 import { LogController } from "./LogController";
@@ -53,8 +53,7 @@ export class PluginController {
    * Sets the plugin's serverAPI.
    * @param server The serverAPI to use.
    */
-  static setup(server: ServerAPI, tabMasterManager: TabMasterManager): void {
-    this.server = server;
+  static setup(tabMasterManager: TabMasterManager): void {
     this.tabMasterManager = tabMasterManager;
     this.steamController = new SteamController();
   }

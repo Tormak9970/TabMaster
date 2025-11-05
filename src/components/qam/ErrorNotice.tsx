@@ -1,4 +1,4 @@
-import { Field, Focusable } from 'decky-frontend-lib';
+import { Field, Focusable } from '@decky/ui';
 import { FC } from 'react';
 import { FaCircleExclamation } from 'react-icons/fa6';
 

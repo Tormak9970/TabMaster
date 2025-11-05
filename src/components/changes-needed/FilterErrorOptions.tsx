@@ -6,7 +6,7 @@ import {
   Focusable,
   SingleDropdownOption,
   showModal
-} from "decky-frontend-lib";
+} from "@decky/ui";
 import { VFC, Fragment, useState, useContext } from "react";
 import { FilterType, SdCardParamType, TabFilterSettings } from "../filters/Filters";
 import { FixMergeFilterModal } from "../modals/FixMergeFilterModal";

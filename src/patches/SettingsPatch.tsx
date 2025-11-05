@@ -1,4 +1,4 @@
-import { afterPatch, ConfirmModal, findInReactTree, findInTree, ServerAPI, showModal } from "decky-frontend-lib";
+import { afterPatch, ConfirmModal, findInReactTree, findInTree, showModal } from "@decky/ui";
 import { ReactElement } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { LogController } from "../lib/controllers/LogController";
@@ -9,7 +9,7 @@ const findHome = (root: any) => {
   return findInTree(root, filter, { walkable: ['props', 'children', 'pages', 'content'] });
 };
 
-export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager) => {
+export const patchSettings = (tabMasterManager: TabMasterManager) => {
   return addPatch("/settings", (props: { path: string; children: ReactElement; }) => {
     afterPatch(props.children, 'type', (_: any, ret1: any) => {
       if (!ret1?.type) {
@@ -101,6 +101,5 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
     });
 
     return props;
-  },
-  serverAPI);
+  });
 };

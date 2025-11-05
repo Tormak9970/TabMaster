@@ -1,4 +1,4 @@
-import { ConfirmModal } from "decky-frontend-lib";
+import { ConfirmModal } from "@decky/ui";
 import { VFC, useState, Fragment, useEffect } from "react";
 import { ModalStyles } from "../styles/ModalStyles";
 import { FiltersPanel } from "../filters/FiltersPanel";

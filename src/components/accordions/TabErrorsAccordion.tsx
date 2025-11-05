@@ -1,4 +1,4 @@
-import { Button, Focusable } from "decky-frontend-lib";
+import { Button, Focusable } from "@decky/ui";
 import React, { VFC, useState, Fragment } from "react";
 import { BiSolidDownArrow } from "react-icons/bi";
 import { FaCircleCheck, FaCircleExclamation, FaCircleXmark } from "react-icons/fa6";

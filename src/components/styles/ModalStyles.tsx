@@ -1,4 +1,4 @@
-import { gamepadDialogClasses } from "decky-frontend-lib";
+import { gamepadDialogClasses } from "@decky/ui";
 import { VFC } from "react";
 
 export const modalMargin = '16px + 2.8vw';

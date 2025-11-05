@@ -1,4 +1,4 @@
-import { DialogButton } from 'decky-frontend-lib';
+import { DialogButton } from '@decky/ui';
 import { VFC } from 'react';
 import { FaTrash } from 'react-icons/fa6';
 

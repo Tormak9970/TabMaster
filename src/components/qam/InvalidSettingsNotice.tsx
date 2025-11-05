@@ -1,4 +1,4 @@
-import { DialogButton, Field, showModal } from 'decky-frontend-lib';
+import { DialogButton, Field, showModal } from '@decky/ui';
 import { FC } from 'react';
 import { FaCircleExclamation } from 'react-icons/fa6';
 import { DestructiveModal } from '../generic/DestructiveModal';

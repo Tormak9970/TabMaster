@@ -1,4 +1,4 @@
-import { DialogButton, DropdownOption, Field, FieldProps, Focusable } from "decky-frontend-lib";
+import { DialogButton, DropdownOption, Field, FieldProps, Focusable } from "@decky/ui";
 import { VFC } from "react";
 import { FaTimes } from "react-icons/fa";
 

@@ -3,11 +3,10 @@ import {
   findInReactTree,
   Patch,
   replacePatch,
-  RoutePatch,
-  ServerAPI,
   showContextMenu,
   wrapReactType
-} from "decky-frontend-lib";
+} from "@decky/ui";
+import { RoutePatch } from "@decky/api";
 import { ReactElement, useEffect, useState } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { CustomTabContainer } from "../state/CustomTabContainer";
@@ -24,7 +23,7 @@ let TabAppGridComponent: TabAppGridComponent | undefined;
  * @param tabMasterManager The plugin's core state manager.
  * @returns A routepatch for the library.
  */
-export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager): RoutePatch => {
+export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => {
   
   return addPatch("/library", (props: { path: string; children: ReactElement; }) => {
     afterPatch(props.children, "type", (_: Record<string, unknown>[], ret1: ReactElement) => {
@@ -60,7 +59,8 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
 
           //* This runs once for every outer run
           innerPatch = replacePatch(ret2.type, 'type', (args) => {
-            const hooks = (window.SP_REACT as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentDispatcher.current;
+            const hooks = (window.SP_REACT as any)?.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED?.ReactCurrentDispatcher?.current ||
+              Object.values((window.SP_REACT as any)?.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE).find((p: any) => p?.useEffect);
             const realUseMemo = hooks.useMemo;
 
             //* deps contains useful variables from within the orignal component that we otherwise wouldn't be able to get
@@ -137,8 +137,7 @@ export const patchLibrary = (serverAPI: ServerAPI, tabMasterManager: TabMasterMa
     });
 
     return props;
-  },
-  serverAPI)
+  })
 };
 
 /**

@@ -1,4 +1,4 @@
-import { gamepadDialogClasses, quickAccessControlsClasses, scrollPanelClasses } from "decky-frontend-lib";
+import { gamepadDialogClasses, quickAccessControlsClasses, scrollPanelClasses } from "@decky/ui";
 import { VFC } from "react";
 
  const deckyQamTabClass = 'tab_undefined'

@@ -1,6 +1,6 @@
 import { Fragment, VFC, useState } from "react";
 import { FilterDefaultParams, FilterType, TabFilterSettings, canBeInverted } from "./Filters";
-import { Dropdown, Focusable, afterPatch } from "decky-frontend-lib";
+import { Dropdown, Focusable, afterPatch } from "@decky/ui";
 import { FilterSelect } from "./FilterSelect";
 import { TrashButton } from '../generic/TrashButton';
 

@@ -1,4 +1,4 @@
-import { sleep } from 'decky-frontend-lib';
+import { sleep } from '@decky/ui';
 import { LogController } from './LogController';
 import { MicroSDeck as MicroSDeckManager } from '@cebbinghaus/microsdeck';
 import { EventType } from '@cebbinghaus/microsdeck/dist/backend';
