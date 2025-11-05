@@ -1,4 +1,4 @@
-import { findModuleChild } from "decky-frontend-lib"
+import { findModuleChild } from "@decky/ui"
 
 export const useSortingHook = findModuleChild((mod) => {
     if (typeof mod !== 'object') return undefined

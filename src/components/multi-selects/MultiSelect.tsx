@@ -1,4 +1,4 @@
-import { DropdownOption, Field, FieldProps, Focusable, SingleDropdownOption } from "decky-frontend-lib";
+import { DropdownOption, Field, FieldProps, Focusable, SingleDropdownOption } from "@decky/ui";
 import { useState, VFC, useEffect } from "react";
 import { MultiSelectStyles } from "../styles/MultiSelectStyles";
 import { MultiSelectedOption } from "./MultiSelectOption";

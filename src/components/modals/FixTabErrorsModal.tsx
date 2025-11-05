@@ -3,7 +3,7 @@ import {
   ModalRoot,
   PanelSection,
   PanelSectionRow,
-} from "decky-frontend-lib";
+} from "@decky/ui";
 import { useState, VFC, useEffect, Fragment } from "react";
 import { PythonInterop } from "../../lib/controllers/PythonInterop";
 import { TabMasterContextProvider } from "../../state/TabMasterContext";

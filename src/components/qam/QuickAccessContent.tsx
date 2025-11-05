@@ -5,7 +5,7 @@ import {
   Navigation,
   showContextMenu,
   quickAccessMenuClasses
-} from "decky-frontend-lib";
+} from "@decky/ui";
 import { VFC, useState } from "react";
 
 import { FaBook, FaBookmark, FaArrowUpFromBracket } from "react-icons/fa6";
