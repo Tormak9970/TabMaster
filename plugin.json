@@ -1,7 +1,8 @@
 {
   "name": "TabMaster",
-  "author": "Travis Lane (Tormak), Jessebofill, & Witherking25",
+  "author": "Travis Lane (Tormak), Jesse Bofill, & Kernel Panic",
   "flags": ["debug"],
+  "api_version": 1,
   "publish": {
     "tags": ["Customization", "Library", "Tabs"],
     "description": "Gives you full control over your Steam library! Support for customizing, adding, and hiding Library Tabs.",

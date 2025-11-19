@@ -1,4 +1,4 @@
-import { Module, findModuleChild } from "decky-frontend-lib";
+import { Module, findModuleChild } from "@decky/ui";
 
 export type SoundEffect =
   "bumper_end.wav" |

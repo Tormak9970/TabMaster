@@ -1,4 +1,4 @@
-import { Menu, MenuItem, showModal, Focusable, MenuGroup, ReorderableEntry, ReorderableList, MenuItemProps, gamepadContextMenuClasses } from 'decky-frontend-lib';
+import { Menu, MenuItem, showModal, Focusable, MenuGroup, ReorderableEntry, ReorderableList, MenuItemProps, gamepadContextMenuClasses } from '@decky/ui';
 import { FC, Fragment, VFC, useState } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { TabMasterContextProvider, useTabMasterContext } from '../../state/TabMasterContext';
@@ -6,11 +6,11 @@ import { showModalEditTab, showModalNewTab } from '../modals/EditTabModal';
 import { LibraryMenuStyles } from '../styles/LibraryMenuStyles';
 import { DestructiveModal } from '../generic/DestructiveModal';
 import { PresetMenuItems } from './PresetMenu';
-import { CustomTabContainer } from '../CustomTabContainer';
-import { TabListLabel } from '../TabListLabel';
+import { CustomTabContainer } from '../../state/CustomTabContainer';
+import { TabListLabel } from '../other/TabListLabel';
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 import { TabProfilesSubMenu } from './TabProfileMenu';
-import { TabIdEntryType } from "../QuickAccessContent";
+import { TabIdEntryType } from "../qam/QuickAccessContent";
 
 export interface LibraryMenuProps {
   closeMenu: () => void;

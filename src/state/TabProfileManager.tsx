@@ -1,4 +1,4 @@
-import { CustomTabContainer } from '../components/CustomTabContainer';
+import { CustomTabContainer } from './CustomTabContainer';
 import { PythonInterop } from '../lib/controllers/PythonInterop';
 import { TabMasterManager } from './TabMasterManager';
 
@@ -14,6 +14,11 @@ export class TabProfileManager {
    * @param tabProfiles The existing tab profiles the current user has.
    */
   constructor(tabProfiles: TabProfileDictionary) {
+    Object.values(tabProfiles).forEach((tabs) => tabs.forEach((tabId, index) => {
+      if (tabId === 'DeckGames') {
+        tabs[index] = 'GreatOnDeck';
+      }
+    }));
     this.tabProfiles = tabProfiles;
   }
 

@@ -6,9 +6,9 @@ import {
   Focusable,
   SingleDropdownOption,
   showModal
-} from "decky-frontend-lib";
+} from "@decky/ui";
 import { VFC, Fragment, useState, useContext } from "react";
-import { FilterType, TabFilterSettings } from "../filters/Filters";
+import { FilterType, SdCardParamType, TabFilterSettings } from "../filters/Filters";
 import { FixMergeFilterModal } from "../modals/FixMergeFilterModal";
 import { ErrorPanelTabNameContext } from "../../state/ErrorPanelNameContext";
 import { DestructiveModal } from '../generic/DestructiveModal';
@@ -163,12 +163,17 @@ const SDCardFilterErrorOption: VFC<FilterErrorOptionsProps<'sd card'>> = ({ isMe
   const dropdownOptions: DropdownOption[] = [
     {
       label: "Inserted Card",
-      data: undefined,
+      data: SdCardParamType.INSTALLED,
     },
     {
       label: "Specific Card",
       options: cardsAndGames.map(([card]) => { return { label: card.name || card.uid, data: card.uid } })
-    }];
+    },
+    {
+      label: "Any Card",
+      data: SdCardParamType.ANY
+    }
+  ];
 
   function onChange({data}: SingleDropdownOption) {
     const updatedFilter = { ...filter };
@@ -178,7 +183,7 @@ const SDCardFilterErrorOption: VFC<FilterErrorOptionsProps<'sd card'>> = ({ isMe
 
   return (
     <Field
-      label="Selected Collection"
+      label="Selected Card"
       description={
         <div className="filter-entry">
           <Focusable style={{
@@ -189,8 +194,8 @@ const SDCardFilterErrorOption: VFC<FilterErrorOptionsProps<'sd card'>> = ({ isMe
             <Focusable style={{
               width: "calc(100% - 55px)"
             }}>
-              <Dropdown rgOptions={dropdownOptions} selectedOption={filter.params.card} onChange={onChange} />
-            </Focusable>
+              <Dropdown rgOptions={dropdownOptions} selectedOption={filter.params.card ?? SdCardParamType.INSTALLED} onChange={onChange} />
+              </Focusable>                                                        {/*  ^ back compat for undefined as installed card */}
             <Focusable style={{
               marginLeft: "10px",
               width: "45px"

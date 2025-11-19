@@ -2,7 +2,7 @@ import { VFC, useState } from "react";
 import { TabErrorsAccordion } from "../accordions/TabErrorsAccordion";
 import { FilterType, TabFilterSettings } from "../filters/Filters";
 import { ErroredFiltersPanel } from "./ErroredFiltersPanel";
-import { ButtonItem, showModal } from "decky-frontend-lib";
+import { ButtonItem, showModal } from "@decky/ui";
 import { ErrorPanelTabNameContext } from "../../state/ErrorPanelNameContext";
 import { DestructiveModal } from '../generic/DestructiveModal';
 

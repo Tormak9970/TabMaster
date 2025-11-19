@@ -1,15 +1,16 @@
-import { afterPatch, ConfirmModal, findInTree, ServerAPI, showModal } from "decky-frontend-lib";
+import { afterPatch, ConfirmModal, findInReactTree, findInTree, showModal } from "@decky/ui";
 import { ReactElement } from "react";
 import { TabMasterManager } from "../state/TabMasterManager";
 import { LogController } from "../lib/controllers/LogController";
+import { addPatch } from '../lib/Utils';
 
 const findHome = (root: any) => {
   const filter = (node: any) => node?.type?.toString?.().includes('#HomeSettings_ShowingLess');
   return findInTree(root, filter, { walkable: ['props', 'children', 'pages', 'content'] });
 };
 
-export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterManager) => {
-  return serverAPI.routerHook.addPatch("/settings", (props: { path: string; children: ReactElement; }) => {
+export const patchSettings = (tabMasterManager: TabMasterManager) => {
+  return addPatch("/settings", (props: { path: string; children: ReactElement; }) => {
     afterPatch(props.children, 'type', (_: any, ret1: any) => {
       if (!ret1?.type) {
         LogController.raiseError('Failed to find settings element to patch');
@@ -42,7 +43,7 @@ export const patchSettings = (serverAPI: ServerAPI, tabMasterManager: TabMasterM
         }
 
         afterPatch(homeElement, 'type', (_: any, ret3: any) => {
-          const buttonElementContainer = ret3?.props?.children?.find((elt: React.ReactElement) => {
+          const buttonElementContainer = findInReactTree(ret3, (elt: React.ReactElement) => {
             return elt?.type?.toString?.().includes('HomeSettings');
           });
 

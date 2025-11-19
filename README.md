@@ -10,6 +10,15 @@ A plugin for customizing, adding, and removing Library Tabs.
 TabMaster allows you to have full control over your library tabs! You can hide, filter, reorder them as you please.
 
 
+# Using the plugin
+
+Once you have installed TabMaster, open it in the Quick Access Menu (QAM), where you can reorder, hide and add tabs!
+
+
+# Installation
+1. [Install the Decky plugin loader](https://github.com/SteamDeckHomebrew/decky-loader#installation)
+2. Use the built in plugin store to download the Tab Master Plugin
+
 # Features
 
 Features Include:<br/>
@@ -28,6 +37,7 @@ Available Filters:
  - **Merge** - Selects apps that pass a subgroup of filters.
  - **Platform** - Selects Steam or non-Steam apps.
  - **Deck Compatibility** - Selects apps that have a specific Steam Deck compatibilty status.
+ - **SteamOS Compatibility** - Selects apps that have a specific SteamOS compatibilty status.
  - **Review Score** - Selects apps that are greater/less than the provided metacritic/steam review score.
  - **Time Played** - Selects apps that have a play time greater/less than the provided time.
  - **Size on Disk** - Selects apps that have an install size greater/less than the provided size.
@@ -38,7 +48,7 @@ Available Filters:
  - **Steam Features** - Selects apps that support specific Steam Features.
  - **MicroSD Card** - Selects apps that are present on the inserted/specific MicroSD Card.
 
-If you want to see another filter, please open a filter request [here](https://github.com/Tormak9970/TabMaster/issues/new/choose).
+If you want us to add another filter, please open a filter request [here](https://github.com/Tormak9970/TabMaster/issues/new/choose).
 
 Filter Examples:
  - **Collection**<br/><img src="./assets/filters/docs_collection-example.png" width="600" />
@@ -51,11 +61,12 @@ Filter Examples:
  - **Merge**<br/><img src="./assets/filters/docs_merge-example.png" width="600" />
  - **Platform**<br/><img src="./assets/filters/docs_platform-example.png" width="600" />
  - **Deck Compatibility**<br/><img src="./assets/filters/docs_deck-compat-example.png" width="600" />
+ - **SteamOS Compatibility**<br/><img src="./assets/filters/docs_steamos-compat-example.png" width="600" />
  - **Review Score**<br/><img src="./assets/filters/docs_review-score-example.png" width="600" />
  - **Time Played**<br/><img src="./assets/filters/docs_time-played-example.png" width="600" />
  - **Size on Disk**<br/><img src="./assets/filters/docs_size-on-disk-example.png" width="600" />
  - **Release Date**<br/><img src="./assets/filters/docs_release-date-example.png" width="600" />
- - **Purchase Date**<br/><img src="./assets/filters/docs_pruchase-date-example.png" width="600" />
+ - **Purchase Date**<br/><img src="./assets/filters/docs_purchase-date-example.png" width="600" />
  - **Last Played**<br/><img src="./assets/filters/docs_last-played-example.png" width="600" />
  - **Family Sharing**<br/><img src="./assets/filters/docs_family-sharing-example.png" width="600" />
  - **Demo**<br/><img src="./assets/filters/docs_demo-example.png" width="600" />
@@ -65,20 +76,9 @@ Filter Examples:
  - **MicroSD Card**<br/><img src="./assets/filters/docs_microsd-card-example.png" width="600" />
 
 
-# Using the plugin
-
-Once you have installed TabMaster, open it in the Quick Access Menu (QAM), where you can reorder, hide and add tabs!
-
-
-# Installation
-1. [Install the Decky plugin loader](https://github.com/SteamDeckHomebrew/decky-loader#installation)
-2. Use the built in plugin store to download the Tab Master Plugin
-
-
 # Contributing
 
 If you're interested in fixing a bug, submitting a new feature, or just helping out, please read the [Contributor Guidelines](./Contributing.md)
-
 
 # Licensing
  - This program is licensed under the [GNU General Public License Version 3](https://www.gnu.org/licenses/#GPL) and [BSD 3-Clause License](https://opensource.org/license/bsd-3-clause/) <br/>

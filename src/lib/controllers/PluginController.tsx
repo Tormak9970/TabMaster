@@ -1,4 +1,4 @@
-import { ConfirmModal, ServerAPI, showModal } from "decky-frontend-lib";
+import { ConfirmModal, showModal } from "@decky/ui";
 import { PythonInterop } from "./PythonInterop";
 import { SteamController } from "./SteamController";
 import { LogController } from "./LogController";
@@ -47,13 +47,13 @@ export class PluginController {
   private static steamController: SteamController;
 
   private static onWakeSub: Unregisterer;
-
+  static isDismounted: boolean;
+  
   /**
    * Sets the plugin's serverAPI.
    * @param server The serverAPI to use.
    */
-  static setup(server: ServerAPI, tabMasterManager: TabMasterManager): void {
-    this.server = server;
+  static setup(tabMasterManager: TabMasterManager): void {
     this.tabMasterManager = tabMasterManager;
     this.steamController = new SteamController();
   }
@@ -131,6 +131,7 @@ export class PluginController {
    * Function to run when the plugin dismounts.
    */
   static dismount(): void {
+    this.isDismounted = true;
     if (this.onWakeSub) this.onWakeSub.unregister();
 
     this.tabMasterManager.disposeReactions();

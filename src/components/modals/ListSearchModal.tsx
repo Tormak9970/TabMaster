@@ -7,9 +7,11 @@ import {
   ModalRoot,
   PanelSection,
   SingleDropdownOption,
-  TextField
-} from "decky-frontend-lib";
-import { VFC, useEffect, useMemo, useState } from "react";
+  TextField,
+  GamepadEvent,
+  GamepadButton
+} from "@decky/ui";
+import { VFC, useEffect, useMemo, useRef, useState } from "react";
 import { IconType } from "react-icons/lib";
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -36,6 +38,8 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
   const [filteredList, setFilteredList] = useState(list);
   const [renderTopArrow, setRenderTopArrow] = useState(false);
   const [renderBottomArrow, setRenderBottomArrow] = useState(true);
+  const searchRef = useRef<any>(null);
+  const listRef = useRef<List>(null);
 
   useEffect(() => {
     setFilteredList(list.filter((entry) => (entry.label as string).toLowerCase().includes(query.toLowerCase())));
@@ -61,7 +65,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
       <div style={style} className="post">
         <DialogButton
           key={`${filteredList[index].label}`}
-          style={{ borderRadius: "unset", margin: "0", padding: "10px" }}
+          style={{ borderRadius: "unset", margin: "0", padding: "10px", scrollMarginTop: "0" }}
           onClick={() => {
             onSelectOption(filteredList[index]);
             closeModal!();
@@ -75,6 +79,16 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
       </div>
     );
   }, [filteredList]);
+  
+  const actionButtonProps = { 
+    onButtonDown: (evt: GamepadEvent) => {
+      if (evt.detail.button === GamepadButton.SELECT) {
+        searchRef?.current?.Focus?.();
+        searchRef?.current?.element?.click?.();
+      }    
+    },
+    actionDescriptionMap: { [GamepadButton.SELECT]: 'Search'}
+  }
 
   return (
     <div className="tab-master-list-search-modal">
@@ -82,7 +96,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
       <ModalRoot onCancel={closeModal} onEscKeypress={closeModal}>
         <DialogBody>
           <DialogControlsSection>
-            <Focusable flow-children="right" style={{ display: "flex" }}>
+            <Focusable flow-children="right" style={{ display: "flex" }} {...actionButtonProps} >
               <div
                 style={{
                   display: "flex",
@@ -102,8 +116,13 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
                 <TextField
                   value={query}
                   placeholder={`Search ${entryLabel}...`}
-                  onChange={(e) => { setQuery(e.target.value); }}
+                  onChange={(e) => {
+                    listRef.current?.scrollToItem(0);
+                    setQuery(e.target.value);
+                  }}
                   style={{ height: "100%" }}
+                  //@ts-ignore
+                  ref={searchRef}
                 />
               </div>
             </Focusable>
@@ -116,6 +135,8 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
               <PanelSection title={`${entryLabel} - ${filteredList.length}`}>
                 <Focusable
                   style={{ display: "flex", gap: "4px", flexDirection: "column", height: "48.7vh", overflow: "scroll" }}
+                  key={filteredList.length}
+                  {...actionButtonProps}
                 >
                   <AutoSizer>
                     {/* @ts-ignore */}
@@ -126,6 +147,8 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({ rgOptions: list, en
                         itemCount={filteredList.length}
                         itemSize={44}
                         onItemsRendered={onItemsRendered}
+                        overscanCount={10}
+                        ref={listRef}
                       >
                         {ListEntry}
                       </List>

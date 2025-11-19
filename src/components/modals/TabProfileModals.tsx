@@ -1,9 +1,9 @@
-import { ConfirmModal, Field, TextField, quickAccessControlsClasses } from 'decky-frontend-lib';
+import { ConfirmModal, Field, TextField, quickAccessControlsClasses } from '@decky/ui';
 import { VFC, useState, Fragment, FC } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { TabMasterContextProvider } from "../../state/TabMasterContext";
 import { TabProfileModalStyles } from "../styles/TabProfileModalStyles";
-import { TabListLabel } from '../TabListLabel';
+import { TabListLabel } from '../other/TabListLabel';
 import { ScrollableWindow } from '../generic/ScrollableWindow';
 import { DestructiveModal } from '../generic/DestructiveModal';
 
@@ -43,7 +43,7 @@ export const CreateTabProfileModal: VFC<CreateTabProfileModalProps> = ({ tabMast
             } />
           </div>
           <div style={{ marginRight: '-4px' }}>
-            <ScrollableWindow height='180px' fadeAmount={'12px'}>
+            <ScrollableWindow height='180px' fadeAmount={'12px'} onCancel={() => closeModal!()}>
               <div style={{ padding: '0 20px' }}>
                 {visibleTabs.map(tabContainer =>
                   <TabItem >
@@ -90,7 +90,7 @@ export const OverwriteTabProfileModal: VFC<OverwriteTabProfileModalProps> = ({ p
             </div>
             <div style={{ height: '1.5px', background: '#ffffff1a' }} />
             <div style={{ marginRight: '-4px' }}>
-              <ScrollableWindow height='200px' fadeAmount={'12px'}>
+              <ScrollableWindow height='200px' fadeAmount={'12px'} onCancel={() => closeModal!()}>
                 <div style={{ display: 'flex', flexDirection: 'row', padding: '0 20px', gap: '30px' }}>
                   <div style={{ flex: 1 }}>
                     {visibleTabsList.map(tabContainer =>

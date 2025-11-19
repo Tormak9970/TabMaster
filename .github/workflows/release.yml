@@ -9,7 +9,7 @@ jobs:
   create-release:
     permissions:
       contents: write
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     outputs:
       release_id: ${{ steps.create-release.outputs.result }}
       change_log: ${{ steps.changelog.outputs.changelog }}
@@ -57,7 +57,7 @@ jobs:
     needs: create-release
     permissions:
       contents: write
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
@@ -128,6 +128,9 @@ jobs:
 
             const cwdPath = path.resolve(process.cwd());
 
+            // * manually install rollup
+            child_process.execSync("pnpm i rollup");
+            
             // * build the plugin with `pnpm build`
             child_process.execSync("pnpm build");
 
@@ -166,7 +169,7 @@ jobs:
     needs: [create-release, build-plugin]
     permissions:
       contents: write
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository

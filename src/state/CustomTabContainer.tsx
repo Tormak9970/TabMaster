@@ -1,8 +1,9 @@
-import { EditableTabSettings } from "./modals/EditTabModal";
-import { TabFilterSettings, FilterType, Filter } from "./filters/Filters";
+import { EditableTabSettings } from "../components/modals/EditTabModal";
+import { TabFilterSettings, FilterType, Filter } from "../components/filters/Filters";
 import { filtersHaveType, getIncludedCategoriesFromBitField } from "../lib/Utils";
-import { gamepadTabbedPageClasses, showModal } from "decky-frontend-lib";
-import { SortOverrideMessage } from './modals/SortOverrideMessage';
+import { gamepadTabbedPageClasses, showModal } from "@decky/ui";
+import { SortOverrideMessage } from '../components/modals/SortOverrideMessage';
+import { ReactElement } from 'react';
 
 /**
  * Wrapper for injecting custom tabs.
@@ -61,22 +62,24 @@ export class CustomTabContainer implements TabContainer {
     this.checkMicroSDeckDependency();
   }
 
-  getActualTab(TabContentComponent: TabContentComponent, sortingProps: Omit<TabContentProps, 'collection'>, footer: SteamTab['footer'] = {}, collectionAppFilter: any, isMicroSDeckInstalled: boolean): SteamTab | null {
+  getActualTab(TabAppGrid: TabAppGridComponent, TabContext: TabContext | undefined, sortingProps: Omit<TabAppGridComponentProps, 'collection'>, footer: SteamTab['footer'] = {}, collectionAppFilter: any, isMicroSDeckInstalled: boolean): SteamTab | null {
     if (!isMicroSDeckInstalled && this.dependsOnMicroSDeck) return null;
     if (this.autoHide && this.collection.visibleApps.length === 0) return null;
     const showSortOverride = () => showModal(<SortOverrideMessage eSortBy={this.sortByOverride} />);
     if (this.sortByOverride !== -1) footer.onOptionsButton = showSortOverride;
+    const createContent = (inner: ReactElement) => !TabContext ? inner : <TabContext.Provider value={{ label: this.title }}>{inner}</TabContext.Provider>;
 
     return {
       title: this.title,
       id: this.id,
       footer: footer,
-      content: <TabContentComponent
-        collection={this.collection}
-        setSortBy={sortingProps.setSortBy}
-        eSortBy={this.sortByOverride === -1 ? sortingProps.eSortBy : this.sortByOverride}
-        showSortingContextMenu={this.sortByOverride === -1 ? sortingProps.showSortingContextMenu : showSortOverride}
-      />,
+      content: createContent(
+        <TabAppGrid
+          collection={this.collection}
+          setSortBy={sortingProps.setSortBy}
+          eSortBy={this.sortByOverride === -1 ? sortingProps.eSortBy : this.sortByOverride}
+          showSortingContextMenu={this.sortByOverride === -1 ? sortingProps.showSortingContextMenu : showSortOverride}
+        />),
       renderTabAddon: () => {
         return <span className={gamepadTabbedPageClasses.TabCount}>
           {this.collection.GetAppCountWithToolsFilter(collectionAppFilter)}
