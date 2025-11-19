@@ -14,6 +14,8 @@ const mobxReactionFilter = (mod: any) => {
       return val;
     }
   }
+
+  return;
 };
 
 const res = findModuleChild(mobxReactionFilter);
