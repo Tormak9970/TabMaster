@@ -26,7 +26,7 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldLabel} {
         display: none;
       }
-      .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildren} {
+      .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildrenInner} {
         width: 100%;
       }
       .tab-master-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldChildrenWithIcon} {
@@ -43,7 +43,7 @@ export const ModalStyles: VFC<{}> = ({}) => {
         display: none;
       }
       /* The button item */
-      .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.FieldChildren} > button.${gamepadDialogClasses.Button}.DialogButton {
+      .tab-master-modal-scope .filter-entry .${gamepadDialogClasses.FieldChildrenInner} > button.${gamepadDialogClasses.Button}.DialogButton {
         padding: 10px;
         min-width: 45px;
       }
