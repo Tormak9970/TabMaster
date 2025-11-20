@@ -1,6 +1,5 @@
 import { getCompactTimestamp, validateTabStructure } from "../Utils";
 import { TabProfileDictionary } from '../../state/TabProfileManager';
-import { PluginController } from './PluginController';
 import { USER_BACKUP_NAME } from '../../constants';
 import { call, FileSelectionType, openFilePicker, toaster } from '@decky/api';
 
@@ -8,6 +7,12 @@ import { call, FileSelectionType, openFilePicker, toaster } from '@decky/api';
  * Class for frontend -> backend communication.
  */
 export class PythonInterop {
+  static isDismounted = false;
+
+  static dismount() {
+    PythonInterop.isDismounted = true
+  }
+
   /**
    * Gets the user's desktop path.
    * @returns The path.
@@ -292,7 +297,7 @@ export class PythonInterop {
    */
   static toast(title: string, message: string): void {
     setTimeout(() => {
-      if (PluginController.isDismounted) return;
+      if (PythonInterop.isDismounted) return;
       try {
         toaster.toast({
           title: title,

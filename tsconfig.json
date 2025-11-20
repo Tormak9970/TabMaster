@@ -6,7 +6,6 @@
     "jsx": "react",
     "jsxFactory": "window.SP_REACT.createElement",
     "declaration": false,
-    "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "esModuleInterop": true,
