@@ -21,6 +21,7 @@ class Plugin:
   user_id: str = None
   users_dict: dict[str, dict] = None
   tags: list[dict] = None
+  save_on_shutdown = True
 
   settings: SettingsManager
 
@@ -35,11 +36,29 @@ class Plugin:
   async def get_user_desktop(self) -> str:
     return os.environ["DECKY_USER_HOME"] + "/Desktop"
 
+  async def restore_settings(self, source_path: str) -> bool:
+    """
+    Waits until users_dict is loaded, then returns restores settings
+    """
+    while Plugin.users_dict is None:
+      await asyncio.sleep(0.1)
+
+    success = True
+
+    try:
+      with open(source_path, 'r', encoding='utf-8') as settings_file:
+        data = json.loads(settings_file)
+        self.settings.settings = data
+        self.settings.commit()
+        self.save_on_shutdown = False
+    except:
+      success = False
+
+    return success
+
   async def backup_settings(self, dest_path: str) -> bool:
     """
-    Waits until users_dict is loaded, then returns users_dict
-
-    :return: The users dictionary
+    Waits until users_dict is loaded, then backs up settings
     """
     while Plugin.users_dict is None:
       await asyncio.sleep(0.1)
@@ -198,22 +217,37 @@ class Plugin:
 
   # Plugin settings setters
   async def set_tabs(self, tabs: dict[str, dict]):
+    if not self.save_on_shutdown:
+      return
+    
     Plugin.users_dict[Plugin.user_id]["tabs"] = tabs
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
   async def set_tags(self, tags: list[dict]):
+    if not self.save_on_shutdown:
+      return
+    
     Plugin.tags = tags
     await Plugin.set_setting(self, "tags", Plugin.tags)
 
   async def set_friends(self, friends: list[dict]):
+    if not self.save_on_shutdown:
+      return
+    
     Plugin.users_dict[Plugin.user_id]["friends"] = friends
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
   async def set_friends_games(self, friends_games: dict[str, list[int]]):
+    if not self.save_on_shutdown:
+      return
+    
     Plugin.users_dict[Plugin.user_id]["friendsGames"] = friends_games
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
   async def set_tab_profiles(self, tab_profiles: dict[str, list[str]]):
+    if not self.save_on_shutdown:
+      return
+    
     Plugin.users_dict[Plugin.user_id]["tabProfiles"] = tab_profiles
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 

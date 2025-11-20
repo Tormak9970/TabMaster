@@ -61,6 +61,43 @@ export class PythonInterop {
       return e;
     }
   }
+  
+  /**
+   * Gets a file chosen by the user.
+   * @returns The choosen file.
+   */
+  static async openJSONFile(): Promise<string | Error> {
+    const startPath = await this.getUserDesktopPath();
+
+    if (startPath instanceof Error) {
+      return startPath;
+    }
+
+    const res = await openFilePicker(
+      FileSelectionType.FILE,
+      startPath,
+      true,
+      true,
+      undefined,
+      ['json'],
+      false,
+      false
+    );
+
+    return res.realpath;
+  }
+  
+  /**
+   * Restores the plugin's settings from a previous backup.
+   * @param srcPath The path to the settings to restore.
+   */
+  static async restoreSettings(srcPath: string): Promise<boolean | Error> {
+    try {
+      return await call<[src_path: string], boolean>("restore_settings", srcPath);
+    } catch(e: any) {
+      return e;
+    }
+  }
 
     /**
    * Backs up the plugin's settings to default settings dir.

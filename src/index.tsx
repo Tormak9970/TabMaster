@@ -14,7 +14,6 @@ import { Fragment } from 'react';
 declare global {
   let DeckyPluginLoader: DeckyLoader;
   var MicroSDeck: MicroSDeck | undefined;
-  var SteamClient: SteamClient;
   let collectionStore: CollectionStore;
   let appStore: AppStore;
   let loginStore: LoginStore;
