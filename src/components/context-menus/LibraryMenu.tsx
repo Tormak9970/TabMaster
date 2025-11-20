@@ -11,6 +11,7 @@ import { TabListLabel } from '../other/TabListLabel';
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 import { TabProfilesSubMenu } from './TabProfileMenu';
 import { TabIdEntryType } from "../qam/QuickAccessContent";
+import { showAddCollectionModal } from "../modals/AddCollectionModal";
 
 export interface LibraryMenuProps {
   closeMenu: () => void;
@@ -97,6 +98,19 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
         onClick={() => showModalEditTab(tabContainer as CustomTabContainer, tabMasterManager)}
       >
         Edit
+      </MenuItem>
+    }
+    {isCustomTab &&
+      <MenuItem
+        onOKActionDescription={`Create a collection from this tab`}
+        onClick={() => {
+          const customTab = tabContainer as CustomTabContainer
+          customTab.buildCollection()
+
+          showAddCollectionModal(customTab.collection.allApps)
+        }}
+      >
+        Snapshot
       </MenuItem>
     }
     <MenuItem onClick={() => tabMasterManager.hideTab(selectedTabId)} onOKActionDescription={`Hide "${tabTitle}"`}>
