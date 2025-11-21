@@ -198,6 +198,22 @@ export class PythonInterop {
   }
 
   /**
+   * Gets the shared tabs.
+   * @returns A promise resolving to the shared tabs or null when the tab structure fails validation
+   */
+  static async getSharedTabs(): Promise<TabSettingsDictionary | Error | null> {
+    try {
+      const result = await call<[], TabSettingsDictionary>("get_shared_tabs");
+
+      if (!validateTabStructure(result))  return null;
+
+      return result;
+    } catch (e: any) {
+      return e;
+    }
+  }
+
+  /**
    * Gets the store tags.
    * @returns A promise resolving to the store tags.
    */

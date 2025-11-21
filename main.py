@@ -162,6 +162,31 @@ class Plugin:
     tabs = Plugin.users_dict[Plugin.user_id]["tabs"]
     log(f"Got tabs {tabs}")
     return tabs or {}
+  
+  async def get_shared_tabs(self) -> dict[str, dict] | None:
+    """
+    Waits until tabs are loaded, then returns the tabs that are available from other users
+
+    :return: The tabs
+    """
+    while Plugin.users_dict is None:
+      await asyncio.sleep(0.1)
+    
+    tabs = {}
+
+    for user_id in Plugin.users_dict:
+      if user_id != Plugin.user_id:
+        user_tabs = Plugin.users_dict[user_id]["tabs"]
+        
+        for tab_name in user_tabs:
+          tab = user_tabs[tab_name]
+
+          if tab.visibleToOthers:
+            tabs[tab_name] = tab
+
+    tabs = Plugin.users_dict[Plugin.user_id]["tabs"]
+    log(f"Got shared tabs {tabs}")
+    return tabs or {}
 
   async def get_tags(self) -> list[dict] | None:
     """

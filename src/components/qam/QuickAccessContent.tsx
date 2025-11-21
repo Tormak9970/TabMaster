@@ -10,7 +10,7 @@ import {
 } from "@decky/ui";
 import { VFC, useState } from "react";
 
-import { FaBook, FaBookmark, FaArrowUpFromBracket, FaArrowRightToBracket, FaFolderPlus } from "react-icons/fa6";
+import { FaBook, FaBookmark, FaArrowUpFromBracket, FaArrowRightToBracket, FaFolderPlus, FaSlideshare } from "react-icons/fa6";
 import { PiListPlusBold } from "react-icons/pi";
 
 import { useTabMasterContext } from "../../state/TabMasterContext";
@@ -155,6 +155,16 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
                 onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />)}
               >
                 <PiListPlusBold size='1.4em' />
+              </DialogButton>
+            </Focusable>
+            <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
+              <DialogButton
+                disabled={!tabMasterManager.hasSettingsLoaded}
+                style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center" }}
+                onOKActionDescription={'View Shared Tabs'}
+                onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />)}
+              >
+                <FaSlideshare size='1.4em' />
               </DialogButton>
             </Focusable>
             <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
