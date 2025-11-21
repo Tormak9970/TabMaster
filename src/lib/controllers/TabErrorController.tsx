@@ -29,7 +29,10 @@ export class TabErrorController {
 
     validationSet.forEach(item => {
       const tabContainer = tabsMap.get(item.tabId);
-      if (tabContainer && tabContainer.filters) tabsSettings[item.tabId] = tabContainer;
+      if (tabContainer && tabContainer.filters) {
+        if (!Object.keys(tabContainer)) tabContainer.visibleToOthers = false;
+        tabsSettings[item.tabId] = tabContainer;
+      }
     });
 
     const tabsToFix = this.checkForBrokenFilters(tabsSettings);
