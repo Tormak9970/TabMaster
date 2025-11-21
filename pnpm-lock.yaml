@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@cebbinghaus/microsdeck':
-        specifier: 0.10.0-edd7525
-        version: 0.10.0-edd7525
+        specifier: 0.11.0-67f2353
+        version: 0.11.0-67f2353
       react-icons:
         specifier: ^4.12.0
         version: 4.12.0(react@19.1.0)
@@ -102,8 +102,8 @@ packages:
     resolution: {integrity: sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==}
     engines: {node: '>=6.9.0'}
 
-  '@cebbinghaus/microsdeck@0.10.0-edd7525':
-    resolution: {integrity: sha512-QPB37kOIz9xU7M00Q0Ee5nkbT5V6Z1eFh55UxR+esWnlzJqViDmC0rJ7d7PpZtnd+s/6CCvGPd1v4zO0oUZ4OA==}
+  '@cebbinghaus/microsdeck@0.11.0-67f2353':
+    resolution: {integrity: sha512-ejr2lujTOyxw4NTZcVUHOyKQNt8yda6m7Q7Gv6ssHbK8VuDvTpUbSH9/fy9CnuulgoFkQZwJmAp7jQ5X29rBww==}
 
   '@commitlint/cli@17.8.1':
     resolution: {integrity: sha512-ay+WbzQesE0Rv4EQKfNbSMiJJ12KdKTDzIt0tcK4k11FdsWmtwP0Kp1NWMOUswfIWo6Eb7p7Ln721Nx9FLNBjg==}
@@ -1693,7 +1693,7 @@ snapshots:
 
   '@babel/runtime@7.27.6': {}
 
-  '@cebbinghaus/microsdeck@0.10.0-edd7525':
+  '@cebbinghaus/microsdeck@0.11.0-67f2353':
     dependencies:
       semver: 7.7.2
 
