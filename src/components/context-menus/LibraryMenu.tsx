@@ -2,7 +2,7 @@ import { Menu, MenuItem, showModal, Focusable, MenuGroup, ReorderableEntry, Reor
 import { FC, Fragment, VFC, useState } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { TabMasterContextProvider, useTabMasterContext } from '../../state/TabMasterContext';
-import { showModalEditTab, showModalNewTab } from '../modals/EditTabModal';
+import { showModalDuplicateTab, showModalEditTab, showModalNewTab } from '../modals/EditTabModal';
 import { LibraryMenuStyles } from '../styles/LibraryMenuStyles';
 import { DestructiveModal } from '../generic/DestructiveModal';
 import { PresetMenuItems } from './PresetMenu';
@@ -98,6 +98,14 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
         onClick={() => showModalEditTab(tabContainer as CustomTabContainer, tabMasterManager)}
       >
         Edit
+      </MenuItem>
+    }
+    {isCustomTab &&
+      <MenuItem
+        onOKActionDescription={`Duplicate "${tabTitle}"`}
+        onClick={() => showModalDuplicateTab(tabContainer as CustomTabContainer, tabMasterManager)}
+      >
+        Duplicate
       </MenuItem>
     }
     {isCustomTab &&

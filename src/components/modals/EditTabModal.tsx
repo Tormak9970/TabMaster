@@ -279,6 +279,37 @@ export function showModalNewTab(tabMasterManager: TabMasterManager) {
 }
 
 /**
+ * Function to show the EditTabModal when duplicating a tab.
+ * @param tabContainer CustomTabContainer to duplicate.
+ * @param tabMasterManager TabMasterManager instance.
+ */
+export function showModalDuplicateTab(tabContainer: CustomTabContainer, tabMasterManager: TabMasterManager) {
+  showModal(
+    <EditTabModal
+      onConfirm={(_: any, tabSettings: EditableTabSettings) => {
+        tabMasterManager.createCustomTab(
+          tabSettings.title,
+          tabMasterManager.getTabs().visibleTabsList.length,
+          tabSettings.filters,
+          tabSettings.filtersMode,
+          tabSettings.categoriesToInclude,
+          tabSettings.autoHide,
+          tabSettings.visibleToOthers,
+          tabSettings.sortByOverride
+        );
+      }}
+      tabMasterManager={tabMasterManager}
+      tabFilters={structuredClone(tabContainer.filters)}
+      filtersMode={tabContainer.filtersMode}
+      categoriesToInclude={tabContainer.categoriesToInclude}
+      autoHide={tabContainer.autoHide}
+      visibleToOthers={tabContainer.visibleToOthers}
+      sortBy={tabContainer.sortByOverride}
+    />
+  );
+}
+
+/**
  * Function to show the EditTabModal when editing a tab.
  * @param tabContainer CustomTabContainer to edit.
  * @param tabMasterManager TabMasterManager instance.
