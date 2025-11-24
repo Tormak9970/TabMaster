@@ -29,6 +29,7 @@ import { GITHUB_URL, DISCORD_URL } from '../../constants';
 import { InvalidSettingsNotice } from './InvalidSettingsNotice';
 import { TabsPanelSection } from './TabsPanelSection';
 import { ErrorNotice } from './ErrorNotice';
+import { showModalSharedTabs } from "../modals/SharedTabsModal";
 
 
 export type TabIdEntryType = {
@@ -162,7 +163,7 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
                 disabled={!tabMasterManager.hasSettingsLoaded}
                 style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center" }}
                 onOKActionDescription={'View Shared Tabs'}
-                onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />)}
+                onClick={() => showModalSharedTabs(tabMasterManager)}
               >
                 <FaSlideshare size='1.4em' />
               </DialogButton>

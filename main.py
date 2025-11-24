@@ -181,10 +181,12 @@ class Plugin:
         for tab_name in user_tabs:
           tab = user_tabs[tab_name]
 
-          if tab.visibleToOthers:
-            tabs[tab_name] = tab
+          if "visibleToOthers" in tab and tab["visibleToOthers"]:
+            if user_id not in tabs:
+              tabs[user_id] = {}
+            
+            tabs[user_id][tab_name] = tab
 
-    tabs = Plugin.users_dict[Plugin.user_id]["tabs"]
     log(f"Got shared tabs {tabs}")
     return tabs or {}
 
