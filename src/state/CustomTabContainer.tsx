@@ -17,6 +17,7 @@ export class CustomTabContainer implements TabContainer {
   filtersMode: LogicalMode;
   categoriesToInclude: number;
   autoHide: boolean;
+  visibleToOthers: boolean;
   dependsOnMicroSDeck: boolean;
   sortByOverride: number;
 
@@ -29,9 +30,10 @@ export class CustomTabContainer implements TabContainer {
    * @param filtersMode boolean operator for top level filters
    * @param categoriesToInclude A bit field of which categories should be included in the tab.
    * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
+   * @param visibleToOthers Whether or not the tab can be added by other users.
    * @param sortByOverride The eSortBy number to force use for sorting. -1 ignores override.
    */
-  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean, sortByOverride: number) {
+  constructor(id: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean, visibleToOthers: boolean, sortByOverride: number) {
     this.id = id;
     this.title = title;
     this.position = position;
@@ -39,6 +41,7 @@ export class CustomTabContainer implements TabContainer {
     this.filtersMode = filtersMode;
     this.categoriesToInclude = categoriesToInclude;
     this.autoHide = autoHide;
+    this.visibleToOthers = visibleToOthers;
     this.dependsOnMicroSDeck = false;
     this.sortByOverride = sortByOverride;
 
@@ -128,6 +131,7 @@ export class CustomTabContainer implements TabContainer {
     this.categoriesToInclude = updatedTabInfo.categoriesToInclude;
     this.filters = updatedTabInfo.filters;
     this.autoHide = updatedTabInfo.autoHide;
+    this.visibleToOthers = updatedTabInfo.visibleToOthers;
     this.sortByOverride = updatedTabInfo.sortByOverride;
     this.buildCollection();
     this.checkMicroSDeckDependency();

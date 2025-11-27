@@ -32,7 +32,7 @@ export const QamStyles: VFC<{}> = ({}) => {
         margin-left: 5px;
       }
 
-      .tab-master-scope .${gamepadDialogClasses.FieldChildren} {
+      .tab-master-scope .${gamepadDialogClasses.FieldChildrenInner} {
         margin: 0px 16px;
       }
       .tab-master-scope .${gamepadDialogClasses.FieldLabel} {
@@ -45,7 +45,7 @@ export const QamStyles: VFC<{}> = ({}) => {
       .tab-master-scope .add-tab-btn .${gamepadDialogClasses.FieldLabel} {
         display: none;
       }
-      .tab-master-scope .add-tab-btn .${gamepadDialogClasses.FieldChildren} {
+      .tab-master-scope .add-tab-btn .${gamepadDialogClasses.FieldChildrenInner} {
         width: calc(100% - 32px);
       }
 
@@ -79,7 +79,7 @@ export const QamStyles: VFC<{}> = ({}) => {
         display: none
       }
 
-      .tab-master-scope .no-sep .${gamepadDialogClasses.FieldChildren} {
+      .tab-master-scope .no-sep .${gamepadDialogClasses.FieldChildrenInner} {
         width: 100%;
       }
       .tab-master-scope .no-sep .${(gamepadDialogClasses as any).FieldChildrenWithIcon} {

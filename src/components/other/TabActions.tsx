@@ -2,9 +2,10 @@ import { MenuItem, showModal, Menu, showContextMenu, DialogButton } from "@decky
 import { VFC } from "react"
 import { FaEllipsisH } from "react-icons/fa"
 import { TabMasterManager } from "../../state/TabMasterManager"
-import { showModalEditTab } from "../modals/EditTabModal"
+import { showModalDuplicateTab, showModalEditTab } from "../modals/EditTabModal"
 import { DestructiveModal } from '../generic/DestructiveModal';
 import { CustomTabContainer } from '../../state/CustomTabContainer';
+import { showAddCollectionModal } from "../modals/AddCollectionModal"
 
 interface TabActionsContextMenuProps {
   tabContainer: TabContainer,
@@ -22,6 +23,25 @@ export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabCont
   ];
 
   if (tabContainer.filters) {
+    menuItems.unshift(
+      <MenuItem
+        onClick={() => {
+          const customTab = tabContainer as CustomTabContainer
+          customTab.buildCollection()
+
+          showAddCollectionModal(customTab.collection.allApps)
+        }}
+      >
+        Snapshot
+      </MenuItem>
+    );
+
+    menuItems.unshift(
+      <MenuItem onSelected={() => showModalDuplicateTab(tabContainer as CustomTabContainer, tabMasterManager)}>
+        Duplicate
+      </MenuItem>
+    );
+
     menuItems.unshift(
       <MenuItem onSelected={() => showModalEditTab(tabContainer as CustomTabContainer, tabMasterManager)}>
         Edit

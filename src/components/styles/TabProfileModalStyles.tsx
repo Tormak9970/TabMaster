@@ -24,7 +24,7 @@ export const TabProfileModalStyles: VFC<{}> = ({}) => {
       .tab-master-tab-profile-modal-scope .styled-btn .${gamepadDialogClasses.FieldLabel} {
         display: none;
       }
-      .tab-master-tab-profile-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildren} {
+      .tab-master-tab-profile-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildrenInner} {
         width: 100%;
       }
       .tab-master-tab-profile-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldChildrenWithIcon} {

@@ -1,6 +1,5 @@
 import { getCompactTimestamp, validateTabStructure } from "../Utils";
 import { TabProfileDictionary } from '../../state/TabProfileManager';
-import { PluginController } from './PluginController';
 import { USER_BACKUP_NAME } from '../../constants';
 import { call, FileSelectionType, openFilePicker, toaster } from '@decky/api';
 
@@ -8,6 +7,12 @@ import { call, FileSelectionType, openFilePicker, toaster } from '@decky/api';
  * Class for frontend -> backend communication.
  */
 export class PythonInterop {
+  static isDismounted = false;
+
+  static dismount() {
+    PythonInterop.isDismounted = true
+  }
+
   /**
    * Gets the user's desktop path.
    * @returns The path.
@@ -52,6 +57,43 @@ export class PythonInterop {
   static async backupSettings(destPath: string): Promise<boolean | Error> {
     try {
       return await call<[dest_path: string], boolean>("backup_settings", `${destPath}/${USER_BACKUP_NAME}_${getCompactTimestamp()}.json`);
+    } catch(e: any) {
+      return e;
+    }
+  }
+  
+  /**
+   * Gets a file chosen by the user.
+   * @returns The choosen file.
+   */
+  static async openJSONFile(): Promise<string | Error> {
+    const startPath = await this.getUserDesktopPath();
+
+    if (startPath instanceof Error) {
+      return startPath;
+    }
+
+    const res = await openFilePicker(
+      FileSelectionType.FILE,
+      startPath,
+      true,
+      true,
+      undefined,
+      ['json'],
+      false,
+      false
+    );
+
+    return res.realpath;
+  }
+  
+  /**
+   * Restores the plugin's settings from a previous backup.
+   * @param srcPath The path to the settings to restore.
+   */
+  static async restoreSettings(srcPath: string): Promise<boolean | Error> {
+    try {
+      return await call<[src_path: string], boolean>("restore_settings", srcPath);
     } catch(e: any) {
       return e;
     }
@@ -148,6 +190,22 @@ export class PythonInterop {
       const result = await call<[], TabSettingsDictionary>("get_tabs");
 
       if (!validateTabStructure(result))  return null;
+
+      return result;
+    } catch (e: any) {
+      return e;
+    }
+  }
+
+  /**
+   * Gets the shared tabs.
+   * @returns A promise resolving to the shared tabs or null when the tab structure fails validation
+   */
+  static async getSharedTabs(): Promise<Record<string, TabSettingsDictionary> | Error | null> {
+    try {
+      const result = await call<[], Record<string, TabSettingsDictionary>>("get_shared_tabs");
+
+      if (Object.values(result).some((tabs) => !validateTabStructure(tabs))) return null;
 
       return result;
     } catch (e: any) {
@@ -292,7 +350,7 @@ export class PythonInterop {
    */
   static toast(title: string, message: string): void {
     setTimeout(() => {
-      if (PluginController.isDismounted) return;
+      if (PythonInterop.isDismounted) return;
       try {
         toaster.toast({
           title: title,
