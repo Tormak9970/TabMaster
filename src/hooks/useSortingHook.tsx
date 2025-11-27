@@ -1,12 +1,7 @@
-import { findModuleChild } from "@decky/ui"
+import { findModuleExport } from "@decky/ui"
 
-export const useSortingHook = findModuleChild((mod) => {
-    if (typeof mod !== 'object') return undefined
-    for (const prop in mod) {
-        if (mod[prop]?.toString && mod[prop].toString().includes('setItem("AppGridDisplaySettings"')) {
-            return mod[prop]
-        }
-    }
+export const useSortingHook = findModuleExport(modExport => {
+  if (modExport?.toString().includes('setItem("AppGridDisplaySettings"')) return modExport;
 }) as () => {
     eSortBy: number
     setSortBy: (e: any) => void
