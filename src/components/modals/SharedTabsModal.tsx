@@ -18,6 +18,7 @@ import { showModalDuplicateTab } from "./EditTabModal";
 import { SharedTabsModalStyles } from "../styles/SharedTabsStyles";
 import { SharedTabAccordion } from "../accordions/SharedTabAccordion";
 import { FaRegWindowMaximize } from "react-icons/fa6";
+import { useTabMasterContext } from "../../state/TabMasterContext";
 
 type UserTabProps = {
   tab: TabSettings,
@@ -56,16 +57,18 @@ export const SharedTabsModal: VFC<SharedTabsModalProps> = ({ closeModal, onConfi
   const [loading, setLoading] = useState(true);
   const [sharedTabs, setSharedTabs] = useState<Record<string, TabSettingsDictionary>>({});
 
+  const tabMasterManager = useTabMasterContext()
+
   const tabsByUser: { user: string, tabs: TabSettings[] }[] = useMemo(() => {
     if (loading) return [];
 
-    return Array.from(Object.entries(sharedTabs).map(([user, tabs]) => {
+    return Array.from(Object.entries(sharedTabs).map(([userId, tabs]) => {
       return {
-        user,
+        user: tabMasterManager.currentUsersFriends.find((friend) => friend.steamid.toString() === userId)?.name ?? userId,
         tabs: Array.from(Object.values(tabs))
       };
     }));
-  }, [sharedTabs]);
+  }, [sharedTabs, tabMasterManager.currentUsersFriends]);
 
   useEffect(() => {
     PythonInterop.getSharedTabs().then((res) => {
