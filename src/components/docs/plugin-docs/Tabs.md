@@ -11,7 +11,9 @@
    - Changing Tabs
    - Reordering Tabs
    - Hiding Tabs
+ - Duplicating Tabs
  - Removing Tabs
+ - Sharing Tabs
 
 <br/>
 
@@ -87,9 +89,18 @@ Tabs can be hidden from the library as well. This means they won't appear in you
 
 <br/>
 
+### Duplicating Tabs
+Tabs can be duplicated from either the Library Context Menu or the QAM Menu. This will bring you to the "Create Tab" modal with the filters pre-filtered.
+
+<br/>
 
 ### Removing Tabs (Custom Tabs Only)
 If you decide your custom tab just isn't cutting it, you can completely remove it too. To do this, navigate to the tab's menu (the same one where you edit and hide tabs), and click `delete`. You will be prompted to confirm (as this can't be undone!), and once you do, the tab will be perminantly removed from TabMaster.
+
+<br/>
+
+### Sharing Tabs
+Tabs can be shared with other users on your device. Simply toggle "Other users can copy this tab" to true, and it will show up for them in the shared tabs modal.
 
 <br/>
 

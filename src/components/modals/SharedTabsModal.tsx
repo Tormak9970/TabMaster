@@ -18,7 +18,6 @@ import { showModalDuplicateTab } from "./EditTabModal";
 import { SharedTabsModalStyles } from "../styles/SharedTabsStyles";
 import { SharedTabAccordion } from "../accordions/SharedTabAccordion";
 import { FaRegWindowMaximize } from "react-icons/fa6";
-import { useTabMasterContext } from "../../state/TabMasterContext";
 
 type UserTabProps = {
   tab: TabSettings,
@@ -51,24 +50,25 @@ const UserTab: VFC<UserTabProps> = ({ tab, closeModal, onConfirm }: UserTabProps
 export type SharedTabsModalProps = {
   closeModal?: () => void,
   onConfirm: (tabSettings: TabSettings) => void,
+  tabMasterManager: TabMasterManager,
 }
 
-export const SharedTabsModal: VFC<SharedTabsModalProps> = ({ closeModal, onConfirm }: SharedTabsModalProps) => {
+export const SharedTabsModal: VFC<SharedTabsModalProps> = ({ closeModal, onConfirm, tabMasterManager }: SharedTabsModalProps) => {
   const [loading, setLoading] = useState(true);
   const [sharedTabs, setSharedTabs] = useState<Record<string, TabSettingsDictionary>>({});
 
-  const tabMasterManager = useTabMasterContext()
+  const { currentUsersFriends } = useMemo(() => tabMasterManager.getFriendsAndTags(), [tabMasterManager]);
 
   const tabsByUser: { user: string, tabs: TabSettings[] }[] = useMemo(() => {
     if (loading) return [];
 
     return Array.from(Object.entries(sharedTabs).map(([userId, tabs]) => {
       return {
-        user: tabMasterManager.currentUsersFriends.find((friend) => friend.steamid.toString() === userId)?.name ?? userId,
+        user: currentUsersFriends.find((friend) => friend.steamid.toString() === userId)?.name ?? userId,
         tabs: Array.from(Object.values(tabs))
       };
     }));
-  }, [sharedTabs, tabMasterManager.currentUsersFriends]);
+  }, [sharedTabs, currentUsersFriends]);
 
   useEffect(() => {
     PythonInterop.getSharedTabs().then((res) => {
@@ -145,6 +145,7 @@ export function showModalSharedTabs(tabMasterManager: TabMasterManager) {
 
         showModalDuplicateTab(container, tabMasterManager);
       }}
+      tabMasterManager={tabMasterManager}
     />
   );
 }
