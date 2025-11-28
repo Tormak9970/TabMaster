@@ -35,6 +35,7 @@ type EditTabModalProps = {
   filtersMode: LogicalMode,
   categoriesToInclude: number, //bit field
   autoHide: boolean;
+  visibleToOthers: boolean;
   sortBy: number;
 };
 
@@ -42,7 +43,7 @@ type EditTabModalProps = {
 /**
  * The modal for editing and creating custom tabs.
  */
-export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager, filtersMode, categoriesToInclude, autoHide: _autoHide, sortBy }) => {
+export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, tabId, tabTitle, tabFilters, tabMasterManager, filtersMode, categoriesToInclude, autoHide: _autoHide, visibleToOthers: _visibleToOthers, sortBy }) => {
   const [name, setName] = useState<string>(tabTitle ?? '');
   const [topLevelFilters, setTopLevelFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters);
   const [topLevelLogicMode, setTopLevelLogicMode] = useState<LogicalMode>(filtersMode);
@@ -51,6 +52,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
   const [canAddFilter, setCanAddFilter] = useState<boolean>(true);
   const [patchInput, setPatchInput] = useState<boolean>(true);
   const [autoHide, setAutoHide] = useState<boolean>(_autoHide);
+  const [visibleToOthers, setVisibleToOthers] = useState<boolean>(_visibleToOthers);
   const [sortByOverride, setSortByOverride] = useState(sortBy);
   const sortOptions: SingleDropdownOption[] = useSortingMenuItems([]);
 
@@ -92,7 +94,8 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
         filtersMode: topLevelLogicMode,
         categoriesToInclude: catsToInclude,
         autoHide: autoHide,
-        sortByOverride: sortByOverride
+        sortByOverride: sortByOverride,
+        visibleToOthers: visibleToOthers
       };
       onConfirm(tabId, updated);
       closeModal!();
@@ -138,6 +141,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
             <IncludeCategoriesPanel categoriesToInclude={catsToInclude} setCategoriesToInclude={setCatsToInclude} />
             <div className='field-item-container'>
               <ToggleField label='Automatically hide tab if empty' checked={autoHide} onChange={checked => setAutoHide(checked)} bottomSeparator='thick' />
+              <ToggleField label='Other users can copy this tab' checked={visibleToOthers} onChange={checked => setVisibleToOthers(checked)} bottomSeparator='thick' />
               <DropdownItem
                 label='Sort apps by'
                 rgOptions={sortOptions}
@@ -259,6 +263,7 @@ export function showModalNewTab(tabMasterManager: TabMasterManager) {
           tabSettings.filtersMode,
           tabSettings.categoriesToInclude,
           tabSettings.autoHide,
+          tabSettings.visibleToOthers,
           tabSettings.sortByOverride
         );
       }}
@@ -267,7 +272,39 @@ export function showModalNewTab(tabMasterManager: TabMasterManager) {
       filtersMode="and"
       categoriesToInclude={IncludeCategories.games}
       autoHide={false}
+      visibleToOthers={false}
       sortBy={-1}
+    />
+  );
+}
+
+/**
+ * Function to show the EditTabModal when duplicating a tab.
+ * @param tabContainer CustomTabContainer to duplicate.
+ * @param tabMasterManager TabMasterManager instance.
+ */
+export function showModalDuplicateTab(tabContainer: CustomTabContainer, tabMasterManager: TabMasterManager) {
+  showModal(
+    <EditTabModal
+      onConfirm={(_: any, tabSettings: EditableTabSettings) => {
+        tabMasterManager.createCustomTab(
+          tabSettings.title,
+          tabMasterManager.getTabs().visibleTabsList.length,
+          tabSettings.filters,
+          tabSettings.filtersMode,
+          tabSettings.categoriesToInclude,
+          tabSettings.autoHide,
+          tabSettings.visibleToOthers,
+          tabSettings.sortByOverride
+        );
+      }}
+      tabMasterManager={tabMasterManager}
+      tabFilters={structuredClone(tabContainer.filters)}
+      filtersMode={tabContainer.filtersMode}
+      categoriesToInclude={tabContainer.categoriesToInclude}
+      autoHide={tabContainer.autoHide}
+      visibleToOthers={tabContainer.visibleToOthers}
+      sortBy={tabContainer.sortByOverride}
     />
   );
 }
@@ -290,6 +327,7 @@ export function showModalEditTab(tabContainer: CustomTabContainer, tabMasterMana
       filtersMode={tabContainer.filtersMode}
       categoriesToInclude={tabContainer.categoriesToInclude}
       autoHide={tabContainer.autoHide}
+      visibleToOthers={tabContainer.visibleToOthers}
       sortBy={tabContainer.sortByOverride}
     />
   );

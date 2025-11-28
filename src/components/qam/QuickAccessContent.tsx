@@ -4,11 +4,13 @@ import {
   Focusable,
   Navigation,
   showContextMenu,
-  quickAccessMenuClasses
+  quickAccessMenuClasses,
+  showModal,
+  ConfirmModal
 } from "@decky/ui";
 import { VFC, useState } from "react";
 
-import { FaBook, FaBookmark, FaArrowUpFromBracket } from "react-icons/fa6";
+import { FaBook, FaBookmark, FaArrowUpFromBracket, FaArrowRightToBracket, FaFolderPlus, FaSlideshare } from "react-icons/fa6";
 import { PiListPlusBold } from "react-icons/pi";
 
 import { useTabMasterContext } from "../../state/TabMasterContext";
@@ -27,12 +29,29 @@ import { GITHUB_URL, DISCORD_URL } from '../../constants';
 import { InvalidSettingsNotice } from './InvalidSettingsNotice';
 import { TabsPanelSection } from './TabsPanelSection';
 import { ErrorNotice } from './ErrorNotice';
+import { showModalSharedTabs } from "../modals/SharedTabsModal";
 
 
 export type TabIdEntryType = {
   id: string;
 };
 
+
+const restartSteam = () => {
+  SteamClient.System.RestartPC();
+};
+
+const showRestartConfirm = () => {
+  showModal(
+    <ConfirmModal
+      strTitle={'Restart Steam?'}
+      strCancelButtonText={'Later'}
+      strOKButtonText={'Restart Now'}
+      strDescription={'Your backup has been restored. TabMaster has been set to not save changes until you restart to avoid overwriting your restored settings. It is strongly recommend to restart as soon as possible'}
+      onOK={restartSteam}
+    />
+  );
+};
 
 /**
  * The Quick Access Menu content for TabMaster.
@@ -47,7 +66,17 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
   const isMicroSDeckInstalled = microSDeckInstallState === MicroSDeckInstallState.VERSION_COMPATIBLE;
   const hasSdTabs = !!visibleTabsList.find(tabContainer => (tabContainer as CustomTabContainer).dependsOnMicroSDeck);
 
+  const handleRestorePrompt = async () => {
+    const path = await PythonInterop.openJSONFile();
+    if (path instanceof Error) {
+      LogController.raiseError('TabMaster encountered a problem opening the filepicker.', path.message);
+      return;
+    }
 
+    await PythonInterop.restoreSettings(path);
+
+    showRestartConfirm()
+  }
 
   const handleBackupPrompt = async () => {
     const path = await PythonInterop.openFolder();
@@ -110,9 +139,13 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
         </div>
         <Field className="no-sep">
           <Focusable style={{ width: "100%", display: "flex" }}>
-            <Focusable className="add-tab-btn" style={{ width: "calc(100% - 50px)" }}>
-              <DialogButton disabled={!tabMasterManager.hasSettingsLoaded} onClick={() => showModalNewTab(tabMasterManager)} onOKActionDescription={'Add Tab'}>
-                Add Tab
+            <Focusable className="add-tab-btn">
+              <DialogButton
+                disabled={!tabMasterManager.hasSettingsLoaded}
+                style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center" }}
+                onClick={() => showModalNewTab(tabMasterManager)} onOKActionDescription={'Add Tab'}
+              >
+                <FaFolderPlus size='1em' />
               </DialogButton>
             </Focusable>
             <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
@@ -123,6 +156,26 @@ export const QuickAccessContent: VFC<{}> = ({ }) => {
                 onClick={() => showContextMenu(<PresetMenu tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />)}
               >
                 <PiListPlusBold size='1.4em' />
+              </DialogButton>
+            </Focusable>
+            <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
+              <DialogButton
+                disabled={!tabMasterManager.hasSettingsLoaded}
+                style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center" }}
+                onOKActionDescription={'View Shared Tabs'}
+                onClick={() => showModalSharedTabs(tabMasterManager)}
+              >
+                <FaSlideshare size='1.4em' />
+              </DialogButton>
+            </Focusable>
+            <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>
+              <DialogButton
+                disabled={!tabMasterManager.hasSettingsLoaded}
+                style={{ height: '40px', width: '42px', minWidth: 0, padding: '10px 12px', marginLeft: 'auto', display: "flex", justifyContent: "center", alignItems: "center" }}
+                onOKActionDescription={'Restore Settings'}
+                onClick={handleRestorePrompt}
+              >
+                <FaArrowRightToBracket size='1em' rotate={90} />
               </DialogButton>
             </Focusable>
             <Focusable className="add-tab-btn" style={{ marginLeft: "10px" }}>

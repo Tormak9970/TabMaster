@@ -61,6 +61,43 @@ export class PythonInterop {
       return e;
     }
   }
+  
+  /**
+   * Gets a file chosen by the user.
+   * @returns The choosen file.
+   */
+  static async openJSONFile(): Promise<string | Error> {
+    const startPath = await this.getUserDesktopPath();
+
+    if (startPath instanceof Error) {
+      return startPath;
+    }
+
+    const res = await openFilePicker(
+      FileSelectionType.FILE,
+      startPath,
+      true,
+      true,
+      undefined,
+      ['json'],
+      false,
+      false
+    );
+
+    return res.realpath;
+  }
+  
+  /**
+   * Restores the plugin's settings from a previous backup.
+   * @param srcPath The path to the settings to restore.
+   */
+  static async restoreSettings(srcPath: string): Promise<boolean | Error> {
+    try {
+      return await call<[src_path: string], boolean>("restore_settings", srcPath);
+    } catch(e: any) {
+      return e;
+    }
+  }
 
     /**
    * Backs up the plugin's settings to default settings dir.
@@ -153,6 +190,22 @@ export class PythonInterop {
       const result = await call<[], TabSettingsDictionary>("get_tabs");
 
       if (!validateTabStructure(result))  return null;
+
+      return result;
+    } catch (e: any) {
+      return e;
+    }
+  }
+
+  /**
+   * Gets the shared tabs.
+   * @returns A promise resolving to the shared tabs or null when the tab structure fails validation
+   */
+  static async getSharedTabs(): Promise<Record<string, TabSettingsDictionary> | Error | null> {
+    try {
+      const result = await call<[], Record<string, TabSettingsDictionary>>("get_shared_tabs");
+
+      if (Object.values(result).some((tabs) => !validateTabStructure(tabs))) return null;
 
       return result;
     } catch (e: any) {

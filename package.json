@@ -1,6 +1,6 @@
 {
   "name": "tabmaster",
-  "version": "2.11.2",
+  "version": "2.13.0",
   "description": "Gives you full control over your Steam library! Support for customizing, adding, and hiding Library Tabs.",
   "type": "module",
   "scripts": {

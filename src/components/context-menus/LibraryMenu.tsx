@@ -2,7 +2,7 @@ import { Menu, MenuItem, showModal, Focusable, MenuGroup, ReorderableEntry, Reor
 import { FC, Fragment, VFC, useState } from 'react';
 import { TabMasterManager } from '../../state/TabMasterManager';
 import { TabMasterContextProvider, useTabMasterContext } from '../../state/TabMasterContext';
-import { showModalEditTab, showModalNewTab } from '../modals/EditTabModal';
+import { showModalDuplicateTab, showModalEditTab, showModalNewTab } from '../modals/EditTabModal';
 import { LibraryMenuStyles } from '../styles/LibraryMenuStyles';
 import { DestructiveModal } from '../generic/DestructiveModal';
 import { PresetMenuItems } from './PresetMenu';
@@ -11,6 +11,7 @@ import { TabListLabel } from '../other/TabListLabel';
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop';
 import { TabProfilesSubMenu } from './TabProfileMenu';
 import { TabIdEntryType } from "../qam/QuickAccessContent";
+import { showAddCollectionModal } from "../modals/AddCollectionModal";
 
 export interface LibraryMenuProps {
   closeMenu: () => void;
@@ -97,6 +98,27 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
         onClick={() => showModalEditTab(tabContainer as CustomTabContainer, tabMasterManager)}
       >
         Edit
+      </MenuItem>
+    }
+    {isCustomTab &&
+      <MenuItem
+        onOKActionDescription={`Duplicate "${tabTitle}"`}
+        onClick={() => showModalDuplicateTab(tabContainer as CustomTabContainer, tabMasterManager)}
+      >
+        Duplicate
+      </MenuItem>
+    }
+    {isCustomTab &&
+      <MenuItem
+        onOKActionDescription={`Create a collection from this tab`}
+        onClick={() => {
+          const customTab = tabContainer as CustomTabContainer
+          customTab.buildCollection()
+
+          showAddCollectionModal(customTab.collection.allApps)
+        }}
+      >
+        Snapshot
       </MenuItem>
     }
     <MenuItem onClick={() => tabMasterManager.hideTab(selectedTabId)} onOKActionDescription={`Hide "${tabTitle}"`}>
