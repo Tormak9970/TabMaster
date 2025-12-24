@@ -6,13 +6,13 @@ import { STEAM_FEATURES_ID_MAP } from "./SteamFeatures";
 import { FaCheckCircle, FaHdd, FaSdCard, FaShoppingCart, FaTrophy, FaUserFriends } from "react-icons/fa";
 import { IoGrid } from "react-icons/io5";
 import { SiSteam, SiSteamdeck } from "react-icons/si";
-import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCompactDisc, FaListCheck, FaPlay, FaRegClock, FaSteam, FaTags, FaUserPlus } from "react-icons/fa6";
+import { FaAward, FaBan, FaCalendarDays, FaCloudArrowDown, FaCompactDisc, FaFolder, FaListCheck, FaPlay, FaRegClock, FaSteam, FaTags, FaUserPlus } from "react-icons/fa6";
 import { BsClockHistory, BsRegex } from "react-icons/bs";
 import { LuCombine } from "react-icons/lu";
 import { LogController } from "../../lib/controllers/LogController";
 import { CardAndGames } from '@cebbinghaus/microsdeck';
 
-export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'steamos compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'purchase date' | 'last played' | 'family sharing' | 'demo' | 'streamable' | 'steam features' | 'achievements' | 'sd card';
+export type FilterType = 'collection' | 'installed' | 'regex' | 'friends' | 'tags' | 'whitelist' | 'blacklist' | 'merge' | 'platform' | 'deck compatibility' | 'steamos compatibility' | 'review score' | 'time played' | 'size on disk' | 'release date' | 'purchase date' | 'last played' | 'family sharing' | 'demo' | 'streamable' | 'steam features' | 'achievements' | 'sd card' | 'install folder';
 
 export type TimeUnit = 'minutes' | 'hours' | 'days';
 export type ThresholdCondition = 'above' | 'below';
@@ -68,6 +68,7 @@ type AchievementsFilterParams = {
   condition: ThresholdCondition
 }
 type SdCardParams = { card: SdCardParamType | string | undefined }; //inserted card/ any card/ card uid (undefined value is legacy)
+type InstallFolderParams = { driveName: string };
 
 // appOverview.rt_purchased_time
 
@@ -95,6 +96,7 @@ export type FilterParams<T extends FilterType> =
   T extends 'steam features' ? SteamFeaturesFilterParams :
   T extends 'achievements' ? AchievementsFilterParams :
   T extends 'sd card' ? SdCardParams :
+  T extends 'install folder' ? InstallFolderParams :
   never;
 
 export type TabFilterSettings<T extends FilterType> = {
@@ -110,7 +112,7 @@ type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOv
  * Define the deafult params for a filter type here
  * Checking and settings defaults in component is unnecessary
  */
-export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
+export const FilterDefaultParams: () => { [key in FilterType]: FilterParams<key> } = () => ({
   "collection": { id: "favorite", name: "Favorites" },
   "installed": { installed: true },
   "regex": { regex: "" },
@@ -133,8 +135,9 @@ export const FilterDefaultParams: { [key in FilterType]: FilterParams<key> } = {
   "streamable": { isStreamable: true },
   "steam features": { features: [], mode: 'and' },
   "achievements": { threshold: 10, thresholdType: "percent", condition: 'above' },
-  "sd card": { card: SdCardParamType.INSTALLED }
-}
+  "sd card": { card: SdCardParamType.INSTALLED },
+  "install folder": { driveName: installFolderStore?.AllInstallFolders?.find((folder) => folder.bIsDefaultFolder)?.strDriveName ?? "" }
+})
 
 /**
  * Dictionary of descriptions for each filter.
@@ -162,7 +165,8 @@ export const FilterDescriptions: { [filterType in FilterType]: string } = {
   streamable: "Selects apps that can/can't be streamed from another computer.",
   achievements: "Selects apps based on their completion percentage.",
   "steam features": "Selects apps that support specific Steam Features.",
-  "sd card": "Selects apps that are present on the inserted/specific MicroSD Card."
+  "sd card": "Selects apps that are present on the inserted/specific MicroSD Card.",
+  "install folder": "Selects apps that are installed in a specific Steam Install Folder."
 }
 
 /**
@@ -191,7 +195,8 @@ export const FilterIcons: { [filterType in FilterType]: IconType } = {
   streamable: FaCloudArrowDown,
   "steam features": FaListCheck,
   achievements: FaTrophy,
-  "sd card": FaSdCard
+  "sd card": FaSdCard,
+  "install folder": FaFolder
 }
 
 
@@ -212,6 +217,7 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
     case "steam features":
     case "achievements":
     case "sd card":
+    case "install folder":
       return true;
     case "platform":
     case "installed":
@@ -270,6 +276,7 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
     case "streamable":
     case "achievements":
     case "sd card":
+    case "install folder":
       return true;
   }
 }
@@ -418,6 +425,21 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
       return {
         passed,
         errors: passed ? [] : ["Couldn't find the selected card in the list of known cards."]
+      };
+    }
+    case "install folder": {
+      const cardFilter = filter as TabFilterSettings<'install folder'>;
+
+      let passed = true;
+      if (typeof cardFilter.params.driveName === 'string') {
+        if (!installFolderStore.AllInstallFolders.find((folder) => folder.strDriveName === cardFilter.params.driveName)) {
+          passed = false;
+        }
+      }
+      
+      return {
+        passed,
+        errors: passed ? [] : ["Couldn't find the selected install folder in the list of known install folder."]
       };
     }
     case "achievements": {
@@ -673,6 +695,15 @@ export class Filter {
       }
       if (!card) return false;
       return isOnCard(card);
+    },
+    'install folder': (params: FilterParams<'install folder'>, appOverview: SteamAppOverview) => {
+      const folder = installFolderStore.AllInstallFolders.find((folder) => folder.strDriveName === params.driveName)
+
+      if (!folder?.bIsMounted) {
+        return false;
+      }
+
+      return folder.vecApps.some((app) => app.nAppID === appOverview.appid);
     }
   };
 

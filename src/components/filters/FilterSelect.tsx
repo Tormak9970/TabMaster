@@ -100,7 +100,7 @@ type FilterSelectProps = {
  * Component for handling filter selection.
  */
 export const FilterSelect: VFC<FilterSelectProps> = ({ selectedOption, onChange }) => {
-  const filterTypeOptions = Object.keys(FilterDefaultParams).map(filterType => ({ label: capitalizeEachWord(filterType), data: filterType}));
+  const filterTypeOptions = Object.keys(FilterDefaultParams()).map(filterType => ({ label: capitalizeEachWord(filterType), data: filterType}));
 
   return (
     <CustomDropdown

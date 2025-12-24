@@ -34,7 +34,7 @@ export const FilterEntry: VFC<FilterEntryProps> = ({ index, filter, containingGr
     const updatedFilter = {
       type: selectedType,
       inverted: false,
-      params: {...FilterDefaultParams[selectedType]}
+      params: {...FilterDefaultParams()[selectedType]}
     };
     const updatedFilters = [...containingGroupFilters];
     updatedFilters[index] = updatedFilter;
