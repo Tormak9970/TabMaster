@@ -1,16 +1,16 @@
-import { EditableTabSettings } from "../components/modals/EditTabModal";
-import { TabFilterSettings, FilterType, Filter } from "../components/filters/Filters";
-import { PythonInterop } from "../lib/controllers/PythonInterop";
-import { CustomTabContainer } from "./CustomTabContainer";
-import { v4 as uuidv4 } from "uuid";
-import { defaultTabsSettings, getNonBigIntUserId } from "../lib/Utils";
-import { LogController } from "../lib/controllers/LogController";
-import { PresetName, PresetOptions, getPreset } from '../presets/presets';
-import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop';
-import { TabErrorController } from '../lib/controllers/TabErrorController';
-import { TabProfileManager } from './TabProfileManager';
-import { AUTO_BACKUP_NAME } from '../constants';
-import { reaction } from '../lib/mobx';
+import { EditableTabSettings } from '../components/modals/EditTabModal'
+import { TabFilterSettings, FilterType, Filter } from '../components/filters/Filters'
+import { PythonInterop } from '../lib/controllers/PythonInterop'
+import { CustomTabContainer } from './CustomTabContainer'
+import { v4 as uuidv4 } from 'uuid'
+import { defaultTabsSettings, getNonBigIntUserId } from '../lib/Utils'
+import { LogController } from '../lib/controllers/LogController'
+import { PresetName, PresetOptions, getPreset } from '../presets/presets'
+import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop'
+import { TabErrorController } from '../lib/controllers/TabErrorController'
+import { TabProfileManager } from './TabProfileManager'
+import { AUTO_BACKUP_NAME } from '../constants'
+import { reaction } from '../lib/mobx'
 
 /**
  * Converts a list of filters into a 1D array.
@@ -18,778 +18,967 @@ import { reaction } from '../lib/mobx';
  * @returns A 1D array of tab filters.
  */
 function flattenFilters(filters: TabFilterSettings<FilterType>[]): TabFilterSettings<FilterType>[] {
-  const res: TabFilterSettings<FilterType>[] = [];
+    const res: TabFilterSettings<FilterType>[] = []
 
-  for (const filter of filters) {
-    if (filter.type === "merge") {
-      const mergeFilters = flattenFilters((filter as TabFilterSettings<"merge">).params.filters);
-      res.push(...mergeFilters);
-    } else {
-      res.push(filter);
+    for (const filter of filters) {
+        if (filter.type === 'merge') {
+            const mergeFilters = flattenFilters((filter as TabFilterSettings<'merge'>).params.filters)
+            res.push(...mergeFilters)
+        } else {
+            res.push(filter)
+        }
     }
-  }
 
-  return res;
+    return res
 }
 
-function isDepreciatedStoreMap(storeTagMap: StoreTagLocalizationMap): storeTagMap is DepreciatedStoreTagLocalizationMap {
-  return (storeTagMap as DepreciatedStoreTagLocalizationMap).entries !== undefined;
+function isDepreciatedStoreMap(
+    storeTagMap: StoreTagLocalizationMap
+): storeTagMap is DepreciatedStoreTagLocalizationMap {
+    return (storeTagMap as DepreciatedStoreTagLocalizationMap).entries !== undefined
 }
 
 /**
  * Class that handles TabMaster's core state.
  */
 export class TabMasterManager {
-  private tabsMap: Map<string, TabContainer>;
-  private visibleTabsList: TabContainer[] = [];
-  private hiddenTabsList: TabContainer[] = [];
+    private tabsMap: Map<string, TabContainer>
+    private visibleTabsList: TabContainer[] = []
+    private hiddenTabsList: TabContainer[] = []
 
-  private hasLoaded: boolean;
+    private hasLoaded: boolean
 
-  private currentUsersFriends: FriendEntry[] = [];
-  private friendsGameMap: Map<number, number[]> = new Map();
-  private allStoreTags: TagResponse[] = [];
-  private userHasVisibleFavorites: boolean = false;
-  private userHasVisibleSoundtracks: boolean = false;
+    private currentUsersFriends: FriendEntry[] = []
+    private friendsGameMap: Map<number, number[]> = new Map()
+    private allStoreTags: TagResponse[] = []
+    private userHasVisibleFavorites: boolean = false
+    private userHasVisibleSoundtracks: boolean = false
 
-  private userCollectionIds: string[] = [];
+    private userCollectionIds: string[] = []
 
-  public eventBus = new EventTarget();
+    public eventBus = new EventTarget()
 
-  public microSDeckInstalled: boolean = false;
+    public microSDeckInstalled: boolean = false
 
-  private disposers: (() => void)[] = [];
-  private collectionDisposers: { [collectionId: string]: () => void; } = {};
+    private disposers: (() => void)[] = []
+    private collectionDisposers: { [collectionId: string]: () => void } = {}
 
-  public tabProfileManager: TabProfileManager | undefined;
-  public invalidSettingsLoaded: {
-    isTrue: boolean;
-    confirmReset: () => Promise<void>;
-    waitForResetConfirmation: Promise<any>;
-  };
-
-
-  /**
-   * Creates a new TabMasterManager.
-   */
-  constructor() {
-    this.hasLoaded = false;
-    this.tabsMap = new Map<string, TabContainer>();
-
-    this.invalidSettingsLoaded = {
-      isTrue: false,
-      waitForResetConfirmation: null as unknown as Promise<any>,
-      confirmReset: async () => { }
-    };
-    this.invalidSettingsLoaded.waitForResetConfirmation = new Promise(async (resolve) => this.invalidSettingsLoaded.confirmReset = async () => {
-      this.invalidSettingsLoaded.isTrue = false;
-      resolve(0);
-    });
-  }
-
-  private handleMicroSDeckChange() {
-    if (!this.hasLoaded) return;
-
-    const microSDeckTabs: string[] = [];
-    for (let tab of this.tabsMap.values()) {
-      if ((tab as CustomTabContainer).dependsOnMicroSDeck) microSDeckTabs.push(tab.id);
+    public tabProfileManager: TabProfileManager | undefined
+    public invalidSettingsLoaded: {
+        isTrue: boolean
+        confirmReset: () => Promise<void>
+        waitForResetConfirmation: Promise<any>
     }
 
-    TabErrorController.validateTabs(microSDeckTabs, this, true);
-  }
+    /**
+     * Creates a new TabMasterManager.
+     */
+    constructor() {
+        this.hasLoaded = false
+        this.tabsMap = new Map<string, TabContainer>()
 
-  private initReactions(): void {
-    // * subscribe to changes to all games
-    this.addDisposer(reaction(() => collectionStore.GetCollection("type-games").allApps, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 600 }));
-
-    // * subscribe to when visible favorites change
-    this.addDisposer(reaction(() => collectionStore.GetCollection('favorite').allApps.length, this.handleNumOfVisibleFavoritesChanged.bind(this)));
-
-    // *subscribe to when visible soundtracks change
-    this.addDisposer(reaction(() => collectionStore.GetCollection('type-music').visibleApps.length, this.handleNumOfVisibleSoundtracksChanged.bind(this)));
-
-    // *subscribe to when installed games change
-    this.addDisposer(reaction(() => collectionStore.GetCollection('local-install').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this)));
-
-    // * subscribe to game hide or show
-    this.addDisposer(reaction(() => collectionStore.GetCollection("hidden").allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this), { delay: 50 }));
-
-    // * subscribe to non-steam games if they exist
-    if (collectionStore.GetCollection('desk-desktop-apps')) {
-      this.addDisposer(reaction(() => collectionStore.GetCollection('desk-desktop-apps').allApps.length, this.rebuildCustomTabsOnCollectionChange.bind(this)));
+        this.invalidSettingsLoaded = {
+            isTrue: false,
+            waitForResetConfirmation: null as unknown as Promise<any>,
+            confirmReset: async () => {},
+        }
+        this.invalidSettingsLoaded.waitForResetConfirmation = new Promise(
+            async resolve =>
+                (this.invalidSettingsLoaded.confirmReset = async () => {
+                    this.invalidSettingsLoaded.isTrue = false
+                    resolve(0)
+                })
+        )
     }
 
-    // * subscribe for when collections are deleted
-    this.addDisposer(reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this)));
+    private handleMicroSDeckChange() {
+        if (!this.hasLoaded) return
 
-    this.handleUserCollectionRemove(collectionStore.userCollections.length); // * this loads the collection ids for the first time.
-
-    // * subscribe to user's friendlist updates
-    this.addDisposer(reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 }));
-
-    // * subscribe to store tag list changes
-    this.addDisposer(reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 }));
-
-    // * subscribe to achievement cache changes
-    this.addDisposer(reaction(() => appAchievementProgressCache.m_achievementProgress.mapCache.size, this.handleAchievementsReaction.bind(this)));
-
-    //* subscribe to app close for time played updates
-    this.addDisposer(SteamClient.GameSessions.RegisterForAppLifetimeNotifications(
-      (e) => !e.bRunning && // skip if game is running
-        Array.from(this.tabsMap.values()).find(tabContainer => tabContainer.filters && (tabContainer as CustomTabContainer).containsFilterType('time played')) && //skip if no time played filters exist
-        setTimeout(() => { this.rebuildCustomTabs(); this.update(); }, 3500)).unregister); //add slight dealy because sometimes app playtime runs 1 min behind
-
-    this.handleFriendsReaction(friendStore.allFriends);
-    this.storeTagReaction(appStore.m_mapStoreTagLocalization);
-    MicroSDeckInterop.initEventHandlers({ change: this.handleMicroSDeckChange.bind(this) });
-  }
-
-  /**
-   * Handles the favorites reaction.
-   * @param numOfVisibleFavorites The number of visible favorites.
-   */
-  private handleNumOfVisibleFavoritesChanged(numOfVisibleFavorites: number) {
-    if (!this.hasLoaded) return;
-
-    const userHadVisibleFavorites = this.userHasVisibleFavorites;
-
-    if (!userHadVisibleFavorites && numOfVisibleFavorites !== 0) {
-      this.userHasVisibleFavorites = true;
-      const favoriteTabContainer = { ...defaultTabsSettings.Favorites, position: this.visibleTabsList.length };
-      this.visibleTabsList.push(this.addDefaultTabContainer(favoriteTabContainer));
-      this.updateAndSave();
-    }
-
-    if (userHadVisibleFavorites && numOfVisibleFavorites === 0) {
-      this.userHasVisibleFavorites = false;
-      this.deleteTab('Favorites');
-    }
-  }
-
-  /**
-   * Handles the soundtrack reaction.
-   * @param numOfVisibleSoundtracks The number of visible soundtracks.
-   */
-  private handleNumOfVisibleSoundtracksChanged(numOfVisibleSoundtracks: number) {
-    if (!this.hasLoaded) return;
-
-    const userHadVisibleSoundtracks = this.userHasVisibleSoundtracks;
-
-    if (!userHadVisibleSoundtracks && numOfVisibleSoundtracks !== 0) {
-      this.userHasVisibleSoundtracks = true;
-      const soundtrackTabContainer = { ...defaultTabsSettings.Soundtracks, position: this.visibleTabsList.length };
-      this.visibleTabsList.push(this.addDefaultTabContainer(soundtrackTabContainer));
-      this.updateAndSave();
-    }
-
-    if (userHadVisibleSoundtracks && numOfVisibleSoundtracks === 0) {
-      this.userHasVisibleSoundtracks = false;
-      this.deleteTab('Soundtracks');
-    }
-  }
-
-  /**
-   * Handles rebuilding tabs when a collection changes.
-   */
-  private rebuildCustomTabsOnCollectionChange() {
-    if (!this.hasLoaded) return;
-    this.rebuildCustomTabs();
-  }
-
-  /**
-   * Handles rebuilding tabs when a collection changes.
-   */
-  private rebuildCustomTabs() {
-    if (!this.hasLoaded) return;
-
-    this.visibleTabsList.forEach((tabContainer) => {
-      if (tabContainer.filters && tabContainer.filters.length !== 0) {
-        (tabContainer as CustomTabContainer).buildCollection();
-      }
-    });
-  }
-
-  /**
-   * Handles when the user deletes one of their collections.
-   * @param newLength The new length of the userCollections.
-   */
-  private handleUserCollectionRemove(newLength: number) {
-    const userCollections = collectionStore.userCollections;
-
-    if (newLength < this.userCollectionIds.length && this.hasLoaded) {
-      let validateTabs = false;
-      const collectionsInUse = Object.keys(this.collectionDisposers);
-      const currentUserCollectionIds = userCollections.map((collection) => collection.id);
-
-      this.userCollectionIds = this.userCollectionIds.filter((id) => {
-        const isIncluded = currentUserCollectionIds.includes(id);
-
-        if (!isIncluded && collectionsInUse.includes(id)) {
-          validateTabs = true;
-          this.collectionDisposers[id]();
-          delete this.collectionDisposers[id];
+        const microSDeckTabs: string[] = []
+        for (let tab of this.tabsMap.values()) {
+            if ((tab as CustomTabContainer).dependsOnMicroSDeck) microSDeckTabs.push(tab.id)
         }
 
-        return isIncluded;
-      });
-
-      if (validateTabs) TabErrorController.validateTabs(Array.from(this.tabsMap.keys()), this);
-    } else {
-      for (const userCollection of userCollections) {
-        if (!this.userCollectionIds.includes(userCollection.id)) this.userCollectionIds.push(userCollection.id);
-      }
+        TabErrorController.validateTabs(microSDeckTabs, this, true)
     }
-  }
 
-  /**
-   * Handles updating state when the store tag localization map changes.
-   * @param storeTagLocalizationMap The store tag localization map.
-   */
-  private storeTagReaction(storeTagLocalizationMap: StoreTagLocalizationMap) {
-    if (storeTagLocalizationMap) {
-      if (isDepreciatedStoreMap(storeTagLocalizationMap)) {
-        const tagEntriesArray = Array.from(storeTagLocalizationMap.entries());
+    private initReactions(): void {
+        // * subscribe to changes to all games
+        this.addDisposer(
+            reaction(
+                () => collectionStore.GetCollection('type-games').allApps,
+                this.rebuildCustomTabsOnCollectionChange.bind(this),
+                { delay: 600 }
+            )
+        )
 
-        this.allStoreTags = tagEntriesArray.map(([_, entry]) => {
-          return {
-            tag: entry.tagid,
-            string: entry.name
-          };
-        });
-      } else {
-        const tagEntriesArray = Object.entries(storeTagLocalizationMap);
+        // * subscribe to when visible favorites change
+        this.addDisposer(
+            reaction(
+                () => collectionStore.GetCollection('favorite').allApps.length,
+                this.handleNumOfVisibleFavoritesChanged.bind(this)
+            )
+        )
 
-        this.allStoreTags = tagEntriesArray.map(([tag, string]) => {
-          return {
-            tag: parseInt(tag),
-            string
-          };
-        });
-      }
+        // *subscribe to when visible soundtracks change
+        this.addDisposer(
+            reaction(
+                () => collectionStore.GetCollection('type-music').visibleApps.length,
+                this.handleNumOfVisibleSoundtracksChanged.bind(this)
+            )
+        )
 
-      PythonInterop.setTags(this.allStoreTags);
-    } else {
-      LogController.error("Failed to get store tags. Both _data and data_ were undefined");
-    }
-  }
+        // *subscribe to when installed games change
+        this.addDisposer(
+            reaction(
+                () => collectionStore.GetCollection('local-install').allApps.length,
+                this.rebuildCustomTabsOnCollectionChange.bind(this)
+            )
+        )
 
-  /**
-   * Handles updating state when the user's friends list changes.
-   * @param friends An array of the user's friends.
-   */
-  private handleFriendsReaction(friends: FriendStoreEntry[]) {
-    // console.log("We reacted to friend store changes!");
-    this.currentUsersFriends = friends.map((storeEntry: FriendStoreEntry) => {
-      const entry = storeEntry;
-      const userid = getNonBigIntUserId(entry.m_persona.m_steamid.m_ulSteamID.low, entry.m_persona.m_steamid.m_ulSteamID.high);
-      return {
-        steamid: userid,
-        name: (entry.m_strNickname && entry.m_strNickname !== "") ? entry.m_strNickname : entry.m_persona.m_strPlayerName,
-      };
-    });
+        // * subscribe to game hide or show
+        this.addDisposer(
+            reaction(
+                () => collectionStore.GetCollection('hidden').allApps.length,
+                this.rebuildCustomTabsOnCollectionChange.bind(this),
+                { delay: 50 }
+            )
+        )
 
-    PythonInterop.setFriends(this.currentUsersFriends);
-
-    Promise.all(this.currentUsersFriends.map((friend: FriendEntry) => {
-      //* pretty sure it returns undefined if friends account is set to private, not sure if we should handle this in the ui
-      friendStore.FetchOwnedGames(friend.steamid).then((res) => {
-        this.friendsGameMap.set(friend.steamid, res ? Array.from(res.setApps) : []);
-      });
-    })).then(() => {
-      PythonInterop.setFriendGames(this.friendsGameMap);
-
-      if (!this.hasLoaded) return;
-
-      const listOfBadFriends: Set<number> = new Set();
-      const customTabsList = this.visibleTabsList.filter((tabContainer) => tabContainer.filters && tabContainer.filters.length !== 0);
-
-      //* splitting these loops up is technically more efficient, otherwise we end up with 3 or 4 nested loops
-      customTabsList.forEach((tabContainer: TabContainer) => {
-        const friendsFilters = tabContainer.filters!.filter((filter: TabFilterSettings<FilterType>) => filter.type === "friends");
-        const friendsIds2D: number[][] = friendsFilters.map((collectionFilter) => collectionFilter.params.friends);
-
-        if (friendsIds2D.length > 0) {
-          //* cheap way to remove duplicates, so we only have to do one loop later
-          const friendsIds: number[] = [...new Set(friendsIds2D.flat())];
-
-          for (const id of friendsIds) {
-            const stillFriends = this.currentUsersFriends.find((friendEntry) => friendEntry.steamid === id);
-
-            if (!stillFriends) listOfBadFriends.add(id);
-          }
+        // * subscribe to non-steam games if they exist
+        if (collectionStore.GetCollection('desk-desktop-apps')) {
+            this.addDisposer(
+                reaction(
+                    () => collectionStore.GetCollection('desk-desktop-apps').allApps.length,
+                    this.rebuildCustomTabsOnCollectionChange.bind(this)
+                )
+            )
         }
-      });
 
-      customTabsList.forEach((tabContainer) => {
-        let shouldRebuildCollection = false;
-        const friendsFilters = tabContainer.filters!.filter((filter: TabFilterSettings<FilterType>) => filter.type === "friends");
+        // * subscribe for when collections are deleted
+        this.addDisposer(
+            reaction(() => collectionStore.userCollections.length, this.handleUserCollectionRemove.bind(this))
+        )
 
-        //* remove friend's id from filter
-        friendsFilters.forEach((friendFilter: TabFilterSettings<"friends">) => {
+        this.handleUserCollectionRemove(collectionStore.userCollections.length) // * this loads the collection ids for the first time.
 
-          for (const id of listOfBadFriends) {
-            const badFriendIdx = friendFilter.params.friends.indexOf(id);
+        // * subscribe to user's friendlist updates
+        this.addDisposer(reaction(() => friendStore.allFriends, this.handleFriendsReaction.bind(this), { delay: 50 }))
 
-            if (badFriendIdx >= 0) {
-              shouldRebuildCollection = true;
-              friendFilter.params.friends.splice(badFriendIdx, 1);
+        // * subscribe to store tag list changes
+        this.addDisposer(
+            reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 })
+        )
+
+        // * subscribe to achievement cache changes
+        this.addDisposer(
+            reaction(
+                () => appAchievementProgressCache.m_achievementProgress.mapCache.size,
+                this.handleAchievementsReaction.bind(this)
+            )
+        )
+
+        //* subscribe to app close for time played updates
+        this.addDisposer(
+            SteamClient.GameSessions.RegisterForAppLifetimeNotifications(
+                e =>
+                    !e.bRunning && // skip if game is running
+                    Array.from(this.tabsMap.values()).find(
+                        tabContainer =>
+                            tabContainer.filters &&
+                            (tabContainer as CustomTabContainer).containsFilterType('time played')
+                    ) && //skip if no time played filters exist
+                    setTimeout(() => {
+                        this.rebuildCustomTabs()
+                        this.update()
+                    }, 3500)
+            ).unregister
+        ) //add slight dealy because sometimes app playtime runs 1 min behind
+
+        this.handleFriendsReaction(friendStore.allFriends)
+        this.storeTagReaction(appStore.m_mapStoreTagLocalization)
+        MicroSDeckInterop.initEventHandlers({ change: this.handleMicroSDeckChange.bind(this) })
+
+        // Register for install folder changes
+        this.addDisposer(
+            SteamClient.InstallFolder.RegisterForInstallFolderChanges(() => {
+                this.handleInstallFolderChanges()
+            }).unregister
+        )
+    }
+
+    /**
+     * Handles the favorites reaction.
+     * @param numOfVisibleFavorites The number of visible favorites.
+     */
+    private handleNumOfVisibleFavoritesChanged(numOfVisibleFavorites: number) {
+        if (!this.hasLoaded) return
+
+        const userHadVisibleFavorites = this.userHasVisibleFavorites
+
+        if (!userHadVisibleFavorites && numOfVisibleFavorites !== 0) {
+            this.userHasVisibleFavorites = true
+            const favoriteTabContainer = { ...defaultTabsSettings.Favorites, position: this.visibleTabsList.length }
+            this.visibleTabsList.push(this.addDefaultTabContainer(favoriteTabContainer))
+            this.updateAndSave()
+        }
+
+        if (userHadVisibleFavorites && numOfVisibleFavorites === 0) {
+            this.userHasVisibleFavorites = false
+            this.deleteTab('Favorites')
+        }
+    }
+
+    /**
+     * Handles the soundtrack reaction.
+     * @param numOfVisibleSoundtracks The number of visible soundtracks.
+     */
+    private handleNumOfVisibleSoundtracksChanged(numOfVisibleSoundtracks: number) {
+        if (!this.hasLoaded) return
+
+        const userHadVisibleSoundtracks = this.userHasVisibleSoundtracks
+
+        if (!userHadVisibleSoundtracks && numOfVisibleSoundtracks !== 0) {
+            this.userHasVisibleSoundtracks = true
+            const soundtrackTabContainer = { ...defaultTabsSettings.Soundtracks, position: this.visibleTabsList.length }
+            this.visibleTabsList.push(this.addDefaultTabContainer(soundtrackTabContainer))
+            this.updateAndSave()
+        }
+
+        if (userHadVisibleSoundtracks && numOfVisibleSoundtracks === 0) {
+            this.userHasVisibleSoundtracks = false
+            this.deleteTab('Soundtracks')
+        }
+    }
+
+    /**
+     * Handles rebuilding tabs when a collection changes.
+     */
+    private rebuildCustomTabsOnCollectionChange() {
+        if (!this.hasLoaded) return
+        this.rebuildCustomTabs()
+    }
+
+    /**
+     * Handles rebuilding tabs when a collection changes.
+     */
+    private rebuildCustomTabs() {
+        if (!this.hasLoaded) return
+
+        this.visibleTabsList.forEach(tabContainer => {
+            if (tabContainer.filters && tabContainer.filters.length !== 0) {
+                ;(tabContainer as CustomTabContainer).buildCollection()
             }
-          }
-        });
+        })
+    }
 
-        if (shouldRebuildCollection) {
-          (tabContainer as CustomTabContainer).buildCollection();
-        }
-      });
-    });
-  }
+    /**
+     * Handles when the user deletes one of their collections.
+     * @param newLength The new length of the userCollections.
+     */
+    private handleUserCollectionRemove(newLength: number) {
+        const userCollections = collectionStore.userCollections
 
-  /**
-   * Handles updating state when the the achievement cache changes.
-   * @param _size The size of the achievements map.
-   */
-  private handleAchievementsReaction(_size: number) {
-    this.visibleTabsList.forEach(tabContainer => {
-      if (tabContainer.filters) {
-        const tab = tabContainer as CustomTabContainer;
-        if (tab.containsFilterType('achievements')) {
-          tab.buildCollection();
-        }
-      }
-    });
-  }
+        if (newLength < this.userCollectionIds.length && this.hasLoaded) {
+            let validateTabs = false
+            const collectionsInUse = Object.keys(this.collectionDisposers)
+            const currentUserCollectionIds = userCollections.map(collection => collection.id)
 
-  /**
-   * Checks for tabs with filters that are based on time ago and rebuilds their collections.
-   */
-  buildTimeBasedFilterTabs() {
-    this.visibleTabsList.forEach(tabContainer => {
-      if (tabContainer.filters) {
-        const tab = tabContainer as CustomTabContainer;
-        if (tab.containsFilterType('last played', 'release date')) {
-          if (!tab.containsFilterType('merge')) {
-            //@ts-ignore
-            if (tab.filters.find(filter => filter.params.daysAgo !== undefined)) {
-              tab.buildCollection();
+            this.userCollectionIds = this.userCollectionIds.filter(id => {
+                const isIncluded = currentUserCollectionIds.includes(id)
+
+                if (!isIncluded && collectionsInUse.includes(id)) {
+                    validateTabs = true
+                    this.collectionDisposers[id]()
+                    delete this.collectionDisposers[id]
+                }
+
+                return isIncluded
+            })
+
+            if (validateTabs) TabErrorController.validateTabs(Array.from(this.tabsMap.keys()), this)
+        } else {
+            for (const userCollection of userCollections) {
+                if (!this.userCollectionIds.includes(userCollection.id)) this.userCollectionIds.push(userCollection.id)
             }
-          } else {
-            tab.buildCollection();
-          }
         }
-      }
-    });
-  }
-
-  /**
-   * Push a callback function to be called on cleanup
-   */
-  addDisposer(disposer: () => void) {
-    this.disposers.push(disposer);
-  }
-
-  /**
-   * Handles cleaning up all reactions.
-   */
-  disposeReactions(): void {
-    this.disposers.forEach(disposer => disposer());
-    for (const disposer of Object.values(this.collectionDisposers)) {
-      disposer();
-    }
-  }
-
-  /**
-   * Updates the settings for a custom tab.
-   * @param customTabId The id of the custom tab.
-   * @param updatedTabSettings The new settings for the tab.
-   */
-  updateCustomTab(customTabId: string, updatedTabSettings: EditableTabSettings) {
-    (this.tabsMap.get(customTabId) as CustomTabContainer).update(updatedTabSettings);
-
-    const filters = updatedTabSettings.filters;
-    if (filters) this.addCollectionReactionsForFilters(flattenFilters(filters));
-
-    this.updateAndSave();
-  }
-
-  /**
-   * Reorders the tabs.
-   * @param orederedTabIds The updated order of tabs.
-   */
-  reorderTabs(orederedTabIds: string[]) {
-    for (let i = 0; i < orederedTabIds.length; i++) {
-      this.tabsMap.get(orederedTabIds[i])!.position = i;
     }
 
-    this.rebuildTabLists();
-    this.updateAndSave();
-  }
+    /**
+     * Handles updating state when the store tag localization map changes.
+     * @param storeTagLocalizationMap The store tag localization map.
+     */
+    private storeTagReaction(storeTagLocalizationMap: StoreTagLocalizationMap) {
+        if (storeTagLocalizationMap) {
+            if (isDepreciatedStoreMap(storeTagLocalizationMap)) {
+                const tagEntriesArray = Array.from(storeTagLocalizationMap.entries())
 
-  /**
-   * Hides a tab from the library.
-   * @param tabId The id of the tab to hide.
-   */
-  hideTab(tabId: string) {
-    const tabContainer = this.tabsMap.get(tabId)!;
+                this.allStoreTags = tagEntriesArray.map(([_, entry]) => {
+                    return {
+                        tag: entry.tagid,
+                        string: entry.name,
+                    }
+                })
+            } else {
+                const tagEntriesArray = Object.entries(storeTagLocalizationMap)
 
-    this.hiddenTabsList.push(this.visibleTabsList.splice(tabContainer.position, 1)[0]);
-    this.visibleTabsList.slice(tabContainer.position).forEach(tabContainer => tabContainer.position--);
+                this.allStoreTags = tagEntriesArray.map(([tag, string]) => {
+                    return {
+                        tag: parseInt(tag),
+                        string,
+                    }
+                })
+            }
 
-    tabContainer.position = -1;
-
-    this.updateAndSave();
-  }
-
-  /**
-   * Unhides a hidden tab in the library.
-   * @param tabId The id of the tab to show.
-   */
-  showTab(tabId: string) {
-    const tabContainer = this.tabsMap.get(tabId)!;
-    if (tabContainer.position > -1) return;
-    const hiddenIndex = this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer);
-
-    tabContainer.position = this.visibleTabsList.length;
-    this.visibleTabsList.push(this.hiddenTabsList.splice(hiddenIndex, 1)[0]);
-
-    if (tabContainer.filters && (tabContainer as CustomTabContainer).collection.allApps === undefined) {
-      (tabContainer as CustomTabContainer).buildCollection();
-    }
-
-    this.updateAndSave();
-  }
-
-  /**
-   * Deletes a tab.
-   * @param tabId The id of the tab to delete.
-   */
-  deleteTab(tabId: string) {
-    const tabContainer = this.tabsMap.get(tabId)!;
-
-    let tabsArrayToRemoveFrom: TabContainer[];
-    let updateIndexes = false;
-    let index: number;
-
-    if (tabContainer.position > -1) {
-      tabsArrayToRemoveFrom = this.visibleTabsList;
-      index = tabContainer.position;
-      updateIndexes = true;
-    } else {
-      tabsArrayToRemoveFrom = this.hiddenTabsList;
-      index = this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer);
-    }
-    tabsArrayToRemoveFrom.splice(index, 1);
-    if (updateIndexes) {
-      for (let i = index; i < this.visibleTabsList.length; i++) {
-        this.visibleTabsList[i].position--;
-      }
-    }
-    this.tabsMap.delete(tabId);
-    this.tabProfileManager?.onDeleteTab(tabId);
-    if (!this.tabProfileManager) LogController.error('Attempted to delete a tab before TabProfileManager has been initialized.', 'This should not be possible.');
-    this.updateAndSave();
-  }
-
-  /**
-   * Creates a new custom tab.
-   * @param title The title of the tab.
-   * @param position The position of the tab.
-   * @param filterSettingsList The list of filters for the tab.
-   * @param filtersMode The logic mode for these filters.
-   * @param categoriesToInclude A bit field of which categories should be included in the tab.
-   * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
-   * @param visibleToOthers Whether or not the tab can be copied by other users.
-   * @param sortByOverride The eSortBy number to force use for sorting. -1 ignores override.
-   */
-  createCustomTab(title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean, visibleToOthers: boolean, sortByOverride: number) {
-    const id = uuidv4();
-    this.addCollectionReactionsForFilters(flattenFilters(filterSettingsList));
-    this.visibleTabsList.push(this.addCustomTabContainer(id, title, position, filterSettingsList, filtersMode, categoriesToInclude, autoHide, visibleToOthers, sortByOverride));
-    this.updateAndSave();
-  }
-
-  createPresetTab<Name extends PresetName>(presetName: Name, tabTitle: string, ...options: PresetOptions<Name>) {
-    const { filters, filtersMode, categoriesToInclude } = getPreset(presetName, ...options);
-    this.createCustomTab(tabTitle, this.visibleTabsList.length, filters, filtersMode, categoriesToInclude, false, false, -1);
-  }
-
-  /**
-   * Adds a reaction to collection lengths if they are not already registered.
-   * @param filters The array of filters to check.
-   */
-  private addCollectionReactionsForFilters(filters: TabFilterSettings<FilterType>[]): void {
-    const collectionFilters = filters.filter((filter: TabFilterSettings<FilterType>) => filter.type === "collection");
-
-    if (collectionFilters.length > 0) {
-      for (const collectionFilter of collectionFilters) {
-        const collectionId: string = (collectionFilter as TabFilterSettings<"collection">).params.id;
-
-        if (!this.collectionDisposers[collectionId]) {
-          //* subscribe to user collection updates
-          this.collectionDisposers[collectionId] = reaction(() => collectionStore.GetCollection(collectionId).allApps.length, () => {
-            this.rebuildCustomTabsOnCollectionChange();
-          });
+            PythonInterop.setTags(this.allStoreTags)
+        } else {
+            LogController.error('Failed to get store tags. Both _data and data_ were undefined')
         }
-      }
     }
-  }
 
-  /**
-   * Other async load calls that don't need to be waited for when starting the plugin
-   */
-  asyncLoadOther() {
-    PythonInterop.getTags().then((res: TagResponse[] | Error) => {
-      if (res instanceof Error) {
-        LogController.raiseError(`Error loading tags \n ${res.message}`);
-      } else {
-        if (this.allStoreTags.length === 0) {
-          this.allStoreTags = res;
+    /**
+     * Handles updating state when the user's friends list changes.
+     * @param friends An array of the user's friends.
+     */
+    private handleFriendsReaction(friends: FriendStoreEntry[]) {
+        // console.log("We reacted to friend store changes!");
+        this.currentUsersFriends = friends.map((storeEntry: FriendStoreEntry) => {
+            const entry = storeEntry
+            const userid = getNonBigIntUserId(
+                entry.m_persona.m_steamid.m_ulSteamID.low,
+                entry.m_persona.m_steamid.m_ulSteamID.high
+            )
+            return {
+                steamid: userid,
+                name:
+                    entry.m_strNickname && entry.m_strNickname !== ''
+                        ? entry.m_strNickname
+                        : entry.m_persona.m_strPlayerName,
+            }
+        })
+
+        PythonInterop.setFriends(this.currentUsersFriends)
+
+        Promise.all(
+            this.currentUsersFriends.map((friend: FriendEntry) => {
+                //* pretty sure it returns undefined if friends account is set to private, not sure if we should handle this in the ui
+                friendStore.FetchOwnedGames(friend.steamid).then(res => {
+                    this.friendsGameMap.set(friend.steamid, res ? Array.from(res.setApps) : [])
+                })
+            })
+        ).then(() => {
+            PythonInterop.setFriendGames(this.friendsGameMap)
+
+            if (!this.hasLoaded) return
+
+            const listOfBadFriends: Set<number> = new Set()
+            const customTabsList = this.visibleTabsList.filter(
+                tabContainer => tabContainer.filters && tabContainer.filters.length !== 0
+            )
+
+            //* splitting these loops up is technically more efficient, otherwise we end up with 3 or 4 nested loops
+            customTabsList.forEach((tabContainer: TabContainer) => {
+                const friendsFilters = tabContainer.filters!.filter(
+                    (filter: TabFilterSettings<FilterType>) => filter.type === 'friends'
+                )
+                const friendsIds2D: number[][] = friendsFilters.map(collectionFilter => collectionFilter.params.friends)
+
+                if (friendsIds2D.length > 0) {
+                    //* cheap way to remove duplicates, so we only have to do one loop later
+                    const friendsIds: number[] = [...new Set(friendsIds2D.flat())]
+
+                    for (const id of friendsIds) {
+                        const stillFriends = this.currentUsersFriends.find(friendEntry => friendEntry.steamid === id)
+
+                        if (!stillFriends) listOfBadFriends.add(id)
+                    }
+                }
+            })
+
+            customTabsList.forEach(tabContainer => {
+                let shouldRebuildCollection = false
+                const friendsFilters = tabContainer.filters!.filter(
+                    (filter: TabFilterSettings<FilterType>) => filter.type === 'friends'
+                )
+
+                //* remove friend's id from filter
+                friendsFilters.forEach((friendFilter: TabFilterSettings<'friends'>) => {
+                    for (const id of listOfBadFriends) {
+                        const badFriendIdx = friendFilter.params.friends.indexOf(id)
+
+                        if (badFriendIdx >= 0) {
+                            shouldRebuildCollection = true
+                            friendFilter.params.friends.splice(badFriendIdx, 1)
+                        }
+                    }
+                })
+
+                if (shouldRebuildCollection) {
+                    ;(tabContainer as CustomTabContainer).buildCollection()
+                }
+            })
+        })
+    }
+
+    /**
+     * Handles rebuilding tabs when install folders change.
+     */
+    private handleInstallFolderChanges() {
+        this.visibleTabsList.forEach(tabContainer => {
+            if (tabContainer.filters) {
+                const tab = tabContainer as CustomTabContainer
+                if (tab.containsFilterType('install folder')) {
+                    tab.buildCollection()
+                }
+            }
+        })
+    }
+
+    /**
+     * Handles updating state when the the achievement cache changes.
+     * @param _size The size of the achievements map.
+     */
+    private handleAchievementsReaction(_size: number) {
+        this.visibleTabsList.forEach(tabContainer => {
+            if (tabContainer.filters) {
+                const tab = tabContainer as CustomTabContainer
+                if (tab.containsFilterType('achievements')) {
+                    tab.buildCollection()
+                }
+            }
+        })
+    }
+
+    /**
+     * Checks for tabs with filters that are based on time ago and rebuilds their collections.
+     */
+    buildTimeBasedFilterTabs() {
+        this.visibleTabsList.forEach(tabContainer => {
+            if (tabContainer.filters) {
+                const tab = tabContainer as CustomTabContainer
+                if (tab.containsFilterType('last played', 'release date')) {
+                    if (!tab.containsFilterType('merge')) {
+                        //@ts-ignore
+                        if (tab.filters.find(filter => filter.params.daysAgo !== undefined)) {
+                            tab.buildCollection()
+                        }
+                    } else {
+                        tab.buildCollection()
+                    }
+                }
+            }
+        })
+    }
+
+    /**
+     * Push a callback function to be called on cleanup
+     */
+    addDisposer(disposer: () => void) {
+        this.disposers.push(disposer)
+    }
+
+    /**
+     * Handles cleaning up all reactions.
+     */
+    disposeReactions(): void {
+        this.disposers.forEach(disposer => disposer())
+        for (const disposer of Object.values(this.collectionDisposers)) {
+            disposer()
         }
-      }
-    });
-    PythonInterop.getFriends().then((res: FriendEntry[] | Error) => {
-      if (res instanceof Error) {
-        LogController.raiseError(`Error loading friends \n ${res.message}`);
-      } else {
-        if (this.currentUsersFriends.length === 0) {
-          this.currentUsersFriends = res;
+    }
+
+    /**
+     * Updates the settings for a custom tab.
+     * @param customTabId The id of the custom tab.
+     * @param updatedTabSettings The new settings for the tab.
+     */
+    updateCustomTab(customTabId: string, updatedTabSettings: EditableTabSettings) {
+        ;(this.tabsMap.get(customTabId) as CustomTabContainer).update(updatedTabSettings)
+
+        const filters = updatedTabSettings.filters
+        if (filters) this.addCollectionReactionsForFilters(flattenFilters(filters))
+
+        this.updateAndSave()
+    }
+
+    /**
+     * Reorders the tabs.
+     * @param orederedTabIds The updated order of tabs.
+     */
+    reorderTabs(orederedTabIds: string[]) {
+        for (let i = 0; i < orederedTabIds.length; i++) {
+            this.tabsMap.get(orederedTabIds[i])!.position = i
         }
-      }
-    });
-    PythonInterop.getFriendsGames().then((res: Map<number, number[]> | Error) => {
-      if (res instanceof Error) {
-        LogController.raiseError(`Error loading friends games \n ${res.message}`);
-      } else {
-        if (this.friendsGameMap.size === 0) {
-          this.friendsGameMap = res;
+
+        this.rebuildTabLists()
+        this.updateAndSave()
+    }
+
+    /**
+     * Hides a tab from the library.
+     * @param tabId The id of the tab to hide.
+     */
+    hideTab(tabId: string) {
+        const tabContainer = this.tabsMap.get(tabId)!
+
+        this.hiddenTabsList.push(this.visibleTabsList.splice(tabContainer.position, 1)[0])
+        this.visibleTabsList.slice(tabContainer.position).forEach(tabContainer => tabContainer.position--)
+
+        tabContainer.position = -1
+
+        this.updateAndSave()
+    }
+
+    /**
+     * Unhides a hidden tab in the library.
+     * @param tabId The id of the tab to show.
+     */
+    showTab(tabId: string) {
+        const tabContainer = this.tabsMap.get(tabId)!
+        if (tabContainer.position > -1) return
+        const hiddenIndex = this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer)
+
+        tabContainer.position = this.visibleTabsList.length
+        this.visibleTabsList.push(this.hiddenTabsList.splice(hiddenIndex, 1)[0])
+
+        if (tabContainer.filters && (tabContainer as CustomTabContainer).collection.allApps === undefined) {
+            ;(tabContainer as CustomTabContainer).buildCollection()
         }
-      }
-    });
-  }
 
-  /**
-   * Loads the user's tabs from the backend.
-   */
-  loadTabs = async () => {
-    this.initReactions();
-    let settings = await PythonInterop.getTabs();
-    const profiles = await PythonInterop.getTabProfiles();
-
-    this.asyncLoadOther();
-    try {
-      if (settings instanceof Error) {
-        throw new Error(`Error loading tab settings \n ${settings.message}`);
-      }
-      if (profiles instanceof Error) {
-        throw new Error(`Error loading tab profiles \n ${profiles.message}`);
-      }
-
-      if (!settings) {
-        PythonInterop.error(`Tabs were corrupted.`);
-        PythonInterop.toast("TabMaster Settings Couldn't Load", "Tab settings did not follow the expected format and could not load");
-        this.invalidSettingsLoaded.isTrue = true;
-        await this.invalidSettingsLoaded.waitForResetConfirmation;
-        const res = await PythonInterop.backupDefaultDir(AUTO_BACKUP_NAME);
-        if (res !== true) return LogController.raiseError("Couldn't backup settings");
-        settings = {};
-      }
-
-      this.tabProfileManager = new TabProfileManager(profiles);
-      TabErrorController.validateSettingsOnLoad((Object.keys(settings).length > 0) ? settings : defaultTabsSettings, this, this.finishLoadingTabs.bind(this));
-
-    } catch (e) {
-      if (e instanceof Error) {
-        LogController.raiseError(`Encountered an error while loading \n ${e.message}`);
-      }
-    }
-  };
-
-  /**
-   * Finishes the tab loading process.
-   * @param tabsSettings The tabsSettings to finish loading.
-   */
-  private finishLoadingTabs(tabsSettings: TabSettingsDictionary): void {
-    const visibleTabContainers: TabContainer[] = [];
-    const hiddenTabContainers: TabContainer[] = [];
-    const existingPositions: TabContainer[] = [];
-    const favoritesCollection = collectionStore.GetCollection("favorite");
-    const soundtracksCollection = collectionStore.GetCollection('type-music');
-    this.userHasVisibleFavorites = favoritesCollection && favoritesCollection.visibleApps.length > 0;
-    this.userHasVisibleSoundtracks = soundtracksCollection && soundtracksCollection.visibleApps.length > 0;
-    let favoritesOriginalIndex = null;
-    let soundtracksOriginalIndex = null;
-
-    if (tabsSettings.Favorites && !this.userHasVisibleFavorites) {
-      favoritesOriginalIndex = tabsSettings.Favorites.position;
-      delete tabsSettings['Favorites'];
-    }
-    if (tabsSettings.Soundtracks && !this.userHasVisibleSoundtracks) {
-      soundtracksOriginalIndex = tabsSettings.Soundtracks.position;
-      delete tabsSettings['Soundtracks'];
+        this.updateAndSave()
     }
 
-    for (const keyId in tabsSettings) {
-      const { id, title, filters: _filters, position, filtersMode, categoriesToInclude, autoHide, visibleToOthers, sortByOverride } = tabsSettings[keyId];
-      const filters = Filter.removeUnknownTypes(_filters);
-      const tabContainer = filters ? this.addCustomTabContainer(id, title, position, filters, filtersMode!, categoriesToInclude!, autoHide!, visibleToOthers!, sortByOverride) : this.addDefaultTabContainer(tabsSettings[keyId]);
+    /**
+     * Deletes a tab.
+     * @param tabId The id of the tab to delete.
+     */
+    deleteTab(tabId: string) {
+        const tabContainer = this.tabsMap.get(tabId)!
 
-      if (favoritesOriginalIndex !== null && favoritesOriginalIndex > -1 && tabContainer.position > favoritesOriginalIndex) {
-        tabContainer.position--;
-      }
-      if (soundtracksOriginalIndex !== null && soundtracksOriginalIndex > -1 && tabContainer.position > soundtracksOriginalIndex) {
-        tabContainer.position--;
-      }
-      tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] ? existingPositions.push(tabContainer) : visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer);
+        let tabsArrayToRemoveFrom: TabContainer[]
+        let updateIndexes = false
+        let index: number
 
-      if (filters) {
-        const flatFilters = flattenFilters(filters);
-        this.addCollectionReactionsForFilters(flatFilters);
-      }
-    }
-
-    existingPositions.forEach(tabContainer => visibleTabContainers.splice(tabContainer.position, 0, tabContainer));
-    this.visibleTabsList = visibleTabContainers.filter(elt => elt);
-    this.visibleTabsList.forEach((tabContainer, i) => tabContainer.position = i);
-    this.hiddenTabsList = hiddenTabContainers;
-    this.hasLoaded = true;
-
-    this.updateAndSave();
-  }
-
-  /**
-   * Gets the user's tabs
-   * @returns The visibleTabs, hiddenTabs and tabsMap.
-   */
-  getTabs() {
-    return {
-      visibleTabsList: this.visibleTabsList,
-      hiddenTabsList: this.hiddenTabsList,
-      tabsMap: this.tabsMap
-    };
-  }
-
-  /**
-   * Gets the userFriends and store tags.
-   * @returns The tags and userFriends currently in state.
-   */
-  getFriendsAndTags() {
-    return {
-      currentUsersFriends: this.currentUsersFriends,
-      allStoreTags: this.allStoreTags
-    };
-  }
-
-  get hasSettingsLoaded() {
-    return this.hasLoaded;
-  }
-
-  /**
-   * Gets the list of the user's friends who own an app.
-   * @param appid The id of the app.
-   * @returns A list of ids of friends who own this app.
-   */
-  getFriendsWhoOwn(appid: number): number[] {
-    return Array.from(this.friendsGameMap.entries())
-      .filter(([, ownedGames]) => ownedGames.includes(appid))
-      .map(([friendId]) => friendId);
-  }
-
-  /**
-   * Saves the tabs to the backend.
-   */
-  private saveTabs() {
-    LogController.log('Saving Tabs...');
-
-    const allTabsSettings: TabSettingsDictionary = {};
-
-    this.tabsMap.forEach(tabContainer => {
-      const tabSettings: TabSettings = tabContainer.filters ?
-        {
-          id: tabContainer.id,
-          title: tabContainer.title,
-          position: tabContainer.position,
-          filters: tabContainer.filters,
-          filtersMode: (tabContainer as CustomTabContainer).filtersMode,
-          categoriesToInclude: (tabContainer as CustomTabContainer).categoriesToInclude,
-          autoHide: (tabContainer as CustomTabContainer).autoHide,
-          visibleToOthers: (tabContainer as CustomTabContainer).visibleToOthers,
-          sortByOverride: (tabContainer as CustomTabContainer).sortByOverride
+        if (tabContainer.position > -1) {
+            tabsArrayToRemoveFrom = this.visibleTabsList
+            index = tabContainer.position
+            updateIndexes = true
+        } else {
+            tabsArrayToRemoveFrom = this.hiddenTabsList
+            index = this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer)
         }
-        : tabContainer;
+        tabsArrayToRemoveFrom.splice(index, 1)
+        if (updateIndexes) {
+            for (let i = index; i < this.visibleTabsList.length; i++) {
+                this.visibleTabsList[i].position--
+            }
+        }
+        this.tabsMap.delete(tabId)
+        this.tabProfileManager?.onDeleteTab(tabId)
+        if (!this.tabProfileManager)
+            LogController.error(
+                'Attempted to delete a tab before TabProfileManager has been initialized.',
+                'This should not be possible.'
+            )
+        this.updateAndSave()
+    }
 
-      allTabsSettings[tabContainer.id] = tabSettings;
-    });
-    PythonInterop.setTabs(allTabsSettings);
-  }
+    /**
+     * Creates a new custom tab.
+     * @param title The title of the tab.
+     * @param position The position of the tab.
+     * @param filterSettingsList The list of filters for the tab.
+     * @param filtersMode The logic mode for these filters.
+     * @param categoriesToInclude A bit field of which categories should be included in the tab.
+     * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
+     * @param visibleToOthers Whether or not the tab can be copied by other users.
+     * @param sortByOverride The eSortBy number to force use for sorting. -1 ignores override.
+     */
+    createCustomTab(
+        title: string,
+        position: number,
+        filterSettingsList: TabFilterSettings<FilterType>[],
+        filtersMode: LogicalMode,
+        categoriesToInclude: number,
+        autoHide: boolean,
+        visibleToOthers: boolean,
+        sortByOverride: number
+    ) {
+        const id = uuidv4()
+        this.addCollectionReactionsForFilters(flattenFilters(filterSettingsList))
+        this.visibleTabsList.push(
+            this.addCustomTabContainer(
+                id,
+                title,
+                position,
+                filterSettingsList,
+                filtersMode,
+                categoriesToInclude,
+                autoHide,
+                visibleToOthers,
+                sortByOverride
+            )
+        )
+        this.updateAndSave()
+    }
 
-  /**
-   * Creates a new tab container from the provided tab data.
-   * @param tabId The id of the tab.
-   * @param title The title of the tab.
-   * @param position The position of the tab.
-   * @param filterSettingsList The tab's filters.
-   * @param categoriesToInclude A bit field of which categories should be included in the tab.
-   * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
-   * @param visibleToOthers Whether or not the tab can be added by other users.
-   * @param sortByOverride The eSortBy number to force use for sorting. -1 ignores override.
-   * @returns A tab container for this tab.
-   */
-  private addCustomTabContainer(tabId: string, title: string, position: number, filterSettingsList: TabFilterSettings<FilterType>[], filtersMode: LogicalMode, categoriesToInclude: number, autoHide: boolean, visibleToOthers: boolean, sortByOverride: number = -1) {
-    const tabContainer = new CustomTabContainer(tabId, title, position, filterSettingsList, filtersMode, categoriesToInclude, autoHide, visibleToOthers, sortByOverride);
-    this.tabsMap.set(tabId, tabContainer);
-    return tabContainer;
-  }
+    createPresetTab<Name extends PresetName>(presetName: Name, tabTitle: string, ...options: PresetOptions<Name>) {
+        const { filters, filtersMode, categoriesToInclude } = getPreset(presetName, ...options)
+        this.createCustomTab(
+            tabTitle,
+            this.visibleTabsList.length,
+            filters,
+            filtersMode,
+            categoriesToInclude,
+            false,
+            false,
+            -1
+        )
+    }
 
-  /**
-   * Creates a new tab container for each of the default tabs.
-   * @param defaultTabSettings The default tabs.
-   * @returns Tab containers for all of the default tabs.
-   */
-  private addDefaultTabContainer(defaultTabSettings: TabContainer) {
-    this.tabsMap.set(defaultTabSettings.id, defaultTabSettings);
-    return defaultTabSettings;
-  }
+    /**
+     * Adds a reaction to collection lengths if they are not already registered.
+     * @param filters The array of filters to check.
+     */
+    private addCollectionReactionsForFilters(filters: TabFilterSettings<FilterType>[]): void {
+        const collectionFilters = filters.filter(
+            (filter: TabFilterSettings<FilterType>) => filter.type === 'collection'
+        )
 
-  /**
-   * Rebuilds the library tab list.
-   */
-  private rebuildTabLists() {
-    const visibleTabContainers: TabContainer[] = [];
-    const hiddenTabContainers: TabContainer[] = [];
-    this.tabsMap.forEach(tabContainer => {
-      tabContainer.position > -1 ? visibleTabContainers[tabContainer.position] = tabContainer : hiddenTabContainers.push(tabContainer);
-    });
-    this.visibleTabsList = visibleTabContainers;
-    this.hiddenTabsList = hiddenTabContainers;
-  }
+        if (collectionFilters.length > 0) {
+            for (const collectionFilter of collectionFilters) {
+                const collectionId: string = (collectionFilter as TabFilterSettings<'collection'>).params.id
 
-  /**
-   * Saves tab settings and dispatches event to update context provider
-   */
-  private updateAndSave() {
-    this.saveTabs();
-    this.update();
-  }
+                if (!this.collectionDisposers[collectionId]) {
+                    //* subscribe to user collection updates
+                    this.collectionDisposers[collectionId] = reaction(
+                        () => collectionStore.GetCollection(collectionId).allApps.length,
+                        () => {
+                            this.rebuildCustomTabsOnCollectionChange()
+                        }
+                    )
+                }
+            }
+        }
+    }
 
-  /**
-   * Dispatches event to update context provider and rerenders library component.
-   */
-  private update() {
-    this.eventBus.dispatchEvent(new Event("stateUpdate"));
-    this.rerenderLibrary();
-  }
+    /**
+     * Other async load calls that don't need to be waited for when starting the plugin
+     */
+    asyncLoadOther() {
+        PythonInterop.getTags().then((res: TagResponse[] | Error) => {
+            if (res instanceof Error) {
+                LogController.raiseError(`Error loading tags \n ${res.message}`)
+            } else {
+                if (this.allStoreTags.length === 0) {
+                    this.allStoreTags = res
+                }
+            }
+        })
+        PythonInterop.getFriends().then((res: FriendEntry[] | Error) => {
+            if (res instanceof Error) {
+                LogController.raiseError(`Error loading friends \n ${res.message}`)
+            } else {
+                if (this.currentUsersFriends.length === 0) {
+                    this.currentUsersFriends = res
+                }
+            }
+        })
+        PythonInterop.getFriendsGames().then((res: Map<number, number[]> | Error) => {
+            if (res instanceof Error) {
+                LogController.raiseError(`Error loading friends games \n ${res.message}`)
+            } else {
+                if (this.friendsGameMap.size === 0) {
+                    this.friendsGameMap = res
+                }
+            }
+        })
+    }
 
-  /**
-   * Method that will be used to force library to rerender. Assigned later in the library patch.
-   */
-  private rerenderLibrary() {
+    /**
+     * Loads the user's tabs from the backend.
+     */
+    loadTabs = async () => {
+        this.initReactions()
+        let settings = await PythonInterop.getTabs()
+        const profiles = await PythonInterop.getTabProfiles()
 
-  }
+        this.asyncLoadOther()
+        try {
+            if (settings instanceof Error) {
+                throw new Error(`Error loading tab settings \n ${settings.message}`)
+            }
+            if (profiles instanceof Error) {
+                throw new Error(`Error loading tab profiles \n ${profiles.message}`)
+            }
 
-  /**
-   * Assigns the callback that will be used to rerender the library.
-   * @param handler The callback that will cause the library to rerender.
-   */
-  registerRerenderLibraryHandler(handler: () => void) {
-    this.rerenderLibrary = handler;
-  }
+            if (!settings) {
+                PythonInterop.error(`Tabs were corrupted.`)
+                PythonInterop.toast(
+                    "TabMaster Settings Couldn't Load",
+                    'Tab settings did not follow the expected format and could not load'
+                )
+                this.invalidSettingsLoaded.isTrue = true
+                await this.invalidSettingsLoaded.waitForResetConfirmation
+                const res = await PythonInterop.backupDefaultDir(AUTO_BACKUP_NAME)
+                if (res !== true) return LogController.raiseError("Couldn't backup settings")
+                settings = {}
+            }
+
+            this.tabProfileManager = new TabProfileManager(profiles)
+            TabErrorController.validateSettingsOnLoad(
+                Object.keys(settings).length > 0 ? settings : defaultTabsSettings,
+                this,
+                this.finishLoadingTabs.bind(this)
+            )
+        } catch (e) {
+            if (e instanceof Error) {
+                LogController.raiseError(`Encountered an error while loading \n ${e.message}`)
+            }
+        }
+    }
+
+    /**
+     * Finishes the tab loading process.
+     * @param tabsSettings The tabsSettings to finish loading.
+     */
+    private finishLoadingTabs(tabsSettings: TabSettingsDictionary): void {
+        const visibleTabContainers: TabContainer[] = []
+        const hiddenTabContainers: TabContainer[] = []
+        const existingPositions: TabContainer[] = []
+        const favoritesCollection = collectionStore.GetCollection('favorite')
+        const soundtracksCollection = collectionStore.GetCollection('type-music')
+        this.userHasVisibleFavorites = favoritesCollection && favoritesCollection.visibleApps.length > 0
+        this.userHasVisibleSoundtracks = soundtracksCollection && soundtracksCollection.visibleApps.length > 0
+        let favoritesOriginalIndex = null
+        let soundtracksOriginalIndex = null
+
+        if (tabsSettings.Favorites && !this.userHasVisibleFavorites) {
+            favoritesOriginalIndex = tabsSettings.Favorites.position
+            delete tabsSettings['Favorites']
+        }
+        if (tabsSettings.Soundtracks && !this.userHasVisibleSoundtracks) {
+            soundtracksOriginalIndex = tabsSettings.Soundtracks.position
+            delete tabsSettings['Soundtracks']
+        }
+
+        for (const keyId in tabsSettings) {
+            const {
+                id,
+                title,
+                filters: _filters,
+                position,
+                filtersMode,
+                categoriesToInclude,
+                autoHide,
+                visibleToOthers,
+                sortByOverride,
+            } = tabsSettings[keyId]
+            const filters = Filter.removeUnknownTypes(_filters)
+            const tabContainer = filters
+                ? this.addCustomTabContainer(
+                      id,
+                      title,
+                      position,
+                      filters,
+                      filtersMode!,
+                      categoriesToInclude!,
+                      autoHide!,
+                      visibleToOthers!,
+                      sortByOverride
+                  )
+                : this.addDefaultTabContainer(tabsSettings[keyId])
+
+            if (
+                favoritesOriginalIndex !== null &&
+                favoritesOriginalIndex > -1 &&
+                tabContainer.position > favoritesOriginalIndex
+            ) {
+                tabContainer.position--
+            }
+            if (
+                soundtracksOriginalIndex !== null &&
+                soundtracksOriginalIndex > -1 &&
+                tabContainer.position > soundtracksOriginalIndex
+            ) {
+                tabContainer.position--
+            }
+            tabContainer.position > -1
+                ? visibleTabContainers[tabContainer.position]
+                    ? existingPositions.push(tabContainer)
+                    : (visibleTabContainers[tabContainer.position] = tabContainer)
+                : hiddenTabContainers.push(tabContainer)
+
+            if (filters) {
+                const flatFilters = flattenFilters(filters)
+                this.addCollectionReactionsForFilters(flatFilters)
+            }
+        }
+
+        existingPositions.forEach(tabContainer => visibleTabContainers.splice(tabContainer.position, 0, tabContainer))
+        this.visibleTabsList = visibleTabContainers.filter(elt => elt)
+        this.visibleTabsList.forEach((tabContainer, i) => (tabContainer.position = i))
+        this.hiddenTabsList = hiddenTabContainers
+        this.hasLoaded = true
+
+        this.updateAndSave()
+    }
+
+    /**
+     * Gets the user's tabs
+     * @returns The visibleTabs, hiddenTabs and tabsMap.
+     */
+    getTabs() {
+        return {
+            visibleTabsList: this.visibleTabsList,
+            hiddenTabsList: this.hiddenTabsList,
+            tabsMap: this.tabsMap,
+        }
+    }
+
+    /**
+     * Gets the userFriends and store tags.
+     * @returns The tags and userFriends currently in state.
+     */
+    getFriendsAndTags() {
+        return {
+            currentUsersFriends: this.currentUsersFriends,
+            allStoreTags: this.allStoreTags,
+        }
+    }
+
+    get hasSettingsLoaded() {
+        return this.hasLoaded
+    }
+
+    /**
+     * Gets the list of the user's friends who own an app.
+     * @param appid The id of the app.
+     * @returns A list of ids of friends who own this app.
+     */
+    getFriendsWhoOwn(appid: number): number[] {
+        return Array.from(this.friendsGameMap.entries())
+            .filter(([, ownedGames]) => ownedGames.includes(appid))
+            .map(([friendId]) => friendId)
+    }
+
+    /**
+     * Saves the tabs to the backend.
+     */
+    private saveTabs() {
+        LogController.log('Saving Tabs...')
+
+        const allTabsSettings: TabSettingsDictionary = {}
+
+        this.tabsMap.forEach(tabContainer => {
+            const tabSettings: TabSettings = tabContainer.filters
+                ? {
+                      id: tabContainer.id,
+                      title: tabContainer.title,
+                      position: tabContainer.position,
+                      filters: tabContainer.filters,
+                      filtersMode: (tabContainer as CustomTabContainer).filtersMode,
+                      categoriesToInclude: (tabContainer as CustomTabContainer).categoriesToInclude,
+                      autoHide: (tabContainer as CustomTabContainer).autoHide,
+                      visibleToOthers: (tabContainer as CustomTabContainer).visibleToOthers,
+                      sortByOverride: (tabContainer as CustomTabContainer).sortByOverride,
+                  }
+                : tabContainer
+
+            allTabsSettings[tabContainer.id] = tabSettings
+        })
+        PythonInterop.setTabs(allTabsSettings)
+    }
+
+    /**
+     * Creates a new tab container from the provided tab data.
+     * @param tabId The id of the tab.
+     * @param title The title of the tab.
+     * @param position The position of the tab.
+     * @param filterSettingsList The tab's filters.
+     * @param categoriesToInclude A bit field of which categories should be included in the tab.
+     * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
+     * @param visibleToOthers Whether or not the tab can be added by other users.
+     * @param sortByOverride The eSortBy number to force use for sorting. -1 ignores override.
+     * @returns A tab container for this tab.
+     */
+    private addCustomTabContainer(
+        tabId: string,
+        title: string,
+        position: number,
+        filterSettingsList: TabFilterSettings<FilterType>[],
+        filtersMode: LogicalMode,
+        categoriesToInclude: number,
+        autoHide: boolean,
+        visibleToOthers: boolean,
+        sortByOverride: number = -1
+    ) {
+        const tabContainer = new CustomTabContainer(
+            tabId,
+            title,
+            position,
+            filterSettingsList,
+            filtersMode,
+            categoriesToInclude,
+            autoHide,
+            visibleToOthers,
+            sortByOverride
+        )
+        this.tabsMap.set(tabId, tabContainer)
+        return tabContainer
+    }
+
+    /**
+     * Creates a new tab container for each of the default tabs.
+     * @param defaultTabSettings The default tabs.
+     * @returns Tab containers for all of the default tabs.
+     */
+    private addDefaultTabContainer(defaultTabSettings: TabContainer) {
+        this.tabsMap.set(defaultTabSettings.id, defaultTabSettings)
+        return defaultTabSettings
+    }
+
+    /**
+     * Rebuilds the library tab list.
+     */
+    private rebuildTabLists() {
+        const visibleTabContainers: TabContainer[] = []
+        const hiddenTabContainers: TabContainer[] = []
+        this.tabsMap.forEach(tabContainer => {
+            tabContainer.position > -1
+                ? (visibleTabContainers[tabContainer.position] = tabContainer)
+                : hiddenTabContainers.push(tabContainer)
+        })
+        this.visibleTabsList = visibleTabContainers
+        this.hiddenTabsList = hiddenTabContainers
+    }
+
+    /**
+     * Saves tab settings and dispatches event to update context provider
+     */
+    private updateAndSave() {
+        this.saveTabs()
+        this.update()
+    }
+
+    /**
+     * Dispatches event to update context provider and rerenders library component.
+     */
+    private update() {
+        this.eventBus.dispatchEvent(new Event('stateUpdate'))
+        this.rerenderLibrary()
+    }
+
+    /**
+     * Method that will be used to force library to rerender. Assigned later in the library patch.
+     */
+    private rerenderLibrary() {}
+
+    /**
+     * Assigns the callback that will be used to rerender the library.
+     * @param handler The callback that will cause the library to rerender.
+     */
+    registerRerenderLibraryHandler(handler: () => void) {
+        this.rerenderLibrary = handler
+    }
 }
