@@ -357,5 +357,17 @@ Filters apps based on if they are installed on the specified MicroSD card.
 
 <br/>
 
+#### Install Folder
+**Options:**<br/>
+`Install Folder` - The Install Folder to use.
+
+**Behavior:**<br/>
+Filters apps based on if they are installed in the specified Steam Install Folder.
+
+**Example:**<br/>
+<img title="Install Folder Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_install-folder-example.png" />
+
+<br/>
+
 
 ###### © Travis Lane (Tormak), Jessebofill

@@ -110,7 +110,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({ closeModal, onConfirm, ta
     updatedFilters.push({
       type: "collection",
       inverted: false,
-      params: FilterDefaultParams.collection
+      params: FilterDefaultParams().collection
     });
     setTopLevelFilters(updatedFilters);
   }

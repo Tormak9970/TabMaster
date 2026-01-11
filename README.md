@@ -47,6 +47,7 @@ Available Filters:
  - **Streamable** - Selects apps that can/can't be streamed from another computer.
  - **Steam Features** - Selects apps that support specific Steam Features.
  - **MicroSD Card** - Selects apps that are present on the inserted/specific MicroSD Card.
+ - **Install Folder** - Selects apps that are present on the specific install folder.
 
 If you want us to add another filter, please open a filter request [here](https://github.com/Tormak9970/TabMaster/issues/new/choose).
 
@@ -74,6 +75,7 @@ Filter Examples:
  - **Steam Features**<br/><img src="./assets/filters/docs_steam-features-example.png" width="600" />
  - **Achievements**<br/><img src="./assets/filters/docs_achievements-example.png" width="600" />
  - **MicroSD Card**<br/><img src="./assets/filters/docs_microsd-card-example.png" width="600" />
+ - **Install Folder**<br/><img src="./assets/filters/docs_install-folder-example.png" width="600" />
 
 
 # Contributing

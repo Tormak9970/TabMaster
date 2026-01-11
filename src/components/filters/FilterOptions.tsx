@@ -10,7 +10,7 @@ import {
   showModal
 } from "@decky/ui";
 import React, { VFC, Fragment, useState, useMemo } from "react";
-import { FaTag, FaTags, FaUser, FaCompactDisc, FaListCheck, FaSteam } from "react-icons/fa6";
+import { FaTag, FaTags, FaUser, FaCompactDisc, FaListCheck, FaSteam, FaStar, FaFolder } from "react-icons/fa6";
 import { FaUserFriends, FaQuestionCircle } from "react-icons/fa";
 import { MdApps } from "react-icons/md";
 import { IoGameController, IoGrid } from "react-icons/io5";
@@ -1015,6 +1015,49 @@ const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({ index, setCon
   );
 };
 
+
+/**
+ * The options for an installed folder filter.
+ */
+const InstallFolderFilterOptions: VFC<FilterOptionsProps<'install folder'>> = ({ index, setContainingGroupFilters, filter, containingGroupFilters }) => {
+  const collectionDropdownOptions: SingleDropdownOption[] = installFolderStore.AllInstallFolders.map(folder => {
+    return {
+      label: folder.strUserLabel || folder.strDriveName,
+      data: folder.strDriveName
+    };
+  });
+
+  function onChange(data: SingleDropdownOption) {
+    const updatedFilter = { ...filter };
+    updatedFilter.params.driveName = data.data;
+    const updatedFilters = [...containingGroupFilters];
+    updatedFilters[index] = updatedFilter;
+    setContainingGroupFilters(updatedFilters);
+  }
+
+  return (
+    <Field
+      label="Selected Install Folder"
+      description={
+        <ListSearchDropdown
+          entryLabel="Install Folders"
+          rgOptions={collectionDropdownOptions}
+          selectedOption={filter.params.driveName}
+          onChange={onChange}
+          TriggerIcon={IoGrid}
+          determineEntryIcon={(entry) => {
+            if (entry.bIsDefaultFolder) {
+              return FaStar
+            }
+
+            return FaFolder
+          }}
+        />
+      }
+    />
+  );
+};
+
 /**
  * The options for an individual filter.
  */
@@ -1068,6 +1111,8 @@ export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({ index, filt
         return <AchievementsFilterOptions index={index} filter={filterCopy as TabFilterSettings<'achievements'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       case "sd card":
         return <SDCardFilterOptions index={index} filter={filterCopy as TabFilterSettings<'sd card'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
+      case 'install folder':
+        return <InstallFolderFilterOptions index={index} filter={filterCopy as TabFilterSettings<'install folder'>} containingGroupFilters={containingGroupFilters} setContainingGroupFilters={setContainingGroupFilters} />;
       default:
         return <Fragment />;
     }

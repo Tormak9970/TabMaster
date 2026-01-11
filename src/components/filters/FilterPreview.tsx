@@ -165,6 +165,10 @@ const SDCardFilterPreview: VFC<FilterPreviewProps<'sd card'>> = ({ filter }) => 
   return <FilterPreviewGeneric filter={filter} displayData={label} isInverted={filter.inverted} />;
 }
 
+const InstallFolderFilterPreview: VFC<FilterPreviewProps<'install folder'>> = ({ filter }) => {
+  return <FilterPreviewGeneric filter={filter} displayData={filter.params.driveName} isInverted={filter.inverted} />;
+}
+
 /**
  * Generates the preview data for filters in a merge group.
  */
@@ -217,6 +221,8 @@ export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) =
         return <AchievementsFilterPreview filter={filter as TabFilterSettings<'achievements'>} />
       case "sd card":
         return <SDCardFilterPreview filter={filter as TabFilterSettings<'sd card'>} />;
+      case "install folder":
+        return <InstallFolderFilterPreview filter={filter as TabFilterSettings<'install folder'>} />;
       default:
         return <Fragment />;
     }

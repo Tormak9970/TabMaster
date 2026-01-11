@@ -43,6 +43,5 @@ yalc.lock
 
 # .vscode/settings.json
 .vscode/tasks.json
-.vscode/settings.json
 # Ignore output folder
 dist
