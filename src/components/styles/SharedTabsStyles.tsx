@@ -1,12 +1,12 @@
-import { gamepadDialogClasses, quickAccessControlsClasses } from "@decky/ui";
-import { VFC } from "react";
+import { gamepadDialogClasses, quickAccessControlsClasses } from '@decky/ui'
+import { VFC } from 'react'
 
 /**
  * All css styling for TabMaster's SharedTabsModal.
  */
 export const SharedTabsModalStyles: VFC<{}> = ({}) => {
-  return (
-    <style>{`
+    return (
+        <style>{`
       .tab-master-shared-tabs-modal .${quickAccessControlsClasses.PanelSection} {
         margin: 0px;
         padding: 0px;
@@ -90,5 +90,5 @@ export const SharedTabsModalStyles: VFC<{}> = ({}) => {
         transform: scale(0.6);
       }
     `}</style>
-  );
+    )
 }

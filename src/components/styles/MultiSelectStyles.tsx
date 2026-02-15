@@ -1,12 +1,12 @@
-import { gamepadDialogClasses } from "@decky/ui";
-import { VFC } from "react";
+import { gamepadDialogClasses } from '@decky/ui'
+import { VFC } from 'react'
 
 /**
  * All css styling for the TabMaster MultiSelect component.
  */
 export const MultiSelectStyles: VFC<{}> = ({}) => {
-  return (
-    <style>{`
+    return (
+        <style>{`
       /* The button item wrapper */
       .tab-master-modal-scope .multi-select .${gamepadDialogClasses.Field} {
         padding: 0;
@@ -21,5 +21,5 @@ export const MultiSelectStyles: VFC<{}> = ({}) => {
         min-width: 45px;
       }
     `}</style>
-  );
+    )
 }

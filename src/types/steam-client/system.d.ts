@@ -1,3 +1,3 @@
 type System = {
-  RegisterForOnResumeFromSuspend?: (callback: () => void) => Unregisterer;
+    RegisterForOnResumeFromSuspend?: (callback: () => void) => Unregisterer
 }

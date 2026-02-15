@@ -1,12 +1,12 @@
-import { gamepadContextMenuClasses } from "@decky/ui";
-import { VFC } from 'react';
+import { gamepadContextMenuClasses } from '@decky/ui'
+import { VFC } from 'react'
 
 /**
  * CSS styling for the Library Context Menu part of TabMaster.
  */
-export const LibraryMenuStyles: VFC<{}> = ({ }) => {
-  return (
-    <style>{`
+export const LibraryMenuStyles: VFC<{}> = ({}) => {
+    return (
+        <style>{`
       .${gamepadContextMenuClasses.BasicContextMenuHeader} {
         margin: 0;
       }
@@ -21,5 +21,5 @@ export const LibraryMenuStyles: VFC<{}> = ({ }) => {
         margin-right: 5px;
       }
     `}</style>
-  );
-};
+    )
+}

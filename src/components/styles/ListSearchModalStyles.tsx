@@ -1,12 +1,12 @@
-import { gamepadDialogClasses, quickAccessControlsClasses } from "@decky/ui";
-import { VFC } from "react";
+import { gamepadDialogClasses, quickAccessControlsClasses } from '@decky/ui'
+import { VFC } from 'react'
 
 /**
  * All css styling for TabMaster's ListSearchModal.
  */
 export const ListSearchModalStyles: VFC<{}> = ({}) => {
-  return (
-    <style>{`
+    return (
+        <style>{`
       .tab-master-list-search-modal .${quickAccessControlsClasses.PanelSection} {
         margin: 0px;
         padding: 0px;
@@ -57,5 +57,5 @@ export const ListSearchModalStyles: VFC<{}> = ({}) => {
         animation: tab-master-arrow-bounce-down 2.7s infinite ease-in-out;
       }
     `}</style>
-  );
+    )
 }
