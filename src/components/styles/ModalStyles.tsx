@@ -1,7 +1,7 @@
-import { gamepadDialogClasses } from "@decky/ui";
-import { VFC } from "react";
+import { gamepadDialogClasses } from '@decky/ui'
+import { VFC } from 'react'
 
-export const modalMargin = '16px + 2.8vw';
+export const modalMargin = '16px + 2.8vw'
 
 // New modal background should be "radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%)"
 
@@ -9,8 +9,8 @@ export const modalMargin = '16px + 2.8vw';
  * All css styling for TabMaster's modals.
  */
 export const ModalStyles: VFC<{}> = ({}) => {
-  return (
-    <style>{`
+    return (
+        <style>{`
       .tab-master-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
         margin-left: 15px;
       }
@@ -112,5 +112,5 @@ export const ModalStyles: VFC<{}> = ({}) => {
         font-size: 12px;
       }
     `}</style>
-  );
+    )
 }

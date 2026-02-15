@@ -24,6 +24,7 @@ import { BsClockHistory, BsRegex } from 'react-icons/bs'
 import { LuCombine } from 'react-icons/lu'
 import { LogController } from '../../lib/controllers/LogController'
 import { CardAndGames } from '@cebbinghaus/microsdeck'
+import { MdNewReleases } from 'react-icons/md'
 
 export type FilterType =
     | 'collection'
@@ -50,6 +51,7 @@ export type FilterType =
     | 'achievements'
     | 'sd card'
     | 'install folder'
+    | 'coming soon'
 
 export type TimeUnit = 'minutes' | 'hours' | 'days'
 export type ThresholdCondition = 'above' | 'below'
@@ -93,6 +95,7 @@ type PurchaseDateFilterParams = { date?: DateObj; daysAgo?: number; condition: T
 type LastPlayedFilterParams = { date?: DateObj; daysAgo?: number; condition: ThresholdCondition }
 type FamilySharingFilterParams = { isFamilyShared: boolean }
 type DemoFilterParams = { isDemo: boolean }
+type ComingSoonParams = { isComingSoon: boolean }
 type StreamableFilterParams = { isStreamable: boolean }
 type SteamFeaturesFilterParams = { features: number[]; mode: LogicalMode }
 type AchievementsFilterParams = {
@@ -112,52 +115,54 @@ type InstallFolderParams = { driveName: string }
 export type FilterParams<T extends FilterType> = T extends 'collection'
     ? CollectionFilterParams
     : T extends 'installed'
-    ? InstalledFilterParams
-    : T extends 'regex'
-    ? RegexFilterParams
-    : T extends 'friends'
-    ? FriendsFilterParams
-    : T extends 'tags'
-    ? TagsFilterParams
-    : T extends 'whitelist'
-    ? WhitelistFilterParams
-    : T extends 'blacklist'
-    ? BlacklistFilterParams
-    : T extends 'merge'
-    ? MergeFilterParams
-    : T extends 'platform'
-    ? PlatformFilterParams
-    : T extends 'deck compatibility'
-    ? DeckCompatFilterParams
-    : T extends 'steamos compatibility'
-    ? SteamOSCompatFilterParams
-    : T extends 'review score'
-    ? ReviewScoreFilterParams
-    : T extends 'time played'
-    ? TimePlayedFilterParams
-    : T extends 'size on disk'
-    ? SizeOnDiskFilterParams
-    : T extends 'release date'
-    ? ReleaseDateFilterParams
-    : T extends 'purchase date'
-    ? PurchaseDateFilterParams
-    : T extends 'last played'
-    ? LastPlayedFilterParams
-    : T extends 'family sharing'
-    ? FamilySharingFilterParams
-    : T extends 'demo'
-    ? DemoFilterParams
-    : T extends 'streamable'
-    ? StreamableFilterParams
-    : T extends 'steam features'
-    ? SteamFeaturesFilterParams
-    : T extends 'achievements'
-    ? AchievementsFilterParams
-    : T extends 'sd card'
-    ? SdCardParams
-    : T extends 'install folder'
-    ? InstallFolderParams
-    : never
+      ? InstalledFilterParams
+      : T extends 'regex'
+        ? RegexFilterParams
+        : T extends 'friends'
+          ? FriendsFilterParams
+          : T extends 'tags'
+            ? TagsFilterParams
+            : T extends 'whitelist'
+              ? WhitelistFilterParams
+              : T extends 'blacklist'
+                ? BlacklistFilterParams
+                : T extends 'merge'
+                  ? MergeFilterParams
+                  : T extends 'platform'
+                    ? PlatformFilterParams
+                    : T extends 'deck compatibility'
+                      ? DeckCompatFilterParams
+                      : T extends 'steamos compatibility'
+                        ? SteamOSCompatFilterParams
+                        : T extends 'review score'
+                          ? ReviewScoreFilterParams
+                          : T extends 'time played'
+                            ? TimePlayedFilterParams
+                            : T extends 'size on disk'
+                              ? SizeOnDiskFilterParams
+                              : T extends 'release date'
+                                ? ReleaseDateFilterParams
+                                : T extends 'purchase date'
+                                  ? PurchaseDateFilterParams
+                                  : T extends 'last played'
+                                    ? LastPlayedFilterParams
+                                    : T extends 'family sharing'
+                                      ? FamilySharingFilterParams
+                                      : T extends 'demo'
+                                        ? DemoFilterParams
+                                        : T extends 'coming soon'
+                                          ? ComingSoonParams
+                                          : T extends 'streamable'
+                                            ? StreamableFilterParams
+                                            : T extends 'steam features'
+                                              ? SteamFeaturesFilterParams
+                                              : T extends 'achievements'
+                                                ? AchievementsFilterParams
+                                                : T extends 'sd card'
+                                                  ? SdCardParams
+                                                  : T extends 'install folder'
+                                                    ? InstallFolderParams
+                                                    : never
 
 export type TabFilterSettings<T extends FilterType> = {
     type: T
@@ -191,6 +196,7 @@ export const FilterDefaultParams: () => { [key in FilterType]: FilterParams<key>
     'last played': { date: undefined, condition: 'above' },
     'family sharing': { isFamilyShared: true },
     demo: { isDemo: true },
+    'coming soon': { isComingSoon: true },
     streamable: { isStreamable: true },
     'steam features': { features: [], mode: 'and' },
     achievements: { threshold: 10, thresholdType: 'percent', condition: 'above' },
@@ -223,6 +229,7 @@ export const FilterDescriptions: { [filterType in FilterType]: string } = {
     'last played': 'Selects apps based on when they were last played.',
     'family sharing': "Selects apps that are/aren't shared from family members.",
     demo: "Selects apps that are/aren't demos.",
+    'coming soon': "Selects apps that are/aren't soon to be released.",
     streamable: "Selects apps that can/can't be streamed from another computer.",
     achievements: 'Selects apps based on their completion percentage.',
     'steam features': 'Selects apps that support specific Steam Features.',
@@ -253,6 +260,7 @@ export const FilterIcons: { [filterType in FilterType]: IconType } = {
     'last played': BsClockHistory,
     'family sharing': FaUserPlus,
     demo: FaCompactDisc,
+    'coming soon': MdNewReleases,
     streamable: FaCloudArrowDown,
     'steam features': FaListCheck,
     achievements: FaTrophy,
@@ -290,6 +298,7 @@ export function canBeInverted(filter: TabFilterSettings<FilterType>): boolean {
         case 'purchase date':
         case 'last played':
         case 'demo':
+        case 'coming soon':
         case 'family sharing':
         case 'streamable':
             return false
@@ -338,6 +347,7 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
         case 'review score':
         case 'time played':
         case 'demo':
+        case 'coming soon':
         case 'family sharing':
         case 'streamable':
         case 'achievements':
@@ -534,6 +544,7 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
         case 'purchase date':
         case 'last played':
         case 'demo':
+        case 'coming soon':
         case 'family sharing':
         case 'streamable':
         case 'steam features':
@@ -616,8 +627,8 @@ export class Filter {
                 params.units === 'minutes'
                     ? params.timeThreshold
                     : params.units === 'hours'
-                    ? params.timeThreshold * 60
-                    : params.timeThreshold * 1440
+                      ? params.timeThreshold * 60
+                      : params.timeThreshold * 1440
             return params.condition === 'above'
                 ? appOverview.minutes_playtime_forever >= minutesThreshold
                 : appOverview.minutes_playtime_forever <= minutesThreshold
@@ -770,6 +781,9 @@ export class Filter {
         },
         demo: (params: FilterParams<'demo'>, appOverview: SteamAppOverview) => {
             return params.isDemo ? appOverview.app_type === 8 : appOverview.app_type !== 8
+        },
+        'coming soon': (params: FilterParams<'coming soon'>, appOverview: SteamAppOverview) => {
+            return params.isComingSoon ? appOverview.display_status === 13 : appOverview.display_status !== 13
         },
         streamable: (params: FilterParams<'streamable'>, appOverview: SteamAppOverview) => {
             const isStreamable = appOverview.per_client_data.some(

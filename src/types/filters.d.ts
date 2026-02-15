@@ -1,27 +1,27 @@
 // ? Global types related to filters.
 
 type TagResponse = {
-  tag: number,
-  string: string | undefined
+    tag: number
+    string: string | undefined
 }
 
 type FriendEntry = {
-  name: string,
-  steamid: number
+    name: string
+    steamid: number
 }
 
 type FilterErrorEntry = {
-  filterIdx: number,
-  errors: string[],
-  mergeErrorEntries?: FilterErrorEntry[]
+    filterIdx: number
+    errors: string[]
+    mergeErrorEntries?: FilterErrorEntry[]
 }
 
 type ValidationResponse = {
-  passed: boolean,
-  errors: string[],
-  mergeErrorEntries?: FilterErrorEntry[]
+    passed: boolean
+    errors: string[]
+    mergeErrorEntries?: FilterErrorEntry[]
 }
 
 type LogicalMode = 'and' | 'or'
 
-type SteamPlatform = "steam" | "nonSteam"
+type SteamPlatform = 'steam' | 'nonSteam'

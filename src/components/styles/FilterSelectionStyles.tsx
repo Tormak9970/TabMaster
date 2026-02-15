@@ -1,12 +1,12 @@
-import { gamepadDialogClasses } from "@decky/ui";
-import { VFC } from "react";
+import { gamepadDialogClasses } from '@decky/ui'
+import { VFC } from 'react'
 
 /**
  * All css styling for TabMaster's filter selection.
  */
 export const FilterSelectStyles: VFC<{}> = ({}) => {
-  return (
-    <style>{`
+    return (
+        <style>{`
       .tab-master-filter-select {
         width: 100%;
         height: auto;
@@ -31,5 +31,5 @@ export const FilterSelectStyles: VFC<{}> = ({}) => {
         text-align: initial;
       }
     `}</style>
-  );
+    )
 }
