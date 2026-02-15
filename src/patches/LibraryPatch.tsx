@@ -66,7 +66,7 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
             //* deps contains useful variables from within the orignal component that we otherwise wouldn't be able to get
             const fakeUseMemo = (fn: () => any, deps: any[]) => {
               return realUseMemo(() => {
-                const tabs: SteamTab[] = fn();
+                let tabs: [SteamTab[], boolean]= fn();
                 if (!Array.isArray(tabs)) {
                   LogController.raiseError('No array returned when trying to retrieve default tabs');
                   return tabs;
@@ -76,7 +76,7 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
                 const sortingProps = { eSortBy, setSortBy, showSortingContextMenu };
                 const collectionsAppFilterGamepad = deps[6];
 
-                const tabTemplate = tabs.find((tab: SteamTab) => tab?.id === "AllGames");
+                let tabTemplate = tabs[0].find((tab: SteamTab) => tab?.id === "AllGames");
                 if (tabTemplate === undefined) {
                   LogController.raiseError(`Couldn't find default tab "AllGames" to copy from`);
                   return tabs;
@@ -101,7 +101,7 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
                       const footer = { ...(tabTemplate.footer ?? {}), onMenuButton: getShowMenu(tabContainer.id, tabMasterManager), onMenuActionDescription: 'Tab Master' };
                       return (tabContainer as CustomTabContainer).getActualTab(TabAppGrid, TabContext, sortingProps, footer, collectionsAppFilterGamepad, isMicroSDeckInstalled) || [];
                     } else {
-                      return tabs.find(actualTab => {
+                      return tabs[0].find(actualTab => {
                         if (actualTab.id === tabContainer.id) {
                           if (!actualTab.footer) actualTab.footer = {};
                           actualTab.footer.onMenuActionDescription = 'Tab Master';
@@ -113,10 +113,11 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
                     }
                   });
                 } else {
-                  pacthedTabs = tabs;
+                  pacthedTabs = tabs[0];
                 }
 
-                return pacthedTabs;
+                console.log("pacthedTabs:", pacthedTabs)
+                return [pacthedTabs, tabs[1]];
               }, deps);
             };
 
