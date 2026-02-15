@@ -1,9 +1,21 @@
-import { SliderField, SliderFieldProps, gamepadDialogClasses, gamepadSliderClasses } from '@decky/ui';
-import { VFC } from 'react';
+import { SliderField, SliderFieldProps, gamepadDialogClasses, gamepadSliderClasses } from '@decky/ui'
+import { VFC } from 'react'
 
-export interface SliderProps extends Omit<SliderFieldProps, 'label' | 'description' | 'layout' | 'icon' | 'bottomSeparator' | 'indentLevel' | 'tooltip' | 'showValue' | 'editableValue' | 'valueSuffix'> { }
+export interface SliderProps extends Omit<
+    SliderFieldProps,
+    | 'label'
+    | 'description'
+    | 'layout'
+    | 'icon'
+    | 'bottomSeparator'
+    | 'indentLevel'
+    | 'tooltip'
+    | 'showValue'
+    | 'editableValue'
+    | 'valueSuffix'
+> {}
 
-const highlightColor = '#bbc1c94a';
+const highlightColor = '#bbc1c94a'
 
 const sliderStyle = `
   .slider-container.highlight-slider .${gamepadDialogClasses.Field}.gpfocuswithin .${gamepadSliderClasses.SliderControl} {
@@ -35,16 +47,16 @@ const sliderStyle = `
   .slider-container .${gamepadSliderClasses.SliderNotchContainer} {
     margin-top: 4px;
   }
-`;
+`
 
 export const Slider: VFC<SliderProps> = ({ highlightOnFocus, ...props }) => {
-  return (
-    <div
-      className={`slider-container${(highlightOnFocus ?? true) ? ' highlight-slider' : ''}`}
-      style={{ minHeight: '40px', display: 'flex', alignItems: 'center', flex: 'auto' }}
-    >
-      <style>{sliderStyle}</style>
-      <SliderField {...props} highlightOnFocus={false} />
-    </div>
-  );
-};
+    return (
+        <div
+            className={`slider-container${(highlightOnFocus ?? true) ? ' highlight-slider' : ''}`}
+            style={{ minHeight: '40px', display: 'flex', alignItems: 'center', flex: 'auto' }}
+        >
+            <style>{sliderStyle}</style>
+            <SliderField {...props} highlightOnFocus={false} />
+        </div>
+    )
+}

@@ -1,12 +1,12 @@
-import { gamepadDialogClasses } from "@decky/ui";
-import { VFC } from "react";
+import { gamepadDialogClasses } from '@decky/ui'
+import { VFC } from 'react'
 
 /**
  * All css styling for TabMaster's fix modals.
  */
 export const FixModalStyles: VFC<{}> = ({}) => {
-  return (
-    <style>{`
+    return (
+        <style>{`
       .tab-master-fix-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {
         margin-left: 15px;
       }
@@ -103,5 +103,5 @@ export const FixModalStyles: VFC<{}> = ({}) => {
         margin-right: 10px;
       }
     `}</style>
-  );
+    )
 }

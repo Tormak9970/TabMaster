@@ -1,6 +1,6 @@
-import { createContext } from "react";
+import { createContext } from 'react'
 
 /**
  * Context for tab name in error panel
  */
-export const ErrorPanelTabNameContext = createContext<string | null>(null);
+export const ErrorPanelTabNameContext = createContext<string | null>(null)
