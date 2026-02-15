@@ -1,51 +1,53 @@
 ## Filters
 
 ### Table of Contents
- - Overview
- - Inverting Filters
- - Available Filters
-   - Collection
-   - Installed
-   - Friends
-   - Community Tags
-   - Whitelist
-   - Blacklist
-   - Platform
-   - Deck Compatibility
-   - SteamOS Compatibility
-   - Regex
-   - Merge
-   - Platform
-   - Deck Compatability
-   - Review Score
-   - Time Played
-   - Size on Disk
-   - Release Date
-   - Last Played
-   - Demo
-   - Streamable
-   - Steam Features
-   - Achievements
-   - MicroSD Card (Requires MicroSDeck)
+
+- Overview
+- Inverting Filters
+- Available Filters
+    - Collection
+    - Installed
+    - Friends
+    - Community Tags
+    - Whitelist
+    - Blacklist
+    - Platform
+    - Deck Compatibility
+    - SteamOS Compatibility
+    - Regex
+    - Merge
+    - Platform
+    - Deck Compatability
+    - Review Score
+    - Time Played
+    - Size on Disk
+    - Release Date
+    - Last Played
+    - Demo
+    - Streamable
+    - Steam Features
+    - Achievements
+    - MicroSD Card (Requires MicroSDeck)
 
 <br/>
 
-
 ### Overview
+
 Below you will find information on the options and behavior of each filter, as well as an example of how to use it. Keep in mind that while most of the examples simply show how the filter is used on its own, each filter can be combined together to create very complexed selections. The `merge filter` example demonstrates this
 
 <br/>
 
 ### Inverting Filters
+
 Most filters have an option to invert them. This can be used to do the exact opposite of what the filter would normally do!<br/>
 Example: Inverting a `Collection` filter would cause it to include any apps **not in** that collection, instead of **in** it.
 
 <br/>
 
-
 ### Available Filters
 
 #### Collection
+
 **Options:**<br/>
 `collection` - The collection to use.
 `inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
@@ -59,6 +61,7 @@ Filters apps based on if they are included in the collection.
 <br/>
 
 #### Installed
+
 **Options:**<br/>
 `installed` - A toggle. On is `installed`, off is `uninstalled`.
 
@@ -71,12 +74,14 @@ Filters apps based on their install state.
 <br/>
 
 #### Friends
+
 **Options:**<br/>
 `friends` - A list of your users in your Steam Friends list.
 `logic mode` - Specifies whether to use `and` vs. `or` mode.
 `inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
 
 **Behavior:**<br/>
+
 - `and`: Filters apps based on if they are owned by all listed friends.
 - `or`: Filters apps based on if they are owned by any listed friend.
 
@@ -86,12 +91,14 @@ Filters apps based on their install state.
 <br/>
 
 #### Community Tags
+
 **Options:**<br/>
 `tags` - A list of community tags.
 `logic mode` - Specifies whether to use `and` vs. `or` mode.
 `inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
 
 **Behavior:**<br/>
+
 - `and`: Filters apps based on if they have all listed tags.
 - `or`: Filters apps based on if they have any listed tag.
 
@@ -101,6 +108,7 @@ Filters apps based on their install state.
 <br/>
 
 #### Whitelist
+
 **Options:**<br/>
 `apps` - A list of apps to whitelist.
 
@@ -113,6 +121,7 @@ Filters apps by if they are in the list.
 <br/>
 
 #### Blacklist
+
 **Options:**<br/>
 `apps` - A list of apps to blacklist.
 
@@ -125,6 +134,7 @@ Filters apps by if they are not in the list.
 <br/>
 
 #### Regex
+
 **Options:**<br/>
 `regex` - The regular expression to use.
 `inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
@@ -142,6 +152,7 @@ Also, by typing a phrase like "Zelda" into the regex field, it will include any 
 <br/>
 
 #### Merge
+
 **Options:**<br/>
 `filters` - The filters for this group.
 `logic mode` - Specifies whether to use `and` vs. `or` mode.
@@ -159,6 +170,7 @@ By grouping filters you are able to specify the mode for filters in the group se
 <br/>
 
 #### Platform
+
 **Options:**<br/>
 `platform` - The desired platform, either Steam or Non Steam.
 
@@ -171,6 +183,7 @@ Filters apps based on their platform.
 <br/>
 
 #### Deck Compatability
+
 **Options:**<br/>
 `compatability level` - The desired compatability level, either "Verified", "Playable", "Unsupported", or "Unkown".
 `inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
@@ -184,6 +197,7 @@ Filters apps based on their Steam Deck compatability.
 <br/>
 
 #### SteamOS Compatability
+
 **Options:**<br/>
 `compatability level` - The desired compatability level, either "Compatible", "Unsupported", or "Unkown".
 `inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
@@ -197,6 +211,7 @@ Filters apps based on their SteamOS Deck compatability.
 <br/>
 
 #### Review Score
+
 **Options:**<br/>
 `score` - The desired review score.
 `type` - The desired review type to use, Metacritic or Steam.
@@ -211,6 +226,7 @@ Filters apps based on their review score.
 <br/>
 
 #### Time Played
+
 **Options:**<br/>
 `play time` - The desired amount of time in the selected interval.
 `time interval` - The time interval to use, "minutes", "hours", or "days".
@@ -225,6 +241,7 @@ Filters apps based on your time spent playing them.
 <br/>
 
 #### Size on Disk
+
 **Options:**<br/>
 `size` - The desired size of apps to include.
 `greater/less` - Whether to include apps that are greater than or equal to the provided score, or less than or equal to it.
@@ -238,6 +255,7 @@ Filters apps based on their size.
 <br/>
 
 #### Release Date
+
 **Options:**<br/>
 `date` - The desired release date of apps to include.
 `time period` - Whether you want to specify only the year, just the month and year, or the day, month, and year.
@@ -252,6 +270,7 @@ Filters apps based on their release date.
 <br/>
 
 #### Purchase Date
+
 **Options:**<br/>
 `date` - The desired purchase date of apps to include.
 `time period` - Whether you want to specify only the year, just the month and year, or the day, month, and year.
@@ -266,6 +285,7 @@ Filters apps based on their purchase date.
 <br/>
 
 #### Last Played
+
 **Options:**<br/>
 `date` - The desired last played date of apps to include.
 `time period` - Whether you want to specify only the year, just the month and year, or the day, month, and year.
@@ -280,6 +300,7 @@ Filters apps based on when they were last played.
 <br/>
 
 #### Family Sharing
+
 **Options:**<br/>
 `Is from family member` - Whether to only include games that are shared from a family member, or only those that aren't.
 
@@ -292,6 +313,7 @@ Filters apps based on if they are a shared by a family member or not.
 <br/>
 
 #### Demo
+
 **Options:**<br/>
 `Is demo` - Whether to only include games that are demos, or only those that aren't.
 
@@ -303,7 +325,21 @@ Filters apps based on if they are a demo or not.
 
 <br/>
 
+#### Coming Soon
+
+**Options:**<br/>
+`Is Coming Soon` - Whether to only include games that are coming soon, or only those that aren't.
+
+**Behavior:**<br/>
+Filters apps based on if they are a coming soon or not.
+
+**Example:**<br/>
+<img title="Coming Soon Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_coming-soon-example.png" />
+
+<br/>
+
 #### Streamable
+
 **Options:**<br/>
 `Is Streamable` - Whether to only include games that can be streamed, or only those that can't.
 
@@ -316,12 +352,14 @@ Filters apps based on if they can be streamed or not.
 <br/>
 
 #### Steam Features
+
 **Options:**<br/>
 `features` - A list of Steam features.
 `logic mode` - Specifies whether to use `and` vs. `or` mode.
 `inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
 
 **Behavior:**<br/>
+
 - `and`: Filters apps based on if they have all listed features.
 - `or`: Filters apps based on if they have any listed features.
 
@@ -331,6 +369,7 @@ Filters apps based on if they can be streamed or not.
 <br/>
 
 #### Achievements
+
 **Options:**<br/>
 `percentage` - The desired achievement percentage completion (or count) of apps to include.
 `greater/less` - Whether to include apps that have an achievement completion percentage greater than or equal to the provided percentage, or less than or equal to it.
@@ -345,6 +384,7 @@ Filters apps based on their achievement completion percentage or count.
 <br/>
 
 #### MicroSD Card (Requires MicroSDeck)
+
 **Options:**<br/>
 `MicroSD card` - The MicroSD card to use (if none are showing up, make sure they are showing up in MicroSDeck).
 `inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
@@ -358,6 +398,7 @@ Filters apps based on if they are installed on the specified MicroSD card.
 <br/>
 
 #### Install Folder
+
 **Options:**<br/>
 `Install Folder` - The Install Folder to use.
 
@@ -368,6 +409,5 @@ Filters apps based on if they are installed in the specified Steam Install Folde
 <img title="Install Folder Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_install-folder-example.png" />
 
 <br/>
-
 
 ###### © Travis Lane (Tormak), Jessebofill
