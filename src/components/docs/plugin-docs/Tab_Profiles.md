@@ -1,12 +1,14 @@
 ## Tab Profiles
 
 ### Table of Contents
- - Overview
- - The Tab Profiles Context Menu
- - Creating Profiles
- - Applying Profiles
- - Overwriting Profiles
- - Deleting Profiles
+
+- [Table of Contents](#table-of-contents)
+- [Overview](#overview)
+- [The Tab Profiles Context Menu](#the-tab-profiles-context-menu)
+- [Creating Profiles](#creating-profiles)
+- [Applying Profiles](#applying-profiles)
+- [Overwriting Profiles](#overwriting-profiles)
+- [Deleting Profiles](#deleting-profiles)
 
 <br/>
 

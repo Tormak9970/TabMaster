@@ -13,6 +13,7 @@ These docs serve as a reference for questions you may have, and a guide for help
 
 
 ### Table of Contents
+
 * Overview
   * General overview of the plugin and docs. **You are here**
 * Tabs

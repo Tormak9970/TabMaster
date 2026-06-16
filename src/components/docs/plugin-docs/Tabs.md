@@ -1,19 +1,20 @@
 ## Tabs
 
 ### Table of Contents
- - Overview
- - Custom vs. Default
- - The TabMaster Context Menu
- - Quick Tabs
- - Adding Tabs
-   - New Tab Options
- - Editing Tabs
-   - Changing Tabs
-   - Reordering Tabs
-   - Hiding Tabs
- - Duplicating Tabs
- - Removing Tabs
- - Sharing Tabs
+
+- [Overview](#overview)
+- [Custom vs. Default](#custom-vs-default)
+- [The TabMaster Context Menu](#the-tabmaster-context-menu)
+- [Quick Tabs](#quick-tabs)
+- [Adding Tabs](#adding-tabs)
+    - [Options:](#options)
+- [Editing Tabs](#editing-tabs)
+    - [Changing Tabs (Custom Tabs Only)](#changing-tabs-custom-tabs-only)
+    - [Reordering Tabs](#reordering-tabs)
+    - [Hiding Tabs](#hiding-tabs)
+- [Duplicating Tabs](#duplicating-tabs)
+- [Removing Tabs (Custom Tabs Only)](#removing-tabs-custom-tabs-only)
+- [Sharing Tabs](#sharing-tabs)
 
 <br/>
 

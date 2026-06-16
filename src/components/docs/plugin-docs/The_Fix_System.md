@@ -1,10 +1,11 @@
 ## The Fix System
 
-### Table of Contes
-- What is the Fix System?
-- How to use the Fix System
-  - Fixing a Filter
-  - Fixing a Filter in a Group
+### Table of Contents
+
+- [What is the Fix System?](#what-is-the-fix-system)
+- [How to use the Fix System](#how-to-use-the-fix-system)
+    - [Fixing a Filter](#fixing-a-filter)
+    - [Fixing a Filter in a Group](#fixing-a-filter-in-a-group)
 
 <br/>
 

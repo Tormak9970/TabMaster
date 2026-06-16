@@ -2,32 +2,34 @@
 
 ### Table of Contents
 
-- Overview
-- Inverting Filters
-- Available Filters
-    - Collection
-    - Installed
-    - Friends
-    - Community Tags
-    - Whitelist
-    - Blacklist
-    - Platform
-    - Deck Compatibility
-    - SteamOS Compatibility
-    - Regex
-    - Merge
-    - Platform
-    - Deck Compatability
-    - Review Score
-    - Time Played
-    - Size on Disk
-    - Release Date
-    - Last Played
-    - Demo
-    - Streamable
-    - Steam Features
-    - Achievements
-    - MicroSD Card (Requires MicroSDeck)
+- [Overview](#overview)
+- [Inverting Filters](#inverting-filters)
+- [Available Filters](#available-filters)
+    - [Collection](#collection)
+    - [Installed](#installed)
+    - [Regex](#regex)
+    - [Friends](#friends)
+    - [Community Tags](#community-tags)
+    - [Whitelist](#whitelist)
+    - [Blacklist](#blacklist)
+    - [Merge](#merge)
+    - [Platform](#platform)
+    - [Deck Compatibility](#deck-compatibility)
+    - [SteamOS Ccompatibility](#steamos-ccompatibility)
+    - [Review Score](#review-score)
+    - [Time Played](#time-played)
+    - [Size on Disk](#size-on-disk)
+    - [Release Date](#release-date)
+    - [Purchase Date](#purchase-date)
+    - [Last Played](#last-played)
+    - [Family Sharing](#family-sharing)
+    - [Demo](#demo)
+    - [Coming Soon](#coming-soon)
+    - [Streamable](#streamable)
+    - [Steam Features](#steam-features)
+    - [Achievements](#achievements)
+    - [MicroSD Card](#microsd-card)
+    - [Install Folder](#install-folder)
 
 <br/>
 
@@ -383,7 +385,10 @@ Filters apps based on their achievement completion percentage or count.
 
 <br/>
 
-#### MicroSD Card (Requires MicroSDeck)
+#### MicroSD Card
+
+**Note:**<br/>
+Requires MicroSDeck.
 
 **Options:**<br/>
 `MicroSD card` - The MicroSD card to use (if none are showing up, make sure they are showing up in MicroSDeck).
