@@ -206,7 +206,7 @@ Filters apps based on their Steam Deck compatability.
 Filters apps based on their SteamOS Deck compatability.
 
 **Example:**<br/>
-<img title="SteamOS Compat Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_SteamOS-compat-example.png" />
+<img title="SteamOS Compat Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_steamos-compat-example.png" />
 
 <br/>
 

@@ -14,7 +14,7 @@
 ### Overview
 Here you can find everything about Tab Profiles, including adding, applying, overwriting, and deleting them. To get started, use the button pictured below or the TabMaster context menu to open the Tab Profiles Menu.
 
-<img title="Managing Tab Profiles" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/docs_managing-tab-profiles.png" />
+<img title="Managing Tab Profiles" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/tab-profiles/docs_managing-tab-profiles.png" />
 
 <br/>
 
@@ -42,7 +42,7 @@ Overwriting a profile is easy! Just open the Tab Profiles menu, and navigate to 
 
 
 ### Overwriting Profiles
-<img title="Overwriting Tab Profiles" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/tab-profiles/docs_coverwriting-tab-profiles.png" />
+<img title="Overwriting Tab Profiles" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/tab-profiles/docs_overwriting-tab-profiles.png" />
 <br/>
 Made a mistake while making a profile, or just decide something needed to change? Well its easy to overwrite profiles, just open the profiles menu and navigate to the profile you want to delete and click "Y". A window will show up comparing what's in the profile, to what you're overwriting it with, allowing you to see the changes that will be made. Simply confirm here, and the profile will be overwritten.
 
