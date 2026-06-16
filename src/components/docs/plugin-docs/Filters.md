@@ -73,6 +73,24 @@ Filters apps based on their install state.
 
 <br/>
 
+#### Regex
+
+**Options:**<br/>
+`regex` - The regular expression to use.
+`inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
+
+**Behavior:**<br/>
+Filters apps by testing if their title matches a regular expression .
+
+**Tip:**<br/>
+Regular expressions can seem daunting and confusing. You can test yours before hand by looking up a "Regex Tester" website.<br/>
+Also, by typing a phrase like "Zelda" into the regex field, it will include any game with that phrase in its title.
+
+**Example:**<br/>
+<img title="Regex Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_regex-example.png" />
+
+<br/>
+
 #### Friends
 
 **Options:**<br/>
@@ -133,24 +151,6 @@ Filters apps by if they are not in the list.
 
 <br/>
 
-#### Regex
-
-**Options:**<br/>
-`regex` - The regular expression to use.
-`inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
-
-**Behavior:**<br/>
-Filters apps by testing if their title matches a regular expression .
-
-**Tip:**<br/>
-Regular expressions can seem daunting and confusing. You can test yours before hand by looking up a "Regex Tester" website.<br/>
-Also, by typing a phrase like "Zelda" into the regex field, it will include any game with that phrase in its title.
-
-**Example:**<br/>
-<img title="Regex Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_regex-example.png" />
-
-<br/>
-
 #### Merge
 
 **Options:**<br/>
@@ -182,28 +182,28 @@ Filters apps based on their platform.
 
 <br/>
 
-#### Deck Compatability
+#### Deck Compatibility
 
 **Options:**<br/>
-`compatability level` - The desired compatability level, either "Verified", "Playable", "Unsupported", or "Unkown".
+`ccompatibility level` - The desired ccompatibility level, either "Verified", "Playable", "Unsupported", or "Unkown".
 `inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
 
 **Behavior:**<br/>
-Filters apps based on their Steam Deck compatability.
+Filters apps based on their Steam Deck ccompatibility.
 
 **Example:**<br/>
 <img title="Deck Compat Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_deck-compat-example.png" />
 
 <br/>
 
-#### SteamOS Compatability
+#### SteamOS Ccompatibility
 
 **Options:**<br/>
-`compatability level` - The desired compatability level, either "Compatible", "Unsupported", or "Unkown".
+`ccompatibility level` - The desired ccompatibility level, either "Compatible", "Unsupported", or "Unkown".
 `inverted` - If true, inverts the filtered apps (exclued apps are now included, and vis versa).
 
 **Behavior:**<br/>
-Filters apps based on their SteamOS Deck compatability.
+Filters apps based on their SteamOS Deck ccompatibility.
 
 **Example:**<br/>
 <img title="SteamOS Compat Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_steamos-compat-example.png" />
