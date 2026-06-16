@@ -10,7 +10,8 @@
 
 
 ### What is the Fix System?
-The fix system is TabMaster's solution for tough situations, where the plugin is unable to automatically fix issues. In these cases, we thought it best to leave the decision of what to do up to you, the user.<br/>
+The fix system is TabMaster's solution for tough situations, where the plugin is unable to automatically fix issues. In these cases, we thought it best to leave the decision of what to do up to you, the user.
+
 **Causes:**
  - Deleting a collection used as a filter
 
@@ -18,7 +19,8 @@ The fix system is TabMaster's solution for tough situations, where the plugin is
 
 
 ### How to use the Fix System
-We've tried to make this system as simple and easy to use as possible. When an issue that would break TabMaster occurs, it will show the fix system window, and let you know what went wrong.<br/>
+We've tried to make this system as simple and easy to use as possible. When an issue that would break TabMaster occurs, it will show the fix system window, and let you know what went wrong.
+
 **Note!**: You need to fix the issue! If you don't TabMaster will not work, and will show the fix system each time you log in until you fix it!
 
 #### Fixing a Filter
