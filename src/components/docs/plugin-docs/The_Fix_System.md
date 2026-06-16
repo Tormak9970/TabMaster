@@ -38,4 +38,6 @@ In order to fix a filter in a merge group, you need to open the group. Once done
 <br/>
 
 
-###### © Travis Lane (Tormak), Jessebofill
+---
+
+© Travis Lane (Tormak), Jessebofill

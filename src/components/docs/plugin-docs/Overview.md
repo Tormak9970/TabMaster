@@ -27,4 +27,6 @@ These docs serve as a reference for questions you may have, and a guide for help
 <br/>
 
 
-###### © Travis Lane (Tormak), Jessebofill
+---
+
+© Travis Lane (Tormak), Jessebofill

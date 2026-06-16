@@ -55,4 +55,6 @@ Decide you don't like a profile anymore? Well deleting it is easy too! Just open
 <br/>
 
 
-###### © Travis Lane (Tormak), Jessebofill
+---
+
+© Travis Lane (Tormak), Jessebofill

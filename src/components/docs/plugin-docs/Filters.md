@@ -410,4 +410,6 @@ Filters apps based on if they are installed in the specified Steam Install Folde
 
 <br/>
 
-###### © Travis Lane (Tormak), Jessebofill
+---
+
+© Travis Lane (Tormak), Jessebofill

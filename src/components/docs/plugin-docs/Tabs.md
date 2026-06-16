@@ -105,4 +105,6 @@ Tabs can be shared with other users on your device. Simply toggle "Other users c
 <br/>
 
 
-###### © Travis Lane (Tormak), Jessebofill
+---
+
+© Travis Lane (Tormak), Jessebofill
