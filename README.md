@@ -60,11 +60,14 @@ Available Filters:
 - **Time Played** - Selects apps that have a play time greater/less than the provided time.
 - **Size on Disk** - Selects apps that have an install size greater/less than the provided size.
 - **Release Date** - Selects apps that were released before/after the provided date.
+- **Purchase Date** - Selects apps that were purchased before/after the provided date.
 - **Last Played** - Selects apps that were last played before/after the provided date.
+- **Family Sharing** - Selects apps that are/aren't from a family member.
 - **Demo** - Selects apps that are/aren't demos.
 - **Coming Soon** - Selects apps that are/aren't coming soon.
 - **Streamable** - Selects apps that can/can't be streamed from another computer.
 - **Steam Features** - Selects apps that support specific Steam Features.
+- **Achievements** - Selects apps based on their achievement completion.
 - **MicroSD Card** - Selects apps that are present on the inserted/specific MicroSD Card.
 - **Install Folder** - Selects apps that are present on the specific install folder.
 
