@@ -14,8 +14,26 @@ Once you have installed TabMaster, open it in the Quick Access Menu (QAM), where
 
 # Installation
 
+## Decky Store
+This is the preferred way to install TabMaster.
+
+### Steps
 1. [Install the Decky plugin loader](https://github.com/SteamDeckHomebrew/decky-loader#installation)
 2. Use the built in plugin store to download the Tab Master Plugin
+   - If you want the bleeding edge version, use Decky's Testing Store
+
+## From Zip
+This is the best way to get fixes for TabMaster early if you're having issues
+
+### Steps
+1. Go into **Desktop Mode** on your device, and open your preferred browser
+2. Go to https://github.com/Tormak9970/TabMaster/releases/latest
+3. Download the file `TabMaster_vX.X.X.zip` (ex: `TabMaster_v2.15.0.zip`), and save it somewhere easy to remember
+4. Go back to **Game Mode**
+5. Open Decky's Settings menu
+6. On the **General** tab, scroll down and make sure you have **Developer mode** toggled on
+7. Go to the **Developer** tab
+8. Click **Install Plugin from ZIP File**, and browse to where you downloaded the zip file earlier
 
 # Features
 
