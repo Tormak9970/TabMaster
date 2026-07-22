@@ -71,7 +71,7 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
 
                                 const [eSortBy, setSortBy, showSortingContextMenu] = deps
                                 const sortingProps = { eSortBy, setSortBy, showSortingContextMenu }
-                                const collectionsAppFilterGamepad = deps[6]
+                                const collectionsAppFilterGamepad = deps[7]
 
                                 let tabTemplate = tabs[0].find((tab: SteamTab) => tab?.id === 'AllGames')
                                 if (tabTemplate === undefined) {
