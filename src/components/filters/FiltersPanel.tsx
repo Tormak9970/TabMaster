@@ -111,7 +111,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({
                                                 }
                                             />
                                         </div>
-                                        <div className='no-sep' style={{ marginBottom: '0.5rem' }}>
+                                        <div className='no-sep' style={{ marginTop: '0.5rem' }}>
                                             <FilterOptions
                                                 index={index}
                                                 filter={filter}
