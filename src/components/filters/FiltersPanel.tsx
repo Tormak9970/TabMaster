@@ -111,7 +111,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({
                                                 }
                                             />
                                         </div>
-                                        <div className='no-sep'>
+                                        <div className='no-sep' style={{ marginBottom: '0.5rem' }}>
                                             <FilterOptions
                                                 index={index}
                                                 filter={filter}
@@ -122,7 +122,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({
                                     </div>
                                 </FilterSectionAccordion>
                                 {index == groupFilters.length - 1 ? (
-                                    <div className='filter-start-cont' style={{ marginTop: '8px' }}>
+                                    <div className='filter-start-cont' style={{ marginTop: '0.5rem' }}>
                                         <div className='filter-line' />
                                     </div>
                                 ) : (
