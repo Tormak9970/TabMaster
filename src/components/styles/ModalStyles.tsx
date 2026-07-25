@@ -21,8 +21,16 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .styled-btn {
         padding: 0 !important;
       }
-      .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldLabel} {
+      .tab-master-modal-scope .styled-btn > div {
+        padding: 0 !important;
+        margin-top: 0.5rem;
+      }
+      .tab-master-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldLeftColumn} {
         display: none;
+      }
+      .tab-master-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldRightColumn} {
+        width: 100%;
+        max-width: 100% !important;
       }
       .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildrenInner} {
         width: 100%;
