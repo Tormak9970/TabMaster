@@ -80,6 +80,22 @@ export const ModalStyles: VFC<{}> = ({}) => {
 
         font-size: 14px;
       }
+      .tab-master-modal-scope .filter-start-cont > div:first-child {
+          background-color: transparent !important;
+      }
+      .tab-master-modal-scope .filter-start-cont button.DialogButton._DialogLayout.Secondary.Focusable {
+        width: 100%;
+        padding: 0px;
+        margin: 0px;
+        background: transparent;
+        outline: none;
+        border: none;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
       .tab-master-modal-scope .filter-start-cont .filter-line {
         height: 2px;
         
