@@ -47,7 +47,7 @@ class Plugin:
 
     try:
       with open(source_path, 'r', encoding='utf-8') as settings_file:
-        data = json.loads(settings_file)
+        data = json.load(settings_file)
         self.settings.settings = data
         self.settings.commit()
         self.save_on_shutdown = False
