@@ -158,7 +158,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
                     <div style={{ margin: '5px', marginTop: '0px' }}>
                         Here you can add, re-order, or remove tabs from the library.
                     </div>
-                    <Field className='no-sep'>
+                    <Field childrenContainerWidth='max' className='no-sep'>
                         <Focusable style={{ width: '100%', display: 'flex' }}>
                             <Focusable className='add-tab-btn'>
                                 <DialogButton
