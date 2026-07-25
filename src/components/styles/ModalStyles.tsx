@@ -1,8 +1,6 @@
 import { gamepadDialogClasses } from '@decky/ui'
 import { VFC } from 'react'
 
-export const modalMargin = '16px + 2.8vw'
-
 // New modal background should be "radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%)"
 
 /**
@@ -61,10 +59,15 @@ export const ModalStyles: VFC<{}> = ({}) => {
         display: none
       }
 
+      .tab-master-modal-scope .edit-filters-container.Panel > div {
+          margin: 0px;
+          padding: 0px;
+      }
+
       /* Filter section start */
       .tab-master-modal-scope .filter-start-cont {
-        margin-left: calc((${modalMargin}) * -1);
-        margin-right: calc((${modalMargin}) * -1);
+        margin-left: -1.5rem;
+        margin-right: -1.5rem;
         padding: 0;
 
         font-size: 14px;
@@ -78,6 +81,10 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .filter-start-cont .filter-label {
         margin: 0px 5px;
         color: #343945;
+      }
+
+      .tab-master-modal-scope .group-combination-logic-field {
+          margin-bottom: 0.5rem;
       }
       
       /* Focused styles */

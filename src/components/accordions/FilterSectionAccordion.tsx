@@ -5,7 +5,6 @@ import { capitalizeFirstLetter, playUISound } from '../../lib/Utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaXmark } from 'react-icons/fa6'
 import { CgCheck } from 'react-icons/cg'
-import { modalMargin } from '../styles/ModalStyles'
 
 type FilterSectionAccordionProps = {
     index: number
@@ -50,7 +49,7 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
                     onOKButton={onClick}
                     onClick={onClick}
                 >
-                    <div className='filter-line' style={{ width: `calc(${modalMargin} - 5px)` }} />
+                    <div className='filter-line' style={{ width: '1.25rem' }} />
                     <div className='filter-label' style={{ display: 'flex', alignItems: 'center' }}>
                         {isValidParams(filter) ? (
                             <CgCheck
@@ -75,7 +74,7 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
                             fontSize: '0.8em',
                         }}
                     />
-                    <div className='filter-line' style={{ width: `calc(${modalMargin})` }} />
+                    <div className='filter-line' style={{ width: '1.25rem' }} />
                 </Button>
             </Focusable>
             {open && children}

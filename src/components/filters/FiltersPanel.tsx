@@ -49,7 +49,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({
     })
 
     const element = (
-        <Focusable style={{ marginTop: '24px' }}>
+        <Focusable style={{ marginTop: '24px' }} className='edit-filters-container'>
             <PanelSection title='Filters'>
                 <PanelSectionRow>
                     <Field
@@ -57,7 +57,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({
                         childrenLayout='inline'
                         childrenContainerWidth='min'
                         inlineWrap='keep-inline'
-                        className='no-sep'
+                        className='no-sep group-combination-logic-field'
                     >
                         <div style={{ width: '100px' }}>
                             <Dropdown

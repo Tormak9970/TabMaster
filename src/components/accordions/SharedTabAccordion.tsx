@@ -3,7 +3,6 @@ import { VFC, ReactNode, useState } from 'react'
 import { playUISound } from '../../lib/Utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaUser } from 'react-icons/fa6'
-import { modalMargin } from '../styles/ModalStyles'
 
 type SharedTabAccordionProps = {
     user: string
@@ -50,7 +49,7 @@ export const SharedTabAccordion: VFC<SharedTabAccordionProps> = ({ user, tabs, i
                     onOKButton={onClick}
                     onClick={onClick}
                 >
-                    <div className='filter-line' style={{ width: `calc(${modalMargin} - 5px)` }} />
+                    <div className='filter-line' style={{ width: '1.25rem' }} />
                     <div className='filter-label' style={{ display: 'flex', alignItems: 'center' }}>
                         <FaUser size='0.9em' style={{ marginRight: '3px', color: '#009e0eb3' }} />
                         {user} - {tabCount} {tabCount === 1 ? 'Tab' : 'Tabs'}
@@ -64,7 +63,7 @@ export const SharedTabAccordion: VFC<SharedTabAccordionProps> = ({ user, tabs, i
                             fontSize: '0.8em',
                         }}
                     />
-                    <div className='filter-line' style={{ width: `calc(${modalMargin})` }} />
+                    <div className='filter-line' style={{ width: '1.25rem' }} />
                 </Button>
             </Focusable>
             {open && children}
