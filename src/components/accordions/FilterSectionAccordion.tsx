@@ -1,11 +1,10 @@
-import { Button, Focusable } from '@decky/ui'
+import { ButtonItem, Focusable } from '@decky/ui'
 import React, { VFC, useState } from 'react'
 import { FilterType, TabFilterSettings, isValidParams } from '../filters/Filters'
 import { capitalizeFirstLetter, playUISound } from '../../lib/Utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaXmark } from 'react-icons/fa6'
 import { CgCheck } from 'react-icons/cg'
-import { modalMargin } from '../styles/ModalStyles'
 
 type FilterSectionAccordionProps = {
     index: number
@@ -20,8 +19,7 @@ type FilterSectionAccordionProps = {
 export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index, filter, isOpen, children }) => {
     const [open, setOpen] = useState(isOpen)
 
-    function onClick(e: any) {
-        e.stopPropagation()
+    function onClick() {
         playUISound('/sounds/deck_ui_misc_01.wav')
         setOpen(!open)
     }
@@ -29,29 +27,16 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
     return (
         <Focusable style={{ width: '100%', padding: '0' }}>
             <Focusable
-                className='filter-start-cont highlight-on-focus'
+                className='filter-start-cont styled-btn highlight-on-focus'
                 focusClassName='start-focused'
                 focusWithinClassName='start-focused'
             >
-                <Button
-                    style={{
-                        width: '100%',
-                        padding: '0',
-                        margin: '0',
-                        background: 'transparent',
-                        outline: 'none',
-                        border: 'none',
-
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                    }}
-                    onOKButton={onClick}
-                    onClick={onClick}
-                >
-                    <div className='filter-line' style={{ width: `calc(${modalMargin} - 5px)` }} />
-                    <div className='filter-label' style={{ display: 'flex', alignItems: 'center' }}>
+                <ButtonItem onClick={onClick}>
+                    <div className='filter-line' style={{ width: '1.25rem', pointerEvents: 'none' }} />
+                    <div
+                        className='filter-label'
+                        style={{ display: 'flex', alignItems: 'center', pointerEvents: 'none' }}
+                    >
                         {isValidParams(filter) ? (
                             <CgCheck
                                 viewBox='5 5 14 14'
@@ -66,17 +51,18 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
                             ? ` - mode: ${capitalizeFirstLetter((filter as TabFilterSettings<'merge'>).params.mode)}`
                             : ''}
                     </div>
-                    <div className='filter-line' style={{ flexGrow: '1' }} />
+                    <div className='filter-line' style={{ flexGrow: '1', pointerEvents: 'none' }} />
                     <BiSolidDownArrow
                         className='filter-accordion-arrow'
                         style={{
                             transition: 'transform 0.2s ease-in-out',
                             transform: !open ? 'rotate(90deg)' : '',
                             fontSize: '0.8em',
+                            pointerEvents: 'none',
                         }}
                     />
-                    <div className='filter-line' style={{ width: `calc(${modalMargin})` }} />
-                </Button>
+                    <div className='filter-line' style={{ width: '1.25rem', pointerEvents: 'none' }} />
+                </ButtonItem>
             </Focusable>
             {open && children}
         </Focusable>
