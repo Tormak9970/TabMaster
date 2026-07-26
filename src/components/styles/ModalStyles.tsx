@@ -1,8 +1,6 @@
 import { gamepadDialogClasses } from '@decky/ui'
 import { VFC } from 'react'
 
-export const modalMargin = '16px + 2.8vw'
-
 // New modal background should be "radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%)"
 
 /**
@@ -23,8 +21,16 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .styled-btn {
         padding: 0 !important;
       }
-      .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldLabel} {
+      .tab-master-modal-scope .styled-btn > div {
+        padding: 0 !important;
+        margin-top: 0.5rem;
+      }
+      .tab-master-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldLeftColumn} {
         display: none;
+      }
+      .tab-master-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldRightColumn} {
+        width: 100%;
+        max-width: 100% !important;
       }
       .tab-master-modal-scope .styled-btn .${gamepadDialogClasses.FieldChildrenInner} {
         width: 100%;
@@ -61,13 +67,34 @@ export const ModalStyles: VFC<{}> = ({}) => {
         display: none
       }
 
+      .tab-master-modal-scope .edit-filters-container.Panel > div {
+          margin: 0px;
+          padding: 0px;
+      }
+
       /* Filter section start */
       .tab-master-modal-scope .filter-start-cont {
-        margin-left: calc((${modalMargin}) * -1);
-        margin-right: calc((${modalMargin}) * -1);
+        margin-left: -1.5rem;
+        margin-right: -1.5rem;
         padding: 0;
 
         font-size: 14px;
+      }
+      .tab-master-modal-scope .filter-start-cont > div:first-child {
+          background-color: transparent !important;
+      }
+      .tab-master-modal-scope .filter-start-cont button.DialogButton._DialogLayout.Secondary.Focusable {
+        width: 100%;
+        padding: 0px;
+        margin: 0px;
+        background: transparent;
+        outline: none;
+        border: none;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
       }
       .tab-master-modal-scope .filter-start-cont .filter-line {
         height: 2px;
@@ -78,6 +105,10 @@ export const ModalStyles: VFC<{}> = ({}) => {
       .tab-master-modal-scope .filter-start-cont .filter-label {
         margin: 0px 5px;
         color: #343945;
+      }
+
+      .tab-master-modal-scope .group-combination-logic-field {
+          margin-bottom: 0.5rem;
       }
       
       /* Focused styles */

@@ -150,7 +150,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
                     strOKButtonText='Save'
                 >
                     <Focusable onMenuButton={onSave} onMenuActionDescription='Save'>
-                        <div style={{ padding: '4px 16px 1px' }} className='name-field'>
+                        <div style={{ padding: '10px 0px' }} className='name-field'>
                             <Field
                                 description={
                                     <>

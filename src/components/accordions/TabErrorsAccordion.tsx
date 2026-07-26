@@ -1,4 +1,4 @@
-import { Button, Focusable } from '@decky/ui'
+import { ButtonItem, Focusable } from '@decky/ui'
 import React, { VFC, useState, Fragment } from 'react'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaCircleCheck, FaCircleExclamation, FaCircleXmark } from 'react-icons/fa6'
@@ -15,7 +15,7 @@ type TabAccordionIconProps = {
 const TabAccordionIcon: VFC<TabAccordionIconProps> = ({ index, tab, open, isDeleted, isPassing }) => {
     if (isDeleted) {
         return (
-            <div className='check-cont'>
+            <div className='check-cont' style={{ pointerEvents: 'none' }}>
                 <FaCircleXmark fill='red' />
                 Deleting Tab {index + 1} - {tab.title}
             </div>
@@ -23,7 +23,7 @@ const TabAccordionIcon: VFC<TabAccordionIconProps> = ({ index, tab, open, isDele
     } else {
         return (
             <>
-                <div className='check-cont'>
+                <div className='check-cont' style={{ pointerEvents: 'none' }}>
                     {isPassing ? <FaCircleCheck fill='#00f500' /> : <FaCircleExclamation fill='yellow' />}
                     Tab {index + 1} - {tab.title}
                 </div>
@@ -33,6 +33,7 @@ const TabAccordionIcon: VFC<TabAccordionIconProps> = ({ index, tab, open, isDele
                         transform: !open ? 'rotate(90deg)' : '',
                         fontSize: '0.8em',
                         marginLeft: '5px',
+                        pointerEvents: 'none',
                     }}
                 />
             </>
@@ -71,30 +72,13 @@ export const TabErrorsAccordion: VFC<TabErrorsAccordionProps> = ({
     return (
         <Focusable style={{ width: '100%', padding: '0' }}>
             <Focusable
-                className='filter-start-cont tab-errors'
+                className='filter-start-cont styled-btn highlight-on-focus'
                 focusClassName='start-focused'
                 focusWithinClassName='start-focused'
             >
-                <Button
-                    style={{
-                        width: '100%',
-                        padding: '5px 20px',
-                        margin: '0',
-                        background: 'transparent',
-                        outline: 'none',
-                        border: 'none',
-
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        fontSize: '16px',
-                    }}
-                    onOKButton={onClick}
-                    onClick={onClick}
-                >
+                <ButtonItem onClick={onClick}>
                     <TabAccordionIcon index={index} tab={tab} open={open} isDeleted={isDeleted} isPassing={isPassing} />
-                </Button>
+                </ButtonItem>
             </Focusable>
             {open && !isDeleted && children}
         </Focusable>
