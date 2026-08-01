@@ -63,6 +63,11 @@ export const defaultTabsSettings: TabSettingsDictionary = {
         title: 'Great On Deck',
         position: 0,
     },
+    GreatOnMachine: {
+        id: 'GreatOnMachine',
+        title: 'Great On Machine',
+        position: 0,
+    },
     AllGames: {
         id: 'AllGames',
         title: 'All Games',
