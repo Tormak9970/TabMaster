@@ -1,14 +1,30 @@
 {
-    "name": "tabmaster",
-    "version": "2.16.0",
-    "description": "Gives you full control over your Steam library! Support for customizing, adding, and hiding Library Tabs.",
-    "type": "module",
-    "scripts": {
-        "build": "shx rm -rf dist && rollup -c",
-        "watch": "rollup -c -w",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "prepare": "husky",
-        "createDist": "rsync -r --exclude \"src/\" --exclude \"__pycache__\" --exclude \"node_modules\" /plugin/ /out/"
+  "name": "tabmaster",
+  "version": "2.16.1",
+  "description": "Gives you full control over your Steam library! Support for customizing, adding, and hiding Library Tabs.",
+  "type": "module",
+  "scripts": {
+    "build": "shx rm -rf dist && rollup -c",
+    "watch": "rollup -c -w",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky",
+    "createDist": "rsync -r --exclude \"src/\" --exclude \"__pycache__\" --exclude \"node_modules\" /plugin/ /out/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tormak9970/TabMaster.git"
+  },
+  "keywords": [
+    "decky",
+    "plugin",
+    "steam-deck",
+    "tabs",
+    "library"
+  ],
+  "contributors": [
+    {
+      "name": "Travis Lane (Tormak)",
+      "email": "Tormak9970@gmail.com"
     },
     "repository": {
         "type": "git",
