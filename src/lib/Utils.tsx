@@ -68,6 +68,11 @@ export const defaultTabsSettings: TabSettingsDictionary = {
         title: 'Great On Machine',
         position: 0,
     },
+    SteamOSCompatible: {
+        id: 'SteamOSCompatible',
+        title: 'SteamOS Compatible',
+        position: 0,
+    },
     AllGames: {
         id: 'AllGames',
         title: 'All Games',
