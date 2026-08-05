@@ -63,20 +63,31 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
                         //* deps contains useful variables from within the orignal component that we otherwise wouldn't be able to get
                         const fakeUseMemo = (fn: () => any, deps: any[]) => {
                             return realUseMemo(() => {
-                                let tabs: [SteamTab[], boolean] = fn()
+                                const original = fn()
+
+                                const isNested = Array.isArray(original) && Array.isArray(original[0])
+                                const tabs: SteamTab[] = isNested ? original[0] : original
+
                                 if (!Array.isArray(tabs)) {
                                     LogController.raiseError('No array returned when trying to retrieve default tabs')
-                                    return tabs
+                                    return original
                                 }
 
                                 const [eSortBy, setSortBy, showSortingContextMenu] = deps
                                 const sortingProps = { eSortBy, setSortBy, showSortingContextMenu }
-                                const collectionsAppFilterGamepad = deps[7]
+                                const collectionsAppFilterGamepad = deps.find(
+                                    (dep: any) => typeof dep?.Matches === 'function'
+                                )
 
-                                let tabTemplate = tabs[0].find((tab: SteamTab) => tab?.id === 'AllGames')
+                                if (collectionsAppFilterGamepad === undefined) {
+                                    LogController.raiseError(`Couldn't find collection filter function to copy from`)
+                                    return original
+                                }
+
+                                let tabTemplate = tabs.find((tab: SteamTab) => tab?.id === 'AllGames')
                                 if (tabTemplate === undefined) {
                                     LogController.raiseError(`Couldn't find default tab "AllGames" to copy from`)
-                                    return tabs
+                                    return original
                                 }
 
                                 const TabAppGrid =
@@ -87,18 +98,18 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
                                     )?.type
                                 if (TabAppGrid === undefined) {
                                     LogController.raiseError(`Couldn't find Tab component`)
-                                    return tabs
+                                    return original
                                 } else {
                                     if (!TabAppGridComponent) TabAppGridComponent = TabAppGrid
                                 }
 
                                 const TabContext: TabContext | undefined = (tabTemplate.content.type as any)._context
 
-                                let pacthedTabs: SteamTab[]
+                                let patchedTabs: SteamTab[]
 
                                 if (tabMasterManager.hasSettingsLoaded) {
                                     let tablist = tabMasterManager.getTabs().visibleTabsList
-                                    pacthedTabs = tablist.flatMap(tabContainer => {
+                                    patchedTabs = tablist.flatMap(tabContainer => {
                                         if (tabContainer.filters) {
                                             const footer = {
                                                 ...(tabTemplate.footer ?? {}),
@@ -117,7 +128,7 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
                                             )
                                         } else {
                                             return (
-                                                tabs[0].find(actualTab => {
+                                                tabs.find(actualTab => {
                                                     if (actualTab.id === tabContainer.id) {
                                                         if (!actualTab.footer) actualTab.footer = {}
                                                         actualTab.footer.onMenuActionDescription = 'Tab Master'
@@ -133,10 +144,10 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
                                         }
                                     })
                                 } else {
-                                    pacthedTabs = tabs[0]
+                                    patchedTabs = tabs
                                 }
 
-                                return [pacthedTabs, tabs[1]]
+                                return isNested ? [patchedTabs, original[1]] : patchedTabs
                             }, deps)
                         }
 
