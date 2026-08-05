@@ -60,8 +60,13 @@ export class CustomTabContainer implements TabContainer {
             AsDeletableCollection: () => null,
             AsDragDropCollection: () => null,
             AsEditableCollection: () => null,
-            GetAppCountWithToolsFilter: appFilter =>
-                this.collection.visibleApps.filter(appOverview => appFilter.Matches(appOverview)).length,
+            GetAppCountWithToolsFilter: appFilter => {
+                if (appFilter && appFilter.Matches) {
+                    return this.collection.visibleApps.filter(appOverview => appFilter.Matches(appOverview)).length
+                }
+
+                return this.collection.visibleApps.length
+            },
             bAllowsDragAndDrop: false,
             bIsDeletable: false,
             bIsDynamic: false,
