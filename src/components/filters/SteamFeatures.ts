@@ -72,7 +72,7 @@ export const STEAM_FEATURES_ID_MAP = {
         image_url: 'public/images/v6/ico/ico_multiPlayer.png',
         show_in_search: true,
     },
-    '3': {
+    '37': {
         categoryid: 37,
         type: 1,
         internal_name: 'Shared/Split Screen PvP',
