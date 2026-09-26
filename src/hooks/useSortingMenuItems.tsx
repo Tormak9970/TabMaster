@@ -1,9 +1,14 @@
 import { useMemo } from 'react'
 
+export const FLAT_LAST_PLAYED_SORT = -2
+
 /**
  * Gets the localized version of a sorting method
  */
 export function getESortByLabel(eSortBy: number) {
+    if (eSortBy === FLAT_LAST_PLAYED_SORT)
+        return `${LocalizationManager.LocalizeString('#Library_SortByLastPlayed')} (Flat Grid)`
+
     const map: { [eSortBy: number]: string } = {
         1: '#Library_SortByAlphabetical',
         10: '#Library_SortByFriendsPlaying',
@@ -24,7 +29,7 @@ export function getESortByLabel(eSortBy: number) {
  * Creates the array of sorting SingleDropdownOptions
  */
 function getSortingMenuItems() {
-    return [1, 10, 2, 4, 5, 6, 7, 8, 9, 11].map(e => ({
+    return [1, 10, 2, 4, 5, FLAT_LAST_PLAYED_SORT, 6, 7, 8, 9, 11].map(e => ({
         data: e,
         label: getESortByLabel(e)!,
     }))

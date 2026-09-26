@@ -3,6 +3,7 @@ import { TabFilterSettings, FilterType, Filter } from '../components/filters/Fil
 import { filtersHaveType, getIncludedCategoriesFromBitField } from '../lib/Utils'
 import { gamepadTabbedPageClasses, showModal } from '@decky/ui'
 import { SortOverrideMessage } from '../components/modals/SortOverrideMessage'
+import { FLAT_LAST_PLAYED_SORT } from '../hooks/useSortingMenuItems'
 import { ReactElement } from 'react'
 
 /**
@@ -95,6 +96,7 @@ export class CustomTabContainer implements TabContainer {
         if (this.sortByOverride !== -1) footer.onOptionsButton = showSortOverride
         const createContent = (inner: ReactElement) =>
             !TabContext ? inner : <TabContext.Provider value={{ label: this.title }}>{inner}</TabContext.Provider>
+        const renderSortBy = this.sortByOverride === -1 ? sortingProps.eSortBy : this.sortByOverride
 
         return {
             title: this.title,
@@ -104,7 +106,8 @@ export class CustomTabContainer implements TabContainer {
                 <TabAppGrid
                     collection={this.collection}
                     setSortBy={sortingProps.setSortBy}
-                    eSortBy={this.sortByOverride === -1 ? sortingProps.eSortBy : this.sortByOverride}
+                    // The flat Last Played option uses alphabetical's single native grid.
+                    eSortBy={this.sortByOverride === FLAT_LAST_PLAYED_SORT ? 1 : renderSortBy}
                     showSortingContextMenu={
                         this.sortByOverride === -1 ? sortingProps.showSortingContextMenu : showSortOverride
                     }
@@ -144,11 +147,31 @@ export class CustomTabContainer implements TabContainer {
             }
         })
 
-        this.collection.allApps = appsList
-        this.collection.visibleApps = [...appsList]
+        const collectionApps =
+            this.sortByOverride === FLAT_LAST_PLAYED_SORT
+                ? [...appsList]
+                      .sort(
+                          (a, b) =>
+                              b.rt_last_time_played - a.rt_last_time_played ||
+                              a.display_name.localeCompare(b.display_name) ||
+                              a.appid - b.appid
+                      )
+                      .map((appItem, rank) => {
+                          // Inherit Steam's overview data and methods without copying every property.
+                          return Object.create(appItem, {
+                              sort_as: {
+                                  value: String(rank).padStart(10, '0'),
+                                  enumerable: true,
+                              },
+                          }) as SteamAppOverview
+                      })
+                : appsList
+
+        this.collection.allApps = collectionApps
+        this.collection.visibleApps = [...collectionApps]
 
         const appMap = new Map<AppId, SteamAppOverview>()
-        appsList.forEach((appItem: SteamAppOverview) => appMap.set(appItem.appid, appItem))
+        collectionApps.forEach((appItem: SteamAppOverview) => appMap.set(appItem.appid, appItem))
 
         this.collection.apps = appMap
     }
