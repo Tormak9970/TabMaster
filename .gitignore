@@ -45,3 +45,5 @@ yalc.lock
 .vscode/tasks.json
 # Ignore output folder
 dist
+
+translations.json
