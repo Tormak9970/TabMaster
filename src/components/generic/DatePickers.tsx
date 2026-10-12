@@ -4,6 +4,7 @@ import { TbCalendarEvent } from 'react-icons/tb'
 import { EnhancedSelector, EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from './EnhancedSelector'
 import { SoundEffect } from '../../lib/GamepadUIAudio'
 import { CustomDropdown } from './CustomDropdown'
+import t from '../../utils/i18n'
 
 export type DatePickerModalType = 'simple' | 'pretty'
 export type DateObj = { day?: number; month?: number; year: number }
@@ -151,7 +152,7 @@ export const DatePicker: VFC<DatePickerProps> = ({
             onChange={onChange}
             selectedOption={date}
             rgOptions={options}
-            strDefaultLabel={strDefaultLabel ?? 'Select Date...'}
+            strDefaultLabel={strDefaultLabel ?? t('LABEL_SELECT_DATE', 'Select Date...')}
             labelCenter={buttonLabelCenter}
             customDropdownIcon={buttonIcon ?? <TbCalendarEvent style={{ margin: 'auto' }} />}
             noDropdownIcon={noIcon ?? false}
@@ -345,7 +346,7 @@ export const SimpleDatePickerModal: VFC<SimpleDatePickerModalProps> = ({
                     {month && (
                         <div style={sectionStyle}>
                             <div style={titleStyle} className={titleClass}>
-                                Month
+                                {t('LABEL_MONTH', 'Month')}
                             </div>
                             {monthSelector}
                         </div>
@@ -353,14 +354,14 @@ export const SimpleDatePickerModal: VFC<SimpleDatePickerModalProps> = ({
                     {day && (
                         <div style={sectionStyle}>
                             <div style={titleStyle} className={titleClass}>
-                                Day
+                                {t('LABEL_DAY', 'Day')}
                             </div>
                             {daySelector}
                         </div>
                     )}
                     <div style={sectionStyle}>
                         <div style={titleStyle} className={titleClass}>
-                            Year
+                            {t('LABEL_YEAR', 'Year')}
                         </div>
                         {yearSelector}
                     </div>

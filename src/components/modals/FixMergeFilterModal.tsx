@@ -6,6 +6,7 @@ import { ErroredFiltersPanel } from '../changes-needed/ErroredFiltersPanel'
 import { ErrorPanelTabNameContext } from '../../state/ErrorPanelNameContext'
 import { FixModalStyles } from '../styles/FixModalStyles'
 import { DestructiveModal } from '../generic/DestructiveModal'
+import t from '../../utils/i18n'
 
 interface FixMergeFilterModalProps {
     mergeParams: TabFilterSettings<'merge'>['params']
@@ -50,7 +51,10 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({
             saveMerge(newMergeParams)
             closeModal()
         } else {
-            PythonInterop.toast('Error', 'All errors must be resolved before saving')
+            PythonInterop.toast(
+                t('TITLE_ERROR', 'Error'),
+                t('MESSAGE_MUST_FIX_ALL_MERGE_GROUP_ERRORS', 'All errors must be resolved before saving')
+            )
         }
     }
 
@@ -61,19 +65,24 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({
                 <ConfirmModal
                     onOK={() => {
                         showModal(
-                            <DestructiveModal onOK={onOkButton} strTitle='WARNING!'>
-                                Are you sure you want save these fixes to this merge group? This can't be can't be
-                                changed later.
+                            <DestructiveModal onOK={onOkButton} strTitle={t('TITLE_ALL_CAPS_WARNING', 'WARNING!')}>
+                                {t(
+                                    'MESSAGE_FIXING_MERGE_GROUP_IS_FINAL',
+                                    "Are you sure you want save these fixes to this merge group? This can't be can't be changed later."
+                                )}
                             </DestructiveModal>
                         )
                     }}
                     bOKDisabled={!isPassing}
-                    strOKButtonText={'Save Changes'}
+                    strOKButtonText={t('LABEL_MERGE_GROUP_SAVE_CHANGES', 'Save Changes')}
                     onCancel={closeModal}
-                    strCancelButtonText={'Discard Changes'}
-                    strTitle={`Fix Merge Group in Tab ${tabName}`}
+                    strCancelButtonText={t('LABEL_MERGE_GROUP_DISCARD_CHANGES', 'Discard Changes')}
+                    strTitle={t('TITLE_FIXING_MERGE_GROUP', 'Fix Merge Group in Tab {tabName}').replace(
+                        '{tabName}',
+                        tabName
+                    )}
                 >
-                    {isPassing && <div>All errors have been resolved.</div>}
+                    {isPassing && <div>{t('MESSAGE_ALL_ERRORS_RESOLVED', 'All errors have been resolved.')}</div>}
                     <ErrorPanelTabNameContext.Provider value={tabName}>
                         <ErroredFiltersPanel
                             isMergeGroup={true}

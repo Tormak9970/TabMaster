@@ -6,6 +6,7 @@ import { FilterSelectStyles } from '../styles/FilterSelectionStyles'
 import { IoFilter } from 'react-icons/io5'
 import { MicroSDeckInterop, microSDeckLibVersion } from '../../lib/controllers/MicroSDeckInterop'
 import { BaseModalProps, CustomDropdown } from '../generic/CustomDropdown'
+import t from '../../utils/i18n'
 
 const FilterSelectModal: VFC<BaseModalProps> = ({ rgOptions, selectedOption, onSelectOption, closeModal }) => {
     const [focusable, setFocusable] = useState(false) //this is to briefly (on modal mount) disable focus on all selections except last selected so it is remebered
@@ -33,7 +34,7 @@ const FilterSelectModal: VFC<BaseModalProps> = ({ rgOptions, selectedOption, onS
                             whiteSpace: 'nowrap',
                         }}
                     >
-                        Change Filter Type
+                        {t('TITLE_CHANGE_FILTER_TYPE', 'Change Filter Type')}
                     </h1>
                     <div className={mainMenuAppRunningClasses.OverlayAchievements}>
                         {rgOptions?.map(option => (
@@ -88,7 +89,9 @@ const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, focusable, 
                     <div style={{ marginRight: '7px' }}>{createElement(FilterIcons[filterType], { size: '.8em' })}</div>
                     <div>{capitalizeEachWord(filterType)}</div>
                     {filterType === 'sd card' && (
-                        <small style={{ fontSize: '0.5em' }}>{`requires MicroSDeck ${requiredMicroSDeckVer}`}</small>
+                        <small
+                            style={{ fontSize: '0.5em' }}
+                        >{`${t('MESSAGE_REQUIRES_MICROSDECK', 'requires MicroSDeck')} ${requiredMicroSDeckVer}`}</small>
                     )}
                 </div>
                 <div className='entry-desc'>{FilterDescriptions[filterType]}</div>

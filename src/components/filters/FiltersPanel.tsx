@@ -4,6 +4,7 @@ import { FilterEntry } from './FilterEntry'
 import { FilterOptions } from './FilterOptions'
 import { TabFilterSettings, FilterType } from './Filters'
 import { FilterSectionAccordion } from '../accordions/FilterSectionAccordion'
+import t from '../../utils/i18n'
 
 interface FiltersPanelProps {
     groupFilters: TabFilterSettings<FilterType>[]
@@ -27,8 +28,8 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({
     collapseFilters,
 }) => {
     const modeOptions = [
-        { label: 'And', data: 'and' },
-        { label: 'Or', data: 'or' },
+        { label: t('LABEL_AND', 'And'), data: 'and' },
+        { label: t('LABEL_OR', 'Or'), data: 'or' },
     ]
 
     let newFilterWasAdded = useRef(false)
@@ -50,10 +51,10 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({
 
     const element = (
         <Focusable style={{ marginTop: '24px' }} className='edit-filters-container'>
-            <PanelSection title='Filters'>
+            <PanelSection title={t('TITLE_FILTERS', 'Filters')}>
                 <PanelSectionRow>
                     <Field
-                        label='Group Combination Logic'
+                        label={t('LABEL_GROUP_COMBINATION_LOGIC', 'Group Combination Logic')}
                         childrenLayout='inline'
                         childrenContainerWidth='min'
                         inlineWrap='keep-inline'
@@ -89,7 +90,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({
                                     <div className='no-sep' key={`${filter.type}`}>
                                         <div className='no-sep'>
                                             <Field
-                                                label='Filter Type'
+                                                label={t('TITLE_FILTER_TYPE', 'Filter Type')}
                                                 description={
                                                     <FilterEntry
                                                         index={index}
@@ -136,13 +137,16 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({
                     <div className='styled-btn no-sep'>
                         {!canAddFilter ? (
                             <div style={{ marginTop: '10px' }}>
-                                Please finish the current filter before adding another
+                                {t(
+                                    'MESSAGE_FINISH_CURRENT_FILTER_BEFORE_ADDING',
+                                    'Please finish the current filter before adding another'
+                                )}
                             </div>
                         ) : (
                             <Fragment />
                         )}
                         <ButtonItem onClick={onAddFilter} disabled={!canAddFilter}>
-                            Add Filter
+                            {t('LABEL_ADD_FILTER', 'Add Filter')}
                         </ButtonItem>
                     </div>
                 </PanelSectionRow>

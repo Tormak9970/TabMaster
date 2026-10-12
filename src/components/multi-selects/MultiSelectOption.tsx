@@ -1,6 +1,7 @@
 import { DialogButton, DropdownOption, Field, FieldProps, Focusable } from '@decky/ui'
 import { VFC } from 'react'
 import { FaTimes } from 'react-icons/fa'
+import t from '../../utils/i18n'
 
 type MultiSelectedOptionProps = {
     option: DropdownOption
@@ -27,7 +28,7 @@ export const MultiSelectedOption: VFC<MultiSelectedOptionProps> = ({ option, fie
                     }}
                     onClick={() => onRemove(option)}
                     onOKButton={() => onRemove(option)}
-                    onOKActionDescription={`Remove ${option.label}`}
+                    onOKActionDescription={`${t('LABEL_REMOVE', 'Remove')} ${option.label}`}
                 >
                     <FaTimes />
                 </DialogButton>

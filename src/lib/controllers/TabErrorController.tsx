@@ -5,6 +5,7 @@ import { FixTabErrorsModalRoot } from '../../components/modals/FixTabErrorsModal
 import { TabMasterManager } from '../../state/TabMasterManager'
 import { EditableTabSettings } from '../../components/modals/EditTabModal'
 import { CustomTabContainer } from '../../state/CustomTabContainer'
+import t from '../../utils/i18n'
 
 /**
  * Hanldes the tab filter validation process.
@@ -108,7 +109,12 @@ export class TabErrorController {
                     if (!filterValidated) {
                         tabErroredFilters.push({
                             filterIdx: i,
-                            errors: [`Filter "${filter.type}" cannot be validated. It has likely been removed.`],
+                            errors: [
+                                t(
+                                    'MESSAGE_FILTER_NOT_VALID',
+                                    `Filter "{filter.type}" cannot be validated. It has likely been removed.`
+                                ).replace('{filter.type}', filter.type),
+                            ],
                         })
                     } else if (!filterValidated.passed) {
                         let entry: FilterErrorEntry = {

@@ -6,6 +6,7 @@ import { TabProfileModalStyles } from '../styles/TabProfileModalStyles'
 import { TabListLabel } from '../other/TabListLabel'
 import { ScrollableWindow } from '../generic/ScrollableWindow'
 import { DestructiveModal } from '../generic/DestructiveModal'
+import t from '../../utils/i18n'
 
 export interface CreateTabProfileModalProps {
     tabMasterManager: TabMasterManager
@@ -25,7 +26,7 @@ export const CreateTabProfileModal: VFC<CreateTabProfileModalProps> = ({ tabMast
             <TabProfileModalStyles />
             <div className='tab-master-tab-profile-modal-scope'>
                 <ConfirmModal
-                    strTitle={'Create New Tab Profile'}
+                    strTitle={t('TITLE_CREATE_NEW_TAB_PROFILE', 'Create New Tab Profile')}
                     onOK={() => {
                         tabMasterManager.tabProfileManager?.write(
                             name,
@@ -43,11 +44,11 @@ export const CreateTabProfileModal: VFC<CreateTabProfileModalProps> = ({ tabMast
                                         style={{ paddingBottom: '6px' }}
                                         className={quickAccessControlsClasses.PanelSectionTitle}
                                     >
-                                        Profile Name
+                                        {t('TITLE_PROFILE_NAME', 'Profile Name')}
                                     </div>
                                     <TextField
                                         value={name}
-                                        placeholder='The name of this tab profile'
+                                        placeholder={t('PLACEHOLDER_TAB_PROFILE_NAME', 'The name of this tab profile')}
                                         onChange={onNameChange}
                                     />
                                 </>
@@ -88,7 +89,7 @@ export const OverwriteTabProfileModal: VFC<OverwriteTabProfileModalProps> = ({
             <TabProfileModalStyles />
             <div className='tab-master-tab-profile-modal-scope'>
                 <DestructiveModal
-                    strTitle={`Overwriting Profile: ${profileName}`}
+                    strTitle={`${t('TITLE_OVERWRITING_PROFILE', 'Overwriting Profile')}: ${profileName}`}
                     onOK={() => {
                         tabMasterManager.tabProfileManager?.write(
                             profileName,
@@ -104,13 +105,13 @@ export const OverwriteTabProfileModal: VFC<OverwriteTabProfileModalProps> = ({
                                 className={quickAccessControlsClasses.PanelSectionTitle}
                                 style={{ flex: 1, paddingBottom: 0 }}
                             >
-                                New Tabs
+                                {t('TITLE_PROFILE_NEW_TABS', 'New Tabs')}
                             </div>
                             <div
                                 className={quickAccessControlsClasses.PanelSectionTitle}
                                 style={{ flex: 1, paddingBottom: 0 }}
                             >
-                                Existing Tabs
+                                {t('TITLE_PROFILE_EXISTING_TABS', 'Existing Tabs')}
                             </div>
                         </div>
                         <div style={{ height: '1.5px', background: '#ffffff1a' }} />

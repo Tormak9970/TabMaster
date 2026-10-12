@@ -5,6 +5,7 @@ import { TabMasterContextProvider } from '../../state/TabMasterContext'
 import type { TabMasterManager } from '../../state/TabMasterManager'
 import { TabErrorsPanel } from '../changes-needed/TabErrorsPanel'
 import { FixModalStyles } from '../styles/FixModalStyles'
+import t from '../../utils/i18n'
 
 type FixTabErrorsModalRootProps = {
     closeModal?: () => void
@@ -85,21 +86,30 @@ const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal,
             onConfirm(updatedTabs)
             closeModal()
         } else {
-            PythonInterop.toast('Error', 'Please fix all tabs before saving')
+            PythonInterop.toast(
+                t('TITLE_ERROR', 'Error'),
+                t('MESSAGE_MUST_FIX_ALL_TAB_ERRORS', 'Please fix all tabs before saving')
+            )
         }
     }
 
     return (
         <>
             <PanelSection>
-                <h1>Fixes Needed for One or More Tabs</h1>
+                <h1>{t('TITLE_TAB_FIXES_NEEDED', 'Fixes Needed for One or More Tabs')}</h1>
                 <PanelSectionRow>
-                    TabMaster has found an issue with one or more of your tabs. Please take a moment to review the issue
-                    {erroredFiltersMap.size > 1 ? 's' : ''} below, and correct{' '}
-                    {erroredFiltersMap.size > 1 ? 'them' : 'it'}.
+                    {erroredFiltersMap.size > 1
+                        ? t(
+                              'MESSAGE_TAB_ERRORS_FOUND_PLURAL',
+                              'TabMaster has found an issue with one or more of your tabs. Please take a moment to review the issues below, and correct them.'
+                          )
+                        : t(
+                              'MESSAGE_TAB_ERRORS_FOUND_SINGULAR',
+                              'TabMaster has found an issue with one or more of your tabs. Please take a moment to review the issue below, and correct it.'
+                          )}
                 </PanelSectionRow>
             </PanelSection>
-            <PanelSection title='Tabs With Errors'>
+            <PanelSection title={t('TITLE_TABS_WITH_ERRORS', 'Tabs With Errors')}>
                 <PanelSectionRow>
                     {Object.values(changedTabs).map((tab: TabSettings, idx: number) => {
                         return (
@@ -117,11 +127,11 @@ const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal,
                 <PanelSectionRow>
                     <DialogButton
                         onOKButton={onApply}
-                        onOKActionDescription='Apply Your Fixes'
+                        onOKActionDescription={t('LABEL_APPLY_YOUR_FIXES', 'Apply Your Fixes')}
                         onClick={onApply}
                         disabled={!canApply}
                     >
-                        Apply Fixes
+                        {t('LABEL_APPLY_TAB_FIXES', 'Apply Fixes')}
                     </DialogButton>
                 </PanelSectionRow>
             </PanelSection>

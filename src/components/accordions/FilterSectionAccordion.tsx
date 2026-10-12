@@ -5,6 +5,7 @@ import { capitalizeFirstLetter, playUISound } from '../../lib/Utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaXmark } from 'react-icons/fa6'
 import { CgCheck } from 'react-icons/cg'
+import t from '../../utils/i18n'
 
 type FilterSectionAccordionProps = {
     index: number
@@ -46,9 +47,9 @@ export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index
                         ) : (
                             <FaXmark size='0.9em' style={{ marginRight: '3px' }} fill='#ff0016a3' />
                         )}
-                        Filter {index + 1} - {capitalizeFirstLetter(filter.type)}
+                        {t('LABEL_FILTER', 'Filter')} {index + 1} - {capitalizeFirstLetter(filter.type)}
                         {filter.type === 'merge'
-                            ? ` - mode: ${capitalizeFirstLetter((filter as TabFilterSettings<'merge'>).params.mode)}`
+                            ? ` - ${t('MESSAGE_MODE', 'mode')}: ${capitalizeFirstLetter((filter as TabFilterSettings<'merge'>).params.mode)}`
                             : ''}
                     </div>
                     <div className='filter-line' style={{ flexGrow: '1', pointerEvents: 'none' }} />

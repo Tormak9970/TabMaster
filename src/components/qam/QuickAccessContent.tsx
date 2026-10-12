@@ -41,6 +41,7 @@ import { InvalidSettingsNotice } from './InvalidSettingsNotice'
 import { TabsPanelSection } from './TabsPanelSection'
 import { ErrorNotice } from './ErrorNotice'
 import { showModalSharedTabs } from '../modals/SharedTabsModal'
+import t from '../../utils/i18n'
 
 export type TabIdEntryType = {
     id: string
@@ -53,12 +54,13 @@ const restartSteam = () => {
 const showRestartConfirm = () => {
     showModal(
         <ConfirmModal
-            strTitle={'Restart Steam?'}
-            strCancelButtonText={'Later'}
-            strOKButtonText={'Restart Now'}
-            strDescription={
+            strTitle={t('TITLE_RESTART_STEAM', 'Restart Steam?')}
+            strCancelButtonText={t('LABEL_RESTART_LATER', 'Later')}
+            strOKButtonText={t('LABEL_RESTART_NOW', 'Restart Now')}
+            strDescription={t(
+                'MESSAGE_RESTART_REASON',
                 'Your backup has been restored. TabMaster has been set to not save changes until you restart to avoid overwriting your restored settings. It is strongly recommend to restart as soon as possible'
-            }
+            )}
             onOK={restartSteam}
         />
     )
@@ -111,15 +113,15 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
 
     const support = (
         <div style={{ wordWrap: 'break-word' }}>
-            Please reach out to
+            {t('MESSAGE_SUPPORT_REACHOUT', 'Please reach out to')}
             <br />
             <a href={GITHUB_URL}>{GITHUB_URL}</a>
             <br />
-            or
+            {t('MESSAGE_SUPPORT_OR', 'or')}
             <br />
             <a href={DISCORD_URL}>{DISCORD_URL}</a>
             <br />
-            for support.
+            {t('MESSAGE_SUPPORT_END', 'for support.')}
         </div>
     )
 
@@ -146,7 +148,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
                                     setMicroSDeckNoticeHidden(true)
                                 }}
                             >
-                                Hide Notice
+                                {t('LABEL_HIDE_NOTICE', 'Hide Notice')}
                             </DialogButton>
                         </div>
                     </Field>
@@ -156,7 +158,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
             {!showResetTabs && (
                 <Focusable>
                     <div style={{ margin: '5px', marginTop: '0px' }}>
-                        Here you can add, re-order, or remove tabs from the library.
+                        {t('MESSAGE_QAM_DESCRIPTION', 'Here you can add, re-order, or remove tabs from the library.')}
                     </div>
                     <Field childrenContainerWidth='max' className='no-sep'>
                         <Focusable style={{ width: '100%', display: 'flex' }}>
@@ -174,7 +176,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
                                         alignItems: 'center',
                                     }}
                                     onClick={() => showModalNewTab(tabMasterManager)}
-                                    onOKActionDescription={'Add Tab'}
+                                    onOKActionDescription={t('LABEL_ADD_TAB', 'Add Tab')}
                                 >
                                     <FaFolderPlus size='1em' />
                                 </DialogButton>
@@ -192,7 +194,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
                                         justifyContent: 'center',
                                         alignItems: 'center',
                                     }}
-                                    onOKActionDescription={'Add Quick Tab'}
+                                    onOKActionDescription={t('LABEL_ADD_QUICK_TAB', 'Add Quick Tab')}
                                     onClick={() =>
                                         showContextMenu(
                                             <PresetMenu
@@ -218,7 +220,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
                                         justifyContent: 'center',
                                         alignItems: 'center',
                                     }}
-                                    onOKActionDescription={'View Shared Tabs'}
+                                    onOKActionDescription={t('LABEL_VIEW_SHARED_TABS', 'View Shared Tabs')}
                                     onClick={() => showModalSharedTabs(tabMasterManager)}
                                 >
                                     <FaSlideshare size='1.4em' />
@@ -237,7 +239,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
                                         justifyContent: 'center',
                                         alignItems: 'center',
                                     }}
-                                    onOKActionDescription={'Restore Settings'}
+                                    onOKActionDescription={t('LABEL_RESTORE_SETTINGS', 'Restore Settings')}
                                     onClick={handleRestorePrompt}
                                 >
                                     <FaArrowRightToBracket size='1em' rotate={90} />
@@ -311,14 +313,14 @@ export const QuickAccessTitleView: VFC<QuickAccessTitleViewProps> = ({ title, ta
             <div style={{ marginRight: 'auto' }}>{title}</div>
             <DialogButton
                 disabled={!tabMasterManager.hasSettingsLoaded}
-                onOKActionDescription='Manage Tab Profiles'
+                onOKActionDescription={t('LABEL_MANAGE_TAB_PROFILES', 'Manage Tab Profiles')}
                 style={buttonStyle}
                 onClick={() => showContextMenu(<TabProfilesMenu tabMasterManager={tabMasterManager} />)}
             >
                 <FaBookmark size='0.9em' />
             </DialogButton>
             <DialogButton
-                onOKActionDescription='Open Docs'
+                onOKActionDescription={t('LABEL_OPEN_DOCS', 'Open Docs')}
                 style={buttonStyle}
                 onClick={() => {
                     Navigation.CloseSideMenus()

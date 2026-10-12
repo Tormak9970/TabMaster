@@ -3,6 +3,7 @@ import { VFC, ReactNode, useState } from 'react'
 import { playUISound } from '../../lib/Utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaUser } from 'react-icons/fa6'
+import t from '../../utils/i18n'
 
 type SharedTabAccordionProps = {
     user: string
@@ -38,7 +39,7 @@ export const SharedTabAccordion: VFC<SharedTabAccordionProps> = ({ user, tabs, i
                         style={{ display: 'flex', alignItems: 'center', pointerEvents: 'none' }}
                     >
                         <FaUser size='0.9em' style={{ marginRight: '3px', color: '#009e0eb3' }} />
-                        {user} - {tabCount} {tabCount === 1 ? 'Tab' : 'Tabs'}
+                        {user} - {tabCount} {tabCount === 1 ? t('LABEL_TAB', 'Tab') : t('LABEL_TABS', 'Tabs')}
                     </div>
                     <div className='filter-line' style={{ flexGrow: '1', pointerEvents: 'none' }} />
                     <BiSolidDownArrow

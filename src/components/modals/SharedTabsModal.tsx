@@ -18,6 +18,7 @@ import { showModalDuplicateTab } from './EditTabModal'
 import { SharedTabsModalStyles } from '../styles/SharedTabsStyles'
 import { SharedTabAccordion } from '../accordions/SharedTabAccordion'
 import { FaRegWindowMaximize } from 'react-icons/fa6'
+import t from '../../utils/i18n'
 
 type UserTabProps = {
     tab: TabSettings
@@ -43,7 +44,8 @@ const UserTab: VFC<UserTabProps> = ({ tab, closeModal, onConfirm }: UserTabProps
                         }}
                     />
                     <Marquee>
-                        {tab.title} - {tab.filters?.length ?? 0} {tab.filters?.length === 1 ? 'Filter' : 'Filters'}
+                        {tab.title} - {tab.filters?.length ?? 0}{' '}
+                        {tab.filters?.length === 1 ? t('LABEL_FILTER', 'Filter') : t('LABEL_FILTER_PLURAL', 'Filters')}
                     </Marquee>
                 </div>
             </DialogButton>
@@ -101,7 +103,7 @@ export const SharedTabsModal: VFC<SharedTabsModalProps> = ({
                 bDisableBackgroundDismiss={false}
                 bHideCloseIcon={false}
             >
-                <DialogHeader>Shared Tabs</DialogHeader>
+                <DialogHeader>{t('TITLE_SHARED_TABS', 'Shared Tabs')}</DialogHeader>
                 <DialogBody>
                     <DialogControlsSection>
                         {/* From Decky-SGDB */}

@@ -3,6 +3,7 @@ import { FilterDefaultParams, FilterType, TabFilterSettings, canBeInverted } fro
 import { Dropdown, Focusable, afterPatch } from '@decky/ui'
 import { FilterSelect } from './FilterSelect'
 import { TrashButton } from '../generic/TrashButton'
+import t from '../../utils/i18n'
 
 type FilterEntryProps = {
     index: number
@@ -26,11 +27,11 @@ export const FilterEntry: VFC<FilterEntryProps> = ({
 }) => {
     const invertOptions = [
         {
-            label: 'Default',
+            label: t('LABEL_FILTER_INVERSION_DEFAULT', 'Default'),
             data: false,
         },
         {
-            label: 'Invert',
+            label: t('LABEL_FILTER_INVERSION_INVERT', 'Invert'),
             data: true,
         },
     ]

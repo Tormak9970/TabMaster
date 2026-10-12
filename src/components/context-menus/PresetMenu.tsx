@@ -4,6 +4,7 @@ import { presetKeys } from '../../presets/presets'
 import { capitalizeEachWord } from '../../lib/Utils'
 import { TabMasterManager } from '../../state/TabMasterManager'
 import { compatCategoryToLabel } from '../filters/Filters'
+import t from '../../utils/i18n'
 
 interface PresetMenuProps {
     tabMasterManager: TabMasterManager
@@ -12,7 +13,7 @@ interface PresetMenuProps {
 
 export const PresetMenu: VFC<PresetMenuProps> = ({ tabMasterManager, isMicroSDeckInstalled }) => {
     return (
-        <Menu label='Quick Tabs'>
+        <Menu label={t('LABEL_QUICK_TABS', 'Quick Tabs')}>
             <PresetMenuItems tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />
         </Menu>
     )
@@ -22,7 +23,7 @@ interface PresetMenuItemsProps extends PresetMenuProps {}
 
 export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, isMicroSDeckInstalled }) => {
     function getActionDescription(name: string) {
-        return { onOKActionDescription: `Create Tab "${name}"` }
+        return { onOKActionDescription: `${t('LABEL_CREATE_TAB', 'Create Tab')} "${name}"` }
     }
 
     return (
@@ -31,9 +32,11 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, i
                 switch (presetName) {
                     case 'collection':
                         return (
-                            <MenuGroup label='Collection'>
+                            <MenuGroup label={t('LABEL_COLLECTION', 'Collection')}>
                                 {collectionStore.userCollections
-                                    .concat([{ displayName: 'Hidden', id: 'hidden' }] as any)
+                                    .concat([
+                                        { displayName: t('GameList_Category_Hidden', 'Hidden', true), id: 'hidden' },
+                                    ] as any)
                                     .map(({ displayName, id }: { displayName: string; id: string }) => (
                                         <MenuItem
                                             onClick={() =>
@@ -54,13 +57,16 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, i
                     case 'installation':
                         return (
                             <MenuGroup label='Installation'>
-                                {['Installed', 'Not Installed'].map(tabName => (
+                                {[
+                                    t('LibraryTab_Installed', 'Installed', true),
+                                    t('LABEL_NOT_INSTALLED', 'Not Installed'),
+                                ].map(tabName => (
                                     <MenuItem
                                         onClick={() =>
                                             tabMasterManager.createPresetTab(
                                                 presetName,
                                                 tabName,
-                                                tabName === 'Installed'
+                                                tabName === t('LibraryTab_Installed', 'Installed', true)
                                             )
                                         }
                                         {...getActionDescription(tabName)}
@@ -72,7 +78,7 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, i
                         )
                     case 'deck compatibility':
                         return (
-                            <MenuGroup label='Deck Compatibility'>
+                            <MenuGroup label={t('LABEL_DECK_COMPATIBILITY', 'Deck Compatibility')}>
                                 {[0, 1, 2, 3].map(level => {
                                     const tabName = compatCategoryToLabel(level)
                                     return (
@@ -90,7 +96,8 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, i
                         return (
                             <MenuGroup label='Platform'>
                                 {(['steam', 'nonSteam'] as SteamPlatform[]).map(platform => {
-                                    const tabName = platform === 'nonSteam' ? 'Non Steam' : 'Steam'
+                                    const tabName =
+                                        platform === 'nonSteam' ? t('LibraryTab_NonSteam', 'Non-Steam', true) : 'Steam'
                                     return (
                                         <MenuItem
                                             onClick={() =>
@@ -106,14 +113,22 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, i
                         )
                     case 'micro sd card':
                         return (
-                            <MenuGroup label='Micro SD Card' disabled={!isMicroSDeckInstalled}>
+                            <MenuGroup
+                                label={t('LABEL_MICROSD_CARD', 'Micro SD Card')}
+                                disabled={!isMicroSDeckInstalled}
+                            >
                                 <MenuItem
-                                    onClick={() => tabMasterManager.createPresetTab(presetName, 'Inserted Card')}
-                                    {...getActionDescription('Inserted Card')}
+                                    onClick={() =>
+                                        tabMasterManager.createPresetTab(
+                                            presetName,
+                                            t('LABEL_PRESET_TITLE_INSERTED_CARD', 'Inserted Card')
+                                        )
+                                    }
+                                    {...getActionDescription(t('LABEL_INSERTED_CARD', 'Inserted Card'))}
                                 >
-                                    Inserted Card
+                                    {t('LABEL_INSERTED_CARD', 'Inserted Card')}
                                 </MenuItem>
-                                <MenuGroup label='Specific Card'>
+                                <MenuGroup label={t('LABEL_SPECIFIC_CARD', 'Specific Card')}>
                                     {window.MicroSDeck?.CardsAndGames.map(([card]) => {
                                         const tabName = card.name || card.uid
                                         return (

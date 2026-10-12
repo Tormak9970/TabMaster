@@ -28,6 +28,7 @@ import {
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { CustomTabContainer } from '../../state/CustomTabContainer'
 import { useSortingMenuItems } from '../../hooks/useSortingMenuItems'
+import t from '../../utils/i18n'
 
 export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>
 
@@ -73,7 +74,15 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
     const [sortByOverride, setSortByOverride] = useState(sortBy)
     const sortOptions: SingleDropdownOption[] = useSortingMenuItems([])
 
-    const nameInputElement = <TextField value={name} placeholder='The title for this tab' onChange={onNameChange} />
+    const cantSaveTitle = t('TITLE_CANT_SAVE_TAB', 'Cannot Save Tab')
+    const saveLabel = t('LABEL_SAVE_TAB', 'Save')
+    const nameInputElement = (
+        <TextField
+            value={name}
+            placeholder={t('PLACEHOLDER_TAB_TITLE', 'The title for this tab')}
+            onChange={onNameChange}
+        />
+    )
 
     //reference to input field class component instance, which has a focus method
     let inputComponentInstance: any
@@ -122,8 +131,13 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
             onConfirm(tabId, updated)
             closeModal!()
         } else {
-            if (!canAddFilter) PythonInterop.toast('Cannot Save Tab', 'Some filters are incomplete')
-            else PythonInterop.toast('Cannot Save Tab', 'Please add a name and at least 1 filter')
+            if (!canAddFilter)
+                PythonInterop.toast(cantSaveTitle, t('MESSAGE_INCOMPLETE_FILTERS', 'Some filters are incomplete'))
+            else
+                PythonInterop.toast(
+                    cantSaveTitle,
+                    t('MESSAGE_ADD_TAB_NAMEE_AND_FILTER', 'Please add a name and at least 1 filter')
+                )
         }
     }
 
@@ -145,11 +159,15 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
                     bAllowFullSize
                     onCancel={closeModal}
                     onEscKeypress={closeModal}
-                    strTitle={tabTitle ? `Modifying: ${tabTitle}` : 'Create New Tab'}
+                    strTitle={
+                        tabTitle
+                            ? `${t('TITLE_MODIFYING_TAB', 'Modifying')}: ${tabTitle}`
+                            : t('TITLE_CREATE_TAB', 'Create New Tab')
+                    }
                     onOK={onSave}
-                    strOKButtonText='Save'
+                    strOKButtonText={saveLabel}
                 >
-                    <Focusable onMenuButton={onSave} onMenuActionDescription='Save'>
+                    <Focusable onMenuButton={onSave} onMenuActionDescription={saveLabel}>
                         <div style={{ padding: '10px 0px' }} className='name-field'>
                             <Field
                                 description={
@@ -158,7 +176,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
                                             style={{ paddingBottom: '6px' }}
                                             className={quickAccessControlsClasses.PanelSectionTitle}
                                         >
-                                            Name
+                                            {t('LABEL_TAB_NAME', 'Name')}
                                         </div>
                                         {nameInputElement}
                                     </>
@@ -171,19 +189,19 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
                         />
                         <div className='field-item-container'>
                             <ToggleField
-                                label='Automatically hide tab if empty'
+                                label={t('LABEL_AUTOMATICALLY_HIDE_TAB', 'Automatically hide tab if empty')}
                                 checked={autoHide}
                                 onChange={checked => setAutoHide(checked)}
                                 bottomSeparator='thick'
                             />
                             <ToggleField
-                                label='Other users can copy this tab'
+                                label={t('LABEL_OTHER_USERS_CAN_COPY_TAB', 'Other users can copy this tab')}
                                 checked={visibleToOthers}
                                 onChange={checked => setVisibleToOthers(checked)}
                                 bottomSeparator='thick'
                             />
                             <DropdownItem
-                                label='Sort apps by'
+                                label={t('LABEL_SORT_TAB_BY', 'Sort apps by')}
                                 rgOptions={sortOptions}
                                 selectedOption={sortByOverride}
                                 onChange={option => setSortByOverride(option.data)}
@@ -222,7 +240,8 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
         .filter(([cat]) => cat !== 'hidden')
         .some(([_cat, checked]) => checked)
 
-    const getCatLabel = (category: string) => (category === 'music' ? 'Soundtracks' : capitalizeFirstLetter(category))
+    const getCatLabel = (category: string) =>
+        category === 'music' ? t('Showcase_AllYourSoundtracks', 'Soundtracks', true) : capitalizeFirstLetter(category)
 
     let catStrings = []
     for (const cat in catsToIncludeObj) {
@@ -250,7 +269,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
                                 style={{ padding: '12px 0', float: 'left' }}
                                 className={quickAccessControlsClasses.PanelSectionTitle}
                             >
-                                Include in tab
+                                {t('LABEL_INCLUDE_IN_TAB', 'Include in tab')}
                             </div>
                             <div style={{ padding: '12px 40px', flex: '1' }}>
                                 {!isOpen && (

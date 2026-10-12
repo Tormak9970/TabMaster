@@ -5,6 +5,7 @@ import { FiltersPanel } from '../filters/FiltersPanel'
 import { TabFilterSettings, FilterType, FilterDefaultParams } from '../filters/Filters'
 import { isValidParams } from '../filters/Filters'
 import { PythonInterop } from '../../lib/controllers/PythonInterop'
+import t from '../../utils/i18n'
 
 interface EditMergeFilterModalProps {
     mergeParams: TabFilterSettings<'merge'>['params']
@@ -27,6 +28,8 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({
     const [canSave, setCanSave] = useState<boolean>(false)
     const [canAddFilter, setCanAddFilter] = useState<boolean>(true)
     const [shouldFocusAddButton, setShouldFocusAddButton] = useState(true)
+
+    const cantSaveTitle = t('TITLE_CANT_SAVE_MERGE_GROUP', 'Cannot Save Merge Group')
 
     useEffect(() => {
         setShouldFocusAddButton(false)
@@ -61,8 +64,13 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({
             saveMerge(mergeParams)
             closeModal()
         } else {
-            if (!canAddFilter) PythonInterop.toast('Cannot Save Merge Group', 'Some filters are incomplete')
-            else PythonInterop.toast('Cannot Save Merge Group', 'A Merge group should have at least 2 filters')
+            if (!canAddFilter)
+                PythonInterop.toast(cantSaveTitle, t('MESSAGE_INCOMPLETE_FILTERS', 'Some filters are incomplete'))
+            else
+                PythonInterop.toast(
+                    cantSaveTitle,
+                    t('MESSAGE_NEED_TWO_FILTERS', 'A Merge group should have at least 2 filters')
+                )
         }
     }
 
@@ -73,8 +81,8 @@ export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({
                 <ConfirmModal
                     onOK={onOkButton}
                     onCancel={closeModal}
-                    strTitle={'Merge Group'}
-                    strOKButtonText='Save Group'
+                    strTitle={t('TITLE_MERGE_GROUP', 'Merge Group')}
+                    strOKButtonText={t('LABEL_SAVE_GROUP', 'Save Group')}
                 >
                     <FiltersPanel
                         groupFilters={groupFilters}

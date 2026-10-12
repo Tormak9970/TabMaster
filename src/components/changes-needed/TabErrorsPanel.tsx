@@ -5,6 +5,7 @@ import { ErroredFiltersPanel } from './ErroredFiltersPanel'
 import { ButtonItem, showModal } from '@decky/ui'
 import { ErrorPanelTabNameContext } from '../../state/ErrorPanelNameContext'
 import { DestructiveModal } from '../generic/DestructiveModal'
+import t from '../../utils/i18n'
 
 type TabErrorsPanelProps = {
     index: number
@@ -41,8 +42,14 @@ export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, errorEntr
                 <ButtonItem
                     onClick={() => {
                         showModal(
-                            <DestructiveModal onOK={() => onChange([], [[]])} strTitle='WARNING!'>
-                                Are you sure you want to delete this Tab? This can't be undone.
+                            <DestructiveModal
+                                onOK={() => onChange([], [[]])}
+                                strTitle={t('TITLE_ALL_CAPS_WARNING', 'WARNING!')}
+                            >
+                                {t(
+                                    'MESSAGE_DELETE_CANT_BE_UNDONE',
+                                    "Are you sure you want to delete this Tab? This can't be undone."
+                                )}
                             </DestructiveModal>
                         )
                     }}
