@@ -3,4 +3,4 @@ commit_message: 'feat(lang): added translations (%language%)'
 append_commit_message: false
 files:
     - source: /src/i18n/strings.json
-      translation: /src/i18n/%two_letters_code%.json
+      translation: /src/i18n/%locale_with_underscore%.json
