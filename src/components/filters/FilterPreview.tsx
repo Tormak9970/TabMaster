@@ -7,10 +7,16 @@ import {
     compatCategoryToLabel,
     steamOSCompatCategoryToLabel,
 } from './Filters'
-import { dateToLabel } from '../generic/DatePickers'
 import { capitalizeEachWord } from '../../lib/Utils'
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
 import t from '../../utils/i18n'
+import {
+    getAchievementDisplayData,
+    getDateFilterDisplayData,
+    getReviewScoreFilterLabel,
+    getSizeOnDiskDisplayData,
+    getTimePlayed,
+} from '../../utils/translationHelpers'
 
 type FilterPreviewGenericProps = {
     filter: TabFilterSettings<FilterType>
@@ -136,30 +142,7 @@ const SteamOSCompatFilterPreview: VFC<FilterPreviewProps<'steamos compatibility'
 
 const ReviewScoreFilterPreview: VFC<FilterPreviewProps<'review score'>> = ({ filter }) => {
     const { scoreThreshold, condition, type } = filter.params
-
-    let displayData: string = ''
-
-    if (type === 'metacritic') {
-        if (condition === 'above') {
-            displayData = t('LABEL_REVIEW_FILTER_METACRITIC_SCORE_ABOVE', 'Metacritic of {scoreThreshold} or higher')
-        } else {
-            displayData = t('LABEL_REVIEW_FILTER_METACRITIC_SCORE_BELOW', 'Metacritic of {scoreThreshold} or lower')
-        }
-    } else {
-        if (condition === 'above') {
-            displayData = t(
-                'LABEL_REVIEW_FILTER_NON_METACRITIC_SCORE_ABOVE',
-                'At least {scoreThreshold}% positive Steam reviews'
-            )
-        } else {
-            displayData = t(
-                'LABEL_REVIEW_FILTER_NON_METACRITIC_SCORE_BELOW',
-                'At most {scoreThreshold}% positive Steam reviews'
-            )
-        }
-    }
-
-    displayData = displayData.replace('{scoreThreshold}', scoreThreshold.toString())
+    let displayData: string = getReviewScoreFilterLabel(scoreThreshold, condition, type)
 
     return <FilterPreviewGeneric filter={filter} displayData={displayData} />
 }
@@ -167,98 +150,44 @@ const ReviewScoreFilterPreview: VFC<FilterPreviewProps<'review score'>> = ({ fil
 const TimePlayedFilterPreview: VFC<FilterPreviewProps<'time played'>> = ({ filter }) => {
     const { timeThreshold, condition, units } = filter.params
 
-    let displayData: string = ''
-
-    if (condition === 'above') {
-        displayData = t('LABEL_TIME_PLAYED_FILTER_ABOVE', 'or more')
-    } else {
-        displayData = t('LABEL_TIME_PLAYED_FILTER_BELOW', 'or less')
-    }
-
-    return (
-        <FilterPreviewGeneric
-            filter={filter}
-            displayData={`${timeThreshold} ${timeThreshold === 1 ? units.slice(0, -1) : units} ${displayData}`}
-        />
-    )
+    return <FilterPreviewGeneric filter={filter} displayData={getTimePlayed(timeThreshold, condition, units)} />
 }
 
 const SizeOnDiskFilterPreview: VFC<FilterPreviewProps<'size on disk'>> = ({ filter }) => {
     const { gbThreshold, condition } = filter.params
 
-    let displayData: string = ''
-
-    if (condition === 'above') {
-        displayData = t('LABEL_SIZE_ON_DISK_FILTER_ABOVE', 'or more')
-    } else {
-        displayData = t('LABEL_SIZE_ON_DISK_FILTER_BELOW', 'or less')
-    }
-
-    return (
-        <FilterPreviewGeneric
-            filter={filter}
-            displayData={`${gbThreshold < 1 ? gbThreshold * 1000 : gbThreshold} ${gbThreshold < 1 ? 'MB' : 'GB'} ${displayData}`}
-        />
-    )
-}
-
-function getDateFilterDisplayData(filter: TabFilterSettings<'release date' | 'purchase date' | 'last played'>) {
-    let displayData: string
-
-    if (filter.params.date) {
-        const { day, month, year } = filter.params.date
-
-        const dateLabel = dateToLabel(year, month, day, { dateStyle: 'long' })
-
-        if (!day) {
-            if (filter.params.condition === 'above') {
-                displayData = t('LABEL_DATE_FILTER_OBJECTIVE_NO_DAY_ABOVE', 'On or after {dateLabel}')
-            } else {
-                displayData = t('LABEL_DATE_FILTER_OBJECTIVE_NO_DAY_BELOW', 'On or before {dateLabel}')
-            }
-        } else {
-            if (filter.params.condition === 'above') {
-                displayData = t('LABEL_DATE_FILTER_OBJECTIVE_NO_DAY_ABOVE', 'In or after {dateLabel}')
-            } else {
-                displayData = t('LABEL_DATE_FILTER_OBJECTIVE_NO_DAY_BELOW', 'In or before {dateLabel}')
-            }
-        }
-
-        return displayData.replace('{dateLabel}', dateLabel)
-    }
-
-    const daysAgo = filter.params.daysAgo
-    if (daysAgo === 1) {
-        if (filter.params.condition === 'above') {
-            displayData = '{daysAgo} day ago or later'
-        } else {
-            displayData = '{daysAgo} day ago or earlier'
-        }
-    } else {
-        if (filter.params.condition === 'above') {
-            displayData = '{daysAgo} days ago or later'
-        } else {
-            displayData = '{daysAgo} days ago or earlier'
-        }
-    }
-
-    return displayData.replace('{daysAgo}', daysAgo!.toString())
+    return <FilterPreviewGeneric filter={filter} displayData={getSizeOnDiskDisplayData(gbThreshold, condition)} />
 }
 
 const ReleaseDateFilterPreview: VFC<FilterPreviewProps<'release date'>> = ({ filter }) => {
-    const displayData = getDateFilterDisplayData(filter)
+    const displayData = getDateFilterDisplayData(
+        filter.type,
+        filter.params.date,
+        filter.params.daysAgo,
+        filter.params.condition
+    )
 
     return <FilterPreviewGeneric filter={filter} displayData={displayData} />
 }
 
 const PurchaseDateFilterPreview: VFC<FilterPreviewProps<'purchase date'>> = ({ filter }) => {
-    const displayData = getDateFilterDisplayData(filter)
+    const displayData = getDateFilterDisplayData(
+        filter.type,
+        filter.params.date,
+        filter.params.daysAgo,
+        filter.params.condition
+    )
 
     return <FilterPreviewGeneric filter={filter} displayData={displayData} />
 }
 
 const LastPlayedFilterPreview: VFC<FilterPreviewProps<'last played'>> = ({ filter }) => {
-    const displayData = getDateFilterDisplayData(filter)
+    const displayData = getDateFilterDisplayData(
+        filter.type,
+        filter.params.date,
+        filter.params.daysAgo,
+        filter.params.condition
+    )
 
     return <FilterPreviewGeneric filter={filter} displayData={displayData} />
 }
@@ -312,13 +241,7 @@ const SteamFeaturesFilterPreview: VFC<FilterPreviewProps<'steam features'>> = ({
 const AchievementsFilterPreview: VFC<FilterPreviewProps<'achievements'>> = ({ filter }) => {
     const { threshold, thresholdType, condition } = filter.params
 
-    let displayData: string = ''
-
-    if (condition === 'above') {
-        displayData = t('LABEL_ACHIEVEMENTS_FILTER_ABOVE', 'or more achievements completed')
-    } else {
-        displayData = t('LABEL_ACHIEVEMENTS_FILTER_BELOW', 'or less achievements completed')
-    }
+    let displayData = getAchievementDisplayData(condition)
 
     return (
         <FilterPreviewGeneric
