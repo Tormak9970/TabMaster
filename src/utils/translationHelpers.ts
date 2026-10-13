@@ -185,3 +185,19 @@ export function getSizeOnDiskDisplayData(gbThreshold: number, condition: Thresho
 
     return `${gbThreshold < 1 ? gbThreshold * 1000 : gbThreshold} ${gbThreshold < 1 ? 'MB' : 'GB'} ${displayData}`
 }
+
+export function getAppCategoryLabels(cat: 'games' | 'music' | 'soundtracks' | 'software' | 'hidden'): string {
+    if (cat === 'games') {
+        return t('AppTypeLabel_game', 'Games', true)
+    }
+
+    if (cat === 'music' || cat === 'soundtracks') {
+        return t('LibraryTab_Soundtracks', 'Soundtracks', true)
+    }
+
+    if (cat === 'software') {
+        return t('AppTypeLabel_software', 'Software', true)
+    }
+
+    return t('GameList_Category_Hidden', 'Hidden', true)
+}

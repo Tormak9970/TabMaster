@@ -1,13 +1,13 @@
 import { Fragment, VFC, createElement } from 'react'
 import {
     FilterIcons,
+    FilterLabels,
     FilterType,
     SdCardParamType,
     TabFilterSettings,
     compatCategoryToLabel,
     steamOSCompatCategoryToLabel,
 } from './Filters'
-import { capitalizeEachWord } from '../../lib/Utils'
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
 import t from '../../utils/i18n'
 import {
@@ -29,7 +29,7 @@ const FilterPreviewGeneric: VFC<FilterPreviewGenericProps> = ({ filter, displayD
         <div style={{ display: 'flex' }}>
             <div style={{ marginRight: '7px' }}>{createElement(FilterIcons[filter.type], { size: '.8em' })}</div>
             <div>
-                <b>{capitalizeEachWord(filter.type)}</b>
+                <b>{FilterLabels()[filter.type]}</b>
                 {' - ' + displayData + (isInverted ? ` (${t('LABEL_FILTER_INVERTED', 'inverted')})` : '')}
             </div>
         </div>

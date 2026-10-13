@@ -1,7 +1,6 @@
 import { Fragment, VFC, createElement, useEffect, useState } from 'react'
 import { achievementClasses, Focusable, mainMenuAppRunningClasses, ModalRoot, SingleDropdownOption } from '@decky/ui'
-import { FilterDefaultParams, FilterDescriptions, FilterIcons, FilterType } from './Filters'
-import { capitalizeEachWord } from '../../lib/Utils'
+import { FilterDefaultParams, FilterIcons, FilterType, FilterDescriptions, FilterLabels } from './Filters'
 import { FilterSelectStyles } from '../styles/FilterSelectionStyles'
 import { IoFilter } from 'react-icons/io5'
 import { MicroSDeckInterop, microSDeckLibVersion } from '../../lib/controllers/MicroSDeckInterop'
@@ -87,14 +86,14 @@ const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, focusable, 
             >
                 <div className='entry-label' style={{ display: 'flex', alignItems: 'baseline' }}>
                     <div style={{ marginRight: '7px' }}>{createElement(FilterIcons[filterType], { size: '.8em' })}</div>
-                    <div>{capitalizeEachWord(filterType)}</div>
+                    <div>{FilterLabels()[filterType]}</div>
                     {filterType === 'sd card' && (
                         <small
                             style={{ fontSize: '0.5em' }}
                         >{`${t('MESSAGE_REQUIRES_MICROSDECK', 'requires MicroSDeck')} ${requiredMicroSDeckVer}`}</small>
                     )}
                 </div>
-                <div className='entry-desc'>{FilterDescriptions[filterType]}</div>
+                <div className='entry-desc'>{FilterDescriptions()[filterType]}</div>
             </div>
         </Focusable>
     )
@@ -110,7 +109,7 @@ type FilterSelectProps = {
  */
 export const FilterSelect: VFC<FilterSelectProps> = ({ selectedOption, onChange }) => {
     const filterTypeOptions = Object.keys(FilterDefaultParams()).map(filterType => ({
-        label: capitalizeEachWord(filterType),
+        label: FilterLabels()[filterType as FilterType],
         data: filterType,
     }))
 

@@ -1,10 +1,10 @@
 import { Menu, MenuGroup, MenuItem } from '@decky/ui'
 import { VFC, Fragment } from 'react'
 import { presetKeys } from '../../presets/presets'
-import { capitalizeEachWord } from '../../lib/Utils'
 import { TabMasterManager } from '../../state/TabMasterManager'
 import { compatCategoryToLabel } from '../filters/Filters'
 import t from '../../utils/i18n'
+import { getAppCategoryLabels } from '../../utils/translationHelpers'
 
 interface PresetMenuProps {
     tabMasterManager: TabMasterManager
@@ -146,7 +146,7 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, i
                             </MenuGroup>
                         )
                     default:
-                        const tabName = capitalizeEachWord(presetName)
+                        const tabName = getAppCategoryLabels(presetName as 'soundtracks' | 'software')
                         return (
                             <MenuItem
                                 onClick={() => tabMasterManager.createPresetTab(presetName, tabName)}

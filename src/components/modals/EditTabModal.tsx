@@ -20,7 +20,6 @@ import { ModalStyles } from '../styles/ModalStyles'
 import { FiltersPanel } from '../filters/FiltersPanel'
 import {
     IncludeCategories,
-    capitalizeFirstLetter,
     getIncludedCategoriesFromBitField,
     playUISound,
     updateCategoriesToIncludeBitField,
@@ -29,6 +28,7 @@ import { BiSolidDownArrow } from 'react-icons/bi'
 import { CustomTabContainer } from '../../state/CustomTabContainer'
 import { useSortingMenuItems } from '../../hooks/useSortingMenuItems'
 import t from '../../utils/i18n'
+import { getAppCategoryLabels } from '../../utils/translationHelpers'
 
 export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>
 
@@ -240,14 +240,13 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
         .filter(([cat]) => cat !== 'hidden')
         .some(([_cat, checked]) => checked)
 
-    const getCatLabel = (category: string) =>
-        category === 'music' ? t('Showcase_AllYourSoundtracks', 'Soundtracks', true) : capitalizeFirstLetter(category)
-
     let catStrings = []
     for (const cat in catsToIncludeObj) {
         const include = catsToIncludeObj[cat as keyof typeof catsToIncludeObj]
 
-        include && (cat !== 'hidden' || showHiddenCat) && catStrings.push(getCatLabel(cat))
+        include &&
+            (cat !== 'hidden' || showHiddenCat) &&
+            catStrings.push(getAppCategoryLabels(cat as keyof typeof catsToIncludeObj))
     }
 
     return (
@@ -292,7 +291,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
                 {isOpen && (
                     <div style={{ padding: '10px 18px' }}>
                         {Object.entries(catsToIncludeObj).map(([category, shouldInclude]) => {
-                            const label = getCatLabel(category)
+                            const label = getAppCategoryLabels(category as keyof typeof catsToIncludeObj)
 
                             const onChange = (checked: boolean) => {
                                 playUISound(

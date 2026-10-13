@@ -125,27 +125,6 @@ export function validateTabStructure(tabs: TabSettingsDictionary): boolean {
 }
 
 /**
- * Capitalizes the first letter of a word.
- * @param word The word to capitalize.
- * @returns The capitalized word.
- */
-export function capitalizeFirstLetter(word: string): string {
-    return word[0].toUpperCase().concat(word.substring(1))
-}
-
-/**
- * Capitalizes the first letter of each word.
- * @param words A string of words.
- * @returns The capitalized string of words.
- */
-export function capitalizeEachWord(words: string): string {
-    return words
-        .split(' ')
-        .map((word: string) => capitalizeFirstLetter(word))
-        .join(' ')
-}
-
-/**
  * Gets the current user's steam id.
  * @param useU64 Whether or not the id should be a u64.
  * @returns The user's steam id.

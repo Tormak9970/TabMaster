@@ -1,6 +1,6 @@
 import { showModal } from '@decky/ui'
 import { LogController } from './LogController'
-import { validateFilter } from '../../components/filters/Filters'
+import { FilterLabels, FilterType, validateFilter } from '../../components/filters/Filters'
 import { FixTabErrorsModalRoot } from '../../components/modals/FixTabErrorsModal'
 import { TabMasterManager } from '../../state/TabMasterManager'
 import { EditableTabSettings } from '../../components/modals/EditTabModal'
@@ -113,7 +113,7 @@ export class TabErrorController {
                                 t(
                                     'MESSAGE_FILTER_NOT_VALID',
                                     `Filter "{filter.type}" cannot be validated. It has likely been removed.`
-                                ).replace('{filter.type}', filter.type),
+                                ).replace('{filter.type}', FilterLabels()[filter.type as FilterType]),
                             ],
                         })
                     } else if (!filterValidated.passed) {
