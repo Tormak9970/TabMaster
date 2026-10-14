@@ -2,7 +2,7 @@ import { DialogButton, Dropdown, DropdownOption, Field, Focusable, SingleDropdow
 import { VFC, Fragment, useState, useContext } from 'react'
 import { FilterType, SdCardParamType, TabFilterSettings } from '../filters/Filters'
 import { FixMergeFilterModal } from '../modals/FixMergeFilterModal'
-import { ErrorPanelTabNameContext } from '../../state/ErrorPanelNameContext'
+import { ErrorPanelTabNameContext } from '@state'
 import { DestructiveModal } from '../generic/DestructiveModal'
 import { TrashButton } from '../generic/TrashButton'
 import { trans_string as t } from '@utils'

@@ -2,7 +2,7 @@ import { ConfirmModal, showModal } from '@decky/ui'
 import { PythonInterop } from './PythonInterop'
 import { SteamController } from './SteamController'
 import { LogController } from './LogController'
-import { TabMasterManager } from '../../state/TabMasterManager'
+import { TabMasterManager } from '@state'
 import { getCurrentUserId } from '../Utils'
 import { DestructiveModal } from '../../components/generic/DestructiveModal'
 

@@ -1,6 +1,6 @@
 import { afterPatch, ConfirmModal, findInReactTree, findInTree, showModal } from '@decky/ui'
 import { ReactElement } from 'react'
-import { TabMasterManager } from '../state/TabMasterManager'
+import { TabMasterManager } from '@state'
 import { LogController } from '../lib/controllers/LogController'
 import { addPatch } from '../lib/Utils'
 import { trans_string as t } from '@utils'

@@ -1,6 +1,6 @@
 import { Menu, MenuGroup, MenuItem, showModal, GamepadButton, gamepadContextMenuClasses } from '@decky/ui'
 import { VFC, Fragment, useState } from 'react'
-import { TabMasterManager } from '../../state/TabMasterManager'
+import { TabMasterManager } from '@state'
 import { CreateTabProfileModal, OverwriteTabProfileModal } from '../modals/TabProfileModals'
 import { DestructiveModal } from '../generic/DestructiveModal'
 import { trans_string as t } from '@utils'

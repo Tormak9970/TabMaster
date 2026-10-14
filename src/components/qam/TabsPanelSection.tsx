@@ -2,7 +2,7 @@ import { PanelSection, ReorderableList, ReorderableEntry, ButtonItem } from '@de
 import { VFC, Fragment } from 'react'
 import { TabIdEntryType } from './QuickAccessContent'
 import { TabActionsButton } from '../other/TabActions'
-import { useTabMasterContext } from '../../state/TabMasterContext'
+import { useTabMasterContext } from '@state'
 import { TabListLabel } from '../other/TabListLabel'
 import { trans_string as t } from '@utils'
 

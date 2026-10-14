@@ -20,7 +20,7 @@ import {
 } from 'react-icons/fa6'
 import { PiListPlusBold } from 'react-icons/pi'
 
-import { useTabMasterContext } from '../../state/TabMasterContext'
+import { useTabMasterContext, CustomTabContainer, TabMasterManager } from '@state'
 
 import { QamStyles } from '../styles/QamStyles'
 import { showModalNewTab } from '../modals/EditTabModal'
@@ -32,9 +32,7 @@ import {
     microSDeckLibVersion,
 } from '../../lib/controllers/MicroSDeckInterop'
 import { MicroSDeckNotice } from './MicroSDeckNotice'
-import { CustomTabContainer } from '../../state/CustomTabContainer'
 import { TabProfilesMenu } from '../context-menus/TabProfileMenu'
-import { TabMasterManager } from '../../state/TabMasterManager'
 import { PythonInterop } from '../../lib/controllers/PythonInterop'
 import { GITHUB_URL, DISCORD_URL } from '../../constants'
 import { InvalidSettingsNotice } from './InvalidSettingsNotice'

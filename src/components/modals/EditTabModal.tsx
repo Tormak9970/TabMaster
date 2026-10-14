@@ -14,8 +14,7 @@ import {
 import { useState, VFC, useEffect, Fragment } from 'react'
 import { FilterDefaultParams, FilterType, TabFilterSettings, isValidParams } from '../filters/Filters'
 import { PythonInterop } from '../../lib/controllers/PythonInterop'
-import { TabMasterContextProvider } from '../../state/TabMasterContext'
-import { TabMasterManager } from '../../state/TabMasterManager'
+import { TabMasterContextProvider, TabMasterManager, CustomTabContainer } from '@state'
 import { ModalStyles } from '../styles/ModalStyles'
 import { FiltersPanel } from '../filters/FiltersPanel'
 import {
@@ -25,7 +24,6 @@ import {
     updateCategoriesToIncludeBitField,
 } from '../../lib/Utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
-import { CustomTabContainer } from '../../state/CustomTabContainer'
 import { useSortingMenuItems } from '@hooks'
 import { trans_string as t, getAppCategoryLabels } from '@utils'
 

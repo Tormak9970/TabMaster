@@ -1,7 +1,7 @@
 import { Menu, MenuGroup, MenuItem } from '@decky/ui'
 import { VFC, Fragment } from 'react'
 import { presetKeys } from '../../presets/presets'
-import { TabMasterManager } from '../../state/TabMasterManager'
+import { TabMasterManager } from '@state'
 import { compatCategoryToLabel } from '../filters/Filters'
 import { trans_string as t, getAppCategoryLabels } from '@utils'
 

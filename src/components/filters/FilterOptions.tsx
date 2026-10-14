@@ -27,7 +27,7 @@ import {
     compatCategoryToLabel,
     steamOSCompatCategoryToLabel,
 } from './Filters'
-import { TabMasterContextProvider, useTabMasterContext } from '../../state/TabMasterContext'
+import { TabMasterContextProvider, useTabMasterContext } from '@state'
 import { ModeMultiSelect } from '../multi-selects/ModeMultiSelect'
 import { EditMergeFilterModal } from '../modals/EditMergeFilterModal'
 import { MultiSelect } from '../multi-selects/MultiSelect'

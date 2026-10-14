@@ -1,7 +1,6 @@
 import { ConfirmModal, Field, TextField, quickAccessControlsClasses } from '@decky/ui'
 import { VFC, useState, Fragment, FC } from 'react'
-import { TabMasterManager } from '../../state/TabMasterManager'
-import { TabMasterContextProvider } from '../../state/TabMasterContext'
+import { TabMasterManager, TabMasterContextProvider } from '@state'
 import { TabProfileModalStyles } from '../styles/TabProfileModalStyles'
 import { TabListLabel } from '../other/TabListLabel'
 import { ScrollableWindow } from '../generic/ScrollableWindow'

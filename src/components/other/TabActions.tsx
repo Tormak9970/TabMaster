@@ -1,10 +1,9 @@
 import { MenuItem, showModal, Menu, showContextMenu, DialogButton } from '@decky/ui'
 import { VFC } from 'react'
 import { FaEllipsisH } from 'react-icons/fa'
-import { TabMasterManager } from '../../state/TabMasterManager'
+import { TabMasterManager, CustomTabContainer } from '@state'
 import { showModalDuplicateTab, showModalEditTab } from '../modals/EditTabModal'
 import { DestructiveModal } from '../generic/DestructiveModal'
-import { CustomTabContainer } from '../../state/CustomTabContainer'
 import { showAddCollectionModal } from '../modals/AddCollectionModal'
 import { trans_string as t } from '@utils'
 

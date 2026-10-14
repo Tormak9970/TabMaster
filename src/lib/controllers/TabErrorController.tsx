@@ -2,9 +2,8 @@ import { showModal } from '@decky/ui'
 import { LogController } from './LogController'
 import { FilterLabels, FilterType, validateFilter } from '../../components/filters/Filters'
 import { FixTabErrorsModalRoot } from '../../components/modals/FixTabErrorsModal'
-import { TabMasterManager } from '../../state/TabMasterManager'
+import { TabMasterManager, CustomTabContainer } from '@state'
 import { EditableTabSettings } from '../../components/modals/EditTabModal'
-import { CustomTabContainer } from '../../state/CustomTabContainer'
 import { trans_string as t } from '@utils'
 
 /**

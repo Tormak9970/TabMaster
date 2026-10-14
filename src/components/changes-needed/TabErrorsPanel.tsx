@@ -3,7 +3,7 @@ import { TabErrorsAccordion } from '../accordions/TabErrorsAccordion'
 import { FilterType, TabFilterSettings } from '../filters/Filters'
 import { ErroredFiltersPanel } from './ErroredFiltersPanel'
 import { ButtonItem, showModal } from '@decky/ui'
-import { ErrorPanelTabNameContext } from '../../state/ErrorPanelNameContext'
+import { ErrorPanelTabNameContext } from '@state'
 import { DestructiveModal } from '../generic/DestructiveModal'
 import { trans_string as t } from '@utils'
 
