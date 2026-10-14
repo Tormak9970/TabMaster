@@ -85,6 +85,9 @@ Filter Examples can be found [here](FilterExamples.md)
 
 If you're interested in fixing a bug, submitting a new feature, or just helping out, please read the [Contributor Guidelines](./Contributing.md)
 
+## Translations
+
+Know a language? You can help improve TabMaster's translations without writing any code. See [How to help the project by improving a language you know](./docs/Translating.md).
 # Credits
 
 **Localisation:**
