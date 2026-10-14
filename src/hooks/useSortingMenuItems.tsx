@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { trans_string as t } from '@utils'
 
 /**
  * Gets the localized version of a sorting method
@@ -35,4 +36,4 @@ function getSortingMenuItems() {
  * @param deps Dependency array to determine when to recalculate
  */
 export const useSortingMenuItems = (deps: any[]) =>
-    useMemo(() => [{ label: 'Default', data: -1 }].concat(getSortingMenuItems()), deps)
+    useMemo(() => [{ label: t('LABEL_DEFAULT_SORT', 'Default'), data: -1 }].concat(getSortingMenuItems()), deps)

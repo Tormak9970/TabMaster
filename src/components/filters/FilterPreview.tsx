@@ -1,15 +1,22 @@
 import { Fragment, VFC, createElement } from 'react'
 import {
     FilterIcons,
+    FilterLabels,
     FilterType,
     SdCardParamType,
     TabFilterSettings,
     compatCategoryToLabel,
     steamOSCompatCategoryToLabel,
 } from './Filters'
-import { dateToLabel } from '../generic/DatePickers'
-import { capitalizeEachWord } from '../../lib/Utils'
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
+import {
+    trans_string as t,
+    getAchievementDisplayData,
+    getDateFilterDisplayData,
+    getReviewScoreFilterLabel,
+    getSizeOnDiskDisplayData,
+    getTimePlayed,
+} from '@utils'
 
 type FilterPreviewGenericProps = {
     filter: TabFilterSettings<FilterType>
@@ -22,8 +29,8 @@ const FilterPreviewGeneric: VFC<FilterPreviewGenericProps> = ({ filter, displayD
         <div style={{ display: 'flex' }}>
             <div style={{ marginRight: '7px' }}>{createElement(FilterIcons[filter.type], { size: '.8em' })}</div>
             <div>
-                <b>{capitalizeEachWord(filter.type)}</b>
-                {' - ' + displayData + (isInverted ? ' (inverted)' : '')}
+                <b>{FilterLabels()[filter.type]}</b>
+                {' - ' + displayData + (isInverted ? ` (${t('LABEL_FILTER_INVERTED', 'inverted')})` : '')}
             </div>
         </div>
     )
@@ -44,7 +51,12 @@ const CollectionFilterPreview: VFC<FilterPreviewProps<'collection'>> = ({ filter
 }
 
 const InstalledFilterPreview: VFC<FilterPreviewProps<'installed'>> = ({ filter }) => {
-    return <FilterPreviewGeneric filter={filter} displayData={filter.params.installed ? 'yes' : 'no'} />
+    return (
+        <FilterPreviewGeneric
+            filter={filter}
+            displayData={filter.params.installed ? t('LABEL_YES', 'yes') : t('LABEL_NO', 'no')}
+        />
+    )
 }
 
 const RegexFilterPreview: VFC<FilterPreviewProps<'regex'>> = ({ filter }) => {
@@ -55,7 +67,7 @@ const FriendsFilterPreview: VFC<FilterPreviewProps<'friends'>> = ({ filter }) =>
     return (
         <FilterPreviewGeneric
             filter={filter}
-            displayData={`${filter.params.friends.length} ${filter.params.friends.length == 1 ? 'friend' : 'friends'}`}
+            displayData={`${filter.params.friends.length} ${filter.params.friends.length == 1 ? t('LABEL_FRIEND_SINGULAR', 'friend') : t('LABEL_FRIENDS_PLURAL', 'friends')}`}
             isInverted={filter.inverted}
         />
     )
@@ -65,25 +77,35 @@ const TagsFilterPreview: VFC<FilterPreviewProps<'tags'>> = ({ filter }) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
-            displayData={`${filter.params.tags.length} ${filter.params.tags.length == 1 ? 'tag' : 'tags'}`}
+            displayData={`${filter.params.tags.length} ${filter.params.tags.length == 1 ? t('LABEL_TAG_SINGULAR', 'tag') : t('LABEL_TAGS_PLURAL', 'tags')}`}
             isInverted={filter.inverted}
         />
     )
 }
 
 const WhitelistFilterPreview: VFC<FilterPreviewProps<'whitelist'>> = ({ filter }) => {
-    return <FilterPreviewGeneric filter={filter} displayData={`${filter.params.games.length} whitelisted`} />
+    return (
+        <FilterPreviewGeneric
+            filter={filter}
+            displayData={`${filter.params.games.length} ${t('LABEL_WHITELISTED', 'whitelisted')}`}
+        />
+    )
 }
 
 const BlackListFilterPreview: VFC<FilterPreviewProps<'blacklist'>> = ({ filter }) => {
-    return <FilterPreviewGeneric filter={filter} displayData={`${filter.params.games.length} blacklisted`} />
+    return (
+        <FilterPreviewGeneric
+            filter={filter}
+            displayData={`${filter.params.games.length} ${t('LABEL_BLACKLISTED', 'blacklisted')}`}
+        />
+    )
 }
 
 const MergeFilterPreview: VFC<FilterPreviewProps<'merge'>> = ({ filter }) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
-            displayData={`${filter.params.filters.length} grouped filters`}
+            displayData={`${filter.params.filters.length} ${t('LABEL_GROUPED_FILTERS', 'grouped filters')}`}
             isInverted={filter.inverted}
         />
     )
@@ -93,7 +115,7 @@ const PlatformFilterPreview: VFC<FilterPreviewProps<'platform'>> = ({ filter }) 
     return (
         <FilterPreviewGeneric
             filter={filter}
-            displayData={filter.params.platform === 'steam' ? 'Steam' : 'Non Steam'}
+            displayData={filter.params.platform === 'steam' ? 'Steam' : t('LibraryTab_NonSteam', 'Non Steam', true)}
         />
     )
 }
@@ -120,101 +142,97 @@ const SteamOSCompatFilterPreview: VFC<FilterPreviewProps<'steamos compatibility'
 
 const ReviewScoreFilterPreview: VFC<FilterPreviewProps<'review score'>> = ({ filter }) => {
     const { scoreThreshold, condition, type } = filter.params
-    return (
-        <FilterPreviewGeneric
-            filter={filter}
-            displayData={
-                type === 'metacritic'
-                    ? `Metacritic of ${scoreThreshold} or ${condition === 'above' ? 'higher' : 'lower'}`
-                    : `At ${condition === 'above' ? 'least' : 'most'} ${scoreThreshold}% positive Steam reviews`
-            }
-        />
-    )
+    let displayData: string = getReviewScoreFilterLabel(scoreThreshold, condition, type)
+
+    return <FilterPreviewGeneric filter={filter} displayData={displayData} />
 }
 
 const TimePlayedFilterPreview: VFC<FilterPreviewProps<'time played'>> = ({ filter }) => {
     const { timeThreshold, condition, units } = filter.params
-    return (
-        <FilterPreviewGeneric
-            filter={filter}
-            displayData={`${timeThreshold} ${timeThreshold === 1 ? units.slice(0, -1) : units} or ${condition === 'above' ? 'more' : 'less'}`}
-        />
-    )
+
+    return <FilterPreviewGeneric filter={filter} displayData={getTimePlayed(timeThreshold, condition, units)} />
 }
 
 const SizeOnDiskFilterPreview: VFC<FilterPreviewProps<'size on disk'>> = ({ filter }) => {
     const { gbThreshold, condition } = filter.params
-    return (
-        <FilterPreviewGeneric
-            filter={filter}
-            displayData={`${gbThreshold < 1 ? gbThreshold * 1000 : gbThreshold} ${gbThreshold < 1 ? 'MB' : 'GB'} or ${condition === 'above' ? 'more' : 'less'}`}
-        />
-    )
+
+    return <FilterPreviewGeneric filter={filter} displayData={getSizeOnDiskDisplayData(gbThreshold, condition)} />
 }
 
 const ReleaseDateFilterPreview: VFC<FilterPreviewProps<'release date'>> = ({ filter }) => {
-    let displayData: string
-
-    if (filter.params.date) {
-        const { day, month, year } = filter.params.date
-        displayData = `${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, { dateStyle: 'long' })}`
-    } else {
-        const daysAgo = filter.params.daysAgo
-        displayData = `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${filter.params.condition === 'above' ? 'later' : 'earlier'}`
-    }
+    const displayData = getDateFilterDisplayData(
+        filter.type,
+        filter.params.date,
+        filter.params.daysAgo,
+        filter.params.condition
+    )
 
     return <FilterPreviewGeneric filter={filter} displayData={displayData} />
 }
 
 const PurchaseDateFilterPreview: VFC<FilterPreviewProps<'purchase date'>> = ({ filter }) => {
-    let displayData: string
-
-    if (filter.params.date) {
-        const { day, month, year } = filter.params.date
-        displayData = `${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, { dateStyle: 'long' })}`
-    } else {
-        const daysAgo = filter.params.daysAgo
-        displayData = `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${filter.params.condition === 'above' ? 'later' : 'earlier'}`
-    }
+    const displayData = getDateFilterDisplayData(
+        filter.type,
+        filter.params.date,
+        filter.params.daysAgo,
+        filter.params.condition
+    )
 
     return <FilterPreviewGeneric filter={filter} displayData={displayData} />
 }
 
 const LastPlayedFilterPreview: VFC<FilterPreviewProps<'last played'>> = ({ filter }) => {
-    let displayData: string
-
-    if (filter.params.date) {
-        const { day, month, year } = filter.params.date
-        displayData = `${!day ? 'In' : 'On'} or ${filter.params.condition === 'above' ? 'after' : 'before'} ${dateToLabel(year, month, day, { dateStyle: 'long' })}`
-    } else {
-        const daysAgo = filter.params.daysAgo
-        displayData = `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago or ${filter.params.condition === 'above' ? 'later' : 'earlier'}`
-    }
+    const displayData = getDateFilterDisplayData(
+        filter.type,
+        filter.params.date,
+        filter.params.daysAgo,
+        filter.params.condition
+    )
 
     return <FilterPreviewGeneric filter={filter} displayData={displayData} />
 }
 
 const FamilySharingFilterPreview: VFC<FilterPreviewProps<'family sharing'>> = ({ filter }) => {
-    return <FilterPreviewGeneric filter={filter} displayData={filter.params.isFamilyShared ? 'yes' : 'no'} />
+    return (
+        <FilterPreviewGeneric
+            filter={filter}
+            displayData={filter.params.isFamilyShared ? t('LABEL_YES', 'yes') : t('LABEL_NO', 'no')}
+        />
+    )
 }
 
 const DemoFilterPreview: VFC<FilterPreviewProps<'demo'>> = ({ filter }) => {
-    return <FilterPreviewGeneric filter={filter} displayData={filter.params.isDemo ? 'yes' : 'no'} />
+    return (
+        <FilterPreviewGeneric
+            filter={filter}
+            displayData={filter.params.isDemo ? t('LABEL_YES', 'yes') : t('LABEL_NO', 'no')}
+        />
+    )
 }
 
 const ComingSoonFilterPreview: VFC<FilterPreviewProps<'coming soon'>> = ({ filter }) => {
-    return <FilterPreviewGeneric filter={filter} displayData={filter.params.isComingSoon ? 'yes' : 'no'} />
+    return (
+        <FilterPreviewGeneric
+            filter={filter}
+            displayData={filter.params.isComingSoon ? t('LABEL_YES', 'yes') : t('LABEL_NO', 'no')}
+        />
+    )
 }
 
 const StreamableFilterPreview: VFC<FilterPreviewProps<'streamable'>> = ({ filter }) => {
-    return <FilterPreviewGeneric filter={filter} displayData={filter.params.isStreamable ? 'yes' : 'no'} />
+    return (
+        <FilterPreviewGeneric
+            filter={filter}
+            displayData={filter.params.isStreamable ? t('LABEL_YES', 'yes') : t('LABEL_NO', 'no')}
+        />
+    )
 }
 
 const SteamFeaturesFilterPreview: VFC<FilterPreviewProps<'steam features'>> = ({ filter }) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
-            displayData={`${filter.params.features.length} ${filter.params.features.length == 1 ? 'feature' : 'features'}`}
+            displayData={`${filter.params.features.length} ${filter.params.features.length == 1 ? t('LABEL_FEATURE_SINGULAR', 'feature') : t('LABEL_FEATURE_PLURAL', 'features')}`}
             isInverted={filter.inverted}
         />
     )
@@ -222,31 +240,34 @@ const SteamFeaturesFilterPreview: VFC<FilterPreviewProps<'steam features'>> = ({
 
 const AchievementsFilterPreview: VFC<FilterPreviewProps<'achievements'>> = ({ filter }) => {
     const { threshold, thresholdType, condition } = filter.params
+
+    let displayData = getAchievementDisplayData(condition)
+
     return (
         <FilterPreviewGeneric
             filter={filter}
-            displayData={`${threshold}${thresholdType === 'percent' ? '%' : ''} or ${condition === 'above' ? 'more' : 'less'} achievements completed`}
+            displayData={`${threshold}${thresholdType === 'percent' ? '%' : ''} ${displayData}`}
         />
     )
 }
 
 const SDCardFilterPreview: VFC<FilterPreviewProps<'sd card'>> = ({ filter }) => {
-    let label: string
+    let displayData: string
     switch (filter.params.card) {
         case SdCardParamType.ANY:
-            label = 'Any'
+            displayData = t('LABEL_ANY', 'Any')
             break
         case SdCardParamType.INSTALLED:
         case undefined:
-            label = 'Inserted'
+            displayData = t('LABEL_INSERTED', 'Inserted')
             break
         default:
-            label =
+            displayData =
                 (MicroSDeckInterop.isInstallOk() &&
                     window.MicroSDeck?.CardsAndGames.find(([card]) => card.uid === filter.params.card)?.[0].name) ||
                 filter.params.card
     }
-    return <FilterPreviewGeneric filter={filter} displayData={label} isInverted={filter.inverted} />
+    return <FilterPreviewGeneric filter={filter} displayData={displayData} isInverted={filter.inverted} />
 }
 
 const InstallFolderFilterPreview: VFC<FilterPreviewProps<'install folder'>> = ({ filter }) => {

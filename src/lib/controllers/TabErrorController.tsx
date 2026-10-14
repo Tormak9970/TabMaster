@@ -1,10 +1,10 @@
 import { showModal } from '@decky/ui'
 import { LogController } from './LogController'
-import { validateFilter } from '../../components/filters/Filters'
+import { FilterLabels, FilterType, validateFilter } from '../../components/filters/Filters'
 import { FixTabErrorsModalRoot } from '../../components/modals/FixTabErrorsModal'
-import { TabMasterManager } from '../../state/TabMasterManager'
+import { TabMasterManager, CustomTabContainer } from '@state'
 import { EditableTabSettings } from '../../components/modals/EditTabModal'
-import { CustomTabContainer } from '../../state/CustomTabContainer'
+import { trans_string as t } from '@utils'
 
 /**
  * Hanldes the tab filter validation process.
@@ -108,7 +108,12 @@ export class TabErrorController {
                     if (!filterValidated) {
                         tabErroredFilters.push({
                             filterIdx: i,
-                            errors: [`Filter "${filter.type}" cannot be validated. It has likely been removed.`],
+                            errors: [
+                                t(
+                                    'MESSAGE_FILTER_NOT_VALID',
+                                    `Filter "{filter.type}" cannot be validated. It has likely been removed.`
+                                ).replace('{filter.type}', FilterLabels()[filter.type as FilterType]),
+                            ],
                         })
                     } else if (!filterValidated.passed) {
                         let entry: FilterErrorEntry = {

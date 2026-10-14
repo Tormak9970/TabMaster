@@ -2,6 +2,7 @@ import { RoutePatch, routerHook } from '@decky/api'
 import { sleep } from '@decky/ui'
 import { FilterType, TabFilterSettings } from '../components/filters/Filters'
 import { GamepadUIAudio, SFXPath } from './GamepadUIAudio'
+import { trans_string as t } from '@utils'
 
 /**
  * Waits for a condition to be true.
@@ -60,47 +61,47 @@ export function getNonBigIntUserId(low: number, high: number): number {
 export const defaultTabsSettings: TabSettingsDictionary = {
     GreatOnDeck: {
         id: 'GreatOnDeck',
-        title: 'Great On Deck',
+        title: t('LibraryTab_DeckGames', 'Great On Deck', true),
         position: 0,
     },
     GreatOnMachine: {
         id: 'GreatOnMachine',
-        title: 'Great On Machine',
+        title: t('LibraryTab_GreatOnMachine', 'Great On Machine', true),
         position: 0,
     },
     SteamOSCompatible: {
         id: 'SteamOSCompatible',
-        title: 'SteamOS Compatible',
+        title: t('LibraryTab_SteamOSCompatibleGames', 'SteamOS Compatible', true),
         position: 0,
     },
     AllGames: {
         id: 'AllGames',
-        title: 'All Games',
+        title: t('LibraryTab_AllGames', 'All Games', true),
         position: 1,
     },
     Installed: {
         id: 'Installed',
-        title: 'Installed',
+        title: t('LibraryTab_Installed', 'Installed', true),
         position: 2,
     },
     Favorites: {
         id: 'Favorites',
-        title: 'Favorites',
+        title: t('LibraryTab_Favorites', 'Favorites', true),
         position: 3,
     },
     Collections: {
         id: 'Collections',
-        title: 'Collections',
+        title: t('LibraryTab_Collections', 'Collections', true),
         position: 4,
     },
     DesktopApps: {
         id: 'DesktopApps',
-        title: 'Non-Steam',
+        title: t('LibraryTab_NonSteam', 'Non-steam', true),
         position: 5,
     },
     Soundtracks: {
         id: 'Soundtracks',
-        title: 'Soundtracks',
+        title: t('LibraryTab_Soundtracks', 'Soundtracks', true),
         position: 6,
     },
 }
@@ -121,27 +122,6 @@ export function validateTabStructure(tabs: TabSettingsDictionary): boolean {
             return tab.id === 'DeckGames' || Object.keys(defaultTabsSettings).includes(tab.id)
         }
     })
-}
-
-/**
- * Capitalizes the first letter of a word.
- * @param word The word to capitalize.
- * @returns The capitalized word.
- */
-export function capitalizeFirstLetter(word: string): string {
-    return word[0].toUpperCase().concat(word.substring(1))
-}
-
-/**
- * Capitalizes the first letter of each word.
- * @param words A string of words.
- * @returns The capitalized string of words.
- */
-export function capitalizeEachWord(words: string): string {
-    return words
-        .split(' ')
-        .map((word: string) => capitalizeFirstLetter(word))
-        .join(' ')
 }
 
 /**
@@ -215,7 +195,7 @@ export function getIncludedCategoriesFromBitField(bitField: number) {
 }
 
 export function debounce(func: Function, wait: number, immediate?: boolean) {
-    let timeout: NodeJS.Timeout | null
+    let timeout: number | null
     return function (this: any) {
         const context = this,
             args = arguments
@@ -224,7 +204,7 @@ export function debounce(func: Function, wait: number, immediate?: boolean) {
             if (!immediate) func.apply(context, args)
         }
         const callNow = immediate && !timeout
-        clearTimeout(timeout as NodeJS.Timeout)
+        clearTimeout(timeout as number)
         timeout = setTimeout(later, wait)
         if (callNow) func.apply(context, args)
     }

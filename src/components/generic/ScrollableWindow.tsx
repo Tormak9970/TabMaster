@@ -8,6 +8,7 @@ import {
     FooterLegendProps,
 } from '@decky/ui'
 import { FC, Fragment, useLayoutEffect, useRef, useState } from 'react'
+import { trans_string as t } from '@utils'
 
 export interface ScrollableWindowProps extends FooterLegendProps {
     height: string
@@ -60,8 +61,8 @@ export const ScrollableWindow: FC<ScrollableWindowProps> = ({
                     noScrollDescription
                         ? {}
                         : {
-                              [GamepadButton.DIR_UP]: 'Scroll Up',
-                              [GamepadButton.DIR_DOWN]: 'Scroll Down',
+                              [GamepadButton.DIR_UP]: t('LABEL_SCROLL_UP', 'Scroll Up'),
+                              [GamepadButton.DIR_DOWN]: t('LABEL_SCROLL_DOWN', 'Scroll Down'),
                           },
                     actionDescriptionMap ?? {}
                 )}

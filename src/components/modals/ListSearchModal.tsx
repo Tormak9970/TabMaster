@@ -19,6 +19,7 @@ import { FaMagnifyingGlass } from 'react-icons/fa6'
 import { BaseModalProps, CustomDropdown } from '../generic/CustomDropdown'
 import { ListSearchModalStyles } from '../styles/ListSearchModalStyles'
 import { BiSolidDownArrow, BiSolidUpArrow } from 'react-icons/bi'
+import { trans_string as t } from '@utils'
 
 export type ListSearchModalProps = {
     rgOptions: SingleDropdownOption[]
@@ -103,7 +104,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({
                 searchRef?.current?.element?.click?.()
             }
         },
-        actionDescriptionMap: { [GamepadButton.SELECT]: 'Search' },
+        actionDescriptionMap: { [GamepadButton.SELECT]: t('LABEL_SEARCH', 'Search') },
     }
 
     return (
@@ -131,7 +132,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({
                             <div style={{ width: '100%' }}>
                                 <TextField
                                     value={query}
-                                    placeholder={`Search ${entryLabel}...`}
+                                    placeholder={`${t('PLACEHOLDER_SEARCH', 'Search')} ${entryLabel}...`}
                                     onChange={e => {
                                         listRef.current?.scrollToItem(0)
                                         setQuery(e.target.value)
