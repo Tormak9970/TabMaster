@@ -1,12 +1,13 @@
 import { ButtonItem, Focusable } from '@decky/ui'
 import React, { VFC, useState } from 'react'
-import { FilterLabels, FilterType, TabFilterSettings, isValidParams } from '../filters/Filters'
+import { FilterLabels, isValidParams } from '../filters/Filters'
 import { playUISound } from '../../lib/Utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaXmark } from 'react-icons/fa6'
 import { CgCheck } from 'react-icons/cg'
 import { trans_string as t } from '@utils'
 import { getLogicalMode } from '@utils'
+import { TabFilterSettings, FilterType } from '@types'
 
 type FilterSectionAccordionProps = {
     index: number

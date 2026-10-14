@@ -1,6 +1,6 @@
 import { DialogButton, Dropdown, DropdownOption, Field, Focusable, SingleDropdownOption, showModal } from '@decky/ui'
 import { VFC, Fragment, useState, useContext } from 'react'
-import { FilterType, SdCardParamType, TabFilterSettings } from '../filters/Filters'
+import { FilterErrorEntry, FilterType, SdCardParamType, TabFilterSettings } from '@types'
 import { FixMergeFilterModal } from '../modals/FixMergeFilterModal'
 import { ErrorPanelTabNameContext } from '@state'
 import { DestructiveModal } from '../generic/DestructiveModal'
@@ -47,7 +47,7 @@ type FilterErrorOptionsProps<T extends FilterType> = {
     numFilters: number
     filter: TabFilterSettings<T>
     mergeErrorEntries?: FilterErrorEntry[] | undefined
-    onFilterUpdate: (filter: TabFilterSettings<FilterType> | []) => void
+    onFilterUpdate: (filter: TabFilterSettings<FilterType> | null) => void
     onFilterDelete: () => void
 }
 
@@ -141,7 +141,7 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({
         updatedFilter.params.filters = mergeParams.filters
         updatedFilter.params.mode = mergeParams.mode
 
-        onFilterUpdate(mergeParams.filters.length === 0 ? [] : updatedFilter)
+        onFilterUpdate(mergeParams.filters.length === 0 ? null : updatedFilter)
         setMergeParams({ ...mergeParams })
         //* this is necessary so that if the accordian remounts the merge filter it will rememember it's state
         mergeErrorEntries!.length = 0

@@ -4,6 +4,7 @@ import { presetKeys } from '../../presets/presets'
 import { TabMasterManager } from '@state'
 import { compatCategoryToLabel } from '../filters/Filters'
 import { trans_string as t, getAppCategoryLabels } from '@utils'
+import { SteamPlatform } from '@types'
 
 interface PresetMenuProps {
     tabMasterManager: TabMasterManager

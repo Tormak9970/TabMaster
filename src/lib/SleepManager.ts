@@ -1,4 +1,5 @@
 import { findModuleExport } from '@decky/ui'
+import { Unregisterer } from '@types'
 
 interface SleepManager {
     RegisterForNotifyResumeFromSuspend: (cb: () => void) => Unregisterer

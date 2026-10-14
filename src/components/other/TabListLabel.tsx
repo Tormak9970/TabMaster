@@ -3,6 +3,7 @@ import { CSSProperties, Fragment, VFC } from 'react'
 import { FaSteam } from 'react-icons/fa6'
 import { FaSdCard } from 'react-icons/fa'
 import { CustomTabContainer } from '@state'
+import { TabContainer } from '@types'
 
 interface TabListLabelProps {
     tabContainer: TabContainer

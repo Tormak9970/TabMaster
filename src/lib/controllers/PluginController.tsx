@@ -5,6 +5,7 @@ import { LogController } from './LogController'
 import { TabMasterManager } from '@state'
 import { getCurrentUserId } from '../Utils'
 import { DestructiveModal } from '../../components/generic/DestructiveModal'
+import { Unregisterer } from '@types'
 
 function showMigrationModal(okCallback: () => Promise<void>, cancelCallback: () => Promise<void>) {
     showModal(

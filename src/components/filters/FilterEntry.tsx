@@ -1,9 +1,10 @@
 import { Fragment, VFC, useState } from 'react'
-import { FilterDefaultParams, FilterType, TabFilterSettings, canBeInverted } from './Filters'
+import { FilterDefaultParams, canBeInverted } from './Filters'
 import { Dropdown, Focusable, afterPatch } from '@decky/ui'
 import { FilterSelect } from './FilterSelect'
 import { TrashButton } from '../generic/TrashButton'
 import { trans_string as t } from '@utils'
+import { TabFilterSettings, FilterType } from '@types'
 
 type FilterEntryProps = {
     index: number

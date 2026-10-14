@@ -5,6 +5,7 @@ import { TabMasterContextProvider, type TabMasterManager } from '@state'
 import { TabErrorsPanel } from '../changes-needed/TabErrorsPanel'
 import { FixModalStyles } from '../styles/FixModalStyles'
 import { trans_string as t } from '@utils'
+import { TabSettingsDictionary, FilterErrorEntry, TabSettings } from '@types'
 
 type FixTabErrorsModalRootProps = {
     closeModal?: () => void

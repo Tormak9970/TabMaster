@@ -1,4 +1,4 @@
-interface DeckyLoader {
+export interface DeckyLoader {
     pluginReloadQueue: { name: string; version?: string }[]
     routerHook: {
         routerState: {

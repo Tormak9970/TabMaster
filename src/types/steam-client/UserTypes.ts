@@ -1,6 +1,8 @@
 // Types for SteamClient.User
 
-type User = {
+import { Unregisterer } from './UtilityTypes'
+
+export type User = {
     RegisterForCurrentUserChanges: (callback: (data: any) => void) => Unregisterer
     RegisterForLoginStateChange: (callback: (username: string) => void) => Unregisterer
     RegisterForPrepareForSystemSuspendProgress: (callback: (data: any) => void) => Unregisterer

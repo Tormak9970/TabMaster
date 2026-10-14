@@ -1,6 +1,6 @@
 import { RoutePatch, routerHook } from '@decky/api'
 import { sleep } from '@decky/ui'
-import { FilterType, TabFilterSettings } from '../components/filters/Filters'
+import { FilterType, TabFilterSettings, TabSettings, TabSettingsDictionary } from '@types'
 import { GamepadUIAudio, SFXPath } from './GamepadUIAudio'
 import { trans_string as t } from '@utils'
 
@@ -195,7 +195,7 @@ export function getIncludedCategoriesFromBitField(bitField: number) {
 }
 
 export function debounce(func: Function, wait: number, immediate?: boolean) {
-    let timeout: number | null
+    let timeout: any | null
     return function (this: any) {
         const context = this,
             args = arguments

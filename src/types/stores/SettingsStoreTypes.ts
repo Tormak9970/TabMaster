@@ -1,9 +1,9 @@
 // Types for the global settingsStore
 
-type ClientSettings = {
+export type ClientSettings = {
     enable_ui_sounds: boolean
 }
 
-type SettingsStore = {
+export type SettingsStore = {
     m_ClientSettings: ClientSettings
 }

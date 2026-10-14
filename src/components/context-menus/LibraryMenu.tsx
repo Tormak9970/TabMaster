@@ -21,6 +21,7 @@ import { TabProfilesSubMenu } from './TabProfileMenu'
 import { TabIdEntryType } from '../qam/QuickAccessContent'
 import { showAddCollectionModal } from '../modals/AddCollectionModal'
 import { trans_string as t } from '@utils'
+import { TabContainer } from '@types'
 
 export interface LibraryMenuProps {
     closeMenu: () => void

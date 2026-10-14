@@ -1,3 +1,4 @@
+import { LoginState, LoginResult, Unregisterer, TagResponse } from '@types'
 import { sleepManager } from '../SleepManager'
 import { waitForCondition } from '../Utils'
 import { LogController } from './LogController'

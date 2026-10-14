@@ -17,22 +17,13 @@ import { IoGameController, IoGrid } from 'react-icons/io5'
 import { BsWindow } from 'react-icons/bs'
 import { IconType } from 'react-icons/lib'
 
-import {
-    FilterType,
-    ReviewScoreType,
-    SdCardParamType,
-    TabFilterSettings,
-    ThresholdCondition,
-    TimeUnit,
-    compatCategoryToLabel,
-    steamOSCompatCategoryToLabel,
-} from './Filters'
+import { compatCategoryToLabel, steamOSCompatCategoryToLabel } from './Filters'
 import { TabMasterContextProvider, useTabMasterContext } from '@state'
 import { ModeMultiSelect } from '../multi-selects/ModeMultiSelect'
 import { EditMergeFilterModal } from '../modals/EditMergeFilterModal'
 import { MultiSelect } from '../multi-selects/MultiSelect'
 import { FilterPreview } from './FilterPreview'
-import { DateIncludes, DatePicker, DateSelection } from '../generic/DatePickers'
+import { DatePicker, DateSelection } from '../generic/DatePickers'
 import { EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from '../generic/EnhancedSelector'
 import { IncludeCategories } from '../../lib/Utils'
 import { Slider } from '../generic/Slider'
@@ -53,6 +44,21 @@ import {
     getAchievementOptions,
     getSizeOnDiskDisplayData,
 } from '@utils'
+import {
+    FilterType,
+    TabFilterSettings,
+    SteamCollection,
+    FriendEntry,
+    LogicalMode,
+    TagResponse,
+    SteamAppOverview,
+    ThresholdCondition,
+    ReviewScoreType,
+    TimeUnit,
+    DateObj,
+    SdCardParamType,
+    DateIncludes,
+} from '@types'
 
 type FilterOptionsProps<T extends FilterType> = {
     index: number

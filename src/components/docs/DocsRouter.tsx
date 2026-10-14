@@ -31,7 +31,7 @@ export const DocsRouter: VFC = () => {
 
         docPages[pageName] = {
             title: pageName,
-            content: <DocPage content={doc} />,
+            content: <DocPage content={doc as string} />,
             route: `/tab-master-docs/${pageName.toLowerCase().replace(/ /g, '-')}`,
             icon: <MdNumbers />,
             hideTitle: true,

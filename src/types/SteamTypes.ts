@@ -1,6 +1,8 @@
-type AppId = number
+import { Collection } from './stores'
 
-type SteamTab = {
+export type AppId = number
+
+export type SteamTab = {
     title: string
     id: string
     content: React.ReactElement
@@ -15,14 +17,14 @@ type SteamTab = {
     renderTabAddon: () => any //Returns a reactElement
 }
 
-interface TabAppGridComponentProps {
+export interface TabAppGridComponentProps {
     collection: Collection
     eSortBy: number
     setSortBy: (e: any) => void
     showSortingContextMenu: (e: any) => void
 }
 
-type LocalizationManager = {
+export type LocalizationManager = {
     AddTokens: unknown
     BLooksLikeToken: (token: string) => boolean
     GetELanguageFallbackOrder: unknown

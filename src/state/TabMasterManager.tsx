@@ -1,5 +1,5 @@
 import { EditableTabSettings } from '../components/modals/EditTabModal'
-import { TabFilterSettings, FilterType, Filter } from '../components/filters/Filters'
+import { Filter } from '../components/filters/Filters'
 import { PythonInterop } from '../lib/controllers/PythonInterop'
 import { CustomTabContainer } from './CustomTabContainer'
 import { v4 as uuidv4 } from 'uuid'
@@ -11,6 +11,18 @@ import { TabErrorController } from '../lib/controllers/TabErrorController'
 import { TabProfileManager } from './TabProfileManager'
 import { AUTO_BACKUP_NAME } from '../constants'
 import { reaction } from '../lib/mobx'
+import {
+    TabFilterSettings,
+    FilterType,
+    TabContainer,
+    FriendEntry,
+    TagResponse,
+    StoreTagLocalizationMap,
+    FriendStoreEntry,
+    LogicalMode,
+    TabSettingsDictionary,
+    TabSettings,
+} from '@types'
 
 /**
  * Converts a list of filters into a 1D array.
@@ -30,12 +42,6 @@ function flattenFilters(filters: TabFilterSettings<FilterType>[]): TabFilterSett
     }
 
     return res
-}
-
-function isDepreciatedStoreMap(
-    storeTagMap: StoreTagLocalizationMap
-): storeTagMap is DepreciatedStoreTagLocalizationMap {
-    return (storeTagMap as DepreciatedStoreTagLocalizationMap).entries !== undefined
 }
 
 /**
@@ -310,25 +316,14 @@ export class TabMasterManager {
      */
     private storeTagReaction(storeTagLocalizationMap: StoreTagLocalizationMap) {
         if (storeTagLocalizationMap) {
-            if (isDepreciatedStoreMap(storeTagLocalizationMap)) {
-                const tagEntriesArray = Array.from(storeTagLocalizationMap.entries())
+            const tagEntriesArray = Object.entries(storeTagLocalizationMap)
 
-                this.allStoreTags = tagEntriesArray.map(([_, entry]) => {
-                    return {
-                        tag: entry.tagid,
-                        string: entry.name,
-                    }
-                })
-            } else {
-                const tagEntriesArray = Object.entries(storeTagLocalizationMap)
-
-                this.allStoreTags = tagEntriesArray.map(([tag, string]) => {
-                    return {
-                        tag: parseInt(tag),
-                        string,
-                    }
-                })
-            }
+            this.allStoreTags = tagEntriesArray.map(([tag, string]) => {
+                return {
+                    tag: parseInt(tag),
+                    string,
+                }
+            })
 
             PythonInterop.setTags(this.allStoreTags)
         } else {
@@ -380,7 +375,7 @@ export class TabMasterManager {
             customTabsList.forEach((tabContainer: TabContainer) => {
                 const friendsFilters = tabContainer.filters!.filter(
                     (filter: TabFilterSettings<FilterType>) => filter.type === 'friends'
-                )
+                ) as TabFilterSettings<'friends'>[]
                 const friendsIds2D: number[][] = friendsFilters.map(collectionFilter => collectionFilter.params.friends)
 
                 if (friendsIds2D.length > 0) {
@@ -399,7 +394,7 @@ export class TabMasterManager {
                 let shouldRebuildCollection = false
                 const friendsFilters = tabContainer.filters!.filter(
                     (filter: TabFilterSettings<FilterType>) => filter.type === 'friends'
-                )
+                ) as TabFilterSettings<'friends'>[]
 
                 //* remove friend's id from filter
                 friendsFilters.forEach((friendFilter: TabFilterSettings<'friends'>) => {

@@ -1,14 +1,15 @@
 // Types for the collectionStore global
 
-type AppCollectionType = 'type-games' | 'type-software' | 'type-music' | 'type-videos' | 'type-tools'
+import { SteamAppOverview } from '../steam-client'
 
-type CollectionStore = {
+export type AppCollectionType = 'type-games' | 'type-software' | 'type-music' | 'type-videos' | 'type-tools'
+
+export type CollectionStore = {
     appTypeCollectionMap: Map<AppCollectionType, Collection>
     userCollections: SteamCollection[]
     allGamesCollection: Collection
     deckDesktopApps: Collection | null
     sharedLibrariesCollections: Collection[]
-    userCollections: Collection[]
     localGamesCollection: Collection
     allAppsCollection: Collection
     BIsHidden: (appId: number) => boolean
@@ -18,7 +19,7 @@ type CollectionStore = {
     GetCollection: (id: SteamCollection['id']) => Collection
 }
 
-type SteamCollection = {
+export type SteamCollection = {
     AsDeletableCollection: () => null
     AsDragDropCollection: () => null
     AsEditableCollection: () => null
@@ -34,11 +35,11 @@ type SteamCollection = {
     visibleApps: SteamAppOverview[]
 }
 
-type Collection = {
+export type Collection = {
     AsDeletableCollection: () => null
     AsDragDropCollection: () => null
     AsEditableCollection: () => null
-    GetAppCountWithToolsFilter: (t) => any
+    GetAppCountWithToolsFilter: (t: any) => any
     allApps: SteamAppOverview[]
     apps: Map<number, SteamAppOverview>
     bAllowsDragAndDrop: boolean

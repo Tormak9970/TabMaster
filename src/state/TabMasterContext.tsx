@@ -1,5 +1,6 @@
 import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { TabMasterManager } from './TabMasterManager'
+import { TabContainer, FriendEntry, TagResponse } from '@types'
 
 const TabMasterContext = createContext<PublicTabMasterContext>(null as any)
 export const useTabMasterContext = () => useContext(TabMasterContext)

@@ -4,6 +4,7 @@ import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaCircleCheck, FaCircleExclamation, FaCircleXmark } from 'react-icons/fa6'
 import { playUISound } from '../../lib/Utils'
 import { trans_string as t } from '@utils'
+import { TabSettings } from '@types'
 
 type TabAccordionIconProps = {
     index: number

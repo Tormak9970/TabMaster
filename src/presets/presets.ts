@@ -1,4 +1,4 @@
-import { FilterType, TabFilterSettings } from '../components/filters/Filters'
+import { FilterType, LogicalMode, SteamPlatform, TabFilterSettings } from '@types'
 import { IncludeCategories } from '../lib/Utils'
 
 type TabPreset = {

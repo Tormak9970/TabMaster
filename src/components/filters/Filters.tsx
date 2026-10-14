@@ -1,7 +1,6 @@
 import { IconType } from 'react-icons/lib'
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
 import { PluginController } from '../../lib/controllers/PluginController'
-import { DateIncludes } from '../generic/DatePickers'
 import { STEAM_FEATURES_ID_MAP } from './SteamFeatures'
 import { FaCheckCircle, FaHdd, FaSdCard, FaShoppingCart, FaTrophy, FaUserFriends } from 'react-icons/fa'
 import { IoGrid } from 'react-icons/io5'
@@ -26,149 +25,19 @@ import { LogController } from '../../lib/controllers/LogController'
 import { CardAndGames } from '@cebbinghaus/microsdeck'
 import { MdNewReleases } from 'react-icons/md'
 import { trans_string as t } from '@utils'
-
-export type FilterType =
-    | 'collection'
-    | 'installed'
-    | 'regex'
-    | 'friends'
-    | 'tags'
-    | 'whitelist'
-    | 'blacklist'
-    | 'merge'
-    | 'platform'
-    | 'deck compatibility'
-    | 'steamos compatibility'
-    | 'review score'
-    | 'time played'
-    | 'size on disk'
-    | 'release date'
-    | 'purchase date'
-    | 'last played'
-    | 'family sharing'
-    | 'demo'
-    | 'streamable'
-    | 'steam features'
-    | 'achievements'
-    | 'sd card'
-    | 'install folder'
-    | 'coming soon'
-
-export type TimeUnit = 'minutes' | 'hours' | 'days'
-export type ThresholdCondition = 'above' | 'below'
-export type ReviewScoreType = 'metacritic' | 'steampercent'
+import {
+    SteamAppOverview,
+    FilterParams,
+    FilterType,
+    SdCardParamType,
+    TabFilterSettings,
+    ValidationResponse,
+    FilterErrorEntry,
+    DateIncludes,
+} from '@types'
 
 function getSteamOSCompatCategory(app: SteamAppOverview) {
     return (app.steam_hw_compat_category_packed >> 4) & 3 || 0
-}
-
-export enum SdCardParamType {
-    INSTALLED = 0,
-    ANY,
-}
-
-type CollectionFilterParams = {
-    id: SteamCollection['id']
-    /**
-     * Always present as of v1.2.2 onward
-     */
-    name?: string
-    /**
-     * @deprecated Replaced by id. Used pre v1.2.2
-     */
-    collection?: SteamCollection['id']
-}
-type InstalledFilterParams = { installed: boolean }
-type RegexFilterParams = { regex: string }
-type FriendsFilterParams = { friends: number[]; mode: LogicalMode }
-type TagsFilterParams = { tags: number[]; mode: LogicalMode }
-type WhitelistFilterParams = { games: number[] }
-type BlacklistFilterParams = { games: number[] }
-type MergeFilterParams = { filters: TabFilterSettings<FilterType>[]; mode: LogicalMode }
-type PlatformFilterParams = { platform: SteamPlatform }
-type DeckCompatFilterParams = { category: number }
-type SteamOSCompatFilterParams = { category: number }
-type ReviewScoreFilterParams = { scoreThreshold: number; condition: ThresholdCondition; type: ReviewScoreType }
-type TimePlayedFilterParams = { timeThreshold: number; condition: ThresholdCondition; units: TimeUnit }
-type SizeOnDiskFilterParams = { gbThreshold: number; condition: ThresholdCondition }
-type ReleaseDateFilterParams = { date?: DateObj; daysAgo?: number; condition: ThresholdCondition }
-type PurchaseDateFilterParams = { date?: DateObj; daysAgo?: number; condition: ThresholdCondition }
-type LastPlayedFilterParams = { date?: DateObj; daysAgo?: number; condition: ThresholdCondition }
-type FamilySharingFilterParams = { isFamilyShared: boolean }
-type DemoFilterParams = { isDemo: boolean }
-type ComingSoonParams = { isComingSoon: boolean }
-type StreamableFilterParams = { isStreamable: boolean }
-type SteamFeaturesFilterParams = { features: number[]; mode: LogicalMode }
-type AchievementsFilterParams = {
-    /**
-     * @deprecated This is no longer used
-     */
-    completionPercentage?: number
-    threshold: number
-    thresholdType: 'count' | 'percent'
-    condition: ThresholdCondition
-}
-type SdCardParams = { card: SdCardParamType | string | undefined } //inserted card/ any card/ card uid (undefined value is legacy)
-type InstallFolderParams = { driveName: string }
-
-// appOverview.rt_purchased_time
-
-export type FilterParams<T extends FilterType> = T extends 'collection'
-    ? CollectionFilterParams
-    : T extends 'installed'
-      ? InstalledFilterParams
-      : T extends 'regex'
-        ? RegexFilterParams
-        : T extends 'friends'
-          ? FriendsFilterParams
-          : T extends 'tags'
-            ? TagsFilterParams
-            : T extends 'whitelist'
-              ? WhitelistFilterParams
-              : T extends 'blacklist'
-                ? BlacklistFilterParams
-                : T extends 'merge'
-                  ? MergeFilterParams
-                  : T extends 'platform'
-                    ? PlatformFilterParams
-                    : T extends 'deck compatibility'
-                      ? DeckCompatFilterParams
-                      : T extends 'steamos compatibility'
-                        ? SteamOSCompatFilterParams
-                        : T extends 'review score'
-                          ? ReviewScoreFilterParams
-                          : T extends 'time played'
-                            ? TimePlayedFilterParams
-                            : T extends 'size on disk'
-                              ? SizeOnDiskFilterParams
-                              : T extends 'release date'
-                                ? ReleaseDateFilterParams
-                                : T extends 'purchase date'
-                                  ? PurchaseDateFilterParams
-                                  : T extends 'last played'
-                                    ? LastPlayedFilterParams
-                                    : T extends 'family sharing'
-                                      ? FamilySharingFilterParams
-                                      : T extends 'demo'
-                                        ? DemoFilterParams
-                                        : T extends 'coming soon'
-                                          ? ComingSoonParams
-                                          : T extends 'streamable'
-                                            ? StreamableFilterParams
-                                            : T extends 'steam features'
-                                              ? SteamFeaturesFilterParams
-                                              : T extends 'achievements'
-                                                ? AchievementsFilterParams
-                                                : T extends 'sd card'
-                                                  ? SdCardParams
-                                                  : T extends 'install folder'
-                                                    ? InstallFolderParams
-                                                    : never
-
-export type TabFilterSettings<T extends FilterType> = {
-    type: T
-    inverted: boolean
-    params: FilterParams<T>
 }
 
 type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview) => boolean

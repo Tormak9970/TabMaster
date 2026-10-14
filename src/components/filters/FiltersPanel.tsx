@@ -2,7 +2,7 @@ import { PanelSection, PanelSectionRow, Field, ButtonItem, Dropdown, afterPatch,
 import { VFC, Fragment, useRef, useEffect } from 'react'
 import { FilterEntry } from './FilterEntry'
 import { FilterOptions } from './FilterOptions'
-import { TabFilterSettings, FilterType } from './Filters'
+import { TabFilterSettings, FilterType, LogicalMode } from '@types'
 import { FilterSectionAccordion } from '../accordions/FilterSectionAccordion'
 import { trans_string as t } from '@utils'
 

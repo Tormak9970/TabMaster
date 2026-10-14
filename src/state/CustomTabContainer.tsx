@@ -1,9 +1,22 @@
 import { EditableTabSettings } from '../components/modals/EditTabModal'
-import { TabFilterSettings, FilterType, Filter } from '../components/filters/Filters'
+import { Filter } from '../components/filters/Filters'
 import { filtersHaveType, getIncludedCategoriesFromBitField } from '../lib/Utils'
 import { gamepadTabbedPageClasses, showModal } from '@decky/ui'
 import { SortOverrideMessage } from '../components/modals/SortOverrideMessage'
 import { ReactElement } from 'react'
+import {
+    TabFilterSettings,
+    FilterType,
+    TabContainer,
+    Collection,
+    LogicalMode,
+    TabAppGridComponent,
+    TabAppGridComponentProps,
+    SteamTab,
+    SteamAppOverview,
+    AppId,
+    TabContext,
+} from '@types'
 
 /**
  * Wrapper for injecting custom tabs.

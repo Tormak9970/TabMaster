@@ -18,6 +18,7 @@ import { SharedTabsModalStyles } from '../styles/SharedTabsStyles'
 import { SharedTabAccordion } from '../accordions/SharedTabAccordion'
 import { FaRegWindowMaximize } from 'react-icons/fa6'
 import { trans_string as t } from '@utils'
+import { TabSettings, TabSettingsDictionary } from '@types'
 
 type UserTabProps = {
     tab: TabSettings

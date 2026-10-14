@@ -1,13 +1,5 @@
 import { Fragment, VFC, createElement } from 'react'
-import {
-    FilterIcons,
-    FilterLabels,
-    FilterType,
-    SdCardParamType,
-    TabFilterSettings,
-    compatCategoryToLabel,
-    steamOSCompatCategoryToLabel,
-} from './Filters'
+import { FilterIcons, FilterLabels, compatCategoryToLabel, steamOSCompatCategoryToLabel } from './Filters'
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
 import {
     trans_string as t,
@@ -17,6 +9,7 @@ import {
     getSizeOnDiskDisplayData,
     getTimePlayed,
 } from '@utils'
+import { TabFilterSettings, FilterType, SdCardParamType } from '@types'
 
 type FilterPreviewGenericProps = {
     filter: TabFilterSettings<FilterType>

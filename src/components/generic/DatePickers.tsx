@@ -4,20 +4,14 @@ import { TbCalendarEvent } from 'react-icons/tb'
 import { EnhancedSelector, EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from './EnhancedSelector'
 import { SoundEffect } from '../../lib/GamepadUIAudio'
 import { CustomDropdown } from './CustomDropdown'
-import { trans_string as t } from '@utils'
+import { trans_string as t, dateToLabel } from '@utils'
+import { DateIncludes, DateObj } from '@types'
 
 export type DatePickerModalType = 'simple' | 'pretty'
 
 /** A SingleDropdownOption with specific date data */
 export interface DateSelection extends SingleDropdownOption {
     data: DateObj
-}
-
-/** Whether the date includes day/ month and year, month and year, or year only. */
-export enum DateIncludes {
-    yearOnly,
-    monthYear,
-    dayMonthYear,
 }
 
 /** Props for DatePicker component */
@@ -404,69 +398,6 @@ function getYearOptions(beginning: number, end: number) {
 
 function getDaysInMonth(month: number, year: number) {
     return new Date(year, month, 0).getDate()
-}
-
-export function dateToLabel(year: number, month?: number, day?: number, formatOptions?: Intl.DateTimeFormatOptions) {
-    const defaultOptions: Intl.DateTimeFormatOptions = {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-    }
-
-    let _options: Intl.DateTimeFormatOptions
-
-    if (formatOptions?.dateStyle) {
-        switch (formatOptions?.dateStyle) {
-            case 'full':
-                _options = {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    weekday: 'long',
-                }
-                break
-
-            case 'long':
-                _options = {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                }
-                break
-
-            case 'medium':
-                _options = {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                }
-                break
-
-            case 'short':
-                _options = {
-                    year: '2-digit',
-                    month: 'numeric',
-                    day: 'numeric',
-                }
-                break
-
-            default:
-                _options = defaultOptions
-        }
-    } else {
-        _options = formatOptions ?? defaultOptions
-    }
-
-    if (month === undefined) {
-        delete _options.month
-    }
-    if (day === undefined) {
-        delete _options.day
-        delete _options.weekday
-    }
-
-    const date = new Date(year, (month ?? 1) - 1, day ?? 1).toLocaleDateString(locales, _options)
-    return date
 }
 
 function isValidDate(day?: number, month?: number, year?: number) {

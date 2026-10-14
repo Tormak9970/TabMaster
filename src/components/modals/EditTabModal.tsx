@@ -12,7 +12,7 @@ import {
     showModal,
 } from '@decky/ui'
 import { useState, VFC, useEffect, Fragment } from 'react'
-import { FilterDefaultParams, FilterType, TabFilterSettings, isValidParams } from '../filters/Filters'
+import { FilterDefaultParams, isValidParams } from '../filters/Filters'
 import { PythonInterop } from '../../lib/controllers/PythonInterop'
 import { TabMasterContextProvider, TabMasterManager, CustomTabContainer } from '@state'
 import { ModalStyles } from '../styles/ModalStyles'
@@ -26,6 +26,7 @@ import {
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { useSortingMenuItems } from '@hooks'
 import { trans_string as t, getAppCategoryLabels } from '@utils'
+import { TabSettings, TabFilterSettings, FilterType, LogicalMode } from '@types'
 
 export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>
 

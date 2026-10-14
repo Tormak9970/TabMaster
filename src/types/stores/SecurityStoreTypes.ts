@@ -1,5 +1,5 @@
 // Types for the global securitystore
 
-type SecurityStore = {
+export type SecurityStore = {
     IsLockScreenActive: () => boolean
 }

@@ -1,11 +1,12 @@
 import { Fragment, VFC, createElement, useEffect, useState } from 'react'
 import { achievementClasses, Focusable, mainMenuAppRunningClasses, ModalRoot, SingleDropdownOption } from '@decky/ui'
-import { FilterDefaultParams, FilterIcons, FilterType, FilterDescriptions, FilterLabels } from './Filters'
+import { FilterDefaultParams, FilterIcons, FilterDescriptions, FilterLabels } from './Filters'
 import { FilterSelectStyles } from '../styles/FilterSelectionStyles'
 import { IoFilter } from 'react-icons/io5'
 import { MicroSDeckInterop, microSDeckLibVersion } from '../../lib/controllers/MicroSDeckInterop'
 import { BaseModalProps, CustomDropdown } from '../generic/CustomDropdown'
 import { trans_string as t } from '@utils'
+import { FilterType } from '@types'
 
 const FilterSelectModal: VFC<BaseModalProps> = ({ rgOptions, selectedOption, onSelectOption, closeModal }) => {
     const [focusable, setFocusable] = useState(false) //this is to briefly (on modal mount) disable focus on all selections except last selected so it is remebered

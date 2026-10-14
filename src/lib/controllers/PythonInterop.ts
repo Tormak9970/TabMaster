@@ -2,6 +2,7 @@ import { getCompactTimestamp, validateTabStructure } from '../Utils'
 import { TabProfileDictionary } from '@state'
 import { USER_BACKUP_NAME } from '../../constants'
 import { call, FileSelectionType, openFilePicker, toaster } from '@decky/api'
+import { UsersDict, TabSettingsDictionary, TagResponse, FriendEntry } from '@types'
 
 /**
  * Class for frontend -> backend communication.

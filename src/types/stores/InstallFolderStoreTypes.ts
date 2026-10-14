@@ -1,4 +1,4 @@
-type InstallFolderApp = {
+export type InstallFolderApp = {
     nAppID: number
     nAppSize: number
     nDLCSize: number
@@ -11,7 +11,7 @@ type InstallFolderApp = {
     strSortAs: string
 }
 
-type InstallFolder = {
+export type InstallFolder = {
     bIsDefaultFolder: boolean
     bIsFixed: boolean
     bIsMounted: boolean
@@ -29,6 +29,6 @@ type InstallFolder = {
     vecApps: InstallFolderApp[]
 }
 
-type InstallFolderStore = {
+export type InstallFolderStore = {
     AllInstallFolders: InstallFolder[]
 }

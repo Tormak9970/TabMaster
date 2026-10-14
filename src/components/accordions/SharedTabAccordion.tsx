@@ -4,6 +4,7 @@ import { playUISound } from '../../lib/Utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaUser } from 'react-icons/fa6'
 import { trans_string as t } from '@utils'
+import { TabSettings } from '@types'
 
 type SharedTabAccordionProps = {
     user: string

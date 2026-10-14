@@ -1,6 +1,13 @@
 // Types for SteamClient.Apps
 
-type Apps = {
+import { Unregisterer } from './UtilityTypes'
+
+export type TagResponse = {
+    tag: number
+    string: string | undefined
+}
+
+export type Apps = {
     GetStoreTagLocalization: (tags: number[]) => Promise<TagResponse[]>
 
     RunGame: (gameId: string, unk1: string, unk2: number, unk3: number) => void
@@ -26,7 +33,7 @@ type Apps = {
     ) => Unregisterer
 }
 
-type SteamAppDetails = {
+export type SteamAppDetails = {
     achievements: SteamAppAchievements
     bCanMoveInstallFolder: boolean
     bCloudAvailable: boolean
@@ -103,7 +110,7 @@ type SteamAppDetails = {
     vecScreenShots: any[]
 }
 
-type SteamAppOverview = {
+export type SteamAppOverview = {
     app_type: number
     gameid: string
     appid: number
@@ -170,7 +177,7 @@ type SteamAppOverview = {
     steam_hw_compat_category_packed: number
 }
 
-type SteamShortcut = {
+export type SteamShortcut = {
     appid: number
     data: {
         bIsApplication: boolean
@@ -182,12 +189,12 @@ type SteamShortcut = {
     }
 }
 
-type SteamAppLanguages = {
+export type SteamAppLanguages = {
     strDisplayName: string
     strShortName: string
 }
 
-type SteamAppAchievements = {
+export type SteamAppAchievements = {
     nAchieved: number
     nTotal: number
     vecAchievedHidden: any[]
@@ -195,7 +202,7 @@ type SteamAppAchievements = {
     vecUnachieved: any[]
 }
 
-type SteamAchievement = {
+export type SteamAchievement = {
     bAchieved: boolean
     bHidden: boolean
     flAchieved: number //percent of players who have gotten it
@@ -209,7 +216,7 @@ type SteamAchievement = {
     strName: string
 }
 
-type SteamGameClientData = {
+export type SteamGameClientData = {
     bytes_downloaded: string
     bytes_total: string
     client_name: string

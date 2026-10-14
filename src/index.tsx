@@ -8,6 +8,18 @@ import { MicroSDeckInterop } from './lib/controllers/MicroSDeckInterop'
 import { QuickAccessContent, QuickAccessTitleView } from './components/qam/QuickAccessContent'
 import { DocsRouter } from './components/docs/DocsRouter'
 import { Fragment } from 'react'
+import {
+    DeckyLoader,
+    CollectionStore,
+    AppStore,
+    LoginStore,
+    FriendStore,
+    SecurityStore,
+    SettingsStore,
+    InstallFolderStore,
+    AppAchievementProgressCache,
+    LocalizationManager,
+} from '@types'
 
 declare global {
     let DeckyPluginLoader: DeckyLoader

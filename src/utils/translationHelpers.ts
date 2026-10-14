@@ -1,7 +1,7 @@
 import { DropdownOption } from '@decky/ui'
-import { ReviewScoreType, ThresholdCondition, TimeUnit } from '../components/filters/Filters'
 import t from './i18n'
-import { DateIncludes, dateToLabel } from '../components/generic/DatePickers'
+import { dateToLabel } from './dateHelpers'
+import { ReviewScoreType, ThresholdCondition, TimeUnit, LogicalMode, DateObj, DateIncludes } from '@types'
 
 export function getLogicalMode(mode: LogicalMode): string {
     return mode === 'and' ? t('LOGIC_MODE_AND', 'and') : t('LOGIC_MODE_OR', 'or')

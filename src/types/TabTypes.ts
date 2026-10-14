@@ -1,6 +1,7 @@
-// ? Global types related to tabs.
+import { FilterType, LogicalMode, TabFilterSettings } from './FilterTypes'
+import { TabAppGridComponentProps } from './SteamTypes'
 
-type TabContainer = {
+export type TabContainer = {
     id: string
     title: string
     position: number //-1 position is a hidden tab
@@ -12,12 +13,12 @@ type TabContainer = {
     visibleToOthers?: boolean
 }
 
-interface TabSettings extends TabContainer {}
+export interface TabSettings extends TabContainer {}
 
-type TabSettingsDictionary = {
+export type TabSettingsDictionary = {
     [tabId: string]: TabSettings
 }
 
-type TabContext = React.Context<{ label: string } | null>
+export type TabContext = React.Context<{ label: string } | null>
 
-type TabAppGridComponent = React.VoidFunctionComponent<TabAppGridComponentProps>
+export type TabAppGridComponent = React.VoidFunctionComponent<TabAppGridComponentProps>

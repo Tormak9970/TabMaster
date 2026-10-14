@@ -1,6 +1,6 @@
 // Types for friendStore global
 
-type SteamFriend = {
+export type SteamFriend = {
     m_strAccountName?: string
     m_strPlayerName: string
     m_steamid: {
@@ -12,40 +12,40 @@ type SteamFriend = {
     }
 }
 
-type FriendStoreEntry = {
+export type FriendStoreEntry = {
     m_persona: SteamFriend
     m_strNickname?: string
 }
 
-type FriendOwnedGames = {
+export type FriendOwnedGames = {
     setApps: Set<number>
 }
 
-type OwnedGamesEntry = {
+export type OwnedGamesEntry = {
     value: {
         m_data: FriendOwnedGames
     }
 }
 
-type OwnedGames = {
+export type OwnedGames = {
     Get: (userid: number) => void
     m_dataMap: {
         _data: Map<number, OwnedGamesEntry>
     }
 }
 
-type PersonaCacheEntry = {
+export type PersonaCacheEntry = {
     value: FriendStoreEntry
 }
 
-type PersonaCacheMap = {
+export type PersonaCacheMap = {
     _data: Map<number, PersonaCacheEntry>
 }
 
-type FriendStore = {
+export type FriendStore = {
     allFriends: FriendStoreEntry[]
     m_ownedGames: OwnedGames
     FetchOwnedGames: (userid: number) => Promise<FriendOwnedGames | undefined>
-    GetOwnedGames(userId): Set<any>
+    GetOwnedGames(userId: number): Set<any>
     m_mapPersonaCache: PersonaCacheMap
 }
