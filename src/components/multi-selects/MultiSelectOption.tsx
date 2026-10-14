@@ -1,7 +1,7 @@
 import { DialogButton, DropdownOption, Field, FieldProps, Focusable } from '@decky/ui'
 import { VFC } from 'react'
 import { FaTimes } from 'react-icons/fa'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 type MultiSelectedOptionProps = {
     option: DropdownOption

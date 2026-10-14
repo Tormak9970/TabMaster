@@ -39,6 +39,9 @@ importers:
       '@decky/ui':
         specifier: 4.12.0
         version: 4.12.0
+      '@rollup/plugin-alias':
+        specifier: ^6.0.0
+        version: 6.0.0(rollup@4.22.5)
       '@rollup/plugin-node-resolve':
         specifier: ^13.3.0
         version: 13.3.0(rollup@4.22.5)
@@ -69,9 +72,6 @@ importers:
       mobx:
         specifier: ^6.12.0
         version: 6.13.7
-      rollup:
-        specifier: ^4.22.5
-        version: 4.22.5
       rollup-plugin-codegen:
         specifier: ^2.1.0
         version: 2.1.0
@@ -234,6 +234,15 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
+  '@rollup/plugin-alias@6.0.0':
+    resolution: {integrity: sha512-tPCzJOtS7uuVZd+xPhoy5W4vThe6KWXNmsFCNktaAh5RTqcLiSfT4huPQIXkgJ6YCOjJHvecOAzQxLFhPxKr+g==}
+    engines: {node: '>=20.19.0'}
+    peerDependencies:
+      rollup: '>=4.0.0'
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+
   '@rollup/plugin-commonjs@26.0.3':
     resolution: {integrity: sha512-2BJcolt43MY+y5Tz47djHkodCC3c1VKVrBDKpVqHKpQ9z9S158kCCqB8NF6/gzxLdNlYW9abB3Ibh+kOWLp8KQ==}
     engines: {node: '>=16.0.0 || 14 >= 14.17'}
@@ -303,15 +312,6 @@ packages:
     engines: {node: '>= 8.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0
-
-  '@rollup/pluginutils@5.2.0':
-    resolution: {integrity: sha512-qWJ2ZTbmumwiLFomfzTyt5Kng4hwPi9rwCYN4SHb6eaRU1KNO4ccxINHr/VhH4GgPlt1XfSTLX2LBTme8ne4Zw==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
-    peerDependenciesMeta:
-      rollup:
-        optional: true
 
   '@rollup/pluginutils@5.4.0':
     resolution: {integrity: sha512-MfPp06CjRLfXQ3wY0R8vJDYBy/MvVcc9OulEfR0B8Iv9ko+GCNaRZ+EpJYFl27LhKsZK0o420sYCRHCjfCgeUg==}
@@ -1118,9 +1118,6 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
-  magic-string@0.30.17:
-    resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}
-
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
@@ -1289,10 +1286,6 @@ packages:
   picomatch@2.3.2:
     resolution: {integrity: sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==}
     engines: {node: '>=8.6'}
-
-  picomatch@4.0.2:
-    resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
-    engines: {node: '>=12'}
 
   picomatch@4.0.4:
     resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
@@ -1931,6 +1924,10 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
+  '@rollup/plugin-alias@6.0.0(rollup@4.22.5)':
+    optionalDependencies:
+      rollup: 4.22.5
+
   '@rollup/plugin-commonjs@26.0.3(rollup@4.22.5)':
     dependencies:
       '@rollup/pluginutils': 5.4.0(rollup@4.22.5)
@@ -1944,9 +1941,9 @@ snapshots:
 
   '@rollup/plugin-inject@5.0.5(rollup@4.22.5)':
     dependencies:
-      '@rollup/pluginutils': 5.2.0(rollup@4.22.5)
+      '@rollup/pluginutils': 5.4.0(rollup@4.22.5)
       estree-walker: 2.0.2
-      magic-string: 0.30.17
+      magic-string: 0.30.21
     optionalDependencies:
       rollup: 4.22.5
 
@@ -1997,14 +1994,6 @@ snapshots:
       '@types/estree': 0.0.39
       estree-walker: 1.0.1
       picomatch: 2.3.2
-      rollup: 4.22.5
-
-  '@rollup/pluginutils@5.2.0(rollup@4.22.5)':
-    dependencies:
-      '@types/estree': 1.0.8
-      estree-walker: 2.0.2
-      picomatch: 4.0.2
-    optionalDependencies:
       rollup: 4.22.5
 
   '@rollup/pluginutils@5.4.0(rollup@4.22.5)':
@@ -2748,10 +2737,6 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  magic-string@0.30.17:
-    dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.0
-
   magic-string@0.30.21:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -2914,8 +2899,6 @@ snapshots:
   picocolors@1.1.1: {}
 
   picomatch@2.3.2: {}
-
-  picomatch@4.0.2: {}
 
   picomatch@4.0.4: {}
 

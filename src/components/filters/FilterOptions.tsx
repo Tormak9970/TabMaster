@@ -39,8 +39,8 @@ import { Slider } from '../generic/Slider'
 import { STEAM_FEATURES_ID_MAP, STEAM_FEATURES_TO_RENDER } from './SteamFeatures'
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
 import { ListSearchDropdown } from '../modals/ListSearchModal'
-import t from '../../utils/i18n'
 import {
+    trans_string as t,
     getLogicalMode,
     getReviewScoreFilterLabel,
     getLeastMostThresholdOptions,
@@ -52,7 +52,7 @@ import {
     getAchievementDisplayData,
     getAchievementOptions,
     getSizeOnDiskDisplayData,
-} from '../../utils/translationHelpers'
+} from '@utils'
 
 type FilterOptionsProps<T extends FilterType> = {
     index: number

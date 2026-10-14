@@ -5,7 +5,7 @@ import { ErroredFiltersPanel } from './ErroredFiltersPanel'
 import { ButtonItem, showModal } from '@decky/ui'
 import { ErrorPanelTabNameContext } from '../../state/ErrorPanelNameContext'
 import { DestructiveModal } from '../generic/DestructiveModal'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 type TabErrorsPanelProps = {
     index: number

@@ -18,7 +18,7 @@ import { showModalDuplicateTab } from './EditTabModal'
 import { SharedTabsModalStyles } from '../styles/SharedTabsStyles'
 import { SharedTabAccordion } from '../accordions/SharedTabAccordion'
 import { FaRegWindowMaximize } from 'react-icons/fa6'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 type UserTabProps = {
     tab: TabSettings

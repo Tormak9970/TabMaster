@@ -22,7 +22,7 @@ import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
 import { TabProfilesSubMenu } from './TabProfileMenu'
 import { TabIdEntryType } from '../qam/QuickAccessContent'
 import { showAddCollectionModal } from '../modals/AddCollectionModal'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 export interface LibraryMenuProps {
     closeMenu: () => void

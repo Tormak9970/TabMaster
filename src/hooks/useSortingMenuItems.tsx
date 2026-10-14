@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import t from '../utils/i18n'
+import { trans_string as t } from '@utils'
 
 /**
  * Gets the localized version of a sorting method

@@ -4,7 +4,7 @@ import { TabIdEntryType } from './QuickAccessContent'
 import { TabActionsButton } from '../other/TabActions'
 import { useTabMasterContext } from '../../state/TabMasterContext'
 import { TabListLabel } from '../other/TabListLabel'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 interface TabEntryInteractablesProps {
     entry: ReorderableEntry<TabIdEntryType>

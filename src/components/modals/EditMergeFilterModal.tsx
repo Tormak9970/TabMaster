@@ -5,7 +5,7 @@ import { FiltersPanel } from '../filters/FiltersPanel'
 import { TabFilterSettings, FilterType, FilterDefaultParams } from '../filters/Filters'
 import { isValidParams } from '../filters/Filters'
 import { PythonInterop } from '../../lib/controllers/PythonInterop'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 interface EditMergeFilterModalProps {
     mergeParams: TabFilterSettings<'merge'>['params']

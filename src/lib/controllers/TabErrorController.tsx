@@ -5,7 +5,7 @@ import { FixTabErrorsModalRoot } from '../../components/modals/FixTabErrorsModal
 import { TabMasterManager } from '../../state/TabMasterManager'
 import { EditableTabSettings } from '../../components/modals/EditTabModal'
 import { CustomTabContainer } from '../../state/CustomTabContainer'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 /**
  * Hanldes the tab filter validation process.

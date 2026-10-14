@@ -19,7 +19,7 @@ import { FaMagnifyingGlass } from 'react-icons/fa6'
 import { BaseModalProps, CustomDropdown } from '../generic/CustomDropdown'
 import { ListSearchModalStyles } from '../styles/ListSearchModalStyles'
 import { BiSolidDownArrow, BiSolidUpArrow } from 'react-icons/bi'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 export type ListSearchModalProps = {
     rgOptions: SingleDropdownOption[]

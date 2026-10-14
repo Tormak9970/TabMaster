@@ -8,7 +8,7 @@ import {
     FooterLegendProps,
 } from '@decky/ui'
 import { FC, Fragment, useLayoutEffect, useRef, useState } from 'react'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 export interface ScrollableWindowProps extends FooterLegendProps {
     height: string

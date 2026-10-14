@@ -6,7 +6,7 @@ import { TabProfileModalStyles } from '../styles/TabProfileModalStyles'
 import { TabListLabel } from '../other/TabListLabel'
 import { ScrollableWindow } from '../generic/ScrollableWindow'
 import { DestructiveModal } from '../generic/DestructiveModal'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 export interface CreateTabProfileModalProps {
     tabMasterManager: TabMasterManager

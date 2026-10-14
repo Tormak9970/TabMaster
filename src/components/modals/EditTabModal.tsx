@@ -26,9 +26,8 @@ import {
 } from '../../lib/Utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { CustomTabContainer } from '../../state/CustomTabContainer'
-import { useSortingMenuItems } from '../../hooks/useSortingMenuItems'
-import t from '../../utils/i18n'
-import { getAppCategoryLabels } from '../../utils/translationHelpers'
+import { useSortingMenuItems } from '@hooks'
+import { trans_string as t, getAppCategoryLabels } from '@utils'
 
 export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>
 

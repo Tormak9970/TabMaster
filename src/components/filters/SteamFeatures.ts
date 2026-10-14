@@ -4,7 +4,7 @@
 //   if (mod.RY && mod.V5) return mod;
 // })
 
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 // StoreFeaturesModule.BA //* this links the k list to the corresponding store categories
 // StoreFeaturesModule.V5 //* this links store category (type, category) to a string

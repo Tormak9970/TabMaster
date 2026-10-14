@@ -1,7 +1,7 @@
 import { ConfirmModal } from '@decky/ui'
 import { VFC } from 'react'
-import { getESortByLabel } from '../../hooks/useSortingMenuItems'
-import t from '../../utils/i18n'
+import { getESortByLabel } from '@hooks'
+import { trans_string as t } from '@utils'
 
 interface SortOverrideMessageProps {
     eSortBy: number

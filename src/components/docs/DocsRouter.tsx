@@ -6,7 +6,7 @@ import { DocPage } from './DocsPage'
 
 //@ts-ignore
 import docs from './docs.codegen'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 type DocRouteEntry = {
     title: string

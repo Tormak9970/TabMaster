@@ -2,7 +2,7 @@ import { DialogButton, Field, showModal } from '@decky/ui'
 import { FC } from 'react'
 import { FaCircleExclamation } from 'react-icons/fa6'
 import { DestructiveModal } from '../generic/DestructiveModal'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 interface InvalidSettingsAlertProps {
     onOk: () => void

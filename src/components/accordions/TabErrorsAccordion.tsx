@@ -3,7 +3,7 @@ import React, { VFC, useState, Fragment } from 'react'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaCircleCheck, FaCircleExclamation, FaCircleXmark } from 'react-icons/fa6'
 import { playUISound } from '../../lib/Utils'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 type TabAccordionIconProps = {
     index: number

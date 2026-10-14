@@ -4,7 +4,7 @@ import { TbCalendarEvent } from 'react-icons/tb'
 import { EnhancedSelector, EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from './EnhancedSelector'
 import { SoundEffect } from '../../lib/GamepadUIAudio'
 import { CustomDropdown } from './CustomDropdown'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 export type DatePickerModalType = 'simple' | 'pretty'
 export type DateObj = { day?: number; month?: number; year: number }

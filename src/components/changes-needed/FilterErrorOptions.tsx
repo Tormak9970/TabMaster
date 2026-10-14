@@ -5,7 +5,7 @@ import { FixMergeFilterModal } from '../modals/FixMergeFilterModal'
 import { ErrorPanelTabNameContext } from '../../state/ErrorPanelNameContext'
 import { DestructiveModal } from '../generic/DestructiveModal'
 import { TrashButton } from '../generic/TrashButton'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 type GuardedDeleteButtonProps = {
     onFilterDelete: () => void

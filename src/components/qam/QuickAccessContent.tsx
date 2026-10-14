@@ -41,7 +41,7 @@ import { InvalidSettingsNotice } from './InvalidSettingsNotice'
 import { TabsPanelSection } from './TabsPanelSection'
 import { ErrorNotice } from './ErrorNotice'
 import { showModalSharedTabs } from '../modals/SharedTabsModal'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 export type TabIdEntryType = {
     id: string

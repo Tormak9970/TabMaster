@@ -3,8 +3,7 @@ import { VFC, Fragment } from 'react'
 import { presetKeys } from '../../presets/presets'
 import { TabMasterManager } from '../../state/TabMasterManager'
 import { compatCategoryToLabel } from '../filters/Filters'
-import t from '../../utils/i18n'
-import { getAppCategoryLabels } from '../../utils/translationHelpers'
+import { trans_string as t, getAppCategoryLabels } from '@utils'
 
 interface PresetMenuProps {
     tabMasterManager: TabMasterManager

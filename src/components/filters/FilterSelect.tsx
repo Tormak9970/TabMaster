@@ -5,7 +5,7 @@ import { FilterSelectStyles } from '../styles/FilterSelectionStyles'
 import { IoFilter } from 'react-icons/io5'
 import { MicroSDeckInterop, microSDeckLibVersion } from '../../lib/controllers/MicroSDeckInterop'
 import { BaseModalProps, CustomDropdown } from '../generic/CustomDropdown'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 const FilterSelectModal: VFC<BaseModalProps> = ({ rgOptions, selectedOption, onSelectOption, closeModal }) => {
     const [focusable, setFocusable] = useState(false) //this is to briefly (on modal mount) disable focus on all selections except last selected so it is remebered

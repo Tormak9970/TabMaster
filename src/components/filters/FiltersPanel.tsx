@@ -4,7 +4,7 @@ import { FilterEntry } from './FilterEntry'
 import { FilterOptions } from './FilterOptions'
 import { TabFilterSettings, FilterType } from './Filters'
 import { FilterSectionAccordion } from '../accordions/FilterSectionAccordion'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 interface FiltersPanelProps {
     groupFilters: TabFilterSettings<FilterType>[]

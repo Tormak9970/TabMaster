@@ -5,8 +5,8 @@ import { playUISound } from '../../lib/Utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaXmark } from 'react-icons/fa6'
 import { CgCheck } from 'react-icons/cg'
-import t from '../../utils/i18n'
-import { getLogicalMode } from '../../utils/translationHelpers'
+import { trans_string as t } from '@utils'
+import { getLogicalMode } from '@utils'
 
 type FilterSectionAccordionProps = {
     index: number

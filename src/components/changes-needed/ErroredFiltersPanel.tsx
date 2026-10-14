@@ -1,7 +1,7 @@
 import { VFC, Fragment, useState } from 'react'
 import { FilterErrorOptions } from './FilterErrorOptions'
 import { FilterType, TabFilterSettings } from '../filters/Filters'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 type ErroredFiltersPanelProps = {
     filters: (TabFilterSettings<FilterType> | [])[]

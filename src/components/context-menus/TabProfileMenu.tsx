@@ -3,7 +3,7 @@ import { VFC, Fragment, useState } from 'react'
 import { TabMasterManager } from '../../state/TabMasterManager'
 import { CreateTabProfileModal, OverwriteTabProfileModal } from '../modals/TabProfileModals'
 import { DestructiveModal } from '../generic/DestructiveModal'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 interface TabsProfilesMenuProps {
     tabMasterManager: TabMasterManager

@@ -3,7 +3,7 @@ import { ReactElement } from 'react'
 import { TabMasterManager } from '../state/TabMasterManager'
 import { LogController } from '../lib/controllers/LogController'
 import { addPatch } from '../lib/Utils'
-import t from '../utils/i18n'
+import { trans_string as t } from '@utils'
 
 const findHome = (root: any) => {
     const filter = (node: any) => node?.type?.toString?.().includes('#HomeSettings_ShowingLess')

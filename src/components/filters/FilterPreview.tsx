@@ -9,14 +9,14 @@ import {
     steamOSCompatCategoryToLabel,
 } from './Filters'
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
-import t from '../../utils/i18n'
 import {
+    trans_string as t,
     getAchievementDisplayData,
     getDateFilterDisplayData,
     getReviewScoreFilterLabel,
     getSizeOnDiskDisplayData,
     getTimePlayed,
-} from '../../utils/translationHelpers'
+} from '@utils'
 
 type FilterPreviewGenericProps = {
     filter: TabFilterSettings<FilterType>

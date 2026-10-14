@@ -6,7 +6,7 @@ import { ErroredFiltersPanel } from '../changes-needed/ErroredFiltersPanel'
 import { ErrorPanelTabNameContext } from '../../state/ErrorPanelNameContext'
 import { FixModalStyles } from '../styles/FixModalStyles'
 import { DestructiveModal } from '../generic/DestructiveModal'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 interface FixMergeFilterModalProps {
     mergeParams: TabFilterSettings<'merge'>['params']

@@ -25,7 +25,7 @@ import { LuCombine } from 'react-icons/lu'
 import { LogController } from '../../lib/controllers/LogController'
 import { CardAndGames } from '@cebbinghaus/microsdeck'
 import { MdNewReleases } from 'react-icons/md'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 export type FilterType =
     | 'collection'

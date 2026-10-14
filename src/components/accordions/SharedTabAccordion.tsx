@@ -3,7 +3,7 @@ import { VFC, ReactNode, useState } from 'react'
 import { playUISound } from '../../lib/Utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaUser } from 'react-icons/fa6'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 type SharedTabAccordionProps = {
     user: string

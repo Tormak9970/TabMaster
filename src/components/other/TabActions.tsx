@@ -6,7 +6,7 @@ import { showModalDuplicateTab, showModalEditTab } from '../modals/EditTabModal'
 import { DestructiveModal } from '../generic/DestructiveModal'
 import { CustomTabContainer } from '../../state/CustomTabContainer'
 import { showAddCollectionModal } from '../modals/AddCollectionModal'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 interface TabActionsContextMenuProps {
     tabContainer: TabContainer

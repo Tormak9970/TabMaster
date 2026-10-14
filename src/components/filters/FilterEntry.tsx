@@ -3,7 +3,7 @@ import { FilterDefaultParams, FilterType, TabFilterSettings, canBeInverted } fro
 import { Dropdown, Focusable, afterPatch } from '@decky/ui'
 import { FilterSelect } from './FilterSelect'
 import { TrashButton } from '../generic/TrashButton'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 type FilterEntryProps = {
     index: number

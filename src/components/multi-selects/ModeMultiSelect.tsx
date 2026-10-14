@@ -5,7 +5,7 @@ import { MultiSelectedOption } from './MultiSelectOption'
 import { MultiSelectProps } from './MultiSelect'
 import { ListSearchTrigger } from '../modals/ListSearchModal'
 import { IconType } from 'react-icons/lib'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 interface ModeMultiSelectPropsGeneric extends Omit<MultiSelectProps, 'onChange' | 'determineEntryIcon'> {
     entryLabel: string

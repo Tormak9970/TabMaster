@@ -4,7 +4,7 @@ import { MultiSelectStyles } from '../styles/MultiSelectStyles'
 import { MultiSelectedOption } from './MultiSelectOption'
 import { ListSearchTrigger } from '../modals/ListSearchModal'
 import { IconType } from 'react-icons/lib'
-import t from '../../utils/i18n'
+import { trans_string as t } from '@utils'
 
 export type MultiSelectProps = {
     entryLabel: string
