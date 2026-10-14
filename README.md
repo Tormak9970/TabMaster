@@ -102,6 +102,10 @@ Filter Examples:
 
 If you're interested in fixing a bug, submitting a new feature, or just helping out, please read the [Contributor Guidelines](./Contributing.md)
 
+## Translations
+
+Know a language? You can help improve TabMaster's translations without writing any code. See [How to help the project by improving a language you know](./docs/Translating.md).
+
 # Licensing
 
 - This program is licensed under the [GNU General Public License Version 3](https://www.gnu.org/licenses/#GPL) and [BSD 3-Clause License](https://opensource.org/license/bsd-3-clause/) <br/>
