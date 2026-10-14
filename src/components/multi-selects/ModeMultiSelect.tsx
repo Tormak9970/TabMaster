@@ -5,6 +5,7 @@ import { MultiSelectedOption } from './MultiSelectOption'
 import { MultiSelectProps } from './MultiSelect'
 import { ListSearchTrigger } from '../modals/ListSearchModal'
 import { IconType } from 'react-icons/lib'
+import { trans_string as t } from '@utils'
 
 interface ModeMultiSelectPropsGeneric extends Omit<MultiSelectProps, 'onChange' | 'determineEntryIcon'> {
     entryLabel: string
@@ -49,8 +50,8 @@ export const ModeMultiSelect: VFC<ModeMultiSelectProps> = ({
     const [dropdownSelected, setDropdownSelected] = useState({ label: dropdownLabel, data: '' })
 
     const modes = [
-        { label: 'And', data: 'and' },
-        { label: 'Or', data: 'or' },
+        { label: t('LABEL_AND', 'And'), data: 'and' },
+        { label: t('LABEL_OR', 'Or'), data: 'or' },
     ]
 
     useEffect(() => {
@@ -59,8 +60,10 @@ export const ModeMultiSelect: VFC<ModeMultiSelectProps> = ({
         setDropdownSelected({
             label:
                 avail.length == 0
-                    ? 'All selected'
-                    : ((!!maxOptions && sel.length == maxOptions ? 'Max selected' : dropdownLabel) as string),
+                    ? t('LABEL_ALL_MODES_SELECTED', 'All selected')
+                    : ((!!maxOptions && sel.length == maxOptions
+                          ? t('LABEL_MAX_MODES_SELECTED', 'Max selected')
+                          : dropdownLabel) as string),
             data: '',
         })
         onChange(sel, innerMode)
@@ -127,7 +130,7 @@ export const ModeMultiSelect: VFC<ModeMultiSelectProps> = ({
                                     onChange={onModeChange}
                                     focusable={true}
                                     // @ts-ignore
-                                    onOKActionDescription='Change the filter mode'
+                                    onOKActionDescription={t('LABEL_CHANGE_FILTER_MODE', 'Change the filter mode')}
                                 />
                             </Focusable>
                         </Focusable>

@@ -11,13 +11,13 @@ import {
 } from '@decky/ui'
 import { VFC, useEffect, useMemo, useState } from 'react'
 import { PythonInterop } from '../../lib/controllers/PythonInterop'
-import { TabMasterManager } from '../../state/TabMasterManager'
-import { CustomTabContainer } from '../../state/CustomTabContainer'
+import { TabMasterManager, CustomTabContainer } from '@state'
 import { v4 as uuidv4 } from 'uuid'
 import { showModalDuplicateTab } from './EditTabModal'
 import { SharedTabsModalStyles } from '../styles/SharedTabsStyles'
 import { SharedTabAccordion } from '../accordions/SharedTabAccordion'
 import { FaRegWindowMaximize } from 'react-icons/fa6'
+import { trans_string as t } from '@utils'
 
 type UserTabProps = {
     tab: TabSettings
@@ -43,7 +43,8 @@ const UserTab: VFC<UserTabProps> = ({ tab, closeModal, onConfirm }: UserTabProps
                         }}
                     />
                     <Marquee>
-                        {tab.title} - {tab.filters?.length ?? 0} {tab.filters?.length === 1 ? 'Filter' : 'Filters'}
+                        {tab.title} - {tab.filters?.length ?? 0}{' '}
+                        {tab.filters?.length === 1 ? t('LABEL_FILTER', 'Filter') : t('LABEL_FILTER_PLURAL', 'Filters')}
                     </Marquee>
                 </div>
             </DialogButton>
@@ -101,7 +102,7 @@ export const SharedTabsModal: VFC<SharedTabsModalProps> = ({
                 bDisableBackgroundDismiss={false}
                 bHideCloseIcon={false}
             >
-                <DialogHeader>Shared Tabs</DialogHeader>
+                <DialogHeader>{t('TITLE_SHARED_TABS', 'Shared Tabs')}</DialogHeader>
                 <DialogBody>
                     <DialogControlsSection>
                         {/* From Decky-SGDB */}

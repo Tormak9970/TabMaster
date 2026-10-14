@@ -86,7 +86,7 @@ const presetDefines = {
 }
 
 export type PresetName = keyof typeof presetDefines
-export type PresetOptions<Name extends keyof typeof presetDefines> = Parameters<(typeof presetDefines)[Name]>
+export type PresetOptions<Name extends PresetName> = Parameters<(typeof presetDefines)[Name]>
 
 export const presetKeys = Object.keys(presetDefines) as PresetName[]
 

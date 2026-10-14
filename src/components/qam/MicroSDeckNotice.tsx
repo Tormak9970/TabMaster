@@ -1,5 +1,6 @@
 import { VFC, CSSProperties } from 'react'
 import { MicroSDeckInstallState } from '../../lib/controllers/MicroSDeckInterop'
+import { trans_string as t } from '@utils'
 
 interface MicroSDeckNoticeProps {
     intallState: MicroSDeckInstallState
@@ -15,27 +16,54 @@ export const MicroSDeckNotice: VFC<MicroSDeckNoticeProps> = ({ intallState, plug
     switch (intallState) {
         case MicroSDeckInstallState.VERSION_TOO_LOW:
         case MicroSDeckInstallState.VERSION_TOO_HIGH:
-            problem = `a version mismatch was detected.
-      TabMaster expects version ${libVersion}, but version ${pluginVersion} is installed.`
+            problem = t(
+                'MESSAGE_MICROSDECK_PROBLEM_VERSION_MISSMATCH',
+                'You have some tabs that rely on the MicroSDeck plugin, but a version mismatch was detected. TabMaster expects version {libVersion}, but version {pluginVersion} is installed.'
+            )
+                .replace('{libVersion}', libVersion)
+                .replace('{pluginVersion}', pluginVersion)
             recommendation =
                 intallState === MicroSDeckInstallState.VERSION_TOO_LOW
-                    ? 'Please update MicroSDeck to specified version.'
-                    : 'Please update TabMaster if available or install specified version of MicroSDeck.'
+                    ? t(
+                          'MESSAGE_MICROSDECK_RECOMMENDATION_VERSION_TOO_LOW',
+                          'Please update MicroSDeck to specified version.'
+                      )
+                    : t(
+                          'MESSAGE_MICROSDECK_RECOMMENDATION_VERSION_TOO_HIGH',
+                          'Please update TabMaster if available or install specified version of MicroSDeck.'
+                      )
             break
         case MicroSDeckInstallState.VERSION_UNKOWN:
-            problem = `TabMaster couldn't correctly determine which version it expects or which version is installed.`
-            recommendation = 'Please try updating TabMaster or MicroSDeck.'
+            problem = t(
+                'MESSAGE_MICROSDECK_PROBLEM_VERSION_UNKOWN',
+                "You have some tabs that rely on the MicroSDeck plugin, but TabMaster couldn't correctly determine which version it expects or which version is installed."
+            )
+            recommendation = t(
+                'MESSAGE_MICROSDECK_RECOMMENDATION_VERSION_UNKOWN',
+                'Please try updating TabMaster or MicroSDeck.'
+            )
             break
         case MicroSDeckInstallState.NOT_INSTALLED:
-            problem = 'it is not installed.'
-            recommendation = 'Please install MicroSDeck for these tabs to work.'
+            problem = t(
+                'MESSAGE_MICROSDECK_PROBLEM_NOT_INSTALLED',
+                'You have some tabs that rely on the MicroSDeck plugin, but it is not installed.'
+            )
+            recommendation = t(
+                'MESSAGE_MICROSDECK_RECOMMENDATION_NOT_INSTALLED',
+                'Please install MicroSDeck for these tabs to work.'
+            )
     }
 
     return (
         <div style={style}>
-            <div>You have some tabs that rely on the MicroSDeck plugin, but {problem}</div>
+            <div>{problem}</div>
             <div>{recommendation}</div>
-            <div>Until then, these tabs will not be displayed in the library.</div>
+            <div>
+                {t(
+                    'MESSAGE_MICROSDECK_NOTICE_CONCLUSION',
+                    'Until then, these tabs will not be displayed in the library.'
+                )}
+            </div>
         </div>
     )
 }

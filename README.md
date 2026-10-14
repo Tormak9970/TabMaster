@@ -1,3 +1,8 @@
+![Version Badge](https://img.shields.io/github/v/release/Tormak9970/TabMaster?label=version)
+[![License Badge](https://img.shields.io/github/license/Tormak9970/TabMaster)](LICENSE)
+![Decky Loader](https://img.shields.io/badge/dynamic/json?url=https://plugins.deckbrew.xyz/plugins?query=TabMaster&query=$[:1].downloads&suffix=%20installs&label=decky&color=3ea6a3)
+[![Crowdin](https://badges.crowdin.net/tabmaster/localized.svg)](https://crowdin.com/project/tabmaster)
+
 # Tab Master
 
 A plugin for customizing, adding, and removing Library Tabs.
@@ -15,17 +20,21 @@ Once you have installed TabMaster, open it in the Quick Access Menu (QAM), where
 # Installation
 
 ## Decky Store
+
 This is the preferred way to install TabMaster.
 
 ### Steps
+
 1. [Install the Decky plugin loader](https://github.com/SteamDeckHomebrew/decky-loader#installation)
 2. Use the built in plugin store to download the Tab Master Plugin
-   - If you want the bleeding edge version, use Decky's Testing Store
+    - If you want the bleeding edge version, use Decky's Testing Store
 
 ## From Zip
+
 This is the best way to get fixes for TabMaster early if you're having issues
 
 ### Steps
+
 1. Go into **Desktop Mode** on your device, and open your preferred browser
 2. Go to https://github.com/Tormak9970/TabMaster/releases/latest
 3. Download the file `TabMaster_vX.X.X.zip` (ex: `TabMaster_v2.15.0.zip`), and save it somewhere easy to remember
@@ -70,33 +79,7 @@ Available Filters:
 
 If you want us to add another filter, please open a filter request [here](https://github.com/Tormak9970/TabMaster/issues/new/choose).
 
-Filter Examples:
-
-- **Collection**<br/><img src="./assets/filters/docs_collection-example.png" width="600" />
-- **Installed**<br/><img src="./assets/filters/docs_installed-example.png" width="600" />
-- **Regex**<br/><img src="./assets/filters/docs_regex-example.png" width="600" />
-- **Friends**<br/><img src="./assets/filters/docs_friends-example.png" width="600" />
-- **Tags**<br/><img src="./assets/filters/docs_tags-example.png" width="600" />
-- **Whitelist**<br/><img src="./assets/filters/docs_whitelist-example.png" width="600" />
-- **Blacklist**<br/><img src="./assets/filters/docs_blacklist-example.png" width="600" />
-- **Merge**<br/><img src="./assets/filters/docs_merge-example.png" width="600" />
-- **Platform**<br/><img src="./assets/filters/docs_platform-example.png" width="600" />
-- **Deck Compatibility**<br/><img src="./assets/filters/docs_deck-compat-example.png" width="600" />
-- **SteamOS Compatibility**<br/><img src="./assets/filters/docs_steamos-compat-example.png" width="600" />
-- **Review Score**<br/><img src="./assets/filters/docs_review-score-example.png" width="600" />
-- **Time Played**<br/><img src="./assets/filters/docs_time-played-example.png" width="600" />
-- **Size on Disk**<br/><img src="./assets/filters/docs_size-on-disk-example.png" width="600" />
-- **Release Date**<br/><img src="./assets/filters/docs_release-date-example.png" width="600" />
-- **Purchase Date**<br/><img src="./assets/filters/docs_purchase-date-example.png" width="600" />
-- **Last Played**<br/><img src="./assets/filters/docs_last-played-example.png" width="600" />
-- **Family Sharing**<br/><img src="./assets/filters/docs_family-sharing-example.png" width="600" />
-- **Demo**<br/><img src="./assets/filters/docs_demo-example.png" width="600" />
-- **Coming Soon**<br/><img src="./assets/filters/docs_coming-soon-example.png" width="600" />
-- **Streamable**<br/><img src="./assets/filters/docs_streamable-example.png" width="600" />
-- **Steam Features**<br/><img src="./assets/filters/docs_steam-features-example.png" width="600" />
-- **Achievements**<br/><img src="./assets/filters/docs_achievements-example.png" width="600" />
-- **MicroSD Card**<br/><img src="./assets/filters/docs_microsd-card-example.png" width="600" />
-- **Install Folder**<br/><img src="./assets/filters/docs_install-folder-example.png" width="600" />
+Filter Examples can be found [here](FilterExamples.md)
 
 # Contributing
 
@@ -105,6 +88,16 @@ If you're interested in fixing a bug, submitting a new feature, or just helping 
 ## Translations
 
 Know a language? You can help improve TabMaster's translations without writing any code. See [How to help the project by improving a language you know](./docs/Translating.md).
+# Credits
+
+**Localisation:**
+https://crowdin.com/project/tabmaster
+| Language | Translators | ![total progress](https://badges.crowdin.net/tabmaster/localized.svg) |
+| - | - | -: |
+
+## Completion Chart
+
+[![Completion Chart](https://badges.awesome-crowdin.com/translation-16478645-937533.png)](https://badges.awesome-crowdin.com/translation-16478645-937533.png)
 
 # Licensing
 

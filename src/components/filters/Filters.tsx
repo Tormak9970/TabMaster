@@ -1,7 +1,7 @@
 import { IconType } from 'react-icons/lib'
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
 import { PluginController } from '../../lib/controllers/PluginController'
-import { DateIncludes, DateObj } from '../generic/DatePickers'
+import { DateIncludes } from '../generic/DatePickers'
 import { STEAM_FEATURES_ID_MAP } from './SteamFeatures'
 import { FaCheckCircle, FaHdd, FaSdCard, FaShoppingCart, FaTrophy, FaUserFriends } from 'react-icons/fa'
 import { IoGrid } from 'react-icons/io5'
@@ -25,6 +25,7 @@ import { LuCombine } from 'react-icons/lu'
 import { LogController } from '../../lib/controllers/LogController'
 import { CardAndGames } from '@cebbinghaus/microsdeck'
 import { MdNewReleases } from 'react-icons/md'
+import { trans_string as t } from '@utils'
 
 export type FilterType =
     | 'collection'
@@ -209,33 +210,76 @@ export const FilterDefaultParams: () => { [key in FilterType]: FilterParams<key>
 /**
  * Dictionary of descriptions for each filter.
  */
-export const FilterDescriptions: { [filterType in FilterType]: string } = {
-    collection: 'Selects apps that are in a certain Steam Collection.',
-    installed: 'Selects apps that are installed/uninstalled.',
-    regex: 'Selects apps whose titles match a regular expression.',
-    friends: 'Selects apps that are also owned by friends.',
-    tags: 'Selects apps that have specific community tags.',
-    whitelist: 'Selects apps that are added to the list.',
-    blacklist: 'Selects apps that are not added to the list.',
-    merge: 'Selects apps that pass a subgroup of filters.',
-    platform: 'Selects Steam or non-Steam apps.',
-    'deck compatibility': 'Selects apps that have a specific Steam Deck compatibilty status.',
-    'steamos compatibility': 'Selects apps that have a specific SteamOS compatibilty status.',
-    'review score': 'Selects apps based on their metacritic/steam review score.',
-    'time played': 'Selects apps based on your play time.',
-    'size on disk': 'Selects apps based on their install size.',
-    'release date': 'Selects apps based on their release date.',
-    'purchase date': 'Selects apps based on when you purchased them.',
-    'last played': 'Selects apps based on when they were last played.',
-    'family sharing': "Selects apps that are/aren't shared from family members.",
-    demo: "Selects apps that are/aren't demos.",
-    'coming soon': "Selects apps that are/aren't soon to be released.",
-    streamable: "Selects apps that can/can't be streamed from another computer.",
-    achievements: 'Selects apps based on their completion percentage.',
-    'steam features': 'Selects apps that support specific Steam Features.',
-    'sd card': 'Selects apps that are present on the inserted/specific MicroSD Card.',
-    'install folder': 'Selects apps that are installed in a specific Steam Install Folder.',
-}
+export const FilterDescriptions: () => { [key in FilterType]: string } = () => ({
+    collection: t('DESCRIPTION_COLLECTION_FILTER', 'Selects apps that are in a certain Steam Collection.'),
+    installed: t('DESCRIPTION_INSTALLED_FILTER', 'Selects apps that are installed/uninstalled.'),
+    regex: t('DESCRIPTION_REGEX_FILTER', 'Selects apps whose titles match a regular expression.'),
+    friends: t('DESCRIPTION_FRIENDS_FILTER', 'Selects apps that are also owned by friends.'),
+    tags: t('DESCRIPTION_TAGS_FILTER', 'Selects apps that have specific community tags.'),
+    whitelist: t('DESCRIPTION_WHITELIST_FILTER', 'Selects apps that are added to the list.'),
+    blacklist: t('DESCRIPTION_BLACKLIST_FILTER', 'Selects apps that are not added to the list.'),
+    merge: t('DESCRIPTION_MERGE_FILTER', 'Selects apps that pass a subgroup of filters.'),
+    platform: t('DESCRIPTION_PLATFORM_FILTER', 'Selects Steam or non-Steam apps.'),
+    'deck compatibility': t(
+        'DESCRIPTION_DECK_COMPAT_FILTER',
+        'Selects apps that have a specific Steam Deck compatibilty status.'
+    ),
+    'steamos compatibility': t(
+        'DESCRIPTION_MACHINE_COMPAT_FILTER',
+        'Selects apps that have a specific SteamOS compatibilty status.'
+    ),
+    'review score': t('DESCRIPTION_REVIEW_FILTER', 'Selects apps based on their metacritic/steam review score.'),
+    'time played': t('DESCRIPTION_TIME_PLAYED_FILTER', 'Selects apps based on your play time.'),
+    'size on disk': t('DESCRIPTION_SIZE_ON_DISK_FILTER', 'Selects apps based on their install size.'),
+    'release date': t('DESCRIPTION_RELEASE_DATE_FILTER', 'Selects apps based on their release date.'),
+    'purchase date': t('DESCRIPTION_PURCHASE_DATE_FILTER', 'Selects apps based on when you purchased them.'),
+    'last played': t('DESCRIPTION_LAST_PLAYED_FILTER', 'Selects apps based on when they were last played.'),
+    'family sharing': t(
+        'DESCRIPTION_FAMILY_SHARING_FILTER',
+        "Selects apps that are/aren't shared from family members."
+    ),
+    demo: t('DESCRIPTION_DEMO_FILTER', "Selects apps that are/aren't demos."),
+    'coming soon': t('DESCRIPTION_COMING_SOON_FILTER', "Selects apps that are/aren't soon to be released."),
+    streamable: t('DESCRIPTION_STREAMABLE_FILTER', "Selects apps that can/can't be streamed from another computer."),
+    achievements: t('DESCRIPTION_ACHIEVEMENTS_FILTER', 'Selects apps based on their completion percentage.'),
+    'steam features': t('DESCRIPTION_STEAM_FEATURES_FILTER', 'Selects apps that support specific Steam Features.'),
+    'sd card': t('DESCRIPTION_SD_CARD_FILTER', 'Selects apps that are present on the inserted/specific MicroSD Card.'),
+    'install folder': t(
+        'DESCRIPTION_INSTALL_FOLDER_FILTER',
+        'Selects apps that are installed in a specific Steam Install Folder.'
+    ),
+})
+
+/**
+ * Dictionary of Labels for each filter.
+ */
+export const FilterLabels: () => { [key in FilterType]: string } = () => ({
+    collection: t('LABEL_COLLECTION_FILTER', 'Collection'),
+    installed: t('LABEL_INSTALLED_FILTER', 'Installed'),
+    regex: t('LABEL_REGEX_FILTER', 'Regex'),
+    friends: t('LABEL_FRIENDS_FILTER', 'Friends'),
+    tags: t('LABEL_TAGS_FILTER', 'Tags'),
+    whitelist: t('LABEL_WHITELIST_FILTER', 'Whitelist'),
+    blacklist: t('LABEL_BLACKLIST_FILTER', 'Blacklist'),
+    merge: t('LABEL_MERGE_FILTER', 'Merge'),
+    platform: t('LABEL_PLATFORM_FILTER', 'Platform'),
+    'deck compatibility': t('LABEL_DECK_COMPAT_FILTER', 'Deck Compatibility'),
+    'steamos compatibility': t('LABEL_MACHINE_COMPAT_FILTER', 'SteamOS Compatibility'),
+    'review score': t('LABEL_REVIEW_FILTER', 'Review Score'),
+    'time played': t('LABEL_TIME_PLAYED_FILTER', 'Time Played'),
+    'size on disk': t('LABEL_SIZE_ON_DISK_FILTER', 'Size On Disk'),
+    'release date': t('LABEL_RELEASE_DATE_FILTER', 'Release Date'),
+    'purchase date': t('LABEL_PURCHASE_DATE_FILTER', 'Purchase Date'),
+    'last played': t('LABEL_LAST_PLAYED_FILTER', 'Last Played'),
+    'family sharing': t('LABEL_FAMILY_SHARING_FILTER', 'Family Sharing'),
+    demo: t('LABEL_DEMO_FILTER', 'Demo'),
+    'coming soon': t('LABEL_COMING_SOON_FILTER', 'Coming Soon'),
+    streamable: t('LABEL_STREAMABLE_FILTER', 'Streamable'),
+    achievements: t('LABEL_ACHIEVEMENTS_FILTER', 'Achievements'),
+    'steam features': t('LABEL_STEAM_FEATURES_FILTER', 'Steam Features'),
+    'sd card': t('LABEL_SD_CARD_FILTER', 'MicroSD Card'),
+    'install folder': t('LABEL_INSTALL_FOLDER_FILTER', 'Install Folder'),
+})
 
 /**
  * Dictionary of icons for each filter.
@@ -365,13 +409,13 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
 export function compatCategoryToLabel(category: number): string {
     switch (category) {
         case 0:
-            return 'Unknown'
+            return t('DeckVerified_CategoryLabel_Unknown', 'Unknown', true)
         case 1:
-            return 'Unsupported'
+            return t('DeckVerified_CategoryLabel_Unsupported', 'Unsupported', true)
         case 2:
-            return 'Playable'
+            return t('DeckVerified_CategoryLabel_Playable', 'Playable', true)
         case 3:
-            return 'Verified'
+            return t('DeckVerified_CategoryLabel_Verified', 'Verified', true)
         default:
             return ''
     }
@@ -385,11 +429,11 @@ export function compatCategoryToLabel(category: number): string {
 export function steamOSCompatCategoryToLabel(category: number): string {
     switch (category) {
         case 0:
-            return 'Unknown'
+            return t('SteamOS_CategoryLabel_Unknown', 'Unknown', true)
         case 1:
-            return 'Unsupported'
+            return t('SteamOS_CategoryLabel_Unsupported', 'Unsupported', true)
         case 2:
-            return 'Compatible'
+            return t('SteamOS_CategoryLabel_Compatible', 'Compatible', true)
         default:
             return ''
     }
@@ -401,8 +445,10 @@ export function steamOSCompatCategoryToLabel(category: number): string {
  * @returns The label of the provided feature.
  */
 export function steamFeatureToLabel(feature: number): string {
-    // @ts-ignore
-    return STEAM_FEATURES_ID_MAP[feature.toString()]?.display_name ?? 'Unkown Steam Feature'
+    return (
+        STEAM_FEATURES_ID_MAP[feature.toString() as keyof typeof STEAM_FEATURES_ID_MAP]?.display_name ??
+        t('LABEL_UNKOWN_STEAM_FEATURE', 'Unkown Steam Feature')
+    )
 }
 
 /**

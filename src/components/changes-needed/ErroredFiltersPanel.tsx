@@ -1,6 +1,7 @@
 import { VFC, Fragment, useState } from 'react'
 import { FilterErrorOptions } from './FilterErrorOptions'
 import { FilterType, TabFilterSettings } from '../filters/Filters'
+import { trans_string as t } from '@utils'
 
 type ErroredFiltersPanelProps = {
     filters: (TabFilterSettings<FilterType> | [])[]
@@ -53,7 +54,7 @@ export const ErroredFiltersPanel: VFC<ErroredFiltersPanelProps> = ({
                                 marginTop: '10px',
                             }}
                         >
-                            Errors
+                            {t('TITLE_ERRORS', 'Errors')}
                         </div>
                         <div className='filter-error-messages'>
                             {errorMessages[errorIdx].map((errorMsg: string) => (
@@ -67,7 +68,7 @@ export const ErroredFiltersPanel: VFC<ErroredFiltersPanelProps> = ({
                                 marginTop: '10px',
                             }}
                         >
-                            Filter Type - {filter.type}
+                            {t('TITLE_FILTER_TYPE', 'Filter Type')} - {filter.type}
                         </div>
                         <FilterErrorOptions
                             isMergeGroup={isMergeGroup}
