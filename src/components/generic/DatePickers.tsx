@@ -7,7 +7,6 @@ import { CustomDropdown } from './CustomDropdown'
 import { trans_string as t } from '@utils'
 
 export type DatePickerModalType = 'simple' | 'pretty'
-export type DateObj = { day?: number; month?: number; year: number }
 
 /** A SingleDropdownOption with specific date data */
 export interface DateSelection extends SingleDropdownOption {

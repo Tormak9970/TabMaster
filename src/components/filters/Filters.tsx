@@ -1,7 +1,7 @@
 import { IconType } from 'react-icons/lib'
 import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
 import { PluginController } from '../../lib/controllers/PluginController'
-import { DateIncludes, DateObj } from '../generic/DatePickers'
+import { DateIncludes } from '../generic/DatePickers'
 import { STEAM_FEATURES_ID_MAP } from './SteamFeatures'
 import { FaCheckCircle, FaHdd, FaSdCard, FaShoppingCart, FaTrophy, FaUserFriends } from 'react-icons/fa'
 import { IoGrid } from 'react-icons/io5'
