@@ -16,3 +16,8 @@ export type UsersDict = {
         friendsGames: Map<number, number[]>
     }
 }
+
+export const enum FileSelectionType {
+    FILE,
+    FOLDER,
+}

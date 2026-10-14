@@ -1,8 +1,8 @@
 import { getCompactTimestamp, validateTabStructure } from '../Utils'
 import { TabProfileDictionary } from '@state'
 import { USER_BACKUP_NAME } from '../../constants'
-import { call, FileSelectionType, openFilePicker, toaster } from '@decky/api'
-import { UsersDict, TabSettingsDictionary, TagResponse, FriendEntry } from '@types'
+import { call, openFilePicker, toaster } from '@decky/api'
+import { UsersDict, TabSettingsDictionary, TagResponse, FriendEntry, FileSelectionType } from '@types'
 
 /**
  * Class for frontend -> backend communication.
@@ -38,6 +38,7 @@ export class PythonInterop {
         }
 
         const res = await openFilePicker(
+            // @ts-expect-error they're the same
             FileSelectionType.FOLDER,
             startPath,
             false,
@@ -78,6 +79,7 @@ export class PythonInterop {
         }
 
         const res = await openFilePicker(
+            // @ts-expect-error they're the same
             FileSelectionType.FILE,
             startPath,
             true,
