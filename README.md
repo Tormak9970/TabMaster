@@ -79,7 +79,7 @@ Available Filters:
 
 If you want us to add another filter, please open a filter request [here](https://github.com/Tormak9970/TabMaster/issues/new/choose).
 
-Filter Examples can be found [here](FilterExamples.md)
+Filter Examples can be found [here](./docs/FilterExamples.md)
 
 # Contributing
 
@@ -88,12 +88,38 @@ If you're interested in fixing a bug, submitting a new feature, or just helping 
 ## Translations
 
 Know a language? You can help improve TabMaster's translations without writing any code. See [How to help the project by improving a language you know](./docs/Translating.md).
+
 # Credits
 
 **Localisation:**
 https://crowdin.com/project/tabmaster
 | Language | Translators | ![total progress](https://badges.crowdin.net/tabmaster/localized.svg) |
 | - | - | -: |
+| Čeština | | |
+| Dansk | | |
+| Deutsch | | |
+| Suomi | | |
+| Ελληνικά | | |
+| Español-España | Sebastian Guardo Lugo | |
+| Español-Latinoamérica | | |
+| Français | | |
+| Italiano | Lemon64k | |
+| 日本語 | | |
+| 한국어 | | |
+| Nederlands | | |
+| Polski | | |
+| Português | | |
+| Português-Brasil | Alberto Eberhardt | |
+| Română | | |
+| Русский | Vladimir Budylnikov | |
+| Svenska | | |
+| Türkçe | | |
+| Українська | Костя | |
+| 简体中文 | Charles Lew | |
+| 正體中文 | | |
+| Norsk | | |
+| ไทย | | |
+| Tiếng Việt | | |
 
 ## Completion Chart
 
