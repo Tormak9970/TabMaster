@@ -1,5 +1,5 @@
 import { Menu, MenuGroup, MenuItem, showModal, GamepadButton, gamepadContextMenuClasses } from '@decky/ui'
-import { VFC, Fragment, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { TabMasterManager } from '@state'
 import { CreateTabProfileModal, OverwriteTabProfileModal } from '../modals/TabProfileModals'
 import { DestructiveModal } from '../generic/DestructiveModal'
@@ -12,7 +12,7 @@ interface TabsProfilesMenuProps {
 /**
  * Context menu for managing Tab Profiles.
  */
-export const TabProfilesMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) => {
+export const TabProfilesMenu = ({ tabMasterManager }: TabsProfilesMenuProps) => {
     return (
         <Menu label={t('LABEL_MANAGE_TAB_PROFILES', 'Manage Tab Profiles')}>
             <TabProfileMenuItems tabMasterManager={tabMasterManager} />
@@ -23,7 +23,7 @@ export const TabProfilesMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }
 /**
  * Context menu sub-menu for managing Tab Profiles.
  */
-export const TabProfilesSubMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) => {
+export const TabProfilesSubMenu = ({ tabMasterManager }: TabsProfilesMenuProps) => {
     return (
         <MenuGroup label={t('LABEL_MANAGE_TAB_PROFILES', 'Manage Tab Profiles')}>
             <TabProfileMenuItems tabMasterManager={tabMasterManager} />
@@ -34,7 +34,7 @@ export const TabProfilesSubMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManage
 /**
  * Menu items for the Tab Profiles context menu.
  */
-const TabProfileMenuItems: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) => {
+const TabProfileMenuItems = ({ tabMasterManager }: TabsProfilesMenuProps) => {
     const [_refresh, setRefresh] = useState(true)
     return (
         <>

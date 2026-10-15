@@ -11,7 +11,7 @@ import {
     quickAccessControlsClasses,
     showModal,
 } from '@decky/ui'
-import { useState, VFC, useEffect, Fragment } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { FilterDefaultParams, isValidParams } from '../filters/Filters'
 import { PythonInterop } from '../../lib/controllers/PythonInterop'
 import { TabMasterContextProvider, TabMasterManager, CustomTabContainer } from '@state'
@@ -47,7 +47,7 @@ type EditTabModalProps = {
 /**
  * The modal for editing and creating custom tabs.
  */
-export const EditTabModal: VFC<EditTabModalProps> = ({
+export const EditTabModal = ({
     closeModal,
     onConfirm,
     tabId,
@@ -59,7 +59,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
     autoHide: _autoHide,
     visibleToOthers: _visibleToOthers,
     sortBy,
-}) => {
+}: EditTabModalProps) => {
     const [name, setName] = useState<string>(tabTitle ?? '')
     const [topLevelFilters, setTopLevelFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters)
     const [topLevelLogicMode, setTopLevelLogicMode] = useState<LogicalMode>(filtersMode)
@@ -229,7 +229,7 @@ type IncludeCategoriesPanelProps = {
 /**
  * Section for selecting categories to include in tab
  */
-const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesToInclude, setCategoriesToInclude }) => {
+const IncludeCategoriesPanel = ({ categoriesToInclude, setCategoriesToInclude }: IncludeCategoriesPanelProps) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const catsToIncludeObj = getIncludedCategoriesFromBitField(categoriesToInclude)

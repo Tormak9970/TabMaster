@@ -1,5 +1,5 @@
 import { ConfirmModal, Focusable, SingleDropdownOption, quickAccessMenuClasses } from '@decky/ui'
-import { ReactElement, VFC, useMemo, useState, Fragment, useEffect } from 'react'
+import { ReactElement, useMemo, useState, Fragment, useEffect } from 'react'
 import { TbCalendarEvent } from 'react-icons/tb'
 import { EnhancedSelector, EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from './EnhancedSelector'
 import { SoundEffect } from '../../lib/GamepadUIAudio'
@@ -54,7 +54,7 @@ interface ModalWrapperProps {
 }
 
 /** A highly configurable button component that pops up a modal to select a date and displays the captured result.  */
-export const DatePicker: VFC<DatePickerProps> = ({
+export const DatePicker = ({
     modalType,
     selectedDate,
     buttonLabelCenter,
@@ -67,7 +67,7 @@ export const DatePicker: VFC<DatePickerProps> = ({
     dateIncludes,
     onChange,
     ...modalProps
-}) => {
+}: DatePickerProps) => {
     const DatePickerModal = modalType === 'pretty' ? PrettyDatePickerModal : SimpleDatePickerModal
     const include = dateIncludes ?? DateIncludes.dayMonthYear
 
@@ -236,7 +236,7 @@ export enum DatePickerModalClasses {
 }
 
 /** A visually simple date picker modal that is configurable */
-export const SimpleDatePickerModal: VFC<SimpleDatePickerModalProps> = ({
+export const SimpleDatePickerModal = ({
     onSelectDate,
     selectedDate,
     toLocaleStringOptions,
@@ -248,7 +248,7 @@ export const SimpleDatePickerModal: VFC<SimpleDatePickerModalProps> = ({
     dateIncludes,
     closeModal,
     ...selectorProps
-}) => {
+}: SimpleDatePickerModalProps) => {
     const thisYear = new Date().getUTCFullYear()
 
     const { day: incomingDay, month: incomingMonth, year: incomingYear } = selectedDate ?? {}
@@ -366,7 +366,7 @@ export const SimpleDatePickerModal: VFC<SimpleDatePickerModalProps> = ({
 
 export interface PrettyDatePickerModalProps extends SimpleDatePickerModalProps {}
 
-export const PrettyDatePickerModal: VFC<PrettyDatePickerModalProps> = ({}) => {
+export const PrettyDatePickerModal = ({}: PrettyDatePickerModalProps) => {
     return null
 }
 

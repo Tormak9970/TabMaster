@@ -1,5 +1,5 @@
 import { PanelSection, ReorderableList, ReorderableEntry, ButtonItem } from '@decky/ui'
-import { VFC, Fragment } from 'react'
+import { Fragment } from 'react'
 import { TabIdEntryType } from './QuickAccessContent'
 import { TabActionsButton } from '../other/TabActions'
 import { useTabMasterContext } from '@state'
@@ -14,7 +14,7 @@ interface TabsPanelSectionProps {
     isMicroSDeckInstalled: boolean
 }
 
-export const TabsPanelSection: VFC<TabsPanelSectionProps> = ({ isMicroSDeckInstalled }) => {
+export const TabsPanelSection = ({ isMicroSDeckInstalled }: TabsPanelSectionProps) => {
     const { visibleTabsList, hiddenTabsList, tabsMap, tabMasterManager } = useTabMasterContext()
 
     function TabEntryInteractables({ entry }: TabEntryInteractablesProps) {

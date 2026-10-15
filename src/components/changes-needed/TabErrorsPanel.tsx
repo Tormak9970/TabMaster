@@ -1,4 +1,4 @@
-import { VFC, useState } from 'react'
+import { useState } from 'react'
 import { TabErrorsAccordion } from '../accordions/TabErrorsAccordion'
 import { FilterErrorEntry, FilterType, TabFilterSettings, TabSettings } from '@types'
 import { ErroredFiltersPanel } from './ErroredFiltersPanel'
@@ -17,7 +17,7 @@ type TabErrorsPanelProps = {
 /**
  * Panel for tab that needs changes
  */
-export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, errorEntries, onTabStatusChange }) => {
+export const TabErrorsPanel = ({ index, tab, errorEntries, onTabStatusChange }: TabErrorsPanelProps) => {
     const [filters, setFilters] = useState(tab.filters!)
     const [isPassing, setIsPassing] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)

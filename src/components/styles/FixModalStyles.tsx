@@ -1,10 +1,9 @@
 import { gamepadDialogClasses } from '@decky/ui'
-import { VFC } from 'react'
 
 /**
  * All css styling for TabMaster's fix modals.
  */
-export const FixModalStyles: VFC<{}> = ({}) => {
+export const FixModalStyles = ({}) => {
     return (
         <style>{`
       .tab-master-fix-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {

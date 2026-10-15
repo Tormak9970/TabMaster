@@ -1,4 +1,4 @@
-import { Fragment, VFC, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { FilterDefaultParams, canBeInverted } from './Filters'
 import { Dropdown, Focusable, afterPatch } from '@decky/ui'
 import { FilterSelect } from './FilterSelect'
@@ -18,14 +18,14 @@ type FilterEntryProps = {
 /**
  * An individual filter for a tab.
  */
-export const FilterEntry: VFC<FilterEntryProps> = ({
+export const FilterEntry = ({
     index,
     filter,
     containingGroupFilters,
     setContainingGroupFilters,
     onFilterDelete,
     shouldFocus,
-}) => {
+}: FilterEntryProps) => {
     const invertOptions = [
         {
             label: t('LABEL_FILTER_INVERSION_DEFAULT', 'Default'),

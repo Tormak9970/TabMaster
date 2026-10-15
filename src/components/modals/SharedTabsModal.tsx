@@ -9,7 +9,7 @@ import {
     ModalRoot,
     showModal,
 } from '@decky/ui'
-import { VFC, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { PythonInterop } from '../../lib/controllers/PythonInterop'
 import { TabMasterManager, CustomTabContainer } from '@state'
 import { v4 as uuidv4 } from 'uuid'
@@ -26,7 +26,7 @@ type UserTabProps = {
     onConfirm: (tabSettings: TabSettings) => void
 }
 
-const UserTab: VFC<UserTabProps> = ({ tab, closeModal, onConfirm }: UserTabProps) => {
+const UserTab = ({ tab, closeModal, onConfirm }: UserTabProps) => {
     return (
         <div className='post'>
             <DialogButton
@@ -59,11 +59,7 @@ export type SharedTabsModalProps = {
     tabMasterManager: TabMasterManager
 }
 
-export const SharedTabsModal: VFC<SharedTabsModalProps> = ({
-    closeModal,
-    onConfirm,
-    tabMasterManager,
-}: SharedTabsModalProps) => {
+export const SharedTabsModal = ({ closeModal, onConfirm, tabMasterManager }: SharedTabsModalProps) => {
     const [loading, setLoading] = useState(true)
     const [sharedTabs, setSharedTabs] = useState<Record<string, TabSettingsDictionary>>({})
 

@@ -1,5 +1,5 @@
 import { ConfirmModal } from '@decky/ui'
-import { VFC, useState, Fragment, useEffect } from 'react'
+import { useState, Fragment, useEffect } from 'react'
 import { ModalStyles } from '../styles/ModalStyles'
 import { FiltersPanel } from '../filters/FiltersPanel'
 import { FilterDefaultParams } from '../filters/Filters'
@@ -18,12 +18,7 @@ interface EditMergeFilterModalProps {
 /**
  * Modal for editing a Merge Filter.
  */
-export const EditMergeFilterModal: VFC<EditMergeFilterModalProps> = ({
-    closeModal,
-    mergeParams,
-    saveMerge,
-    isEditing,
-}) => {
+export const EditMergeFilterModal = ({ closeModal, mergeParams, saveMerge, isEditing }: EditMergeFilterModalProps) => {
     const [groupFilters, setGroupFilters] = useState<TabFilterSettings<FilterType>[]>(mergeParams.filters)
     const [groupLogicMode, setGroupLogicMode] = useState<LogicalMode>(mergeParams.mode)
     const [canSave, setCanSave] = useState<boolean>(false)

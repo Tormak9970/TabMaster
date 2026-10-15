@@ -1,5 +1,5 @@
 import { DialogButton, ModalRoot, PanelSection, PanelSectionRow } from '@decky/ui'
-import { useState, VFC, useEffect, Fragment } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { PythonInterop } from '../../lib/controllers/PythonInterop'
 import { TabMasterContextProvider, type TabMasterManager } from '@state'
 import { TabErrorsPanel } from '../changes-needed/TabErrorsPanel'
@@ -18,13 +18,13 @@ type FixTabErrorsModalRootProps = {
 /**
  * Modal root for the Changes Needed modal.
  */
-export const FixTabErrorsModalRoot: VFC<FixTabErrorsModalRootProps> = ({
+export const FixTabErrorsModalRoot = ({
     closeModal,
     onConfirm,
     tabs,
     erroredFiltersMap,
     tabMasterManager,
-}) => {
+}: FixTabErrorsModalRootProps) => {
     return (
         <div className='tab-master-fix-modal-scope'>
             <FixModalStyles />
@@ -53,7 +53,7 @@ type FixTabErrorsModalProps = {
 /**
  * The modal for fixing tabs with filter errors.
  */
-const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal, tabs, erroredFiltersMap }) => {
+const FixTabErrorsModal = ({ onConfirm, closeModal, tabs, erroredFiltersMap }: FixTabErrorsModalProps) => {
     const [changedTabs, setChangedTabs] = useState<TabSettingsDictionary>(
         Object.fromEntries(Object.entries(tabs).filter(([id]) => erroredFiltersMap.has(id)))
     )

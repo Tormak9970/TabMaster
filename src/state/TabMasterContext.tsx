@@ -1,4 +1,4 @@
-import { createContext, FC, useContext, useEffect, useState } from 'react'
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import { TabMasterManager } from './TabMasterManager'
 import { TabContainer, FriendEntry, TagResponse } from '@types'
 
@@ -7,6 +7,7 @@ export const useTabMasterContext = () => useContext(TabMasterContext)
 
 interface ProviderProps {
     tabMasterManager: TabMasterManager
+    children: ReactNode
 }
 
 interface PublicTabMasterManager {
@@ -20,7 +21,7 @@ interface PublicTabMasterContext extends PublicTabMasterManager {
     tabMasterManager: TabMasterManager
 }
 
-export const TabMasterContextProvider: FC<ProviderProps> = ({ children, tabMasterManager }) => {
+export const TabMasterContextProvider = ({ children, tabMasterManager }: ProviderProps) => {
     const [publicState, setPublicState] = useState<PublicTabMasterManager>({
         ...tabMasterManager.getTabs(),
         ...tabMasterManager.getFriendsAndTags(),

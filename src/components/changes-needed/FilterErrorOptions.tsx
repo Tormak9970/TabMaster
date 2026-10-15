@@ -1,5 +1,5 @@
 import { DialogButton, Dropdown, DropdownOption, Field, Focusable, SingleDropdownOption, showModal } from '@decky/ui'
-import { VFC, Fragment, useState, useContext } from 'react'
+import { Fragment, useState, useContext } from 'react'
 import { FilterErrorEntry, FilterType, SdCardParamType, TabFilterSettings } from '@types'
 import { FixMergeFilterModal } from '../modals/FixMergeFilterModal'
 import { ErrorPanelTabNameContext } from '@state'
@@ -54,13 +54,13 @@ type FilterErrorOptionsProps<T extends FilterType> = {
 /**
  * The error options for a collection filter.
  */
-const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> = ({
+const CollectionFilterErrorOptions = ({
     isMergeGroup,
     numFilters,
     filter,
     onFilterUpdate,
     onFilterDelete,
-}) => {
+}: FilterErrorOptionsProps<'collection'>) => {
     const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map(
         (collection: { displayName: string; id: string }) => {
             return { label: collection.displayName, data: collection.id }
@@ -119,14 +119,14 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
 /**
  * The error options for a merge filter.
  */
-const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({
+const MergeFilterErrorOptions = ({
     isMergeGroup,
     numFilters,
     filter,
     mergeErrorEntries,
     onFilterUpdate,
     onFilterDelete,
-}) => {
+}: FilterErrorOptionsProps<'merge'>) => {
     const tabName = useContext(ErrorPanelTabNameContext)
     const [isPassing, setIsPassing] = useState(mergeErrorEntries!.length === 0)
 
@@ -213,13 +213,13 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({
 /**
  * The error options for an sd card filter.
  */
-const SDCardFilterErrorOption: VFC<FilterErrorOptionsProps<'sd card'>> = ({
+const SDCardFilterErrorOption = ({
     isMergeGroup,
     numFilters,
     filter,
     onFilterUpdate,
     onFilterDelete,
-}) => {
+}: FilterErrorOptionsProps<'sd card'>) => {
     const cardsAndGames = window.MicroSDeck?.CardsAndGames || []
     const dropdownOptions: DropdownOption[] = [
         {
@@ -290,14 +290,14 @@ const SDCardFilterErrorOption: VFC<FilterErrorOptionsProps<'sd card'>> = ({
 /**
  * The error options for an individual filter.
  */
-export const FilterErrorOptions: VFC<FilterErrorOptionsProps<FilterType>> = ({
+export const FilterErrorOptions = ({
     isMergeGroup,
     numFilters,
     filter,
     mergeErrorEntries,
     onFilterUpdate,
     onFilterDelete,
-}) => {
+}: FilterErrorOptionsProps<FilterType>) => {
     if (filter) {
         const filterCopy = { ...filter, params: { ...filter.params } }
         switch (filter.type) {

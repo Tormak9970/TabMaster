@@ -1,5 +1,5 @@
 import { ConfirmModal, showModal } from '@decky/ui'
-import { VFC, useState, Fragment } from 'react'
+import { useState, Fragment } from 'react'
 import { TabFilterSettings, FilterType, FilterErrorEntry } from '@types'
 import { PythonInterop } from '../../lib/controllers/PythonInterop'
 import { ErroredFiltersPanel } from '../changes-needed/ErroredFiltersPanel'
@@ -21,7 +21,7 @@ interface FixMergeFilterModalProps {
 /**
  * Modal for fixing a Merge Filter.
  */
-export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({
+export const FixMergeFilterModal = ({
     mergeParams,
     mergeErrorEntries,
     isPassingOuter,
@@ -29,7 +29,7 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({
     saveMerge,
     closeModal,
     tabName,
-}) => {
+}: FixMergeFilterModalProps) => {
     const [filters, setFilters] = useState<(TabFilterSettings<FilterType> | null)[]>(mergeParams.filters)
     const [isPassing, setIsPassing] = useState(isPassingOuter)
 

@@ -1,12 +1,11 @@
 import { gamepadDialogClasses, quickAccessControlsClasses, scrollPanelClasses } from '@decky/ui'
-import { VFC } from 'react'
 
 const deckyQamTabClass = 'tab_undefined'
 
 /**
  * All css styling for the Quick Access Menu part of TabMaster.
  */
-export const QamStyles: VFC<{}> = ({}) => {
+export const QamStyles = ({}) => {
     return (
         <style>{`
       .${deckyQamTabClass}.${scrollPanelClasses.ScrollPanel} {

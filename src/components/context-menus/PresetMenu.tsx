@@ -1,5 +1,5 @@
 import { Menu, MenuGroup, MenuItem } from '@decky/ui'
-import { VFC, Fragment } from 'react'
+import { Fragment } from 'react'
 import { presetKeys } from '../../presets/presets'
 import { TabMasterManager } from '@state'
 import { compatCategoryToLabel } from '../filters/Filters'
@@ -11,7 +11,7 @@ interface PresetMenuProps {
     isMicroSDeckInstalled: boolean
 }
 
-export const PresetMenu: VFC<PresetMenuProps> = ({ tabMasterManager, isMicroSDeckInstalled }) => {
+export const PresetMenu = ({ tabMasterManager, isMicroSDeckInstalled }: PresetMenuProps) => {
     return (
         <Menu label={t('LABEL_QUICK_TABS', 'Quick Tabs')}>
             <PresetMenuItems tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />
@@ -21,7 +21,7 @@ export const PresetMenu: VFC<PresetMenuProps> = ({ tabMasterManager, isMicroSDec
 
 interface PresetMenuItemsProps extends PresetMenuProps {}
 
-export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, isMicroSDeckInstalled }) => {
+export const PresetMenuItems = ({ tabMasterManager, isMicroSDeckInstalled }: PresetMenuItemsProps) => {
     function getActionDescription(name: string) {
         return { onOKActionDescription: `${t('LABEL_CREATE_TAB', 'Create Tab')} "${name}"` }
     }

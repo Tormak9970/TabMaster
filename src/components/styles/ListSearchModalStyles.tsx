@@ -1,10 +1,9 @@
 import { gamepadDialogClasses, quickAccessControlsClasses } from '@decky/ui'
-import { VFC } from 'react'
 
 /**
  * All css styling for TabMaster's ListSearchModal.
  */
-export const ListSearchModalStyles: VFC<{}> = ({}) => {
+export const ListSearchModalStyles = ({}) => {
     return (
         <style>{`
       .tab-master-list-search-modal .${quickAccessControlsClasses.PanelSection} {

@@ -1,4 +1,4 @@
-import { VFC, Fragment, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { FilterErrorOptions } from './FilterErrorOptions'
 import { trans_string as t } from '@utils'
 import { FilterType, TabFilterSettings, FilterErrorEntry } from '@types'
@@ -13,12 +13,7 @@ type ErroredFiltersPanelProps = {
 /**
  * Renders all errored filters.
  */
-export const ErroredFiltersPanel: VFC<ErroredFiltersPanelProps> = ({
-    filters,
-    errorEntries,
-    onChange,
-    isMergeGroup,
-}) => {
+export const ErroredFiltersPanel = ({ filters, errorEntries, onChange, isMergeGroup }: ErroredFiltersPanelProps) => {
     const [errorMessages, setErrorMessages] = useState<string[][]>(
         errorEntries.map((entry: FilterErrorEntry) => entry.errors)
     )

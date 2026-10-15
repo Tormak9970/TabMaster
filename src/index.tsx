@@ -6,7 +6,6 @@ import { patchLibrary, patchSettings } from '@patches'
 import { MicroSDeck } from '@cebbinghaus/microsdeck'
 import { MicroSDeckInterop } from './lib/controllers/MicroSDeckInterop'
 import { QuickAccessContent, QuickAccessTitleView } from './components/qam/QuickAccessContent'
-import { DocsRouter } from './components/docs/DocsRouter'
 import { Fragment } from 'react'
 import {
     DeckyLoader,
@@ -20,6 +19,7 @@ import {
     AppAchievementProgressCache,
     LocalizationManager,
 } from '@types'
+import { SettingsRouter } from './components/settings/SettingsRouter'
 
 declare global {
     let DeckyPluginLoader: DeckyLoader
@@ -50,9 +50,9 @@ export default definePlugin(() => {
         settingsPatch = patchSettings(tabMasterManager)
     })
 
-    routerHook.addRoute('/tab-master-docs', () => (
+    routerHook.addRoute('/tab-master-settings', () => (
         <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-            <DocsRouter />
+            <SettingsRouter />
         </TabMasterContextProvider>
     ))
     return {
@@ -68,7 +68,7 @@ export default definePlugin(() => {
         onDismount: () => {
             routerHook.removePatch('/library', libraryPatch)
             routerHook.removePatch('/settings', settingsPatch)
-            routerHook.removeRoute('/tab-master-docs')
+            routerHook.removeRoute('/tab-master-settings')
 
             loginUnregisterer.unregister()
             PluginController.dismount()

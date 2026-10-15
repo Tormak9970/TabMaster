@@ -1,10 +1,9 @@
 import { gamepadDialogClasses } from '@decky/ui'
-import { VFC } from 'react'
 
 /**
  * All css styling for TabMaster's filter selection.
  */
-export const FilterSelectStyles: VFC<{}> = ({}) => {
+export const FilterSelectStyles = ({}) => {
     return (
         <style>{`
       .tab-master-filter-select {

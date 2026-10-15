@@ -1,12 +1,11 @@
 import { gamepadDialogClasses } from '@decky/ui'
-import { VFC } from 'react'
 
 // New modal background should be "radial-gradient(155.42% 100% at 0% 0%, #060a0e 0 0%, #0e141b 100%)"
 
 /**
  * CSS styling for TabMaster's Tab profile modals.
  */
-export const TabProfileModalStyles: VFC<{}> = ({}) => {
+export const TabProfileModalStyles = ({}) => {
     return (
         <style>{`
       .tab-master-tab-profile-modal-scope .${gamepadDialogClasses.GamepadDialogContent} .DialogHeader {

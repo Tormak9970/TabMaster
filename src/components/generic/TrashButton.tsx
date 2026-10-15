@@ -1,12 +1,11 @@
 import { DialogButton } from '@decky/ui'
-import { VFC } from 'react'
 import { FaTrash } from 'react-icons/fa6'
 
 interface TrashButtonProps {
     onClick: () => void
 }
 
-export const TrashButton: VFC<TrashButtonProps> = ({ onClick }) => {
+export const TrashButton = ({ onClick }: TrashButtonProps) => {
     return (
         <DialogButton
             onClick={onClick}

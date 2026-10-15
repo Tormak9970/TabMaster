@@ -1,5 +1,5 @@
 import { PanelSection, PanelSectionRow, Field, ButtonItem, Dropdown, afterPatch, Focusable } from '@decky/ui'
-import { VFC, Fragment, useRef, useEffect } from 'react'
+import { Fragment, useRef, useEffect } from 'react'
 import { FilterEntry } from './FilterEntry'
 import { FilterOptions } from './FilterOptions'
 import { TabFilterSettings, FilterType, LogicalMode } from '@types'
@@ -17,7 +17,7 @@ interface FiltersPanelProps {
     collapseFilters?: boolean
 }
 
-export const FiltersPanel: VFC<FiltersPanelProps> = ({
+export const FiltersPanel = ({
     groupFilters,
     groupLogicMode,
     setGroupFilters,
@@ -26,7 +26,7 @@ export const FiltersPanel: VFC<FiltersPanelProps> = ({
     canAddFilter,
     shouldFocusAddButton,
     collapseFilters,
-}) => {
+}: FiltersPanelProps) => {
     const modeOptions = [
         { label: t('LABEL_AND', 'And'), data: 'and' },
         { label: t('LABEL_OR', 'Or'), data: 'or' },
