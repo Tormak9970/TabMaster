@@ -163,6 +163,19 @@ class Plugin:
     log(f"Got tabs {tabs}")
     return tabs or {}
   
+  async def get_tag_overrides(self) -> dict[str, dict] | None:
+    """
+    Waits until tag_overrides are loaded, then returns the tag_overrides
+
+    :return: The tag_overrides
+    """
+    while Plugin.users_dict is None:
+      await asyncio.sleep(0.1)
+    
+    tag_overrides = Plugin.users_dict[Plugin.user_id]["tag_overrides"]
+    log(f"Got tag_overrides {tag_overrides}")
+    return tag_overrides or {}
+  
   async def get_shared_tabs(self) -> dict[str, dict] | None:
     """
     Waits until tabs are loaded, then returns the tabs that are available from other users
@@ -248,6 +261,13 @@ class Plugin:
       return
     
     Plugin.users_dict[Plugin.user_id]["tabs"] = tabs
+    await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
+    
+  async def set_tag_overrides(self, tag_overrides: dict[str, dict]):
+    if not self.save_on_shutdown:
+      return
+    
+    Plugin.users_dict[Plugin.user_id]["tag_overrides"] = tag_overrides
     await Plugin.set_setting(self, "usersDict", Plugin.users_dict)
 
   async def set_tags(self, tags: list[dict]):

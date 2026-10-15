@@ -97,12 +97,12 @@ https://crowdin.com/project/tabmaster
 | - | - | -: |
 | Čeština | | |
 | Dansk | | |
-| Deutsch | | |
+| Deutsch | Schneppi | |
 | Suomi | | |
 | Ελληνικά | | |
 | Español-España | Sebastian Guardo Lugo | |
 | Español-Latinoamérica | | |
-| Français | | |
+| Français | tonymlcz | |
 | Italiano | Lemon64k | |
 | 日本語 | | |
 | 한국어 | | |

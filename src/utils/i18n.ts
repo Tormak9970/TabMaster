@@ -52,7 +52,7 @@ export const LANGS: Record<string, LanguageConfig> = {
     de: {
         name: 'Deutsch',
         strings: de,
-        credit: [],
+        credit: ['Schneppi'],
     },
     fi: {
         name: 'Suomi',
@@ -77,7 +77,7 @@ export const LANGS: Record<string, LanguageConfig> = {
     fr: {
         name: 'Français',
         strings: fr,
-        credit: [],
+        credit: ['tonymlcz'],
     },
     it: {
         name: 'Italiano',
