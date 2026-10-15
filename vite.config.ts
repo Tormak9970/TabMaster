@@ -1,13 +1,61 @@
-import { readFileSync } from 'node:fs'
-import { join, resolve } from 'node:path'
-import { defineConfig } from 'vite'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import path, { join, resolve } from 'node:path'
+import { defineConfig, Plugin } from 'vite'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import pluginExternal from 'vite-plugin-external'
 import codegen from 'vite-plugin-codegen'
 
+function extractStrings(): Plugin {
+    return {
+        name: 'extract-translation-strings',
+        apply: 'build',
+
+        generateBundle(_options, bundle) {
+            const strings: Record<string, string> = {}
+            const steamKeys = new Set()
+            const chunks = Object.values(bundle).filter(file => file.type === 'chunk')
+
+            const translationRegex = /(?<![A-Za-z\d_$])trans_string\(\s*(['"])(.*?)\1\s*,\s*(['"])(.*?)\3\s*\)/g
+
+            const steamRegex =
+                /(?<![A-Za-z\d_$])trans_string\(\s*(['"])(.*?)\1\s*,\s*(['"])(.*?)\3\s*,\s*(?:true|1)\s*\)/g
+
+            for (const chunk of chunks) {
+                for (const match of chunk.code.matchAll(steamRegex)) {
+                    steamKeys.add(match[2])
+                }
+            }
+
+            for (const chunk of chunks) {
+                for (const match of chunk.code.matchAll(translationRegex)) {
+                    const key = match[2]
+                    const value = match[4]
+
+                    if (!steamKeys.has(key)) {
+                        strings[key] = value.replace(/\\(.)/g, '$1')
+                    }
+                }
+            }
+
+            const outputPath = path.resolve('src/i18n/strings.json')
+
+            mkdirSync(path.dirname(outputPath), {
+                recursive: true,
+            })
+
+            writeFileSync(outputPath, JSON.stringify(strings, null, 2))
+
+            console.info(`Extracted ${Object.keys(strings).length} strings`)
+        },
+    }
+}
+
 const manifest = JSON.parse(readFileSync(join('.', 'plugin.json'), 'utf-8'))
 
 export default defineConfig({
+    optimizeDeps: {
+        force: true,
+    },
     plugins: [
         nodePolyfills(),
         codegen(),
@@ -32,8 +80,11 @@ export default defineConfig({
                 '@decky/manifest': JSON.stringify(manifest),
             },
         }),
+        extractStrings(),
     ],
     build: {
+        // DEV Only
+        minify: false,
         lib: {
             entry: resolve(import.meta.dirname, 'src/index.tsx'),
             name: 'TabMaster',
