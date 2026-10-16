@@ -97,7 +97,7 @@ https://crowdin.com/project/tabmaster
 | - | - | -: |
 | Čeština | | |
 | Dansk | | |
-| Deutsch | Schneppi | |
+| Deutsch | Schneppi, pingpong6004 | |
 | Suomi | | |
 | Ελληνικά | | |
 | Español-España | Sebastian Guardo Lugo | |
