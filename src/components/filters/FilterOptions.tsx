@@ -25,10 +25,10 @@ import { MultiSelect } from '../multi-selects/MultiSelect'
 import { FilterPreview } from './FilterPreview'
 import { DatePicker, DateSelection } from '../generic/DatePickers'
 import { EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from '../generic/EnhancedSelector'
-import { IncludeCategories } from '../../lib/Utils'
+import { IncludeCategories } from '@utils'
 import { Slider } from '../generic/Slider'
 import { STEAM_FEATURES_ID_MAP, STEAM_FEATURES_TO_RENDER } from './SteamFeatures'
-import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
+import { MicroSDeckInterop } from '@lib'
 import { ListSearchDropdown } from '../modals/ListSearchModal'
 import {
     trans_string as t,

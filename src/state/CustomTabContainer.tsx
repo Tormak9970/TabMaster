@@ -1,6 +1,6 @@
 import { EditableTabSettings } from '../components/modals/EditTabModal'
 import { Filter } from '../components/filters/Filters'
-import { filtersHaveType, getIncludedCategoriesFromBitField } from '../lib/Utils'
+import { filtersHaveType, getIncludedCategoriesFromBitField } from '@utils'
 import { gamepadTabbedPageClasses, showModal } from '@decky/ui'
 import { SortOverrideMessage } from '../components/modals/SortOverrideMessage'
 import { ReactElement } from 'react'

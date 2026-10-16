@@ -2,7 +2,7 @@ import { ConfirmModal, Focusable, SingleDropdownOption, quickAccessMenuClasses }
 import { ReactElement, useMemo, useState, Fragment, useEffect } from 'react'
 import { TbCalendarEvent } from 'react-icons/tb'
 import { EnhancedSelector, EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from './EnhancedSelector'
-import { SoundEffect } from '../../lib/GamepadUIAudio'
+import { SoundEffect } from '@lib'
 import { CustomDropdown } from './CustomDropdown'
 import { trans_string as t, dateToLabel } from '@utils'
 import { DateIncludes, DateObj } from '@types'

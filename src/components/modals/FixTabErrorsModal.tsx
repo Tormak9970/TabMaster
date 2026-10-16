@@ -1,6 +1,6 @@
 import { DialogButton, ModalRoot, PanelSection, PanelSectionRow } from '@decky/ui'
 import { useState, useEffect, Fragment } from 'react'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
+import { PythonInterop } from '@lib'
 import { TabMasterContextProvider, type TabMasterManager } from '@state'
 import { TabErrorsPanel } from '../changes-needed/TabErrorsPanel'
 import { FixModalStyles } from '../styles/FixModalStyles'

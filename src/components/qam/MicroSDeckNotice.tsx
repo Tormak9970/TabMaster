@@ -1,5 +1,5 @@
 import { CSSProperties } from 'react'
-import { MicroSDeckInstallState } from '../../lib/controllers/MicroSDeckInterop'
+import { MicroSDeckInstallState } from '@lib'
 import { trans_string as t } from '@utils'
 
 interface MicroSDeckNoticeProps {

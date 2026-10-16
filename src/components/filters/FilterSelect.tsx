@@ -3,7 +3,7 @@ import { achievementClasses, Focusable, mainMenuAppRunningClasses, ModalRoot, Si
 import { FilterDefaultParams, FilterIcons, FilterDescriptions, FilterLabels } from './Filters'
 import { FilterSelectStyles } from '../styles/FilterSelectionStyles'
 import { IoFilter } from 'react-icons/io5'
-import { MicroSDeckInterop, microSDeckLibVersion } from '../../lib/controllers/MicroSDeckInterop'
+import { MicroSDeckInterop, microSDeckLibVersion } from '@lib'
 import { BaseModalProps, CustomDropdown } from '../generic/CustomDropdown'
 import { trans_string as t } from '@utils'
 import { FilterType } from '@types'

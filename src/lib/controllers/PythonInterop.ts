@@ -1,4 +1,4 @@
-import { getCompactTimestamp, validateTabStructure } from '../Utils'
+import { getCompactTimestamp, validateTabStructure } from '@utils'
 import { TabProfileDictionary } from '@state'
 import { USER_BACKUP_NAME } from '../../constants'
 import { call, openFilePicker, toaster } from '@decky/api'

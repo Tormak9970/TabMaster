@@ -3,7 +3,7 @@ import { PythonInterop } from './PythonInterop'
 import { SteamController } from './SteamController'
 import { LogController } from './LogController'
 import { TabMasterManager } from '@state'
-import { getCurrentUserId } from '../Utils'
+import { getCurrentUserId } from '@utils'
 import { DestructiveModal } from '../../components/generic/DestructiveModal'
 import { Unregisterer } from '@types'
 

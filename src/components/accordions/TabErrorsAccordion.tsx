@@ -2,8 +2,7 @@ import { ButtonItem, Focusable } from '@decky/ui'
 import React, { useState, Fragment } from 'react'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaCircleCheck, FaCircleExclamation, FaCircleXmark } from 'react-icons/fa6'
-import { playUISound } from '../../lib/Utils'
-import { trans_string as t } from '@utils'
+import { trans_string as t, playUISound } from '@utils'
 import { TabSettings } from '@types'
 
 type TabAccordionIconProps = {

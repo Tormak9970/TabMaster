@@ -10,7 +10,7 @@ import {
     showModal,
 } from '@decky/ui'
 import { useEffect, useMemo, useState } from 'react'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
+import { PythonInterop } from '@lib'
 import { TabMasterManager, CustomTabContainer } from '@state'
 import { v4 as uuidv4 } from 'uuid'
 import { showModalDuplicateTab } from './EditTabModal'

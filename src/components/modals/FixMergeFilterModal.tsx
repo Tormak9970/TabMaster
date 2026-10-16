@@ -1,7 +1,7 @@
 import { ConfirmModal, showModal } from '@decky/ui'
 import { useState, Fragment } from 'react'
 import { TabFilterSettings, FilterType, FilterErrorEntry } from '@types'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
+import { PythonInterop } from '@lib'
 import { ErroredFiltersPanel } from '../changes-needed/ErroredFiltersPanel'
 import { ErrorPanelTabNameContext } from '@state'
 import { FixModalStyles } from '../styles/FixModalStyles'

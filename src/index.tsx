@@ -1,10 +1,9 @@
 import { definePlugin, RoutePatch, routerHook } from '@decky/api'
 import { TbLayoutNavbarExpand } from 'react-icons/tb'
-import { PluginController } from './lib/controllers/PluginController'
+import { PluginController, MicroSDeckInterop } from '@lib'
 import { TabMasterContextProvider, TabMasterManager } from '@state'
 import { patchLibrary, patchSettings } from '@patches'
 import { MicroSDeck } from '@cebbinghaus/microsdeck'
-import { MicroSDeckInterop } from './lib/controllers/MicroSDeckInterop'
 import { QuickAccessContent, QuickAccessTitleView } from './components/qam/QuickAccessContent'
 import { Fragment } from 'react'
 import {

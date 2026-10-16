@@ -2,10 +2,9 @@ import { afterPatch, findInReactTree, Patch, replacePatch, showContextMenu, wrap
 import { RoutePatch } from '@decky/api'
 import { ReactElement, useEffect, useState } from 'react'
 import { TabMasterManager, CustomTabContainer } from '@state'
-import { LogController } from '../lib/controllers/LogController'
+import { LogController, MicroSDeckInterop } from '@lib'
 import { LibraryMenu } from '../components/context-menus/LibraryMenu'
-import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop'
-import { addPatch } from '../lib/Utils'
+import { addPatch } from '@utils'
 import type { SteamTab, TabAppGridComponent, TabContext as TabContextType } from '@types'
 
 let TabAppGridComponentDef: TabAppGridComponent | undefined

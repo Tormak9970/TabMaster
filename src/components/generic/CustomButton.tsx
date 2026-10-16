@@ -1,7 +1,7 @@
 import { FocusableProps, Focusable, DialogButton } from '@decky/ui'
 import { ReactNode, useState } from 'react'
-import { SoundEffect, SFXPath } from '../../lib/GamepadUIAudio'
-import { playUISound } from '../../lib/Utils'
+import { SoundEffect, SFXPath } from '@lib'
+import { playUISound } from '@utils'
 
 export interface CustomButtonProps extends Omit<
     FocusableProps,

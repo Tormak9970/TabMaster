@@ -1,16 +1,12 @@
 import { EditableTabSettings } from '../components/modals/EditTabModal'
 import { Filter } from '../components/filters/Filters'
-import { PythonInterop } from '../lib/controllers/PythonInterop'
 import { CustomTabContainer } from './CustomTabContainer'
 import { v4 as uuidv4 } from 'uuid'
-import { defaultTabsSettings, getNonBigIntUserId } from '../lib/Utils'
-import { LogController } from '../lib/controllers/LogController'
+import { defaultTabsSettings, getNonBigIntUserId } from '@utils'
 import { PresetName, PresetOptions, getPreset } from '../presets/presets'
-import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop'
-import { TabErrorController } from '../lib/controllers/TabErrorController'
 import { TabProfileManager } from './TabProfileManager'
 import { AUTO_BACKUP_NAME } from '../constants'
-import { reaction } from '../lib/mobx'
+import { reaction, TabErrorController, MicroSDeckInterop, LogController, PythonInterop } from '@lib'
 import {
     TabFilterSettings,
     FilterType,

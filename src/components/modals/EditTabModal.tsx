@@ -13,7 +13,7 @@ import {
 } from '@decky/ui'
 import { useState, useEffect, Fragment } from 'react'
 import { FilterDefaultParams, isValidParams } from '../filters/Filters'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
+import { PythonInterop } from '@lib'
 import { TabMasterContextProvider, TabMasterManager, CustomTabContainer } from '@state'
 import { ModalStyles } from '../styles/ModalStyles'
 import { FiltersPanel } from '../filters/FiltersPanel'
@@ -22,10 +22,11 @@ import {
     getIncludedCategoriesFromBitField,
     playUISound,
     updateCategoriesToIncludeBitField,
-} from '../../lib/Utils'
+    trans_string as t,
+    getAppCategoryLabels,
+} from '@utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { useSortingMenuItems } from '@hooks'
-import { trans_string as t, getAppCategoryLabels } from '@utils'
 import { TabSettings, TabFilterSettings, FilterType, LogicalMode } from '@types'
 
 export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>

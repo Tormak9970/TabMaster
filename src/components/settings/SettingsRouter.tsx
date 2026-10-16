@@ -34,6 +34,13 @@ export const SettingsRouter = () => {
     const pages: (SidebarNavigationPage | 'separator')[] = useMemo(() => {
         const docPages: Routes = {}
 
+        const _generalSettings = {
+            title: t('TITLE_SETTINGS_GENERAL', 'General'),
+            content: <General />,
+            route: `${baseRoute}/general`,
+            icon: <FaCog />,
+        }
+
         Object.entries(docs).map(([pageName, doc]) => {
             pageName = pageName.replace(/_/g, ' ')
 
@@ -48,12 +55,7 @@ export const SettingsRouter = () => {
         })
 
         return [
-            {
-                title: t('TITLE_SETTINGS_GENERAL', 'General'),
-                content: <General />,
-                route: `${baseRoute}/general`,
-                icon: <FaCog />,
-            },
+            // generalSettings,
             {
                 title: t('TITLE_SETTINGS_TAGS', 'Tags'),
                 content: <Tags />,

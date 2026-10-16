@@ -1,8 +1,8 @@
 import { RoutePatch, routerHook } from '@decky/api'
 import { sleep } from '@decky/ui'
 import { FilterType, TabFilterSettings, TabSettings, TabSettingsDictionary } from '@types'
-import { GamepadUIAudio, SFXPath } from './GamepadUIAudio'
-import { trans_string as t } from '@utils'
+import { GamepadUIAudio, SFXPath } from '@lib'
+import { trans_string as t } from './i18n'
 
 /**
  * Waits for a condition to be true.

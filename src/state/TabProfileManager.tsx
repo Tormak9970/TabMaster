@@ -1,5 +1,5 @@
 import { CustomTabContainer } from './CustomTabContainer'
-import { PythonInterop } from '../lib/controllers/PythonInterop'
+import { PythonInterop } from '@lib'
 import { TabMasterManager } from './TabMasterManager'
 
 export type TabProfileDictionary = {

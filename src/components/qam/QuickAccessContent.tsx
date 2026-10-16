@@ -17,16 +17,10 @@ import { useTabMasterContext, CustomTabContainer, TabMasterManager } from '@stat
 
 import { QamStyles } from '../styles/QamStyles'
 import { showModalNewTab } from '../modals/EditTabModal'
-import { LogController } from '../../lib/controllers/LogController'
 import { PresetMenu } from '../context-menus/PresetMenu'
-import {
-    MicroSDeckInstallState,
-    MicroSDeckInterop,
-    microSDeckLibVersion,
-} from '../../lib/controllers/MicroSDeckInterop'
+import { MicroSDeckInstallState, MicroSDeckInterop, microSDeckLibVersion, PythonInterop, LogController } from '@lib'
 import { MicroSDeckNotice } from './MicroSDeckNotice'
 import { TabProfilesMenu } from '../context-menus/TabProfileMenu'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
 import { GITHUB_URL, DISCORD_URL } from '../../constants'
 import { InvalidSettingsNotice } from './InvalidSettingsNotice'
 import { TabsPanelSection } from './TabsPanelSection'

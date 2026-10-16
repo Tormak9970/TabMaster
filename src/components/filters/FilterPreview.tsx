@@ -1,6 +1,6 @@
 import { Fragment, createElement } from 'react'
 import { FilterIcons, FilterLabels, compatCategoryToLabel, steamOSCompatCategoryToLabel } from './Filters'
-import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
+import { MicroSDeckInterop } from '@lib'
 import {
     trans_string as t,
     getAchievementDisplayData,

@@ -1,7 +1,7 @@
 import { Focusable, SingleDropdownOption } from '@decky/ui'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { BiChevronRight } from 'react-icons/bi'
-import { SoundEffect } from '../../lib/GamepadUIAudio'
+import { SoundEffect } from '@lib'
 import { CustomButton, CustomButtonFocusMode } from './CustomButton'
 import { CustomDropdown, CustomDropdownProps } from './CustomDropdown'
 

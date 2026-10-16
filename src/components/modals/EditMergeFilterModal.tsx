@@ -4,7 +4,7 @@ import { ModalStyles } from '../styles/ModalStyles'
 import { FiltersPanel } from '../filters/FiltersPanel'
 import { FilterDefaultParams } from '../filters/Filters'
 import { isValidParams } from '../filters/Filters'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
+import { PythonInterop } from '@lib'
 import { trans_string as t } from '@utils'
 import { FilterType, LogicalMode, TabFilterSettings } from '@types'
 
