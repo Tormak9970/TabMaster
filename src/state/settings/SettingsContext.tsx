@@ -21,14 +21,14 @@ export const useSettingsContext = () => useContext(SettingsContext)
 export const SettingsContextProvider = ({ children, settingsManager }: SettingsContextProviderProps) => {
     const [publicState, setPublicState] = useState<SettingsManagerData>({
         tagOverrides: settingsManager.getTagOverrides(),
-        setTagOverrides: settingsManager.setTagOverrides,
+        setTagOverrides: overrides => settingsManager.setTagOverrides(overrides),
     })
 
     useEffect(() => {
         function onUpdate() {
             setPublicState({
                 tagOverrides: settingsManager.getTagOverrides(),
-                setTagOverrides: settingsManager.setTagOverrides,
+                setTagOverrides: overrides => settingsManager.setTagOverrides(overrides),
             })
         }
 

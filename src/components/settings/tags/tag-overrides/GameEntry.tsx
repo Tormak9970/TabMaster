@@ -64,7 +64,7 @@ export const GameEntry = ({ tags, appid, name, overrides, onChange }: GameEntryP
 
     return (
         <>
-            <div>
+            <div className='game-entry'>
                 <Focusable
                     style={{ margin: '0 calc(-12px - 1.4vw)' }}
                     onActivate={() => {

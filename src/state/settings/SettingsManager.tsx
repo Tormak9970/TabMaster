@@ -25,10 +25,8 @@ export class SettingsManager {
         if (tagOverrideRes instanceof Error) {
             LogController.raiseError(`Error loading tag overrides \n ${tagOverrideRes.message}`)
         } else {
-            if (Object.keys(this.userTagOverrides).length === 0) {
-                this.userTagOverrides = tagOverrideRes ?? {}
-                this.eventBus.dispatchEvent(new Event('stateUpdate'))
-            }
+            this.userTagOverrides = tagOverrideRes ?? {}
+            this.eventBus.dispatchEvent(new Event('stateUpdate'))
         }
 
         this.hasLoaded = true

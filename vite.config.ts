@@ -53,9 +53,6 @@ function extractStrings(): Plugin {
 const manifest = JSON.parse(readFileSync(join('.', 'plugin.json'), 'utf-8'))
 
 export default defineConfig({
-    optimizeDeps: {
-        force: true,
-    },
     plugins: [
         nodePolyfills(),
         codegen(),
@@ -95,7 +92,7 @@ export default defineConfig({
         sourcemap: true,
         rolldownOptions: {
             context: 'window',
-            // external: ['react', 'react-dom', '@decky/ui'],
+            external: ['react', 'react-dom', '@decky/ui'],
             output: {
                 dir: 'dist',
                 format: 'esm',
