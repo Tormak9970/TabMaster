@@ -286,8 +286,14 @@
   "LABEL_VIEW_SHARED_TABS": "Просмотреть общие вкладки",
   "LABEL_RESTORE_SETTINGS": "Восстановить настройки",
   "LABEL_OPEN_SETTINGS": "Open Settings",
+  "TITLE_SETTINGS_ABOUT_LEAD_DEVELOPERS": "Lead Developers",
+  "TITLE_SETTINGS_ABOUT_CONTRIBUTORS": "Contributors",
+  "TITLE_SETTINGS_ABOUT_TRANSLATORS": "Translators",
+  "TITLE_SETTINGS_ABOUT_TRANSLATIONS": "Translations",
+  "MESSAGE_HELP_WITH_TRANSLATIONS": "We're working on translating TabMaster so yall can view use it in whatever language you'd like! If you know a language other than English please check out",
+  "TITLE_SETTINGS_ABOUT": "About",
+  "DESCRIPTION_SETTINGS_TABMASTER_ABOUT": "TabMaster gives you full control over your Steam library! Support for customizing, adding, and hiding Library Tabs. It is a labor of love from Travis Lane and Jesse Bofill, and we strive to make TabMaster feel like it was always a part of SteamOS.",
   "TITLE_SETTINGS_GENERAL": "General",
   "TITLE_SETTINGS_TAGS": "Tags",
-  "TITLE_SETTINGS_ABOUT": "About",
   "TITLE_TABMASTER_SETTINGS": "TabMaster Settings"
 }
