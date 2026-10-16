@@ -3,6 +3,11 @@ import { sleep } from '@decky/ui'
 import { FilterType, TabFilterSettings, TabSettings, TabSettingsDictionary } from '@types'
 import { GamepadUIAudio, SFXPath } from '@lib'
 import { trans_string as t } from './i18n'
+import { IconType } from 'react-icons'
+import { IoGameController } from 'react-icons/io5'
+import { FaCompactDisc } from 'react-icons/fa6'
+import { BsWindow } from 'react-icons/bs'
+import { FaQuestionCircle } from 'react-icons/fa'
 
 /**
  * Waits for a condition to be true.
@@ -132,6 +137,24 @@ export function validateTabStructure(tabs: TabSettingsDictionary): boolean {
 export function getCurrentUserId(useU64 = false): string {
     if (useU64) return window.App.m_CurrentUser.strSteamID
     return BigInt.asUintN(32, BigInt(window.App.m_CurrentUser.strSteamID)).toString()
+}
+
+/**
+ * Gets an entry icon for an app based on its type.
+ * @param entry The app entry.
+ * @returns The icon for the app.
+ */
+export function getAppIconType(entry: any): IconType {
+    switch (entry.data.appType) {
+        case IncludeCategories.games:
+            return IoGameController
+        case IncludeCategories.music:
+            return FaCompactDisc
+        case IncludeCategories.software:
+            return BsWindow
+        default:
+            return FaQuestionCircle
+    }
 }
 
 /**

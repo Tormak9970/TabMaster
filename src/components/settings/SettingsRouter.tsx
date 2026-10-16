@@ -10,7 +10,7 @@ import { FaBook, FaTag } from 'react-icons/fa6'
 import { FaCog, FaInfoCircle } from 'react-icons/fa'
 import { General } from './General'
 import { About } from './about/About'
-import { Tags } from './Tags'
+import { Tags } from './tags/Tags'
 
 type RouteEntry = {
     title: string

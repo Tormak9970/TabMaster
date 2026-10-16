@@ -1,11 +1,11 @@
-import { EditableTabSettings } from '../components/modals/EditTabModal'
-import { Filter } from '../components/filters/Filters'
-import { CustomTabContainer } from './CustomTabContainer'
+import { EditableTabSettings } from '../../components/modals/EditTabModal'
+import { Filter } from '../../components/filters/Filters'
+import { CustomTabContainer } from '../CustomTabContainer'
 import { v4 as uuidv4 } from 'uuid'
 import { defaultTabsSettings, getNonBigIntUserId } from '@utils'
-import { PresetName, PresetOptions, getPreset } from '../presets/presets'
-import { TabProfileManager } from './TabProfileManager'
-import { AUTO_BACKUP_NAME } from '../constants'
+import { PresetName, PresetOptions, getPreset } from '../../presets/presets'
+import { TabProfileManager } from '../TabProfileManager'
+import { AUTO_BACKUP_NAME } from '../../constants'
 import { reaction, TabErrorController, MicroSDeckInterop, LogController, PythonInterop } from '@lib'
 import {
     TabFilterSettings,
@@ -654,9 +654,9 @@ export class TabMasterManager {
     }
 
     /**
-     * Other async load calls that don't need to be waited for when starting the plugin
+     * Loads data that doesn't need to be waited for when starting the plugin
      */
-    asyncLoadOther() {
+    loadUserDataAsync() {
         PythonInterop.getTags().then((res: TagResponse[] | Error) => {
             if (res instanceof Error) {
                 LogController.raiseError(`Error loading tags \n ${res.message}`)
@@ -666,7 +666,7 @@ export class TabMasterManager {
                 }
             }
         })
-        PythonInterop.getFriends().then((res: FriendEntry[] | Error) => {
+        PythonInterop.getFriends().then(res => {
             if (res instanceof Error) {
                 LogController.raiseError(`Error loading friends \n ${res.message}`)
             } else {
@@ -675,7 +675,7 @@ export class TabMasterManager {
                 }
             }
         })
-        PythonInterop.getFriendsGames().then((res: Map<number, number[]> | Error) => {
+        PythonInterop.getFriendsGames().then(res => {
             if (res instanceof Error) {
                 LogController.raiseError(`Error loading friends games \n ${res.message}`)
             } else {
@@ -694,7 +694,7 @@ export class TabMasterManager {
         let settings = await PythonInterop.getTabs()
         const profiles = await PythonInterop.getTabProfiles()
 
-        this.asyncLoadOther()
+        this.loadUserDataAsync()
         try {
             if (settings instanceof Error) {
                 throw new Error(`Error loading tab settings \n ${settings.message}`)

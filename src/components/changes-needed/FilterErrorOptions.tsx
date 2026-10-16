@@ -3,41 +3,38 @@ import { Fragment, useState, useContext } from 'react'
 import { FilterErrorEntry, FilterType, SdCardParamType, TabFilterSettings } from '@types'
 import { FixMergeFilterModal } from '../modals/FixMergeFilterModal'
 import { ErrorPanelTabNameContext } from '@state'
-import { DestructiveModal } from '../generic/DestructiveModal'
-import { TrashButton } from '../generic/TrashButton'
 import { trans_string as t } from '@utils'
+import { GuardedDeleteButton } from '../utils/GuardedDeleteButton'
 
-type GuardedDeleteButtonProps = {
+type FilterErrorDeleteButtonProps = {
     onFilterDelete: () => void
     numFilters: number
     isMergeGroup: boolean
 }
 
-const GuardedDeleteButton = (props: GuardedDeleteButtonProps) => {
+const FilterErrorDeleteButton = (props: FilterErrorDeleteButtonProps) => {
     const { onFilterDelete, numFilters, isMergeGroup } = props
 
     return (
-        <TrashButton
-            onClick={() => {
-                showModal(
-                    <DestructiveModal onOK={onFilterDelete} strTitle={t('TITLE_ALL_CAPS_WARNING', 'WARNING!')}>
-                        {t('MESSAGE_DELETE_FILTER_CONFIRM', 'Are you sure you want to delete this filter?') +
-                            ' ' +
-                            (numFilters === 1
-                                ? (isMergeGroup
-                                      ? t(
-                                            'MESSAGE_NO_FILTERS_IN_GROUP',
-                                            `There are no other filters in this merge group. Deleting it will automatically delete the merge filter as well.`
-                                        )
-                                      : t(
-                                            'MESSAGE_NO_FILTERS_IN_TAB',
-                                            `There are no other filters in this tab. Deleting it will automatically delete the tab as well.`
-                                        )) + ' '
-                                : '') +
-                            `This can't be undone.`}
-                    </DestructiveModal>
-                )
-            }}
+        <GuardedDeleteButton
+            title={t('TITLE_ALL_CAPS_WARNING', 'WARNING!')}
+            confirmationMessage={
+                t('MESSAGE_DELETE_FILTER_CONFIRM', 'Are you sure you want to delete this filter?') +
+                ' ' +
+                (numFilters === 1
+                    ? (isMergeGroup
+                          ? t(
+                                'MESSAGE_NO_FILTERS_IN_GROUP',
+                                `There are no other filters in this merge group. Deleting it will automatically delete the merge filter as well.`
+                            )
+                          : t(
+                                'MESSAGE_NO_FILTERS_IN_TAB',
+                                `There are no other filters in this tab. Deleting it will automatically delete the tab as well.`
+                            )) + ' '
+                    : '') +
+                `This can't be undone.`
+            }
+            onDelete={onFilterDelete}
         />
     )
 }
@@ -103,7 +100,7 @@ const CollectionFilterErrorOptions = ({
                                 width: '45px',
                             }}
                         >
-                            <GuardedDeleteButton
+                            <FilterErrorDeleteButton
                                 onFilterDelete={onFilterDelete}
                                 numFilters={numFilters}
                                 isMergeGroup={isMergeGroup ?? false}
@@ -197,7 +194,7 @@ const MergeFilterErrorOptions = ({
                                 width: '45px',
                             }}
                         >
-                            <GuardedDeleteButton
+                            <FilterErrorDeleteButton
                                 onFilterDelete={onFilterDelete}
                                 numFilters={numFilters}
                                 isMergeGroup={isMergeGroup ?? false}
@@ -274,7 +271,7 @@ const SDCardFilterErrorOption = ({
                                 width: '45px',
                             }}
                         >
-                            <GuardedDeleteButton
+                            <FilterErrorDeleteButton
                                 onFilterDelete={onFilterDelete}
                                 numFilters={numFilters}
                                 isMergeGroup={isMergeGroup ?? false}

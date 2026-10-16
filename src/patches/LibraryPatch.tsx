@@ -11,7 +11,6 @@ let TabAppGridComponentDef: TabAppGridComponent | undefined
 
 /**
  * Patches the Steam library to allow the plugin to change the tabs.
- * @param serverAPI The plugin's serverAPI.
  * @param tabMasterManager The plugin's core state manager.
  * @returns A routepatch for the library.
  */

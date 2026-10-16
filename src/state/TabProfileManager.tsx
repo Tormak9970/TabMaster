@@ -1,6 +1,6 @@
 import { CustomTabContainer } from './CustomTabContainer'
 import { PythonInterop } from '@lib'
-import { TabMasterManager } from './TabMasterManager'
+import { TabMasterManager } from './tab-master/TabMasterManager'
 
 export type TabProfileDictionary = {
     [name: string]: string[] //array of ordered tab ids

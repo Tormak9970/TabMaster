@@ -4,8 +4,16 @@ export type TagOverride = {
      *
      * **False**: *Remove this tag from app*
      */
-    method: boolean
-    tagNumber: number
+    [tagNumber: number]: boolean
 }
 
+/**
+ * @example
+ * {
+ *    "1086940": {
+ *      // Treat BG3 as tho it had tag #1
+ *      "1": true
+ *    }
+ * }
+ */
 export type TagOverrideDict = Record<string, TagOverride>

@@ -1,7 +1,7 @@
 import { definePlugin, RoutePatch, routerHook } from '@decky/api'
 import { TbLayoutNavbarExpand } from 'react-icons/tb'
 import { PluginController, MicroSDeckInterop } from '@lib'
-import { TabMasterContextProvider, TabMasterManager } from '@state'
+import { SettingsContextProvider, SettingsManager, TabMasterContextProvider, TabMasterManager } from '@state'
 import { patchLibrary, patchSettings } from '@patches'
 import { MicroSDeck } from '@cebbinghaus/microsdeck'
 import { QuickAccessContent, QuickAccessTitleView } from './components/qam/QuickAccessContent'
@@ -40,28 +40,34 @@ export default definePlugin(() => {
     let settingsPatch: RoutePatch
 
     const tabMasterManager = new TabMasterManager()
+    const settingsManager = new SettingsManager()
     PluginController.setup(tabMasterManager)
 
     const loginUnregisterer = PluginController.initOnLogin(async () => {
         await MicroSDeckInterop.waitForLoad()
+        await settingsManager.loadSettings()
         await tabMasterManager.loadTabs()
         libraryPatch = patchLibrary(tabMasterManager)
         settingsPatch = patchSettings(tabMasterManager)
     })
 
     routerHook.addRoute('/tab-master-settings', () => (
-        <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-            <SettingsRouter />
-        </TabMasterContextProvider>
+        <SettingsContextProvider settingsManager={settingsManager}>
+            <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+                <SettingsRouter />
+            </TabMasterContextProvider>
+        </SettingsContextProvider>
     ))
     return {
         name: 'TabMaster',
         title: <></>,
         titleView: <QuickAccessTitleView title='TabMaster' tabMasterManager={tabMasterManager} />,
         content: (
-            <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-                <QuickAccessContent />
-            </TabMasterContextProvider>
+            <SettingsContextProvider settingsManager={settingsManager}>
+                <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+                    <QuickAccessContent />
+                </TabMasterContextProvider>
+            </SettingsContextProvider>
         ),
         icon: <TbLayoutNavbarExpand />,
         onDismount: () => {

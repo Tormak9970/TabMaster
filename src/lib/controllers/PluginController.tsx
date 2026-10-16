@@ -42,8 +42,6 @@ function showDiscardConfirm(okCallback: () => Promise<void>, onCancel: () => Pro
  * Main controller class for the plugin.
  */
 export class PluginController {
-    // @ts-ignore
-    private static server: ServerAPI
     private static tabMasterManager: TabMasterManager
 
     private static steamController: SteamController
@@ -53,7 +51,6 @@ export class PluginController {
 
     /**
      * Sets the plugin's serverAPI.
-     * @param server The serverAPI to use.
      */
     static setup(tabMasterManager: TabMasterManager): void {
         this.tabMasterManager = tabMasterManager

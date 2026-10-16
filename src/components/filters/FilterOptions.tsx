@@ -10,11 +10,10 @@ import {
     showModal,
 } from '@decky/ui'
 import React, { Fragment, useState, useMemo } from 'react'
-import { FaTag, FaTags, FaUser, FaCompactDisc, FaListCheck, FaSteam, FaStar, FaFolder } from 'react-icons/fa6'
-import { FaUserFriends, FaQuestionCircle } from 'react-icons/fa'
+import { FaTag, FaTags, FaUser, FaListCheck, FaSteam, FaStar, FaFolder } from 'react-icons/fa6'
+import { FaUserFriends } from 'react-icons/fa'
 import { MdApps } from 'react-icons/md'
-import { IoGameController, IoGrid } from 'react-icons/io5'
-import { BsWindow } from 'react-icons/bs'
+import { IoGrid } from 'react-icons/io5'
 import { IconType } from 'react-icons/lib'
 
 import { compatCategoryToLabel, steamOSCompatCategoryToLabel } from './Filters'
@@ -25,7 +24,6 @@ import { MultiSelect } from '../multi-selects/MultiSelect'
 import { FilterPreview } from './FilterPreview'
 import { DatePicker, DateSelection } from '../generic/DatePickers'
 import { EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from '../generic/EnhancedSelector'
-import { IncludeCategories } from '@utils'
 import { Slider } from '../generic/Slider'
 import { STEAM_FEATURES_ID_MAP, STEAM_FEATURES_TO_RENDER } from './SteamFeatures'
 import { MicroSDeckInterop } from '@lib'
@@ -43,6 +41,7 @@ import {
     getAchievementDisplayData,
     getAchievementOptions,
     getSizeOnDiskDisplayData,
+    getAppIconType,
 } from '@utils'
 import {
     FilterType,
@@ -65,24 +64,6 @@ type FilterOptionsProps<T extends FilterType> = {
     filter: TabFilterSettings<T>
     containingGroupFilters: TabFilterSettings<FilterType>[]
     setContainingGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
-}
-
-/**
- * Gets an entry icon for an app based on its type.
- * @param entry The app entry.
- * @returns The icon for the app.
- */
-function getAppIconType(entry: any): IconType {
-    switch (entry.data.appType) {
-        case IncludeCategories.games:
-            return IoGameController
-        case IncludeCategories.music:
-            return FaCompactDisc
-        case IncludeCategories.software:
-            return BsWindow
-        default:
-            return FaQuestionCircle
-    }
 }
 
 /**
