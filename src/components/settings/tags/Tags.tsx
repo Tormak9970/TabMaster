@@ -40,9 +40,8 @@ export const Tags = () => {
                         'DESCRIPTION_TAG_OVERRIDES',
                         'Allows you to override specific tags for apps you own.'
                     )}
-                >
-                    <TagOverrides tagOverrides={tagOverrides} setTagOverrides={setTagOverrides} />
-                </Field>
+                ></Field>
+                <TagOverrides tagOverrides={tagOverrides} setTagOverrides={setTagOverrides} />
             </div>
         </>
     )

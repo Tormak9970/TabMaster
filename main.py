@@ -172,7 +172,7 @@ class Plugin:
     while Plugin.users_dict is None:
       await asyncio.sleep(0.1)
     
-    tag_overrides = Plugin.users_dict[Plugin.user_id]["tag_overrides"]
+    tag_overrides = Plugin.users_dict[Plugin.user_id].get("tag_overrides", {})
     log(f"Got tag_overrides {tag_overrides}")
     return tag_overrides or {}
   
