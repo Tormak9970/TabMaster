@@ -1,4 +1,4 @@
-import { debounce } from '../Utils'
+import { debounce } from '@utils'
 import { PythonInterop } from './PythonInterop'
 
 const errorToastLimit = 10

@@ -1,8 +1,9 @@
 import { Menu, MenuGroup, MenuItem, showModal, GamepadButton, gamepadContextMenuClasses } from '@decky/ui'
-import { VFC, Fragment, useState } from 'react'
-import { TabMasterManager } from '../../state/TabMasterManager'
+import { Fragment, useState } from 'react'
+import { TabMasterManager } from '@state'
 import { CreateTabProfileModal, OverwriteTabProfileModal } from '../modals/TabProfileModals'
 import { DestructiveModal } from '../generic/DestructiveModal'
+import { trans_string as t } from '@utils'
 
 interface TabsProfilesMenuProps {
     tabMasterManager: TabMasterManager
@@ -11,9 +12,9 @@ interface TabsProfilesMenuProps {
 /**
  * Context menu for managing Tab Profiles.
  */
-export const TabProfilesMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) => {
+export const TabProfilesMenu = ({ tabMasterManager }: TabsProfilesMenuProps) => {
     return (
-        <Menu label='Manage Tab Profiles'>
+        <Menu label={t('LABEL_MANAGE_TAB_PROFILES', 'Manage Tab Profiles')}>
             <TabProfileMenuItems tabMasterManager={tabMasterManager} />
         </Menu>
     )
@@ -22,9 +23,9 @@ export const TabProfilesMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }
 /**
  * Context menu sub-menu for managing Tab Profiles.
  */
-export const TabProfilesSubMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) => {
+export const TabProfilesSubMenu = ({ tabMasterManager }: TabsProfilesMenuProps) => {
     return (
-        <MenuGroup label='Manage Tab Profiles'>
+        <MenuGroup label={t('LABEL_MANAGE_TAB_PROFILES', 'Manage Tab Profiles')}>
             <TabProfileMenuItems tabMasterManager={tabMasterManager} />
         </MenuGroup>
     )
@@ -33,12 +34,12 @@ export const TabProfilesSubMenu: VFC<TabsProfilesMenuProps> = ({ tabMasterManage
 /**
  * Menu items for the Tab Profiles context menu.
  */
-const TabProfileMenuItems: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) => {
+const TabProfileMenuItems = ({ tabMasterManager }: TabsProfilesMenuProps) => {
     const [_refresh, setRefresh] = useState(true)
     return (
         <>
             <MenuItem onClick={() => showModal(<CreateTabProfileModal tabMasterManager={tabMasterManager} />)}>
-                Create Profile
+                {t('TITLE_CREATE_PROFILE', 'Create Profile')}
             </MenuItem>
             <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
             {Object.keys(tabMasterManager.tabProfileManager?.tabProfiles ?? {}).map(profileName => {
@@ -46,9 +47,9 @@ const TabProfileMenuItems: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) =
                     <MenuItem
                         onClick={() => tabMasterManager.tabProfileManager?.apply(profileName, tabMasterManager)}
                         actionDescriptionMap={{
-                            [GamepadButton.OK]: 'Apply Profile',
-                            [GamepadButton.SECONDARY]: 'Delete Profile', //X
-                            [GamepadButton.OPTIONS]: 'Overwrite Profile', //Y
+                            [GamepadButton.OK]: t('LABEL_APPLY_PROFILE', 'Apply Profile'),
+                            [GamepadButton.SECONDARY]: t('LABEL_DELETE_PROFILE', 'Delete Profile'), //X
+                            [GamepadButton.OPTIONS]: t('LABEL_OVERWRITE_PROFILE', 'Overwrite Profile'), //Y
                         }}
                         onSecondaryButton={() =>
                             showModal(
@@ -57,9 +58,12 @@ const TabProfileMenuItems: VFC<TabsProfilesMenuProps> = ({ tabMasterManager }) =
                                         tabMasterManager.tabProfileManager?.delete(profileName)
                                         setRefresh(cur => !cur)
                                     }}
-                                    strTitle={`Deleting Profile: ${profileName}`}
+                                    strTitle={`${t('TITLE_DELETE_PROFILE', 'Deleting Profile')}: ${profileName}`}
                                 >
-                                    Are you sure you want to delete this profile?
+                                    {t(
+                                        'MESSAGE_CONFIRM_DELETE_PROFILE',
+                                        'Are you sure you want to delete this profile?'
+                                    )}
                                 </DestructiveModal>
                             )
                         }

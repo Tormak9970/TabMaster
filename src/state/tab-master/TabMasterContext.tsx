@@ -1,0 +1,52 @@
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import { TabMasterManager } from './TabMasterManager'
+import { TabContainer, FriendEntry, TagResponse } from '@types'
+
+const TabMasterContext = createContext<PublicTabMasterContext>(null as any)
+export const useTabMasterContext = () => useContext(TabMasterContext)
+
+interface ProviderProps {
+    tabMasterManager: TabMasterManager
+    children: ReactNode
+}
+
+interface PublicTabMasterManager {
+    visibleTabsList: TabContainer[]
+    hiddenTabsList: TabContainer[]
+    tabsMap: Map<string, TabContainer>
+    currentUsersFriends: FriendEntry[]
+    allStoreTags: TagResponse[]
+}
+interface PublicTabMasterContext extends PublicTabMasterManager {
+    tabMasterManager: TabMasterManager
+}
+
+export const TabMasterContextProvider = ({ children, tabMasterManager }: ProviderProps) => {
+    const [publicState, setPublicState] = useState<PublicTabMasterManager>({
+        ...tabMasterManager.getTabs(),
+        ...tabMasterManager.getFriendsAndTags(),
+    })
+
+    useEffect(() => {
+        function onUpdate() {
+            setPublicState({ ...tabMasterManager.getTabs(), ...tabMasterManager.getFriendsAndTags() })
+        }
+
+        tabMasterManager.eventBus.addEventListener('stateUpdate', onUpdate)
+
+        return () => {
+            tabMasterManager.eventBus.removeEventListener('stateUpdate', onUpdate)
+        }
+    }, [])
+
+    return (
+        <TabMasterContext.Provider
+            value={{
+                ...publicState,
+                tabMasterManager,
+            }}
+        >
+            {children}
+        </TabMasterContext.Provider>
+    )
+}

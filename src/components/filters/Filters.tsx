@@ -1,7 +1,5 @@
 import { IconType } from 'react-icons/lib'
-import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
-import { PluginController } from '../../lib/controllers/PluginController'
-import { DateIncludes, DateObj } from '../generic/DatePickers'
+import { MicroSDeckInterop, PluginController, LogController } from '@lib'
 import { STEAM_FEATURES_ID_MAP } from './SteamFeatures'
 import { FaCheckCircle, FaHdd, FaSdCard, FaShoppingCart, FaTrophy, FaUserFriends } from 'react-icons/fa'
 import { IoGrid } from 'react-icons/io5'
@@ -22,155 +20,31 @@ import {
 } from 'react-icons/fa6'
 import { BsClockHistory, BsRegex } from 'react-icons/bs'
 import { LuCombine } from 'react-icons/lu'
-import { LogController } from '../../lib/controllers/LogController'
 import { CardAndGames } from '@cebbinghaus/microsdeck'
 import { MdNewReleases } from 'react-icons/md'
-
-export type FilterType =
-    | 'collection'
-    | 'installed'
-    | 'regex'
-    | 'friends'
-    | 'tags'
-    | 'whitelist'
-    | 'blacklist'
-    | 'merge'
-    | 'platform'
-    | 'deck compatibility'
-    | 'steamos compatibility'
-    | 'review score'
-    | 'time played'
-    | 'size on disk'
-    | 'release date'
-    | 'purchase date'
-    | 'last played'
-    | 'family sharing'
-    | 'demo'
-    | 'streamable'
-    | 'steam features'
-    | 'achievements'
-    | 'sd card'
-    | 'install folder'
-    | 'coming soon'
-
-export type TimeUnit = 'minutes' | 'hours' | 'days'
-export type ThresholdCondition = 'above' | 'below'
-export type ReviewScoreType = 'metacritic' | 'steampercent'
+import { trans_string as t } from '@utils'
+import {
+    SteamAppOverview,
+    FilterParams,
+    FilterType,
+    SdCardParamType,
+    TabFilterSettings,
+    ValidationResponse,
+    FilterErrorEntry,
+    DateIncludes,
+    TagOverrideDict,
+} from '@types'
 
 function getSteamOSCompatCategory(app: SteamAppOverview) {
     return (app.steam_hw_compat_category_packed >> 4) & 3 || 0
 }
 
-export enum SdCardParamType {
-    INSTALLED = 0,
-    ANY,
-}
-
-type CollectionFilterParams = {
-    id: SteamCollection['id']
-    /**
-     * Always present as of v1.2.2 onward
-     */
-    name?: string
-    /**
-     * @deprecated Replaced by id. Used pre v1.2.2
-     */
-    collection?: SteamCollection['id']
-}
-type InstalledFilterParams = { installed: boolean }
-type RegexFilterParams = { regex: string }
-type FriendsFilterParams = { friends: number[]; mode: LogicalMode }
-type TagsFilterParams = { tags: number[]; mode: LogicalMode }
-type WhitelistFilterParams = { games: number[] }
-type BlacklistFilterParams = { games: number[] }
-type MergeFilterParams = { filters: TabFilterSettings<FilterType>[]; mode: LogicalMode }
-type PlatformFilterParams = { platform: SteamPlatform }
-type DeckCompatFilterParams = { category: number }
-type SteamOSCompatFilterParams = { category: number }
-type ReviewScoreFilterParams = { scoreThreshold: number; condition: ThresholdCondition; type: ReviewScoreType }
-type TimePlayedFilterParams = { timeThreshold: number; condition: ThresholdCondition; units: TimeUnit }
-type SizeOnDiskFilterParams = { gbThreshold: number; condition: ThresholdCondition }
-type ReleaseDateFilterParams = { date?: DateObj; daysAgo?: number; condition: ThresholdCondition }
-type PurchaseDateFilterParams = { date?: DateObj; daysAgo?: number; condition: ThresholdCondition }
-type LastPlayedFilterParams = { date?: DateObj; daysAgo?: number; condition: ThresholdCondition }
-type FamilySharingFilterParams = { isFamilyShared: boolean }
-type DemoFilterParams = { isDemo: boolean }
-type ComingSoonParams = { isComingSoon: boolean }
-type StreamableFilterParams = { isStreamable: boolean }
-type SteamFeaturesFilterParams = { features: number[]; mode: LogicalMode }
-type AchievementsFilterParams = {
-    /**
-     * @deprecated This is no longer used
-     */
-    completionPercentage?: number
-    threshold: number
-    thresholdType: 'count' | 'percent'
-    condition: ThresholdCondition
-}
-type SdCardParams = { card: SdCardParamType | string | undefined } //inserted card/ any card/ card uid (undefined value is legacy)
-type InstallFolderParams = { driveName: string }
-
-// appOverview.rt_purchased_time
-
-export type FilterParams<T extends FilterType> = T extends 'collection'
-    ? CollectionFilterParams
-    : T extends 'installed'
-      ? InstalledFilterParams
-      : T extends 'regex'
-        ? RegexFilterParams
-        : T extends 'friends'
-          ? FriendsFilterParams
-          : T extends 'tags'
-            ? TagsFilterParams
-            : T extends 'whitelist'
-              ? WhitelistFilterParams
-              : T extends 'blacklist'
-                ? BlacklistFilterParams
-                : T extends 'merge'
-                  ? MergeFilterParams
-                  : T extends 'platform'
-                    ? PlatformFilterParams
-                    : T extends 'deck compatibility'
-                      ? DeckCompatFilterParams
-                      : T extends 'steamos compatibility'
-                        ? SteamOSCompatFilterParams
-                        : T extends 'review score'
-                          ? ReviewScoreFilterParams
-                          : T extends 'time played'
-                            ? TimePlayedFilterParams
-                            : T extends 'size on disk'
-                              ? SizeOnDiskFilterParams
-                              : T extends 'release date'
-                                ? ReleaseDateFilterParams
-                                : T extends 'purchase date'
-                                  ? PurchaseDateFilterParams
-                                  : T extends 'last played'
-                                    ? LastPlayedFilterParams
-                                    : T extends 'family sharing'
-                                      ? FamilySharingFilterParams
-                                      : T extends 'demo'
-                                        ? DemoFilterParams
-                                        : T extends 'coming soon'
-                                          ? ComingSoonParams
-                                          : T extends 'streamable'
-                                            ? StreamableFilterParams
-                                            : T extends 'steam features'
-                                              ? SteamFeaturesFilterParams
-                                              : T extends 'achievements'
-                                                ? AchievementsFilterParams
-                                                : T extends 'sd card'
-                                                  ? SdCardParams
-                                                  : T extends 'install folder'
-                                                    ? InstallFolderParams
-                                                    : never
-
-export type TabFilterSettings<T extends FilterType> = {
-    type: T
-    inverted: boolean
-    params: FilterParams<T>
-}
-
 type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview) => boolean
+type FilterFunctionWithTags = (
+    params: FilterParams<FilterType>,
+    appOverview: SteamAppOverview,
+    tagOverrides: TagOverrideDict
+) => boolean
 
 /**
  * Define the deafult params for a filter type here
@@ -209,33 +83,76 @@ export const FilterDefaultParams: () => { [key in FilterType]: FilterParams<key>
 /**
  * Dictionary of descriptions for each filter.
  */
-export const FilterDescriptions: { [filterType in FilterType]: string } = {
-    collection: 'Selects apps that are in a certain Steam Collection.',
-    installed: 'Selects apps that are installed/uninstalled.',
-    regex: 'Selects apps whose titles match a regular expression.',
-    friends: 'Selects apps that are also owned by friends.',
-    tags: 'Selects apps that have specific community tags.',
-    whitelist: 'Selects apps that are added to the list.',
-    blacklist: 'Selects apps that are not added to the list.',
-    merge: 'Selects apps that pass a subgroup of filters.',
-    platform: 'Selects Steam or non-Steam apps.',
-    'deck compatibility': 'Selects apps that have a specific Steam Deck compatibilty status.',
-    'steamos compatibility': 'Selects apps that have a specific SteamOS compatibilty status.',
-    'review score': 'Selects apps based on their metacritic/steam review score.',
-    'time played': 'Selects apps based on your play time.',
-    'size on disk': 'Selects apps based on their install size.',
-    'release date': 'Selects apps based on their release date.',
-    'purchase date': 'Selects apps based on when you purchased them.',
-    'last played': 'Selects apps based on when they were last played.',
-    'family sharing': "Selects apps that are/aren't shared from family members.",
-    demo: "Selects apps that are/aren't demos.",
-    'coming soon': "Selects apps that are/aren't soon to be released.",
-    streamable: "Selects apps that can/can't be streamed from another computer.",
-    achievements: 'Selects apps based on their completion percentage.',
-    'steam features': 'Selects apps that support specific Steam Features.',
-    'sd card': 'Selects apps that are present on the inserted/specific MicroSD Card.',
-    'install folder': 'Selects apps that are installed in a specific Steam Install Folder.',
-}
+export const FilterDescriptions: () => { [key in FilterType]: string } = () => ({
+    collection: t('DESCRIPTION_COLLECTION_FILTER', 'Selects apps that are in a certain Steam Collection.'),
+    installed: t('DESCRIPTION_INSTALLED_FILTER', 'Selects apps that are installed/uninstalled.'),
+    regex: t('DESCRIPTION_REGEX_FILTER', 'Selects apps whose titles match a regular expression.'),
+    friends: t('DESCRIPTION_FRIENDS_FILTER', 'Selects apps that are also owned by friends.'),
+    tags: t('DESCRIPTION_TAGS_FILTER', 'Selects apps that have specific community tags.'),
+    whitelist: t('DESCRIPTION_WHITELIST_FILTER', 'Selects apps that are added to the list.'),
+    blacklist: t('DESCRIPTION_BLACKLIST_FILTER', 'Selects apps that are not added to the list.'),
+    merge: t('DESCRIPTION_MERGE_FILTER', 'Selects apps that pass a subgroup of filters.'),
+    platform: t('DESCRIPTION_PLATFORM_FILTER', 'Selects Steam or non-Steam apps.'),
+    'deck compatibility': t(
+        'DESCRIPTION_DECK_COMPAT_FILTER',
+        'Selects apps that have a specific Steam Deck compatibilty status.'
+    ),
+    'steamos compatibility': t(
+        'DESCRIPTION_MACHINE_COMPAT_FILTER',
+        'Selects apps that have a specific SteamOS compatibilty status.'
+    ),
+    'review score': t('DESCRIPTION_REVIEW_FILTER', 'Selects apps based on their metacritic/steam review score.'),
+    'time played': t('DESCRIPTION_TIME_PLAYED_FILTER', 'Selects apps based on your play time.'),
+    'size on disk': t('DESCRIPTION_SIZE_ON_DISK_FILTER', 'Selects apps based on their install size.'),
+    'release date': t('DESCRIPTION_RELEASE_DATE_FILTER', 'Selects apps based on their release date.'),
+    'purchase date': t('DESCRIPTION_PURCHASE_DATE_FILTER', 'Selects apps based on when you purchased them.'),
+    'last played': t('DESCRIPTION_LAST_PLAYED_FILTER', 'Selects apps based on when they were last played.'),
+    'family sharing': t(
+        'DESCRIPTION_FAMILY_SHARING_FILTER',
+        "Selects apps that are/aren't shared from family members."
+    ),
+    demo: t('DESCRIPTION_DEMO_FILTER', "Selects apps that are/aren't demos."),
+    'coming soon': t('DESCRIPTION_COMING_SOON_FILTER', "Selects apps that are/aren't soon to be released."),
+    streamable: t('DESCRIPTION_STREAMABLE_FILTER', "Selects apps that can/can't be streamed from another computer."),
+    achievements: t('DESCRIPTION_ACHIEVEMENTS_FILTER', 'Selects apps based on their completion percentage.'),
+    'steam features': t('DESCRIPTION_STEAM_FEATURES_FILTER', 'Selects apps that support specific Steam Features.'),
+    'sd card': t('DESCRIPTION_SD_CARD_FILTER', 'Selects apps that are present on the inserted/specific MicroSD Card.'),
+    'install folder': t(
+        'DESCRIPTION_INSTALL_FOLDER_FILTER',
+        'Selects apps that are installed in a specific Steam Install Folder.'
+    ),
+})
+
+/**
+ * Dictionary of Labels for each filter.
+ */
+export const FilterLabels: () => { [key in FilterType]: string } = () => ({
+    collection: t('LABEL_COLLECTION_FILTER', 'Collection'),
+    installed: t('LABEL_INSTALLED_FILTER', 'Installed'),
+    regex: t('LABEL_REGEX_FILTER', 'Regex'),
+    friends: t('LABEL_FRIENDS_FILTER', 'Friends'),
+    tags: t('LABEL_TAGS_FILTER', 'Tags'),
+    whitelist: t('LABEL_WHITELIST_FILTER', 'Whitelist'),
+    blacklist: t('LABEL_BLACKLIST_FILTER', 'Blacklist'),
+    merge: t('LABEL_MERGE_FILTER', 'Merge'),
+    platform: t('LABEL_PLATFORM_FILTER', 'Platform'),
+    'deck compatibility': t('LABEL_DECK_COMPAT_FILTER', 'Deck Compatibility'),
+    'steamos compatibility': t('LABEL_MACHINE_COMPAT_FILTER', 'SteamOS Compatibility'),
+    'review score': t('LABEL_REVIEW_FILTER', 'Review Score'),
+    'time played': t('LABEL_TIME_PLAYED_FILTER', 'Time Played'),
+    'size on disk': t('LABEL_SIZE_ON_DISK_FILTER', 'Size On Disk'),
+    'release date': t('LABEL_RELEASE_DATE_FILTER', 'Release Date'),
+    'purchase date': t('LABEL_PURCHASE_DATE_FILTER', 'Purchase Date'),
+    'last played': t('LABEL_LAST_PLAYED_FILTER', 'Last Played'),
+    'family sharing': t('LABEL_FAMILY_SHARING_FILTER', 'Family Sharing'),
+    demo: t('LABEL_DEMO_FILTER', 'Demo'),
+    'coming soon': t('LABEL_COMING_SOON_FILTER', 'Coming Soon'),
+    streamable: t('LABEL_STREAMABLE_FILTER', 'Streamable'),
+    achievements: t('LABEL_ACHIEVEMENTS_FILTER', 'Achievements'),
+    'steam features': t('LABEL_STEAM_FEATURES_FILTER', 'Steam Features'),
+    'sd card': t('LABEL_SD_CARD_FILTER', 'MicroSD Card'),
+    'install folder': t('LABEL_INSTALL_FOLDER_FILTER', 'Install Folder'),
+})
 
 /**
  * Dictionary of icons for each filter.
@@ -334,7 +251,8 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
         case 'last played':
             return (
                 (filter as TabFilterSettings<'release date'>).params.date !== undefined ||
-                (filter as TabFilterSettings<'release date'>).params.daysAgo !== undefined
+                (filter as TabFilterSettings<'release date'>).params.daysAgo !== undefined ||
+                (filter as TabFilterSettings<'release date'>).params.isUnknown !== undefined
             )
         case 'steam features':
             return (filter as TabFilterSettings<'steam features'>).params.features.length !== 0
@@ -365,13 +283,13 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
 export function compatCategoryToLabel(category: number): string {
     switch (category) {
         case 0:
-            return 'Unknown'
+            return t('DeckVerified_CategoryLabel_Unknown', 'Unknown', true)
         case 1:
-            return 'Unsupported'
+            return t('DeckVerified_CategoryLabel_Unsupported', 'Unsupported', true)
         case 2:
-            return 'Playable'
+            return t('DeckVerified_CategoryLabel_Playable', 'Playable', true)
         case 3:
-            return 'Verified'
+            return t('DeckVerified_CategoryLabel_Verified', 'Verified', true)
         default:
             return ''
     }
@@ -385,11 +303,11 @@ export function compatCategoryToLabel(category: number): string {
 export function steamOSCompatCategoryToLabel(category: number): string {
     switch (category) {
         case 0:
-            return 'Unknown'
+            return t('SteamOS_CategoryLabel_Unknown', 'Unknown', true)
         case 1:
-            return 'Unsupported'
+            return t('SteamOS_CategoryLabel_Unsupported', 'Unsupported', true)
         case 2:
-            return 'Compatible'
+            return t('SteamOS_CategoryLabel_Compatible', 'Compatible', true)
         default:
             return ''
     }
@@ -401,8 +319,10 @@ export function steamOSCompatCategoryToLabel(category: number): string {
  * @returns The label of the provided feature.
  */
 export function steamFeatureToLabel(feature: number): string {
-    // @ts-ignore
-    return STEAM_FEATURES_ID_MAP[feature.toString()]?.display_name ?? 'Unkown Steam Feature'
+    return (
+        STEAM_FEATURES_ID_MAP[feature.toString() as keyof typeof STEAM_FEATURES_ID_MAP]?.display_name ??
+        t('LABEL_UNKOWN_STEAM_FEATURE', 'Unkown Steam Feature')
+    )
 }
 
 /**
@@ -557,6 +477,48 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     }
 }
 
+function dateFilterLogic(
+    dateInMs: number | null,
+    params: FilterParams<'release date' | 'purchase date' | 'last played'>
+) {
+    // Unknown Date case
+    if (!dateInMs) {
+        return !!params.isUnknown
+    }
+
+    //by date case
+    if (params.date) {
+        const { day, month, year } = params.date
+
+        if (params.condition === 'above') {
+            return dateInMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime()
+        } else {
+            const dateIncludes =
+                day === undefined
+                    ? month === undefined
+                        ? DateIncludes.yearOnly
+                        : DateIncludes.monthYear
+                    : DateIncludes.dayMonthYear
+            switch (dateIncludes) {
+                case DateIncludes.dayMonthYear:
+                    return dateInMs < new Date(year, month! - 1, day! + 1).getTime()
+                case DateIncludes.monthYear:
+                    return dateInMs < new Date(year, month!, 1).getTime()
+                case DateIncludes.yearOnly:
+                    return dateInMs < new Date(year + 1, 0, 1).getTime()
+            }
+        }
+    }
+
+    //by days ago case
+    const today = new Date()
+    return params.condition === 'above'
+        ? dateInMs >=
+              new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - params.daysAgo!).getTime()
+        : dateInMs <
+              new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1 - params.daysAgo!).getTime()
+}
+
 /**
  * Utility class for filtering games.
  */
@@ -581,11 +543,30 @@ export class Filter {
                 return params.friends.some(friend => friendsWhoOwn.includes(friend))
             }
         },
-        tags: (params: FilterParams<'tags'>, appOverview: SteamAppOverview) => {
+        tags: (params: FilterParams<'tags'>, appOverview: SteamAppOverview, tagOverrides: TagOverrideDict) => {
+            const override = tagOverrides[appOverview.appid]
+
+            const containsTag = (tag: number) => {
+                const includesTag = appOverview.store_tag.includes(tag)
+                if (override) {
+                    const tagSpecific = override[tag]
+
+                    if (tagSpecific === false && includesTag) {
+                        return false
+                    }
+
+                    if (tagSpecific === true && !includesTag) {
+                        return true
+                    }
+                }
+
+                return includesTag
+            }
+
             if (params.mode === 'and') {
-                return params.tags.every((tag: number) => appOverview.store_tag.includes(tag))
+                return params.tags.every(containsTag)
             } else {
-                return params.tags.some((tag: number) => appOverview.store_tag.includes(tag))
+                return params.tags.some(containsTag)
             }
         },
         whitelist: (params: FilterParams<'whitelist'>, appOverview: SteamAppOverview) => {
@@ -594,11 +575,11 @@ export class Filter {
         blacklist: (params: FilterParams<'whitelist'>, appOverview: SteamAppOverview) => {
             return !params.games.includes(appOverview.appid)
         },
-        merge: (params: FilterParams<'merge'>, appOverview: SteamAppOverview) => {
+        merge: (params: FilterParams<'merge'>, appOverview: SteamAppOverview, tagOverrides: TagOverrideDict) => {
             if (params.mode === 'and') {
-                return params.filters.every(filterSettings => Filter.run(filterSettings, appOverview))
+                return params.filters.every(filterSettings => Filter.run(filterSettings, appOverview, tagOverrides))
             } else {
-                return params.filters.some(filterSettings => Filter.run(filterSettings, appOverview))
+                return params.filters.some(filterSettings => Filter.run(filterSettings, appOverview, tagOverrides))
             }
         },
         platform: (params: FilterParams<'platform'>, appOverview: SteamAppOverview) => {
@@ -639,139 +620,28 @@ export class Filter {
                 : Number(appOverview.size_on_disk) / 1024 ** 3 <= params.gbThreshold
         },
         'release date': (params: FilterParams<'release date'>, appOverview: SteamAppOverview) => {
-            let releaseTimeMs
-            if (appOverview.rt_original_release_date) releaseTimeMs = appOverview.rt_original_release_date * 1000
-            else if (appOverview.rt_steam_release_date !== 0) releaseTimeMs = appOverview.rt_steam_release_date * 1000
-            else return false
-
-            //by date case
-            if (params.date) {
-                const { day, month, year } = params.date
-
-                if (params.condition === 'above') {
-                    return releaseTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime()
-                } else {
-                    const dateIncludes =
-                        day === undefined
-                            ? month === undefined
-                                ? DateIncludes.yearOnly
-                                : DateIncludes.monthYear
-                            : DateIncludes.dayMonthYear
-                    switch (dateIncludes) {
-                        case DateIncludes.dayMonthYear:
-                            return releaseTimeMs < new Date(year, month! - 1, day! + 1).getTime()
-                        case DateIncludes.monthYear:
-                            return releaseTimeMs < new Date(year, month!, 1).getTime()
-                        case DateIncludes.yearOnly:
-                            return releaseTimeMs < new Date(year + 1, 0, 1).getTime()
-                    }
-                }
-                //by days ago case
-            } else {
-                const today = new Date()
-                return params.condition === 'above'
-                    ? releaseTimeMs >=
-                          new Date(
-                              today.getUTCFullYear(),
-                              today.getUTCMonth(),
-                              today.getUTCDate() - params.daysAgo!
-                          ).getTime()
-                    : releaseTimeMs <
-                          new Date(
-                              today.getUTCFullYear(),
-                              today.getUTCMonth(),
-                              today.getUTCDate() + 1 - params.daysAgo!
-                          ).getTime()
+            let releaseTimeMs: number | null = null
+            if (appOverview.rt_original_release_date) {
+                releaseTimeMs = appOverview.rt_original_release_date * 1000
+            } else if (appOverview.rt_steam_release_date !== 0) {
+                releaseTimeMs = appOverview.rt_steam_release_date * 1000
             }
+
+            return dateFilterLogic(releaseTimeMs, params)
         },
         'purchase date': (params: FilterParams<'purchase date'>, appOverview: SteamAppOverview) => {
-            let purchaseTimeMs
-            if (appOverview.rt_purchased_time) purchaseTimeMs = appOverview.rt_purchased_time * 1000
-            else return false
-
-            //by date case
-            if (params.date) {
-                const { day, month, year } = params.date
-
-                if (params.condition === 'above') {
-                    return purchaseTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime()
-                } else {
-                    const dateIncludes =
-                        day === undefined
-                            ? month === undefined
-                                ? DateIncludes.yearOnly
-                                : DateIncludes.monthYear
-                            : DateIncludes.dayMonthYear
-                    switch (dateIncludes) {
-                        case DateIncludes.dayMonthYear:
-                            return purchaseTimeMs < new Date(year, month! - 1, day! + 1).getTime()
-                        case DateIncludes.monthYear:
-                            return purchaseTimeMs < new Date(year, month!, 1).getTime()
-                        case DateIncludes.yearOnly:
-                            return purchaseTimeMs < new Date(year + 1, 0, 1).getTime()
-                    }
-                }
-                //by days ago case
-            } else {
-                const today = new Date()
-                return params.condition === 'above'
-                    ? purchaseTimeMs >=
-                          new Date(
-                              today.getUTCFullYear(),
-                              today.getUTCMonth(),
-                              today.getUTCDate() - params.daysAgo!
-                          ).getTime()
-                    : purchaseTimeMs <
-                          new Date(
-                              today.getUTCFullYear(),
-                              today.getUTCMonth(),
-                              today.getUTCDate() + 1 - params.daysAgo!
-                          ).getTime()
+            let purchaseTimeMs: number | null = null
+            if (appOverview.rt_purchased_time) {
+                purchaseTimeMs = appOverview.rt_purchased_time * 1000
             }
+
+            return dateFilterLogic(purchaseTimeMs, params)
         },
         'last played': (params: FilterParams<'last played'>, appOverview: SteamAppOverview) => {
             const lastPlayedTimeMs = appOverview.rt_last_time_played * 1000
             if (lastPlayedTimeMs === 0) return false
 
-            //by date case
-            if (params.date) {
-                const { day, month, year } = params.date
-
-                if (params.condition === 'above') {
-                    return lastPlayedTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime()
-                } else {
-                    const dateIncludes =
-                        day === undefined
-                            ? month === undefined
-                                ? DateIncludes.yearOnly
-                                : DateIncludes.monthYear
-                            : DateIncludes.dayMonthYear
-                    switch (dateIncludes) {
-                        case DateIncludes.dayMonthYear:
-                            return lastPlayedTimeMs < new Date(year, month! - 1, day! + 1).getTime()
-                        case DateIncludes.monthYear:
-                            return lastPlayedTimeMs < new Date(year, month!, 1).getTime()
-                        case DateIncludes.yearOnly:
-                            return lastPlayedTimeMs < new Date(year + 1, 0, 1).getTime()
-                    }
-                }
-                //by days ago case
-            } else {
-                const today = new Date()
-                return params.condition === 'above'
-                    ? lastPlayedTimeMs >=
-                          new Date(
-                              today.getUTCFullYear(),
-                              today.getUTCMonth(),
-                              today.getUTCDate() - params.daysAgo!
-                          ).getTime()
-                    : lastPlayedTimeMs <
-                          new Date(
-                              today.getUTCFullYear(),
-                              today.getUTCMonth(),
-                              today.getUTCDate() + 1 - params.daysAgo!
-                          ).getTime()
-            }
+            return dateFilterLogic(lastPlayedTimeMs, params)
         },
         'family sharing': (params: FilterParams<'family sharing'>, appOverview: SteamAppOverview) => {
             const isInSharedCollection = collectionStore.sharedLibrariesCollections.some(collection => {
@@ -864,14 +734,29 @@ export class Filter {
     /**
      * Checks if a game passes a given filter.
      * @param filterSettings The filter to run.
-     * @param appOverview The app to check
+     * @param appOverview The app to check.
+     * @param tagOverrides The tag overrides.
      * @returns True if the app meets the filter criteria.
      */
-    static run(filterSettings: TabFilterSettings<FilterType>, appOverview: SteamAppOverview): boolean {
-        const shouldInclude = (this.filterFunctions[filterSettings.type] as FilterFunction)(
-            filterSettings.params,
-            appOverview
-        )
+    static run(
+        filterSettings: TabFilterSettings<FilterType>,
+        appOverview: SteamAppOverview,
+        tagOverrides: TagOverrideDict
+    ): boolean {
+        let shouldInclude: boolean
+
+        if (filterSettings.type === 'tags' || filterSettings.type === 'merge') {
+            shouldInclude = (this.filterFunctions[filterSettings.type] as FilterFunctionWithTags)(
+                filterSettings.params,
+                appOverview,
+                tagOverrides
+            )
+        } else {
+            shouldInclude = (this.filterFunctions[filterSettings.type] as FilterFunction)(
+                filterSettings.params,
+                appOverview
+            )
+        }
         return filterSettings.inverted ? !shouldInclude : shouldInclude
     }
 }

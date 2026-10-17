@@ -1,8 +1,9 @@
 import { ButtonItem, Focusable } from '@decky/ui'
-import React, { VFC, useState, Fragment } from 'react'
+import React, { useState, Fragment } from 'react'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaCircleCheck, FaCircleExclamation, FaCircleXmark } from 'react-icons/fa6'
-import { playUISound } from '../../lib/Utils'
+import { trans_string as t, playUISound } from '@utils'
+import { TabSettings } from '@types'
 
 type TabAccordionIconProps = {
     index: number
@@ -12,12 +13,12 @@ type TabAccordionIconProps = {
     isPassing: boolean
 }
 
-const TabAccordionIcon: VFC<TabAccordionIconProps> = ({ index, tab, open, isDeleted, isPassing }) => {
+const TabAccordionIcon = ({ index, tab, open, isDeleted, isPassing }: TabAccordionIconProps) => {
     if (isDeleted) {
         return (
             <div className='check-cont' style={{ pointerEvents: 'none' }}>
                 <FaCircleXmark fill='red' />
-                Deleting Tab {index + 1} - {tab.title}
+                {t('MESSAGE_DELETING_TAB', 'Deleting Tab')} {index + 1} - {tab.title}
             </div>
         )
     } else {
@@ -25,7 +26,7 @@ const TabAccordionIcon: VFC<TabAccordionIconProps> = ({ index, tab, open, isDele
             <>
                 <div className='check-cont' style={{ pointerEvents: 'none' }}>
                     {isPassing ? <FaCircleCheck fill='#00f500' /> : <FaCircleExclamation fill='yellow' />}
-                    Tab {index + 1} - {tab.title}
+                    {t('LABEL_TAB', 'Tab')} {index + 1} - {tab.title}
                 </div>
                 <BiSolidDownArrow
                     style={{
@@ -53,14 +54,7 @@ type TabErrorsAccordionProps = {
 /**
  * Filter Section accordion component
  */
-export const TabErrorsAccordion: VFC<TabErrorsAccordionProps> = ({
-    index,
-    isPassing,
-    isDeleted,
-    tab,
-    isOpen,
-    children,
-}) => {
+export const TabErrorsAccordion = ({ index, isPassing, isDeleted, tab, isOpen, children }: TabErrorsAccordionProps) => {
     const [open, setOpen] = useState(isOpen)
 
     function onClick(e: any) {

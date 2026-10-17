@@ -1,10 +1,11 @@
 import { DialogButton, ModalRoot, PanelSection, PanelSectionRow } from '@decky/ui'
-import { useState, VFC, useEffect, Fragment } from 'react'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
-import { TabMasterContextProvider } from '../../state/TabMasterContext'
-import type { TabMasterManager } from '../../state/TabMasterManager'
+import { useState, useEffect, Fragment } from 'react'
+import { PythonInterop } from '@lib'
+import { TabMasterContextProvider, type TabMasterManager } from '@state'
 import { TabErrorsPanel } from '../changes-needed/TabErrorsPanel'
 import { FixModalStyles } from '../styles/FixModalStyles'
+import { trans_string as t } from '@utils'
+import { TabSettingsDictionary, FilterErrorEntry, TabSettings } from '@types'
 
 type FixTabErrorsModalRootProps = {
     closeModal?: () => void
@@ -17,28 +18,30 @@ type FixTabErrorsModalRootProps = {
 /**
  * Modal root for the Changes Needed modal.
  */
-export const FixTabErrorsModalRoot: VFC<FixTabErrorsModalRootProps> = ({
+export const FixTabErrorsModalRoot = ({
     closeModal,
     onConfirm,
     tabs,
     erroredFiltersMap,
     tabMasterManager,
-}) => {
+}: FixTabErrorsModalRootProps) => {
     return (
-        <div className='tab-master-fix-modal-scope'>
+        <>
             <FixModalStyles />
-            {/* Steam throws a fit if onCancel isn't present, so we made it do nothing */}
-            <ModalRoot bAllowFullSize onCancel={() => {}}>
-                <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-                    <FixTabErrorsModal
-                        onConfirm={onConfirm}
-                        closeModal={closeModal!}
-                        tabs={{ ...tabs }}
-                        erroredFiltersMap={erroredFiltersMap}
-                    />
-                </TabMasterContextProvider>
-            </ModalRoot>
-        </div>
+            <div className='tab-master-fix-modal-scope'>
+                {/* Steam throws a fit if onCancel isn't present, so we made it do nothing */}
+                <ModalRoot bAllowFullSize onCancel={() => {}}>
+                    <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+                        <FixTabErrorsModal
+                            onConfirm={onConfirm}
+                            closeModal={closeModal!}
+                            tabs={{ ...tabs }}
+                            erroredFiltersMap={erroredFiltersMap}
+                        />
+                    </TabMasterContextProvider>
+                </ModalRoot>
+            </div>
+        </>
     )
 }
 
@@ -52,7 +55,7 @@ type FixTabErrorsModalProps = {
 /**
  * The modal for fixing tabs with filter errors.
  */
-const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal, tabs, erroredFiltersMap }) => {
+const FixTabErrorsModal = ({ onConfirm, closeModal, tabs, erroredFiltersMap }: FixTabErrorsModalProps) => {
     const [changedTabs, setChangedTabs] = useState<TabSettingsDictionary>(
         Object.fromEntries(Object.entries(tabs).filter(([id]) => erroredFiltersMap.has(id)))
     )
@@ -85,21 +88,30 @@ const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal,
             onConfirm(updatedTabs)
             closeModal()
         } else {
-            PythonInterop.toast('Error', 'Please fix all tabs before saving')
+            PythonInterop.toast(
+                t('TITLE_ERROR', 'Error'),
+                t('MESSAGE_MUST_FIX_ALL_TAB_ERRORS', 'Please fix all tabs before saving')
+            )
         }
     }
 
     return (
         <>
             <PanelSection>
-                <h1>Fixes Needed for One or More Tabs</h1>
+                <h1>{t('TITLE_TAB_FIXES_NEEDED', 'Fixes Needed for One or More Tabs')}</h1>
                 <PanelSectionRow>
-                    TabMaster has found an issue with one or more of your tabs. Please take a moment to review the issue
-                    {erroredFiltersMap.size > 1 ? 's' : ''} below, and correct{' '}
-                    {erroredFiltersMap.size > 1 ? 'them' : 'it'}.
+                    {erroredFiltersMap.size > 1
+                        ? t(
+                              'MESSAGE_TAB_ERRORS_FOUND_PLURAL',
+                              'TabMaster has found an issue with one or more of your tabs. Please take a moment to review the issues below, and correct them.'
+                          )
+                        : t(
+                              'MESSAGE_TAB_ERRORS_FOUND_SINGULAR',
+                              'TabMaster has found an issue with one or more of your tabs. Please take a moment to review the issue below, and correct it.'
+                          )}
                 </PanelSectionRow>
             </PanelSection>
-            <PanelSection title='Tabs With Errors'>
+            <PanelSection title={t('TITLE_TABS_WITH_ERRORS', 'Tabs With Errors')}>
                 <PanelSectionRow>
                     {Object.values(changedTabs).map((tab: TabSettings, idx: number) => {
                         return (
@@ -117,11 +129,11 @@ const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal,
                 <PanelSectionRow>
                     <DialogButton
                         onOKButton={onApply}
-                        onOKActionDescription='Apply Your Fixes'
+                        onOKActionDescription={t('LABEL_APPLY_YOUR_FIXES', 'Apply Your Fixes')}
                         onClick={onApply}
                         disabled={!canApply}
                     >
-                        Apply Fixes
+                        {t('LABEL_APPLY_TAB_FIXES', 'Apply Fixes')}
                     </DialogButton>
                 </PanelSectionRow>
             </PanelSection>

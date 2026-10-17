@@ -9,15 +9,16 @@ import {
     ModalRoot,
     showModal,
 } from '@decky/ui'
-import { VFC, useEffect, useMemo, useState } from 'react'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
-import { TabMasterManager } from '../../state/TabMasterManager'
-import { CustomTabContainer } from '../../state/CustomTabContainer'
+import { useEffect, useMemo, useState } from 'react'
+import { PythonInterop } from '@lib'
+import { TabMasterManager, CustomTabContainer } from '@state'
 import { v4 as uuidv4 } from 'uuid'
 import { showModalDuplicateTab } from './EditTabModal'
 import { SharedTabsModalStyles } from '../styles/SharedTabsStyles'
 import { SharedTabAccordion } from '../accordions/SharedTabAccordion'
 import { FaRegWindowMaximize } from 'react-icons/fa6'
+import { trans_string as t } from '@utils'
+import { TabSettings, TabSettingsDictionary } from '@types'
 
 type UserTabProps = {
     tab: TabSettings
@@ -25,7 +26,7 @@ type UserTabProps = {
     onConfirm: (tabSettings: TabSettings) => void
 }
 
-const UserTab: VFC<UserTabProps> = ({ tab, closeModal, onConfirm }: UserTabProps) => {
+const UserTab = ({ tab, closeModal, onConfirm }: UserTabProps) => {
     return (
         <div className='post'>
             <DialogButton
@@ -43,7 +44,8 @@ const UserTab: VFC<UserTabProps> = ({ tab, closeModal, onConfirm }: UserTabProps
                         }}
                     />
                     <Marquee>
-                        {tab.title} - {tab.filters?.length ?? 0} {tab.filters?.length === 1 ? 'Filter' : 'Filters'}
+                        {tab.title} - {tab.filters?.length ?? 0}{' '}
+                        {tab.filters?.length === 1 ? t('LABEL_FILTER', 'Filter') : t('LABEL_FILTER_PLURAL', 'Filters')}
                     </Marquee>
                 </div>
             </DialogButton>
@@ -57,11 +59,7 @@ export type SharedTabsModalProps = {
     tabMasterManager: TabMasterManager
 }
 
-export const SharedTabsModal: VFC<SharedTabsModalProps> = ({
-    closeModal,
-    onConfirm,
-    tabMasterManager,
-}: SharedTabsModalProps) => {
+export const SharedTabsModal = ({ closeModal, onConfirm, tabMasterManager }: SharedTabsModalProps) => {
     const [loading, setLoading] = useState(true)
     const [sharedTabs, setSharedTabs] = useState<Record<string, TabSettingsDictionary>>({})
 
@@ -101,7 +99,7 @@ export const SharedTabsModal: VFC<SharedTabsModalProps> = ({
                 bDisableBackgroundDismiss={false}
                 bHideCloseIcon={false}
             >
-                <DialogHeader>Shared Tabs</DialogHeader>
+                <DialogHeader>{t('TITLE_SHARED_TABS', 'Shared Tabs')}</DialogHeader>
                 <DialogBody>
                     <DialogControlsSection>
                         {/* From Decky-SGDB */}

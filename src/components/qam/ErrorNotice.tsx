@@ -1,12 +1,14 @@
 import { Field, Focusable } from '@decky/ui'
-import { FC } from 'react'
+import { ReactNode } from 'react'
 import { FaCircleExclamation } from 'react-icons/fa6'
+import { trans_string as t } from '@utils'
 
 interface ErrorNoticeProps {
     onDismiss: () => void
+    children: ReactNode
 }
 
-export const ErrorNotice: FC<ErrorNoticeProps> = ({ onDismiss, children }) => {
+export const ErrorNotice = ({ onDismiss, children }: ErrorNoticeProps) => {
     return (
         <div className='notice-field-cont' style={{ paddingBottom: '10px' }}>
             <Field
@@ -15,11 +17,11 @@ export const ErrorNotice: FC<ErrorNoticeProps> = ({ onDismiss, children }) => {
                         <Focusable
                             onActivate={() => {}}
                             onSecondaryButton={onDismiss}
-                            onSecondaryActionDescription='Clear Error'
+                            onSecondaryActionDescription={t('LABEL_CLEAR_ERROR', 'Clear Error')}
                         >
                             <h3>
                                 <FaCircleExclamation style={{ height: '.8em', marginRight: '5px' }} fill='red' />
-                                Tab Master encountered an error
+                                {t('MESSAGE_TABMASTER_ERROR', 'Tab Master encountered an error')}
                             </h3>
                             {children}
                         </Focusable>

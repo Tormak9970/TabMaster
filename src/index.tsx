@@ -1,15 +1,24 @@
 import { definePlugin, RoutePatch, routerHook } from '@decky/api'
 import { TbLayoutNavbarExpand } from 'react-icons/tb'
-import { PluginController } from './lib/controllers/PluginController'
-import { TabMasterContextProvider } from './state/TabMasterContext'
-import { TabMasterManager } from './state/TabMasterManager'
-import { patchLibrary } from './patches/LibraryPatch'
-import { patchSettings } from './patches/SettingsPatch'
+import { PluginController, MicroSDeckInterop } from '@lib'
+import { SettingsContextProvider, SettingsManager, TabMasterContextProvider, TabMasterManager } from '@state'
+import { patchLibrary, patchSettings } from '@patches'
 import { MicroSDeck } from '@cebbinghaus/microsdeck'
-import { MicroSDeckInterop } from './lib/controllers/MicroSDeckInterop'
 import { QuickAccessContent, QuickAccessTitleView } from './components/qam/QuickAccessContent'
-import { DocsRouter } from './components/docs/DocsRouter'
 import { Fragment } from 'react'
+import {
+    DeckyLoader,
+    CollectionStore,
+    AppStore,
+    LoginStore,
+    FriendStore,
+    SecurityStore,
+    SettingsStore,
+    InstallFolderStore,
+    AppAchievementProgressCache,
+    LocalizationManager,
+} from '@types'
+import { SettingsRouter } from './components/settings/SettingsRouter'
 
 declare global {
     let DeckyPluginLoader: DeckyLoader
@@ -35,30 +44,35 @@ export default definePlugin(() => {
 
     const loginUnregisterer = PluginController.initOnLogin(async () => {
         await MicroSDeckInterop.waitForLoad()
+        await SettingsManager.loadSettings()
         await tabMasterManager.loadTabs()
         libraryPatch = patchLibrary(tabMasterManager)
         settingsPatch = patchSettings(tabMasterManager)
     })
 
-    routerHook.addRoute('/tab-master-docs', () => (
-        <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-            <DocsRouter />
-        </TabMasterContextProvider>
+    routerHook.addRoute('/tab-master-settings', () => (
+        <SettingsContextProvider>
+            <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+                <SettingsRouter />
+            </TabMasterContextProvider>
+        </SettingsContextProvider>
     ))
     return {
         name: 'TabMaster',
         title: <></>,
         titleView: <QuickAccessTitleView title='TabMaster' tabMasterManager={tabMasterManager} />,
         content: (
-            <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-                <QuickAccessContent />
-            </TabMasterContextProvider>
+            <SettingsContextProvider>
+                <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+                    <QuickAccessContent />
+                </TabMasterContextProvider>
+            </SettingsContextProvider>
         ),
         icon: <TbLayoutNavbarExpand />,
         onDismount: () => {
             routerHook.removePatch('/library', libraryPatch)
             routerHook.removePatch('/settings', settingsPatch)
-            routerHook.removeRoute('/tab-master-docs')
+            routerHook.removeRoute('/tab-master-settings')
 
             loginUnregisterer.unregister()
             PluginController.dismount()

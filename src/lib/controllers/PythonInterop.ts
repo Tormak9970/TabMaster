@@ -1,7 +1,8 @@
-import { getCompactTimestamp, validateTabStructure } from '../Utils'
-import { TabProfileDictionary } from '../../state/TabProfileManager'
+import { getCompactTimestamp, validateTabStructure } from '@utils'
+import { TabProfileDictionary } from '@state'
 import { USER_BACKUP_NAME } from '../../constants'
-import { call, FileSelectionType, openFilePicker, toaster } from '@decky/api'
+import { call, openFilePicker, toaster } from '@decky/api'
+import { UsersDict, TabSettingsDictionary, TagResponse, FriendEntry, FileSelectionType, TagOverrideDict } from '@types'
 
 /**
  * Class for frontend -> backend communication.
@@ -37,6 +38,7 @@ export class PythonInterop {
         }
 
         const res = await openFilePicker(
+            // @ts-expect-error they're the same
             FileSelectionType.FOLDER,
             startPath,
             false,
@@ -77,6 +79,7 @@ export class PythonInterop {
         }
 
         const res = await openFilePicker(
+            // @ts-expect-error they're the same
             FileSelectionType.FILE,
             startPath,
             true,
@@ -201,6 +204,20 @@ export class PythonInterop {
     }
 
     /**
+     * Gets the plugin's tag overrides.
+     * @returns A promise resolving to the plugin's tag overrides.
+     */
+    static async getTagOverrides(): Promise<TagOverrideDict | Error | null> {
+        try {
+            const result = await call<[], TagOverrideDict>('get_tag_overrides')
+
+            return result
+        } catch (e: any) {
+            return e
+        }
+    }
+
+    /**
      * Gets the shared tabs.
      * @returns A promise resolving to the shared tabs or null when the tab structure fails validation
      */
@@ -285,6 +302,19 @@ export class PythonInterop {
 
         try {
             return await call<[tabs: TabSettingsDictionary], void>('set_tabs', tabs)
+        } catch (e: any) {
+            return e
+        }
+    }
+
+    /**
+     * Sets the plugin's tag overrides.
+     * @param tagOverrides The plugin's tag overrides.
+     * @returns A promise resolving to whether or not the overrides were successfully set.
+     */
+    static async setTagOverrides(tagOverrides: TagOverrideDict): Promise<void | Error> {
+        try {
+            return await call<[tag_overrides: TagOverrideDict], void>('set_tag_overrides', tagOverrides)
         } catch (e: any) {
             return e
         }

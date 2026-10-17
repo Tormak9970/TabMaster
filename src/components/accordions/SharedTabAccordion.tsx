@@ -1,8 +1,9 @@
 import { ButtonItem, Focusable } from '@decky/ui'
-import { VFC, ReactNode, useState } from 'react'
-import { playUISound } from '../../lib/Utils'
+import { ReactNode, useState } from 'react'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaUser } from 'react-icons/fa6'
+import { trans_string as t, playUISound } from '@utils'
+import { TabSettings } from '@types'
 
 type SharedTabAccordionProps = {
     user: string
@@ -14,7 +15,7 @@ type SharedTabAccordionProps = {
 /**
  * Shared Tab accordion component
  */
-export const SharedTabAccordion: VFC<SharedTabAccordionProps> = ({ user, tabs, isOpen, children }) => {
+export const SharedTabAccordion = ({ user, tabs, isOpen, children }: SharedTabAccordionProps) => {
     const [open, setOpen] = useState(isOpen)
 
     const tabCount = tabs.length
@@ -38,7 +39,7 @@ export const SharedTabAccordion: VFC<SharedTabAccordionProps> = ({ user, tabs, i
                         style={{ display: 'flex', alignItems: 'center', pointerEvents: 'none' }}
                     >
                         <FaUser size='0.9em' style={{ marginRight: '3px', color: '#009e0eb3' }} />
-                        {user} - {tabCount} {tabCount === 1 ? 'Tab' : 'Tabs'}
+                        {user} - {tabCount} {tabCount === 1 ? t('LABEL_TAB', 'Tab') : t('LABEL_TABS', 'Tabs')}
                     </div>
                     <div className='filter-line' style={{ flexGrow: '1', pointerEvents: 'none' }} />
                     <BiSolidDownArrow

@@ -1,8 +1,9 @@
 import { BiSolidHide } from 'react-icons/bi'
-import { CSSProperties, Fragment, VFC } from 'react'
+import { CSSProperties, Fragment } from 'react'
 import { FaSteam } from 'react-icons/fa6'
 import { FaSdCard } from 'react-icons/fa'
-import { CustomTabContainer } from '../../state/CustomTabContainer'
+import { CustomTabContainer } from '@state'
+import { TabContainer } from '@types'
 
 interface TabListLabelProps {
     tabContainer: TabContainer
@@ -13,7 +14,7 @@ interface TabListLabelProps {
 /**
  * Tab name and associated icons, used where tabs are listed in QAM and Library menu.
  */
-export const TabListLabel: VFC<TabListLabelProps> = ({ tabContainer, microSDeckDisabled, style }) => {
+export const TabListLabel = ({ tabContainer, microSDeckDisabled, style }: TabListLabelProps) => {
     return (
         <div style={{ display: 'flex', alignItems: 'center', width: '100%', ...style }}>
             <div style={{ marginRight: '5px' }}>{tabContainer.title}</div>

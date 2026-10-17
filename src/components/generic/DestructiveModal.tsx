@@ -1,9 +1,9 @@
 import { ConfirmModal, ConfirmModalProps, gamepadDialogClasses } from '@decky/ui'
-import { Fragment, VFC } from 'react'
+import { Fragment } from 'react'
 
 export interface DestructiveModalProps extends Omit<ConfirmModalProps, 'bDestructiveWarning'> {}
 
-export const DestructiveModal: VFC<DestructiveModalProps> = ({ className, ...props }) => {
+export const DestructiveModal = ({ className, ...props }: DestructiveModalProps) => {
     return (
         <>
             <style>{`.tab-master-destructive-modal button.${gamepadDialogClasses.Button}.DialogButton.gpfocus.Primary {

@@ -8,39 +8,26 @@ import {
     showModal,
     ConfirmModal,
 } from '@decky/ui'
-import { VFC, useState } from 'react'
+import { useState } from 'react'
 
-import {
-    FaBook,
-    FaBookmark,
-    FaArrowUpFromBracket,
-    FaArrowRightToBracket,
-    FaFolderPlus,
-    FaSlideshare,
-} from 'react-icons/fa6'
+import { FaBookmark, FaArrowUpFromBracket, FaArrowRightToBracket, FaFolderPlus, FaSlideshare } from 'react-icons/fa6'
 import { PiListPlusBold } from 'react-icons/pi'
 
-import { useTabMasterContext } from '../../state/TabMasterContext'
+import { useTabMasterContext, CustomTabContainer, TabMasterManager } from '@state'
 
 import { QamStyles } from '../styles/QamStyles'
 import { showModalNewTab } from '../modals/EditTabModal'
-import { LogController } from '../../lib/controllers/LogController'
 import { PresetMenu } from '../context-menus/PresetMenu'
-import {
-    MicroSDeckInstallState,
-    MicroSDeckInterop,
-    microSDeckLibVersion,
-} from '../../lib/controllers/MicroSDeckInterop'
+import { MicroSDeckInstallState, MicroSDeckInterop, microSDeckLibVersion, PythonInterop, LogController } from '@lib'
 import { MicroSDeckNotice } from './MicroSDeckNotice'
-import { CustomTabContainer } from '../../state/CustomTabContainer'
 import { TabProfilesMenu } from '../context-menus/TabProfileMenu'
-import { TabMasterManager } from '../../state/TabMasterManager'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
 import { GITHUB_URL, DISCORD_URL } from '../../constants'
 import { InvalidSettingsNotice } from './InvalidSettingsNotice'
 import { TabsPanelSection } from './TabsPanelSection'
 import { ErrorNotice } from './ErrorNotice'
 import { showModalSharedTabs } from '../modals/SharedTabsModal'
+import { trans_string as t } from '@utils'
+import { FaCog } from 'react-icons/fa'
 
 export type TabIdEntryType = {
     id: string
@@ -53,12 +40,13 @@ const restartSteam = () => {
 const showRestartConfirm = () => {
     showModal(
         <ConfirmModal
-            strTitle={'Restart Steam?'}
-            strCancelButtonText={'Later'}
-            strOKButtonText={'Restart Now'}
-            strDescription={
+            strTitle={t('TITLE_RESTART_STEAM', 'Restart Steam?')}
+            strCancelButtonText={t('LABEL_RESTART_LATER', 'Later')}
+            strOKButtonText={t('LABEL_RESTART_NOW', 'Restart Now')}
+            strDescription={t(
+                'MESSAGE_RESTART_REASON',
                 'Your backup has been restored. TabMaster has been set to not save changes until you restart to avoid overwriting your restored settings. It is strongly recommend to restart as soon as possible'
-            }
+            )}
             onOK={restartSteam}
         />
     )
@@ -67,7 +55,7 @@ const showRestartConfirm = () => {
 /**
  * The Quick Access Menu content for TabMaster.
  */
-export const QuickAccessContent: VFC<{}> = ({}) => {
+export const QuickAccessContent = ({}) => {
     const [microSDeckNoticeHidden, setMicroSDeckNoticeHidden] = useState(MicroSDeckInterop.noticeHidden)
     const [showError, setShowError] = useState(LogController.errorFlag)
     const { visibleTabsList, tabMasterManager } = useTabMasterContext()
@@ -111,15 +99,15 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
 
     const support = (
         <div style={{ wordWrap: 'break-word' }}>
-            Please reach out to
+            {t('MESSAGE_SUPPORT_REACHOUT', 'Please reach out to')}
             <br />
             <a href={GITHUB_URL}>{GITHUB_URL}</a>
             <br />
-            or
+            {t('MESSAGE_SUPPORT_OR', 'or')}
             <br />
             <a href={DISCORD_URL}>{DISCORD_URL}</a>
             <br />
-            for support.
+            {t('MESSAGE_SUPPORT_END', 'for support.')}
         </div>
     )
 
@@ -146,7 +134,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
                                     setMicroSDeckNoticeHidden(true)
                                 }}
                             >
-                                Hide Notice
+                                {t('LABEL_HIDE_NOTICE', 'Hide Notice')}
                             </DialogButton>
                         </div>
                     </Field>
@@ -156,7 +144,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
             {!showResetTabs && (
                 <Focusable>
                     <div style={{ margin: '5px', marginTop: '0px' }}>
-                        Here you can add, re-order, or remove tabs from the library.
+                        {t('MESSAGE_QAM_DESCRIPTION', 'Here you can add, re-order, or remove tabs from the library.')}
                     </div>
                     <Field childrenContainerWidth='max' className='no-sep'>
                         <Focusable style={{ width: '100%', display: 'flex' }}>
@@ -174,7 +162,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
                                         alignItems: 'center',
                                     }}
                                     onClick={() => showModalNewTab(tabMasterManager)}
-                                    onOKActionDescription={'Add Tab'}
+                                    onOKActionDescription={t('LABEL_ADD_TAB', 'Add Tab')}
                                 >
                                     <FaFolderPlus size='1em' />
                                 </DialogButton>
@@ -192,7 +180,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
                                         justifyContent: 'center',
                                         alignItems: 'center',
                                     }}
-                                    onOKActionDescription={'Add Quick Tab'}
+                                    onOKActionDescription={t('LABEL_ADD_QUICK_TAB', 'Add Quick Tab')}
                                     onClick={() =>
                                         showContextMenu(
                                             <PresetMenu
@@ -218,7 +206,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
                                         justifyContent: 'center',
                                         alignItems: 'center',
                                     }}
-                                    onOKActionDescription={'View Shared Tabs'}
+                                    onOKActionDescription={t('LABEL_VIEW_SHARED_TABS', 'View Shared Tabs')}
                                     onClick={() => showModalSharedTabs(tabMasterManager)}
                                 >
                                     <FaSlideshare size='1.4em' />
@@ -237,7 +225,7 @@ export const QuickAccessContent: VFC<{}> = ({}) => {
                                         justifyContent: 'center',
                                         alignItems: 'center',
                                     }}
-                                    onOKActionDescription={'Restore Settings'}
+                                    onOKActionDescription={t('LABEL_RESTORE_SETTINGS', 'Restore Settings')}
                                     onClick={handleRestorePrompt}
                                 >
                                     <FaArrowRightToBracket size='1em' rotate={90} />
@@ -297,7 +285,7 @@ const buttonStyle = {
     alignItems: 'center',
 }
 
-export const QuickAccessTitleView: VFC<QuickAccessTitleViewProps> = ({ title, tabMasterManager }) => {
+export const QuickAccessTitleView = ({ title, tabMasterManager }: QuickAccessTitleViewProps) => {
     return (
         <Focusable
             style={{
@@ -311,21 +299,21 @@ export const QuickAccessTitleView: VFC<QuickAccessTitleViewProps> = ({ title, ta
             <div style={{ marginRight: 'auto' }}>{title}</div>
             <DialogButton
                 disabled={!tabMasterManager.hasSettingsLoaded}
-                onOKActionDescription='Manage Tab Profiles'
+                onOKActionDescription={t('LABEL_MANAGE_TAB_PROFILES', 'Manage Tab Profiles')}
                 style={buttonStyle}
                 onClick={() => showContextMenu(<TabProfilesMenu tabMasterManager={tabMasterManager} />)}
             >
                 <FaBookmark size='0.9em' />
             </DialogButton>
             <DialogButton
-                onOKActionDescription='Open Docs'
+                onOKActionDescription={t('LABEL_OPEN_SETTINGS', 'Open Settings')}
                 style={buttonStyle}
                 onClick={() => {
                     Navigation.CloseSideMenus()
-                    Navigation.Navigate('/tab-master-docs')
+                    Navigation.Navigate('/tab-master-settings')
                 }}
             >
-                <FaBook size='0.9em' />
+                <FaCog size='0.9em' />
             </DialogButton>
         </Focusable>
     )

@@ -11,7 +11,7 @@ import {
     GamepadEvent,
     GamepadButton,
 } from '@decky/ui'
-import { VFC, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { IconType } from 'react-icons/lib'
 import { FixedSizeList as List } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
@@ -19,6 +19,7 @@ import { FaMagnifyingGlass } from 'react-icons/fa6'
 import { BaseModalProps, CustomDropdown } from '../generic/CustomDropdown'
 import { ListSearchModalStyles } from '../styles/ListSearchModalStyles'
 import { BiSolidDownArrow, BiSolidUpArrow } from 'react-icons/bi'
+import { trans_string as t } from '@utils'
 
 export type ListSearchModalProps = {
     rgOptions: SingleDropdownOption[]
@@ -33,7 +34,7 @@ const iconStyles = {
     width: '1em',
 }
 
-export const ListSearchModal: VFC<ListSearchModalProps> = ({
+export const ListSearchModal = ({
     rgOptions: list,
     entryLabel,
     determineEntryIcon,
@@ -103,7 +104,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({
                 searchRef?.current?.element?.click?.()
             }
         },
-        actionDescriptionMap: { [GamepadButton.SELECT]: 'Search' },
+        actionDescriptionMap: { [GamepadButton.SELECT]: t('LABEL_SEARCH', 'Search') },
     }
 
     return (
@@ -131,7 +132,7 @@ export const ListSearchModal: VFC<ListSearchModalProps> = ({
                             <div style={{ width: '100%' }}>
                                 <TextField
                                     value={query}
-                                    placeholder={`Search ${entryLabel}...`}
+                                    placeholder={`${t('PLACEHOLDER_SEARCH', 'Search')} ${entryLabel}...`}
                                     onChange={e => {
                                         listRef.current?.scrollToItem(0)
                                         setQuery(e.target.value)
@@ -210,7 +211,7 @@ export function ListSearchTrigger({
     determineEntryIcon,
     disabled,
 }: ListSearchTriggerProps) {
-    const ModalWrapper: VFC<BaseModalProps> = ({ onSelectOption, rgOptions, closeModal }: BaseModalProps) => {
+    const ModalWrapper = ({ onSelectOption, rgOptions, closeModal }: BaseModalProps) => {
         return (
             <ListSearchModal
                 entryLabel={entryLabel}
