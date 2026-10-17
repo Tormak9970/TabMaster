@@ -3,7 +3,6 @@ import { TagOverrideDict } from '@types'
 import { SettingsManager } from './SettingsManager'
 
 interface SettingsContextProviderProps {
-    settingsManager: SettingsManager
     children: ReactNode
 }
 
@@ -11,31 +10,29 @@ interface SettingsManagerData {
     tagOverrides: TagOverrideDict
     setTagOverrides: (overrides: TagOverrideDict) => Promise<void | Error>
 }
-interface SettingsContextType extends SettingsManagerData {
-    settingsManager: SettingsManager
-}
+interface SettingsContextType extends SettingsManagerData {}
 
 const SettingsContext = createContext<SettingsContextType>(null as any)
 export const useSettingsContext = () => useContext(SettingsContext)
 
-export const SettingsContextProvider = ({ children, settingsManager }: SettingsContextProviderProps) => {
+export const SettingsContextProvider = ({ children }: SettingsContextProviderProps) => {
     const [publicState, setPublicState] = useState<SettingsManagerData>({
-        tagOverrides: settingsManager.getTagOverrides(),
-        setTagOverrides: overrides => settingsManager.setTagOverrides(overrides),
+        tagOverrides: SettingsManager.getTagOverrides(),
+        setTagOverrides: overrides => SettingsManager.setTagOverrides(overrides),
     })
 
     useEffect(() => {
         function onUpdate() {
             setPublicState({
-                tagOverrides: settingsManager.getTagOverrides(),
-                setTagOverrides: overrides => settingsManager.setTagOverrides(overrides),
+                tagOverrides: SettingsManager.getTagOverrides(),
+                setTagOverrides: overrides => SettingsManager.setTagOverrides(overrides),
             })
         }
 
-        settingsManager.eventBus.addEventListener('stateUpdate', onUpdate)
+        SettingsManager.eventBus.addEventListener('stateUpdate', onUpdate)
 
         return () => {
-            settingsManager.eventBus.removeEventListener('stateUpdate', onUpdate)
+            SettingsManager.eventBus.removeEventListener('stateUpdate', onUpdate)
         }
     }, [])
 
@@ -43,7 +40,6 @@ export const SettingsContextProvider = ({ children, settingsManager }: SettingsC
         <SettingsContext.Provider
             value={{
                 ...publicState,
-                settingsManager,
             }}
         >
             {children}

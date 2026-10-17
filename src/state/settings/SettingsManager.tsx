@@ -2,56 +2,58 @@ import { TagOverrideDict } from '@types'
 import { PythonInterop } from '../../lib/controllers/PythonInterop'
 import { LogController } from '../../lib/controllers/LogController'
 
+type TagOverrideReaction = (tagOverrides: TagOverrideDict) => void
+
 /**
  * Class that handles TabMaster's Settings state.
  */
 export class SettingsManager {
-    private hasLoaded: boolean
+    private static userTagOverrides: TagOverrideDict = {}
 
-    private userTagOverrides: TagOverrideDict = {}
+    private static onTagOverrideChangeReaction: TagOverrideReaction = (_tagOverrides: TagOverrideDict) => {}
 
-    public eventBus = new EventTarget()
+    public static eventBus = new EventTarget()
 
-    /**
-     * Creates a new SettingsManager.
-     */
-    constructor() {
-        this.hasLoaded = false
-    }
-
-    async loadSettings() {
+    static async loadSettings() {
         const tagOverrideRes = await PythonInterop.getTagOverrides()
 
         if (tagOverrideRes instanceof Error) {
             LogController.raiseError(`Error loading tag overrides \n ${tagOverrideRes.message}`)
         } else {
-            this.userTagOverrides = tagOverrideRes ?? {}
-            this.eventBus.dispatchEvent(new Event('stateUpdate'))
+            SettingsManager.userTagOverrides = tagOverrideRes ?? {}
+            SettingsManager.eventBus.dispatchEvent(new Event('stateUpdate'))
         }
-
-        this.hasLoaded = true
     }
 
     /**
      * Gets the user's tag overrides.
      * @returns The user's tag overrides.
      */
-    getTagOverrides(): TagOverrideDict {
-        return this.userTagOverrides
+    static getTagOverrides(): TagOverrideDict {
+        return SettingsManager.userTagOverrides
     }
 
     /**
      * Saves the user's tag override settings.
      * @param overrides The new tag overrides.
      */
-    async setTagOverrides(overrides: TagOverrideDict) {
+    static async setTagOverrides(overrides: TagOverrideDict) {
         const res = await PythonInterop.setTagOverrides(overrides)
 
         if (res instanceof Error) {
             LogController.raiseError(`Error saving tag overrides \n ${res.message}`)
         } else {
-            this.userTagOverrides = overrides
-            this.eventBus.dispatchEvent(new Event('stateUpdate'))
+            SettingsManager.userTagOverrides = overrides
+            SettingsManager.onTagOverrideChangeReaction(overrides)
+            SettingsManager.eventBus.dispatchEvent(new Event('stateUpdate'))
         }
+    }
+
+    /**
+     * Set the reaction to call whenever the tagOverrides change
+     * @param reaction The reaction to use.
+     */
+    static async setTagOverrideReaction(reaction: TagOverrideReaction) {
+        this.onTagOverrideChangeReaction = reaction
     }
 }

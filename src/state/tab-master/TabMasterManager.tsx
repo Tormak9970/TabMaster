@@ -19,6 +19,7 @@ import {
     TabSettingsDictionary,
     TabSettings,
 } from '@types'
+import { SettingsManager } from '@state'
 
 /**
  * Converts a list of filters into a 1D array.
@@ -171,6 +172,9 @@ export class TabMasterManager {
         this.addDisposer(
             reaction(() => appStore.m_mapStoreTagLocalization, this.storeTagReaction.bind(this), { delay: 50 })
         )
+
+        // * subscribe to tag override changes
+        SettingsManager.setTagOverrideReaction(this.tagOverridesReaction.bind(this))
 
         // * subscribe to achievement cache changes
         this.addDisposer(
@@ -325,6 +329,25 @@ export class TabMasterManager {
         } else {
             LogController.error('Failed to get store tags. Both _data and data_ were undefined')
         }
+    }
+
+    /**
+     * Handles updating tabs when the user's tagOverrides change.
+     */
+    private tagOverridesReaction() {
+        const customTabsList = this.visibleTabsList.filter(
+            tabContainer => tabContainer.filters && tabContainer.filters.length !== 0
+        )
+
+        customTabsList.forEach(tabContainer => {
+            const tagsFilters = tabContainer.filters!.filter(
+                (filter: TabFilterSettings<FilterType>) => filter.type === 'tags'
+            ) as TabFilterSettings<'tags'>[]
+
+            if (tagsFilters.length > 0) {
+                ;(tabContainer as CustomTabContainer).buildCollection()
+            }
+        })
     }
 
     /**

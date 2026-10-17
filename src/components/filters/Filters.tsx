@@ -32,6 +32,7 @@ import {
     ValidationResponse,
     FilterErrorEntry,
     DateIncludes,
+    TagOverrideDict,
 } from '@types'
 
 function getSteamOSCompatCategory(app: SteamAppOverview) {
@@ -39,6 +40,11 @@ function getSteamOSCompatCategory(app: SteamAppOverview) {
 }
 
 type FilterFunction = (params: FilterParams<FilterType>, appOverview: SteamAppOverview) => boolean
+type FilterFunctionWithTags = (
+    params: FilterParams<FilterType>,
+    appOverview: SteamAppOverview,
+    tagOverrides: TagOverrideDict
+) => boolean
 
 /**
  * Define the deafult params for a filter type here
@@ -494,11 +500,30 @@ export class Filter {
                 return params.friends.some(friend => friendsWhoOwn.includes(friend))
             }
         },
-        tags: (params: FilterParams<'tags'>, appOverview: SteamAppOverview) => {
+        tags: (params: FilterParams<'tags'>, appOverview: SteamAppOverview, tagOverrides: TagOverrideDict) => {
+            const override = tagOverrides[appOverview.appid]
+
+            const containsTag = (tag: number) => {
+                const includesTag = appOverview.store_tag.includes(tag)
+                if (override) {
+                    const tagSpecific = override[tag]
+
+                    if (tagSpecific === false && includesTag) {
+                        return false
+                    }
+
+                    if (tagSpecific === true && !includesTag) {
+                        return true
+                    }
+                }
+
+                return includesTag
+            }
+
             if (params.mode === 'and') {
-                return params.tags.every((tag: number) => appOverview.store_tag.includes(tag))
+                return params.tags.every(containsTag)
             } else {
-                return params.tags.some((tag: number) => appOverview.store_tag.includes(tag))
+                return params.tags.some(containsTag)
             }
         },
         whitelist: (params: FilterParams<'whitelist'>, appOverview: SteamAppOverview) => {
@@ -507,11 +532,11 @@ export class Filter {
         blacklist: (params: FilterParams<'whitelist'>, appOverview: SteamAppOverview) => {
             return !params.games.includes(appOverview.appid)
         },
-        merge: (params: FilterParams<'merge'>, appOverview: SteamAppOverview) => {
+        merge: (params: FilterParams<'merge'>, appOverview: SteamAppOverview, tagOverrides: TagOverrideDict) => {
             if (params.mode === 'and') {
-                return params.filters.every(filterSettings => Filter.run(filterSettings, appOverview))
+                return params.filters.every(filterSettings => Filter.run(filterSettings, appOverview, tagOverrides))
             } else {
-                return params.filters.some(filterSettings => Filter.run(filterSettings, appOverview))
+                return params.filters.some(filterSettings => Filter.run(filterSettings, appOverview, tagOverrides))
             }
         },
         platform: (params: FilterParams<'platform'>, appOverview: SteamAppOverview) => {
@@ -777,14 +802,29 @@ export class Filter {
     /**
      * Checks if a game passes a given filter.
      * @param filterSettings The filter to run.
-     * @param appOverview The app to check
+     * @param appOverview The app to check.
+     * @param tagOverrides The tag overrides.
      * @returns True if the app meets the filter criteria.
      */
-    static run(filterSettings: TabFilterSettings<FilterType>, appOverview: SteamAppOverview): boolean {
-        const shouldInclude = (this.filterFunctions[filterSettings.type] as FilterFunction)(
-            filterSettings.params,
-            appOverview
-        )
+    static run(
+        filterSettings: TabFilterSettings<FilterType>,
+        appOverview: SteamAppOverview,
+        tagOverrides: TagOverrideDict
+    ): boolean {
+        let shouldInclude: boolean
+
+        if (filterSettings.type === 'tags' || filterSettings.type === 'merge') {
+            shouldInclude = (this.filterFunctions[filterSettings.type] as FilterFunctionWithTags)(
+                filterSettings.params,
+                appOverview,
+                tagOverrides
+            )
+        } else {
+            shouldInclude = (this.filterFunctions[filterSettings.type] as FilterFunction)(
+                filterSettings.params,
+                appOverview
+            )
+        }
         return filterSettings.inverted ? !shouldInclude : shouldInclude
     }
 }

@@ -40,19 +40,18 @@ export default definePlugin(() => {
     let settingsPatch: RoutePatch
 
     const tabMasterManager = new TabMasterManager()
-    const settingsManager = new SettingsManager()
     PluginController.setup(tabMasterManager)
 
     const loginUnregisterer = PluginController.initOnLogin(async () => {
         await MicroSDeckInterop.waitForLoad()
-        await settingsManager.loadSettings()
+        await SettingsManager.loadSettings()
         await tabMasterManager.loadTabs()
         libraryPatch = patchLibrary(tabMasterManager)
         settingsPatch = patchSettings(tabMasterManager)
     })
 
     routerHook.addRoute('/tab-master-settings', () => (
-        <SettingsContextProvider settingsManager={settingsManager}>
+        <SettingsContextProvider>
             <TabMasterContextProvider tabMasterManager={tabMasterManager}>
                 <SettingsRouter />
             </TabMasterContextProvider>
@@ -63,7 +62,7 @@ export default definePlugin(() => {
         title: <></>,
         titleView: <QuickAccessTitleView title='TabMaster' tabMasterManager={tabMasterManager} />,
         content: (
-            <SettingsContextProvider settingsManager={settingsManager}>
+            <SettingsContextProvider>
                 <TabMasterContextProvider tabMasterManager={tabMasterManager}>
                     <QuickAccessContent />
                 </TabMasterContextProvider>

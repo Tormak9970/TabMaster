@@ -17,6 +17,7 @@ import {
     AppId,
     TabContext,
 } from '@types'
+import { SettingsManager } from '@state'
 
 /**
  * Wrapper for injecting custom tabs.
@@ -137,6 +138,9 @@ export class CustomTabContainer implements TabContainer {
      * Builds the list of apps for this tab.
      */
     buildCollection() {
+        console.log('rebuilding!')
+        const tagOverrides = SettingsManager.getTagOverrides()
+
         const { hidden, ...catsToIncludeObj } = getIncludedCategoriesFromBitField(this.categoriesToInclude)
         const visibility = hidden ? 'allApps' : 'visibleApps'
         let listToFilter: SteamAppOverview[] = []
@@ -151,9 +155,9 @@ export class CustomTabContainer implements TabContainer {
 
         const appsList = listToFilter.filter(appItem => {
             if (this.filtersMode === 'and') {
-                return this.filters.every(filterSettings => Filter.run(filterSettings, appItem))
+                return this.filters.every(filterSettings => Filter.run(filterSettings, appItem, tagOverrides))
             } else {
-                return this.filters.some(filterSettings => Filter.run(filterSettings, appItem))
+                return this.filters.some(filterSettings => Filter.run(filterSettings, appItem, tagOverrides))
             }
         })
 
