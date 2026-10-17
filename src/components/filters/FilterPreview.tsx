@@ -157,6 +157,7 @@ const ReleaseDateFilterPreview = ({ filter }: FilterPreviewProps<'release date'>
         filter.type,
         filter.params.date,
         filter.params.daysAgo,
+        filter.params.isUnknown,
         filter.params.condition
     )
 
@@ -168,6 +169,7 @@ const PurchaseDateFilterPreview = ({ filter }: FilterPreviewProps<'purchase date
         filter.type,
         filter.params.date,
         filter.params.daysAgo,
+        filter.params.isUnknown,
         filter.params.condition
     )
 
@@ -179,6 +181,7 @@ const LastPlayedFilterPreview = ({ filter }: FilterPreviewProps<'last played'>) 
         filter.type,
         filter.params.date,
         filter.params.daysAgo,
+        filter.params.isUnknown,
         filter.params.condition
     )
 

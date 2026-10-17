@@ -22,8 +22,6 @@ import { ModeMultiSelect } from '../multi-selects/ModeMultiSelect'
 import { EditMergeFilterModal } from '../modals/EditMergeFilterModal'
 import { MultiSelect } from '../multi-selects/MultiSelect'
 import { FilterPreview } from './FilterPreview'
-import { DatePicker, DateSelection } from '../generic/DatePickers'
-import { EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from '../generic/EnhancedSelector'
 import { Slider } from '../generic/Slider'
 import { STEAM_FEATURES_ID_MAP, STEAM_FEATURES_TO_RENDER } from './SteamFeatures'
 import { MicroSDeckInterop } from '@lib'
@@ -35,9 +33,6 @@ import {
     getLeastMostThresholdOptions,
     getTimeOptions,
     getTimePlayed,
-    getEarlyLateThresholdOptions,
-    getTimeframeOptions,
-    getDateFilterDisplayData,
     getAchievementDisplayData,
     getAchievementOptions,
     getSizeOnDiskDisplayData,
@@ -54,17 +49,10 @@ import {
     ThresholdCondition,
     ReviewScoreType,
     TimeUnit,
-    DateObj,
     SdCardParamType,
-    DateIncludes,
+    FilterOptionsProps,
 } from '@types'
-
-type FilterOptionsProps<T extends FilterType> = {
-    index: number
-    filter: TabFilterSettings<T>
-    containingGroupFilters: TabFilterSettings<FilterType>[]
-    setContainingGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
-}
+import { DateFilterOptions } from './utils/DateFilterOptions'
 
 /**
  * Gets an entry icon for a collection based on if its user made.
@@ -749,106 +737,12 @@ const ReleaseDateFilterOptions = ({
     filter,
     containingGroupFilters,
 }: FilterOptionsProps<'release date'>) => {
-    const [date, setDate] = useState<DateObj | undefined>(filter.params.date)
-    const [dateIncludes, setDateIncludes] = useState<DateIncludes>(
-        filter.params.date
-            ? filter.params.date.day === undefined
-                ? filter.params.date.month === undefined
-                    ? DateIncludes.yearOnly
-                    : DateIncludes.monthYear
-                : DateIncludes.dayMonthYear
-            : DateIncludes.dayMonthYear
-    )
-    const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition)
-    const [byDaysAgo, setByDaysAgo] = useState(filter.params.daysAgo !== undefined)
-    const [daysAgo, setDaysAgo] = useState<number>(filter.params.daysAgo ?? 30)
-
-    function onDateChange(dateSelection: DateSelection) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.date = dateSelection.data
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setDate(dateSelection.data)
-    }
-
-    function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition }) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.condition = threshType
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setThresholdType(threshType)
-    }
-
-    function onByDaysAgoChange(byDaysAgo: boolean) {
-        const updatedFilter = { ...filter }
-        if (byDaysAgo) {
-            delete updatedFilter.params.date
-            updatedFilter.params.daysAgo = daysAgo
-        } else {
-            delete updatedFilter.params.daysAgo
-            updatedFilter.params.date = date
-        }
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setByDaysAgo(byDaysAgo)
-    }
-
-    function onSliderChange(value: number) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.daysAgo = value
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setDaysAgo(value)
-    }
-
     return (
-        <Field
-            label={getDateFilterDisplayData('release date', date, daysAgo, thresholdType)}
-            description={
-                <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-                    {byDaysAgo ? (
-                        <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange} />
-                    ) : (
-                        <DatePicker
-                            focusDropdowns={true}
-                            modalType='simple'
-                            buttonContainerStyle={{ flex: 1 }}
-                            onChange={onDateChange}
-                            dateIncludes={dateIncludes}
-                            selectedDate={date}
-                            toLocaleStringOptions={{ dateStyle: 'long' }}
-                            animate={true}
-                            transparencyMode={EnhancedSelectorTransparencyMode.selection}
-                            focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
-                        />
-                    )}
-                    <div style={{ margin: '0 10px' }}>
-                        <Dropdown
-                            rgOptions={getTimeframeOptions()}
-                            selectedOption={dateIncludes}
-                            onChange={option => {
-                                if (option.data === 'byDaysAgo') {
-                                    onByDaysAgoChange(true)
-                                } else {
-                                    if (byDaysAgo) onByDaysAgoChange(false)
-                                    setDateIncludes(option.data)
-                                }
-                            }}
-                        />
-                    </div>
-                    <div>
-                        <Dropdown
-                            rgOptions={getEarlyLateThresholdOptions()}
-                            selectedOption={thresholdType}
-                            onChange={onThreshTypeChange}
-                        />
-                    </div>
-                </Focusable>
-            }
+        <DateFilterOptions
+            index={index}
+            setContainingGroupFilters={setContainingGroupFilters}
+            filter={filter}
+            containingGroupFilters={containingGroupFilters}
         />
     )
 }
@@ -862,106 +756,12 @@ const PurchaseDateFilterOptions = ({
     filter,
     containingGroupFilters,
 }: FilterOptionsProps<'purchase date'>) => {
-    const [date, setDate] = useState<DateObj | undefined>(filter.params.date)
-    const [dateIncludes, setDateIncludes] = useState<DateIncludes>(
-        filter.params.date
-            ? filter.params.date.day === undefined
-                ? filter.params.date.month === undefined
-                    ? DateIncludes.yearOnly
-                    : DateIncludes.monthYear
-                : DateIncludes.dayMonthYear
-            : DateIncludes.dayMonthYear
-    )
-    const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition)
-    const [byDaysAgo, setByDaysAgo] = useState(filter.params.daysAgo !== undefined)
-    const [daysAgo, setDaysAgo] = useState<number>(filter.params.daysAgo ?? 30)
-
-    function onDateChange(dateSelection: DateSelection) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.date = dateSelection.data
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setDate(dateSelection.data)
-    }
-
-    function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition }) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.condition = threshType
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setThresholdType(threshType)
-    }
-
-    function onByDaysAgoChange(byDaysAgo: boolean) {
-        const updatedFilter = { ...filter }
-        if (byDaysAgo) {
-            delete updatedFilter.params.date
-            updatedFilter.params.daysAgo = daysAgo
-        } else {
-            delete updatedFilter.params.daysAgo
-            updatedFilter.params.date = date
-        }
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setByDaysAgo(byDaysAgo)
-    }
-
-    function onSliderChange(value: number) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.daysAgo = value
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setDaysAgo(value)
-    }
-
     return (
-        <Field
-            label={getDateFilterDisplayData('purchase date', date, daysAgo, thresholdType)}
-            description={
-                <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-                    {byDaysAgo ? (
-                        <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange} />
-                    ) : (
-                        <DatePicker
-                            focusDropdowns={true}
-                            modalType='simple'
-                            buttonContainerStyle={{ flex: 1 }}
-                            onChange={onDateChange}
-                            dateIncludes={dateIncludes}
-                            selectedDate={date}
-                            toLocaleStringOptions={{ dateStyle: 'long' }}
-                            animate={true}
-                            transparencyMode={EnhancedSelectorTransparencyMode.selection}
-                            focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
-                        />
-                    )}
-                    <div style={{ margin: '0 10px' }}>
-                        <Dropdown
-                            rgOptions={getTimeframeOptions()}
-                            selectedOption={dateIncludes}
-                            onChange={option => {
-                                if (option.data === 'byDaysAgo') {
-                                    onByDaysAgoChange(true)
-                                } else {
-                                    if (byDaysAgo) onByDaysAgoChange(false)
-                                    setDateIncludes(option.data)
-                                }
-                            }}
-                        />
-                    </div>
-                    <div>
-                        <Dropdown
-                            rgOptions={getEarlyLateThresholdOptions()}
-                            selectedOption={thresholdType}
-                            onChange={onThreshTypeChange}
-                        />
-                    </div>
-                </Focusable>
-            }
+        <DateFilterOptions
+            index={index}
+            setContainingGroupFilters={setContainingGroupFilters}
+            filter={filter}
+            containingGroupFilters={containingGroupFilters}
         />
     )
 }
@@ -975,106 +775,12 @@ const LastPlayedFilterOptions = ({
     filter,
     containingGroupFilters,
 }: FilterOptionsProps<'last played'>) => {
-    const [date, setDate] = useState<DateObj | undefined>(filter.params.date)
-    const [dateIncludes, setDateIncludes] = useState<DateIncludes>(
-        filter.params.date
-            ? filter.params.date.day === undefined
-                ? filter.params.date.month === undefined
-                    ? DateIncludes.yearOnly
-                    : DateIncludes.monthYear
-                : DateIncludes.dayMonthYear
-            : DateIncludes.dayMonthYear
-    )
-    const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition)
-    const [byDaysAgo, setByDaysAgo] = useState(filter.params.daysAgo !== undefined)
-    const [daysAgo, setDaysAgo] = useState<number>(filter.params.daysAgo ?? 30)
-
-    function onDateChange(dateSelection: DateSelection) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.date = dateSelection.data
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setDate(dateSelection.data)
-    }
-
-    function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition }) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.condition = threshType
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setThresholdType(threshType)
-    }
-
-    function onByDaysAgoChange(byDaysAgo: boolean) {
-        const updatedFilter = { ...filter }
-        if (byDaysAgo) {
-            delete updatedFilter.params.date
-            updatedFilter.params.daysAgo = daysAgo
-        } else {
-            delete updatedFilter.params.daysAgo
-            updatedFilter.params.date = date
-        }
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setByDaysAgo(byDaysAgo)
-    }
-
-    function onSliderChange(value: number) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.daysAgo = value
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setDaysAgo(value)
-    }
-
     return (
-        <Field
-            label={getDateFilterDisplayData('last played', date, daysAgo, thresholdType)}
-            description={
-                <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-                    {byDaysAgo ? (
-                        <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange} />
-                    ) : (
-                        <DatePicker
-                            focusDropdowns={true}
-                            modalType='simple'
-                            buttonContainerStyle={{ flex: 1 }}
-                            onChange={onDateChange}
-                            dateIncludes={dateIncludes}
-                            selectedDate={date}
-                            toLocaleStringOptions={{ dateStyle: 'long' }}
-                            animate={true}
-                            transparencyMode={EnhancedSelectorTransparencyMode.selection}
-                            focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
-                        />
-                    )}
-                    <div style={{ margin: '0 10px' }}>
-                        <Dropdown
-                            rgOptions={getTimeframeOptions()}
-                            selectedOption={dateIncludes}
-                            onChange={option => {
-                                if (option.data === 'byDaysAgo') {
-                                    onByDaysAgoChange(true)
-                                } else {
-                                    if (byDaysAgo) onByDaysAgoChange(false)
-                                    setDateIncludes(option.data)
-                                }
-                            }}
-                        />
-                    </div>
-                    <div>
-                        <Dropdown
-                            rgOptions={getEarlyLateThresholdOptions()}
-                            selectedOption={thresholdType}
-                            onChange={onThreshTypeChange}
-                        />
-                    </div>
-                </Focusable>
-            }
+        <DateFilterOptions
+            index={index}
+            setContainingGroupFilters={setContainingGroupFilters}
+            filter={filter}
+            containingGroupFilters={containingGroupFilters}
         />
     )
 }

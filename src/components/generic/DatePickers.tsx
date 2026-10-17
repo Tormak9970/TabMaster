@@ -39,6 +39,9 @@ export interface DatePickerProps extends Omit<SimpleDatePickerModalProps, 'onSel
 
     /** Default text to display in the popup button when selectedDate is undefined or invalid @default 'Select Date...' */
     strDefaultLabel?: string
+
+    /** Whether the DatePicker is disabled */
+    disabled?: boolean
 }
 
 /** CSS class names for DatePicker component */
@@ -66,6 +69,7 @@ export const DatePicker = ({
     toLocaleStringOptions,
     dateIncludes,
     onChange,
+    disabled = false,
     ...modalProps
 }: DatePickerProps) => {
     const DatePickerModal = modalType === 'pretty' ? PrettyDatePickerModal : SimpleDatePickerModal
@@ -169,6 +173,7 @@ export const DatePicker = ({
                     />
                 )
             }}
+            disabled={disabled}
         />
     )
 }

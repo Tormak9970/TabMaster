@@ -251,7 +251,8 @@ export function isValidParams(filter: TabFilterSettings<FilterType>): boolean {
         case 'last played':
             return (
                 (filter as TabFilterSettings<'release date'>).params.date !== undefined ||
-                (filter as TabFilterSettings<'release date'>).params.daysAgo !== undefined
+                (filter as TabFilterSettings<'release date'>).params.daysAgo !== undefined ||
+                (filter as TabFilterSettings<'release date'>).params.isUnknown !== undefined
             )
         case 'steam features':
             return (filter as TabFilterSettings<'steam features'>).params.features.length !== 0
@@ -476,6 +477,48 @@ export function validateFilter(filter: TabFilterSettings<FilterType>): Validatio
     }
 }
 
+function dateFilterLogic(
+    dateInMs: number | null,
+    params: FilterParams<'release date' | 'purchase date' | 'last played'>
+) {
+    // Unknown Date case
+    if (!dateInMs) {
+        return !!params.isUnknown
+    }
+
+    //by date case
+    if (params.date) {
+        const { day, month, year } = params.date
+
+        if (params.condition === 'above') {
+            return dateInMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime()
+        } else {
+            const dateIncludes =
+                day === undefined
+                    ? month === undefined
+                        ? DateIncludes.yearOnly
+                        : DateIncludes.monthYear
+                    : DateIncludes.dayMonthYear
+            switch (dateIncludes) {
+                case DateIncludes.dayMonthYear:
+                    return dateInMs < new Date(year, month! - 1, day! + 1).getTime()
+                case DateIncludes.monthYear:
+                    return dateInMs < new Date(year, month!, 1).getTime()
+                case DateIncludes.yearOnly:
+                    return dateInMs < new Date(year + 1, 0, 1).getTime()
+            }
+        }
+    }
+
+    //by days ago case
+    const today = new Date()
+    return params.condition === 'above'
+        ? dateInMs >=
+              new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - params.daysAgo!).getTime()
+        : dateInMs <
+              new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1 - params.daysAgo!).getTime()
+}
+
 /**
  * Utility class for filtering games.
  */
@@ -577,139 +620,28 @@ export class Filter {
                 : Number(appOverview.size_on_disk) / 1024 ** 3 <= params.gbThreshold
         },
         'release date': (params: FilterParams<'release date'>, appOverview: SteamAppOverview) => {
-            let releaseTimeMs
-            if (appOverview.rt_original_release_date) releaseTimeMs = appOverview.rt_original_release_date * 1000
-            else if (appOverview.rt_steam_release_date !== 0) releaseTimeMs = appOverview.rt_steam_release_date * 1000
-            else return false
-
-            //by date case
-            if (params.date) {
-                const { day, month, year } = params.date
-
-                if (params.condition === 'above') {
-                    return releaseTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime()
-                } else {
-                    const dateIncludes =
-                        day === undefined
-                            ? month === undefined
-                                ? DateIncludes.yearOnly
-                                : DateIncludes.monthYear
-                            : DateIncludes.dayMonthYear
-                    switch (dateIncludes) {
-                        case DateIncludes.dayMonthYear:
-                            return releaseTimeMs < new Date(year, month! - 1, day! + 1).getTime()
-                        case DateIncludes.monthYear:
-                            return releaseTimeMs < new Date(year, month!, 1).getTime()
-                        case DateIncludes.yearOnly:
-                            return releaseTimeMs < new Date(year + 1, 0, 1).getTime()
-                    }
-                }
-                //by days ago case
-            } else {
-                const today = new Date()
-                return params.condition === 'above'
-                    ? releaseTimeMs >=
-                          new Date(
-                              today.getUTCFullYear(),
-                              today.getUTCMonth(),
-                              today.getUTCDate() - params.daysAgo!
-                          ).getTime()
-                    : releaseTimeMs <
-                          new Date(
-                              today.getUTCFullYear(),
-                              today.getUTCMonth(),
-                              today.getUTCDate() + 1 - params.daysAgo!
-                          ).getTime()
+            let releaseTimeMs: number | null = null
+            if (appOverview.rt_original_release_date) {
+                releaseTimeMs = appOverview.rt_original_release_date * 1000
+            } else if (appOverview.rt_steam_release_date !== 0) {
+                releaseTimeMs = appOverview.rt_steam_release_date * 1000
             }
+
+            return dateFilterLogic(releaseTimeMs, params)
         },
         'purchase date': (params: FilterParams<'purchase date'>, appOverview: SteamAppOverview) => {
-            let purchaseTimeMs
-            if (appOverview.rt_purchased_time) purchaseTimeMs = appOverview.rt_purchased_time * 1000
-            else return false
-
-            //by date case
-            if (params.date) {
-                const { day, month, year } = params.date
-
-                if (params.condition === 'above') {
-                    return purchaseTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime()
-                } else {
-                    const dateIncludes =
-                        day === undefined
-                            ? month === undefined
-                                ? DateIncludes.yearOnly
-                                : DateIncludes.monthYear
-                            : DateIncludes.dayMonthYear
-                    switch (dateIncludes) {
-                        case DateIncludes.dayMonthYear:
-                            return purchaseTimeMs < new Date(year, month! - 1, day! + 1).getTime()
-                        case DateIncludes.monthYear:
-                            return purchaseTimeMs < new Date(year, month!, 1).getTime()
-                        case DateIncludes.yearOnly:
-                            return purchaseTimeMs < new Date(year + 1, 0, 1).getTime()
-                    }
-                }
-                //by days ago case
-            } else {
-                const today = new Date()
-                return params.condition === 'above'
-                    ? purchaseTimeMs >=
-                          new Date(
-                              today.getUTCFullYear(),
-                              today.getUTCMonth(),
-                              today.getUTCDate() - params.daysAgo!
-                          ).getTime()
-                    : purchaseTimeMs <
-                          new Date(
-                              today.getUTCFullYear(),
-                              today.getUTCMonth(),
-                              today.getUTCDate() + 1 - params.daysAgo!
-                          ).getTime()
+            let purchaseTimeMs: number | null = null
+            if (appOverview.rt_purchased_time) {
+                purchaseTimeMs = appOverview.rt_purchased_time * 1000
             }
+
+            return dateFilterLogic(purchaseTimeMs, params)
         },
         'last played': (params: FilterParams<'last played'>, appOverview: SteamAppOverview) => {
             const lastPlayedTimeMs = appOverview.rt_last_time_played * 1000
             if (lastPlayedTimeMs === 0) return false
 
-            //by date case
-            if (params.date) {
-                const { day, month, year } = params.date
-
-                if (params.condition === 'above') {
-                    return lastPlayedTimeMs >= new Date(year, (month ?? 1) - 1, day ?? 1).getTime()
-                } else {
-                    const dateIncludes =
-                        day === undefined
-                            ? month === undefined
-                                ? DateIncludes.yearOnly
-                                : DateIncludes.monthYear
-                            : DateIncludes.dayMonthYear
-                    switch (dateIncludes) {
-                        case DateIncludes.dayMonthYear:
-                            return lastPlayedTimeMs < new Date(year, month! - 1, day! + 1).getTime()
-                        case DateIncludes.monthYear:
-                            return lastPlayedTimeMs < new Date(year, month!, 1).getTime()
-                        case DateIncludes.yearOnly:
-                            return lastPlayedTimeMs < new Date(year + 1, 0, 1).getTime()
-                    }
-                }
-                //by days ago case
-            } else {
-                const today = new Date()
-                return params.condition === 'above'
-                    ? lastPlayedTimeMs >=
-                          new Date(
-                              today.getUTCFullYear(),
-                              today.getUTCMonth(),
-                              today.getUTCDate() - params.daysAgo!
-                          ).getTime()
-                    : lastPlayedTimeMs <
-                          new Date(
-                              today.getUTCFullYear(),
-                              today.getUTCMonth(),
-                              today.getUTCDate() + 1 - params.daysAgo!
-                          ).getTime()
-            }
+            return dateFilterLogic(lastPlayedTimeMs, params)
         },
         'family sharing': (params: FilterParams<'family sharing'>, appOverview: SteamAppOverview) => {
             const isInSharedCollection = collectionStore.sharedLibrariesCollections.some(collection => {

@@ -63,9 +63,15 @@ export type SteamOSCompatFilterParams = { category: number }
 export type ReviewScoreFilterParams = { scoreThreshold: number; condition: ThresholdCondition; type: ReviewScoreType }
 export type TimePlayedFilterParams = { timeThreshold: number; condition: ThresholdCondition; units: TimeUnit }
 export type SizeOnDiskFilterParams = { gbThreshold: number; condition: ThresholdCondition }
-export type ReleaseDateFilterParams = { date?: DateObj; daysAgo?: number; condition: ThresholdCondition }
-export type PurchaseDateFilterParams = { date?: DateObj; daysAgo?: number; condition: ThresholdCondition }
-export type LastPlayedFilterParams = { date?: DateObj; daysAgo?: number; condition: ThresholdCondition }
+type DateFilterParams = {
+    date?: DateObj
+    daysAgo?: number
+    isUnknown?: boolean
+    condition: ThresholdCondition
+}
+export type ReleaseDateFilterParams = DateFilterParams
+export type PurchaseDateFilterParams = DateFilterParams
+export type LastPlayedFilterParams = DateFilterParams
 export type FamilySharingFilterParams = { isFamilyShared: boolean }
 export type DemoFilterParams = { isDemo: boolean }
 export type ComingSoonParams = { isComingSoon: boolean }
@@ -139,4 +145,11 @@ export type TabFilterSettings<T extends FilterType> = {
     type: T
     inverted: boolean
     params: FilterParams<T>
+}
+
+export type FilterOptionsProps<T extends FilterType> = {
+    index: number
+    filter: TabFilterSettings<T>
+    containingGroupFilters: TabFilterSettings<FilterType>[]
+    setContainingGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
 }
