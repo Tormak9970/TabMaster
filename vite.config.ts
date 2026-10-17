@@ -56,18 +56,6 @@ export default defineConfig({
     plugins: [
         nodePolyfills(),
         codegen(),
-        // importAssets({
-        //   publicPath: `http://127.0.0.1:1337/plugins/${manifest.name}/`,
-        //   include:[
-        //     /\.gif$/i,
-        //     /\.jpg$/i,
-        //     /\.png$/i,
-        //     /\.svg$/i,
-        //     /\.webm$/i,
-        //     /\.webp$/i,
-        //     /\.mp4$/i,
-        //   ],
-        // }),
         pluginExternal({
             externals: {
                 react: 'SP_REACT',
