@@ -1,9 +1,9 @@
 import { ButtonItem, Focusable } from '@decky/ui'
-import React, { VFC, useState, Fragment } from 'react'
+import React, { useState, Fragment } from 'react'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaCircleCheck, FaCircleExclamation, FaCircleXmark } from 'react-icons/fa6'
-import { playUISound } from '../../lib/Utils'
-import { trans_string as t } from '@utils'
+import { trans_string as t, playUISound } from '@utils'
+import { TabSettings } from '@types'
 
 type TabAccordionIconProps = {
     index: number
@@ -13,7 +13,7 @@ type TabAccordionIconProps = {
     isPassing: boolean
 }
 
-const TabAccordionIcon: VFC<TabAccordionIconProps> = ({ index, tab, open, isDeleted, isPassing }) => {
+const TabAccordionIcon = ({ index, tab, open, isDeleted, isPassing }: TabAccordionIconProps) => {
     if (isDeleted) {
         return (
             <div className='check-cont' style={{ pointerEvents: 'none' }}>
@@ -54,14 +54,7 @@ type TabErrorsAccordionProps = {
 /**
  * Filter Section accordion component
  */
-export const TabErrorsAccordion: VFC<TabErrorsAccordionProps> = ({
-    index,
-    isPassing,
-    isDeleted,
-    tab,
-    isOpen,
-    children,
-}) => {
+export const TabErrorsAccordion = ({ index, isPassing, isDeleted, tab, isOpen, children }: TabErrorsAccordionProps) => {
     const [open, setOpen] = useState(isOpen)
 
     function onClick(e: any) {

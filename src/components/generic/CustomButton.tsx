@@ -1,7 +1,7 @@
 import { FocusableProps, Focusable, DialogButton } from '@decky/ui'
-import { ReactNode, FC, useState } from 'react'
-import { SoundEffect, SFXPath } from '../../lib/GamepadUIAudio'
-import { playUISound } from '../../lib/Utils'
+import { ReactNode, useState } from 'react'
+import { SoundEffect, SFXPath } from '@lib'
+import { playUISound } from '@utils'
 
 export interface CustomButtonProps extends Omit<
     FocusableProps,
@@ -58,7 +58,7 @@ export enum CustomButtonClasses {
 }
 
 /** A button component with many customizable options */
-export const CustomButton: FC<CustomButtonProps> = ({
+export const CustomButton = ({
     audioSFX,
     noAudio,
     disabled,
@@ -76,7 +76,7 @@ export const CustomButton: FC<CustomButtonProps> = ({
     onOKActionDescription,
     children,
     ...focusableProps
-}) => {
+}: CustomButtonProps) => {
     const [focused, setFocused] = useState(false)
     const focusStyle = focusMode ?? CustomButtonFocusMode.highlight
 

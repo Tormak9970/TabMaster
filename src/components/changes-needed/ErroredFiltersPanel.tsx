@@ -1,24 +1,19 @@
-import { VFC, Fragment, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { FilterErrorOptions } from './FilterErrorOptions'
-import { FilterType, TabFilterSettings } from '../filters/Filters'
 import { trans_string as t } from '@utils'
+import { FilterType, TabFilterSettings, FilterErrorEntry } from '@types'
 
 type ErroredFiltersPanelProps = {
-    filters: (TabFilterSettings<FilterType> | [])[]
+    filters: (TabFilterSettings<FilterType> | null)[]
     errorEntries: FilterErrorEntry[]
-    onChange: (filters: (TabFilterSettings<FilterType> | [])[], messages: string[][]) => void
+    onChange: (filters: (TabFilterSettings<FilterType> | null)[], messages: string[][]) => void
     isMergeGroup?: boolean
 }
 
 /**
  * Renders all errored filters.
  */
-export const ErroredFiltersPanel: VFC<ErroredFiltersPanelProps> = ({
-    filters,
-    errorEntries,
-    onChange,
-    isMergeGroup,
-}) => {
+export const ErroredFiltersPanel = ({ filters, errorEntries, onChange, isMergeGroup }: ErroredFiltersPanelProps) => {
     const [errorMessages, setErrorMessages] = useState<string[][]>(
         errorEntries.map((entry: FilterErrorEntry) => entry.errors)
     )
@@ -26,7 +21,7 @@ export const ErroredFiltersPanel: VFC<ErroredFiltersPanelProps> = ({
     function handleFilterUpdate(
         filterListIdx: number,
         errorMessageIdx: number,
-        filter: TabFilterSettings<FilterType> | []
+        filter: TabFilterSettings<FilterType> | null
     ) {
         const messages = [...errorMessages]
         messages[errorMessageIdx] = []
@@ -43,9 +38,11 @@ export const ErroredFiltersPanel: VFC<ErroredFiltersPanelProps> = ({
             {errorEntries.flatMap((erroredFilter: FilterErrorEntry, errorIdx: number) => {
                 const filter = filters[erroredFilter.filterIdx]
 
-                return Array.isArray(filter) ? (
-                    []
-                ) : (
+                if (!filter) {
+                    return <></>
+                }
+
+                return (
                     <div className='filter-error-entry'>
                         <div
                             style={{
@@ -75,7 +72,7 @@ export const ErroredFiltersPanel: VFC<ErroredFiltersPanelProps> = ({
                             numFilters={filters.flatMap(filter => filter).length}
                             filter={filter}
                             onFilterUpdate={filter => handleFilterUpdate(erroredFilter.filterIdx, errorIdx, filter)}
-                            onFilterDelete={() => handleFilterUpdate(erroredFilter.filterIdx, errorIdx, [])}
+                            onFilterDelete={() => handleFilterUpdate(erroredFilter.filterIdx, errorIdx, null)}
                             mergeErrorEntries={errorEntries[errorIdx].mergeErrorEntries}
                         />
                     </div>

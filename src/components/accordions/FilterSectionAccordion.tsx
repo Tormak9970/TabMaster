@@ -1,12 +1,11 @@
 import { ButtonItem, Focusable } from '@decky/ui'
-import React, { VFC, useState } from 'react'
-import { FilterLabels, FilterType, TabFilterSettings, isValidParams } from '../filters/Filters'
-import { playUISound } from '../../lib/Utils'
+import React, { useState } from 'react'
+import { FilterLabels, isValidParams } from '../filters/Filters'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { FaXmark } from 'react-icons/fa6'
 import { CgCheck } from 'react-icons/cg'
-import { trans_string as t } from '@utils'
-import { getLogicalMode } from '@utils'
+import { trans_string as t, playUISound, getLogicalMode } from '@utils'
+import { TabFilterSettings, FilterType } from '@types'
 
 type FilterSectionAccordionProps = {
     index: number
@@ -18,7 +17,7 @@ type FilterSectionAccordionProps = {
 /**
  * Filter Section accordion component
  */
-export const FilterSectionAccordion: VFC<FilterSectionAccordionProps> = ({ index, filter, isOpen, children }) => {
+export const FilterSectionAccordion = ({ index, filter, isOpen, children }: FilterSectionAccordionProps) => {
     const [open, setOpen] = useState(isOpen)
 
     function onClick() {

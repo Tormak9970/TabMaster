@@ -1,5 +1,5 @@
-import { VFC, CSSProperties } from 'react'
-import { MicroSDeckInstallState } from '../../lib/controllers/MicroSDeckInterop'
+import { CSSProperties } from 'react'
+import { MicroSDeckInstallState } from '@lib'
 import { trans_string as t } from '@utils'
 
 interface MicroSDeckNoticeProps {
@@ -9,7 +9,7 @@ interface MicroSDeckNoticeProps {
     style?: CSSProperties
 }
 
-export const MicroSDeckNotice: VFC<MicroSDeckNoticeProps> = ({ intallState, pluginVersion, libVersion, style }) => {
+export const MicroSDeckNotice = ({ intallState, pluginVersion, libVersion, style }: MicroSDeckNoticeProps) => {
     let problem = ''
     let recommendation = ''
 

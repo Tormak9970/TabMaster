@@ -1,5 +1,5 @@
 import { DropdownOption, Field, FieldProps, Focusable, SingleDropdownOption } from '@decky/ui'
-import { useState, VFC, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { MultiSelectStyles } from '../styles/MultiSelectStyles'
 import { MultiSelectedOption } from './MultiSelectOption'
 import { ListSearchTrigger } from '../modals/ListSearchModal'
@@ -22,7 +22,7 @@ export type MultiSelectProps = {
 /**
  * A component for multi select dropdown menus.
  */
-export const MultiSelect: VFC<MultiSelectProps> = ({
+export const MultiSelect = ({
     options,
     selected,
     fieldLabel,
@@ -33,7 +33,7 @@ export const MultiSelect: VFC<MultiSelectProps> = ({
     entryLabel,
     determineEntryIcon,
     TriggerIcon,
-}) => {
+}: MultiSelectProps) => {
     const [sel, setSel] = useState(selected)
     const [available, setAvailable] = useState(options.filter(opt => !selected.includes(opt)))
 

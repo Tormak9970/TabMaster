@@ -1,11 +1,12 @@
 import { Dropdown, DropdownOption, Field, Focusable, SingleDropdownOption } from '@decky/ui'
-import { useState, VFC, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { MultiSelectStyles } from '../styles/MultiSelectStyles'
 import { MultiSelectedOption } from './MultiSelectOption'
 import { MultiSelectProps } from './MultiSelect'
 import { ListSearchTrigger } from '../modals/ListSearchModal'
 import { IconType } from 'react-icons/lib'
 import { trans_string as t } from '@utils'
+import { LogicalMode } from '@types'
 
 interface ModeMultiSelectPropsGeneric extends Omit<MultiSelectProps, 'onChange' | 'determineEntryIcon'> {
     entryLabel: string
@@ -29,7 +30,7 @@ export type ModeMultiSelectProps = ModeMultiSelectPropsDetermined | ModeMultiSel
 /**
  * A component for multi select dropdown menus that supports modes.
  */
-export const ModeMultiSelect: VFC<ModeMultiSelectProps> = ({
+export const ModeMultiSelect = ({
     options,
     selected,
     fieldLabel,
@@ -42,7 +43,7 @@ export const ModeMultiSelect: VFC<ModeMultiSelectProps> = ({
     determineEntryIcon,
     EntryIcon,
     TriggerIcon,
-}) => {
+}: ModeMultiSelectProps) => {
     const [sel, setSel] = useState(selected)
     const [available, setAvailable] = useState(options.filter(opt => !selected.includes(opt)))
     const [innerMode, setInnerMode] = useState(mode)

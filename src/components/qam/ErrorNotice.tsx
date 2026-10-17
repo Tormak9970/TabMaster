@@ -1,13 +1,14 @@
 import { Field, Focusable } from '@decky/ui'
-import { FC } from 'react'
+import { ReactNode } from 'react'
 import { FaCircleExclamation } from 'react-icons/fa6'
 import { trans_string as t } from '@utils'
 
 interface ErrorNoticeProps {
     onDismiss: () => void
+    children: ReactNode
 }
 
-export const ErrorNotice: FC<ErrorNoticeProps> = ({ onDismiss, children }) => {
+export const ErrorNotice = ({ onDismiss, children }: ErrorNoticeProps) => {
     return (
         <div className='notice-field-cont' style={{ paddingBottom: '10px' }}>
             <Field

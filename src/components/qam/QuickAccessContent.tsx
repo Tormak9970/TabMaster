@@ -8,38 +8,26 @@ import {
     showModal,
     ConfirmModal,
 } from '@decky/ui'
-import { VFC, useState } from 'react'
+import { useState } from 'react'
 
-import {
-    FaBook,
-    FaBookmark,
-    FaArrowUpFromBracket,
-    FaArrowRightToBracket,
-    FaFolderPlus,
-    FaSlideshare,
-} from 'react-icons/fa6'
+import { FaBookmark, FaArrowUpFromBracket, FaArrowRightToBracket, FaFolderPlus, FaSlideshare } from 'react-icons/fa6'
 import { PiListPlusBold } from 'react-icons/pi'
 
 import { useTabMasterContext, CustomTabContainer, TabMasterManager } from '@state'
 
 import { QamStyles } from '../styles/QamStyles'
 import { showModalNewTab } from '../modals/EditTabModal'
-import { LogController } from '../../lib/controllers/LogController'
 import { PresetMenu } from '../context-menus/PresetMenu'
-import {
-    MicroSDeckInstallState,
-    MicroSDeckInterop,
-    microSDeckLibVersion,
-} from '../../lib/controllers/MicroSDeckInterop'
+import { MicroSDeckInstallState, MicroSDeckInterop, microSDeckLibVersion, PythonInterop, LogController } from '@lib'
 import { MicroSDeckNotice } from './MicroSDeckNotice'
 import { TabProfilesMenu } from '../context-menus/TabProfileMenu'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
 import { GITHUB_URL, DISCORD_URL } from '../../constants'
 import { InvalidSettingsNotice } from './InvalidSettingsNotice'
 import { TabsPanelSection } from './TabsPanelSection'
 import { ErrorNotice } from './ErrorNotice'
 import { showModalSharedTabs } from '../modals/SharedTabsModal'
 import { trans_string as t } from '@utils'
+import { FaCog } from 'react-icons/fa'
 
 export type TabIdEntryType = {
     id: string
@@ -67,7 +55,7 @@ const showRestartConfirm = () => {
 /**
  * The Quick Access Menu content for TabMaster.
  */
-export const QuickAccessContent: VFC<{}> = ({}) => {
+export const QuickAccessContent = ({}) => {
     const [microSDeckNoticeHidden, setMicroSDeckNoticeHidden] = useState(MicroSDeckInterop.noticeHidden)
     const [showError, setShowError] = useState(LogController.errorFlag)
     const { visibleTabsList, tabMasterManager } = useTabMasterContext()
@@ -297,7 +285,7 @@ const buttonStyle = {
     alignItems: 'center',
 }
 
-export const QuickAccessTitleView: VFC<QuickAccessTitleViewProps> = ({ title, tabMasterManager }) => {
+export const QuickAccessTitleView = ({ title, tabMasterManager }: QuickAccessTitleViewProps) => {
     return (
         <Focusable
             style={{
@@ -318,14 +306,14 @@ export const QuickAccessTitleView: VFC<QuickAccessTitleViewProps> = ({ title, ta
                 <FaBookmark size='0.9em' />
             </DialogButton>
             <DialogButton
-                onOKActionDescription={t('LABEL_OPEN_DOCS', 'Open Docs')}
+                onOKActionDescription={t('LABEL_OPEN_SETTINGS', 'Open Settings')}
                 style={buttonStyle}
                 onClick={() => {
                     Navigation.CloseSideMenus()
-                    Navigation.Navigate('/tab-master-docs')
+                    Navigation.Navigate('/tab-master-settings')
                 }}
             >
-                <FaBook size='0.9em' />
+                <FaCog size='0.9em' />
             </DialogButton>
         </Focusable>
     )

@@ -1,16 +1,17 @@
 import { Menu, MenuGroup, MenuItem } from '@decky/ui'
-import { VFC, Fragment } from 'react'
+import { Fragment } from 'react'
 import { presetKeys } from '../../presets/presets'
 import { TabMasterManager } from '@state'
-import { compatCategoryToLabel } from '../filters/Filters'
+import { compatCategoryToLabel, steamOSCompatCategoryToLabel } from '../filters/Filters'
 import { trans_string as t, getAppCategoryLabels } from '@utils'
+import { SteamPlatform } from '@types'
 
 interface PresetMenuProps {
     tabMasterManager: TabMasterManager
     isMicroSDeckInstalled: boolean
 }
 
-export const PresetMenu: VFC<PresetMenuProps> = ({ tabMasterManager, isMicroSDeckInstalled }) => {
+export const PresetMenu = ({ tabMasterManager, isMicroSDeckInstalled }: PresetMenuProps) => {
     return (
         <Menu label={t('LABEL_QUICK_TABS', 'Quick Tabs')}>
             <PresetMenuItems tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />
@@ -20,7 +21,7 @@ export const PresetMenu: VFC<PresetMenuProps> = ({ tabMasterManager, isMicroSDec
 
 interface PresetMenuItemsProps extends PresetMenuProps {}
 
-export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, isMicroSDeckInstalled }) => {
+export const PresetMenuItems = ({ tabMasterManager, isMicroSDeckInstalled }: PresetMenuItemsProps) => {
     function getActionDescription(name: string) {
         return { onOKActionDescription: `${t('LABEL_CREATE_TAB', 'Create Tab')} "${name}"` }
     }
@@ -80,6 +81,22 @@ export const PresetMenuItems: VFC<PresetMenuItemsProps> = ({ tabMasterManager, i
                             <MenuGroup label={t('LABEL_DECK_COMPATIBILITY', 'Deck Compatibility')}>
                                 {[0, 1, 2, 3].map(level => {
                                     const tabName = compatCategoryToLabel(level)
+                                    return (
+                                        <MenuItem
+                                            onClick={() => tabMasterManager.createPresetTab(presetName, tabName, level)}
+                                            {...getActionDescription(tabName)}
+                                        >
+                                            {tabName}
+                                        </MenuItem>
+                                    )
+                                })}
+                            </MenuGroup>
+                        )
+                    case 'steamos compatibility':
+                        return (
+                            <MenuGroup label={t('LABEL_MACHINE_COMPAT_FILTER', 'SteamOS Compatibility')}>
+                                {[0, 1, 2].map(level => {
+                                    const tabName = steamOSCompatCategoryToLabel(level)
                                     return (
                                         <MenuItem
                                             onClick={() => tabMasterManager.createPresetTab(presetName, tabName, level)}

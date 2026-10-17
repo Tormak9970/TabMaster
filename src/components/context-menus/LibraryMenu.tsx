@@ -9,18 +9,19 @@ import {
     MenuItemProps,
     gamepadContextMenuClasses,
 } from '@decky/ui'
-import { FC, Fragment, VFC, useState } from 'react'
+import { Fragment, useState } from 'react'
 import { TabMasterManager, TabMasterContextProvider, useTabMasterContext, CustomTabContainer } from '@state'
 import { showModalDuplicateTab, showModalEditTab, showModalNewTab } from '../modals/EditTabModal'
 import { LibraryMenuStyles } from '../styles/LibraryMenuStyles'
 import { DestructiveModal } from '../generic/DestructiveModal'
 import { PresetMenuItems } from './PresetMenu'
 import { TabListLabel } from '../other/TabListLabel'
-import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
+import { MicroSDeckInterop } from '@lib'
 import { TabProfilesSubMenu } from './TabProfileMenu'
 import { TabIdEntryType } from '../qam/QuickAccessContent'
 import { showAddCollectionModal } from '../modals/AddCollectionModal'
 import { trans_string as t } from '@utils'
+import { TabContainer } from '@types'
 
 export interface LibraryMenuProps {
     closeMenu: () => void
@@ -31,7 +32,7 @@ export interface LibraryMenuProps {
 /**
  * The library context menu for configuring tab master.
  */
-export const LibraryMenu: VFC<LibraryMenuProps> = ({ closeMenu, selectedTabId, tabMasterManager }) => {
+export const LibraryMenu = ({ closeMenu, selectedTabId, tabMasterManager }: LibraryMenuProps) => {
     const isMicroSDeckInstalled = MicroSDeckInterop.isInstallOk()
 
     return (
@@ -63,7 +64,7 @@ interface LibraryMenuItemsProps extends Omit<LibraryMenuProps, 'tabMasterManager
 /**
  * The menu items for the library context menu (in a separate component to manage state correctly)
  */
-const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu, isMicroSDeckInstalled }) => {
+const LibraryMenuItems = ({ selectedTabId, closeMenu, isMicroSDeckInstalled }: LibraryMenuItemsProps) => {
     const { tabsMap, visibleTabsList, hiddenTabsList, tabMasterManager } = useTabMasterContext()
     const tabTitle = tabMasterManager.getTabs().tabsMap.get(selectedTabId)?.title
     const tabContainer = tabsMap.get(selectedTabId)
@@ -201,7 +202,7 @@ interface HiddenItemsProps {
 /**
  * The group of hidden tab menu items
  */
-const HiddenItems: VFC<HiddenItemsProps> = ({ hiddenTabsList, isMicroSDeckInstalled, onSelectTab }) => {
+const HiddenItems = ({ hiddenTabsList, isMicroSDeckInstalled, onSelectTab }: HiddenItemsProps) => {
     const [_refresh, setRefresh] = useState(true)
     return (
         <>
@@ -230,7 +231,7 @@ interface MenuItemNoCloseProps extends Omit<
 /**
  * Menu items that won't automatically close the menu when clicking
  */
-const MenuItemNoClose: FC<MenuItemNoCloseProps> = ({ onClick, disabled, className, children, ...props }) => {
+const MenuItemNoClose = ({ onClick, disabled, className, children, ...props }: MenuItemNoCloseProps) => {
     return (
         <Focusable
             className={

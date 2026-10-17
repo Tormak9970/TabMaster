@@ -1,5 +1,4 @@
 import { ConfirmModal } from '@decky/ui'
-import { VFC } from 'react'
 import { getESortByLabel } from '@hooks'
 import { trans_string as t } from '@utils'
 
@@ -11,7 +10,7 @@ interface SortOverrideMessageProps {
 /**
  * The message modal to display when sort method is being overriden
  */
-export const SortOverrideMessage: VFC<SortOverrideMessageProps> = ({ eSortBy, closeModal }) => {
+export const SortOverrideMessage = ({ eSortBy, closeModal }: SortOverrideMessageProps) => {
     return (
         <ConfirmModal
             strTitle={`${t('Library_SortCollectionBy', 'Sort By', true)}: ${getESortByLabel(eSortBy)}`}

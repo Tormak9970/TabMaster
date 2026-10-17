@@ -1,7 +1,7 @@
 import { DropdownOption } from '@decky/ui'
-import { ReviewScoreType, ThresholdCondition, TimeUnit } from '../components/filters/Filters'
 import t from './i18n'
-import { DateIncludes, dateToLabel } from '../components/generic/DatePickers'
+import { dateToLabel } from './dateHelpers'
+import { ReviewScoreType, ThresholdCondition, TimeUnit, LogicalMode, DateObj, DateIncludes } from '@types'
 
 export function getLogicalMode(mode: LogicalMode): string {
     return mode === 'and' ? t('LOGIC_MODE_AND', 'and') : t('LOGIC_MODE_OR', 'or')
@@ -34,6 +34,7 @@ export function getTimeframeOptions(): DropdownOption[] {
         { label: t('LABEL_BY_MONTH', 'By Month'), data: DateIncludes.monthYear },
         { label: t('LABEL_BY_YEAR', 'By Year'), data: DateIncludes.yearOnly },
         { label: t('LABEL_BY_DAYS_AGO', 'By Days Ago'), data: 'byDaysAgo' },
+        { label: t('LABEL_BY_UNKNOWN', 'By Unknown Date'), data: 'byUnknown' },
     ]
 }
 
@@ -107,6 +108,7 @@ export function getDateFilterDisplayData(
     type: 'last played' | 'release date' | 'purchase date',
     date: DateObj | undefined,
     daysAgo: number | undefined,
+    byUnknown: boolean | undefined,
     condition: ThresholdCondition,
     prefixWithName = false
 ) {
@@ -156,6 +158,16 @@ export function getDateFilterDisplayData(
             displayData = t('LABEL_DATE_FILTER_DAYS_AGO_PLURAL_LATER', '{daysAgo} days ago or later')
         } else {
             displayData = t('LABEL_DATE_FILTER_DAYS_AGO_PLURAL_EARLIER', '{daysAgo} days ago or earlier')
+        }
+    }
+
+    if (byUnknown) {
+        if (type === 'last played') {
+            return t('LABEL_DATE_FILTER_BY_UNKNOWN_LAST_PLAYED_DATE', 'Last played date is unknown')
+        } else if (type === 'release date') {
+            return t('LABEL_DATE_FILTER_BY_UNKNOWN_DATE', 'Release date is unknown')
+        } else {
+            return t('LABEL_DATE_FILTER_BY_UNKNOWN_DATE', 'Purchase date is unknown')
         }
     }
 

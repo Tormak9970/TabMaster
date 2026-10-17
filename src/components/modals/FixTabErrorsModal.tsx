@@ -1,10 +1,11 @@
 import { DialogButton, ModalRoot, PanelSection, PanelSectionRow } from '@decky/ui'
-import { useState, VFC, useEffect, Fragment } from 'react'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
+import { useState, useEffect, Fragment } from 'react'
+import { PythonInterop } from '@lib'
 import { TabMasterContextProvider, type TabMasterManager } from '@state'
 import { TabErrorsPanel } from '../changes-needed/TabErrorsPanel'
 import { FixModalStyles } from '../styles/FixModalStyles'
 import { trans_string as t } from '@utils'
+import { TabSettingsDictionary, FilterErrorEntry, TabSettings } from '@types'
 
 type FixTabErrorsModalRootProps = {
     closeModal?: () => void
@@ -17,28 +18,30 @@ type FixTabErrorsModalRootProps = {
 /**
  * Modal root for the Changes Needed modal.
  */
-export const FixTabErrorsModalRoot: VFC<FixTabErrorsModalRootProps> = ({
+export const FixTabErrorsModalRoot = ({
     closeModal,
     onConfirm,
     tabs,
     erroredFiltersMap,
     tabMasterManager,
-}) => {
+}: FixTabErrorsModalRootProps) => {
     return (
-        <div className='tab-master-fix-modal-scope'>
+        <>
             <FixModalStyles />
-            {/* Steam throws a fit if onCancel isn't present, so we made it do nothing */}
-            <ModalRoot bAllowFullSize onCancel={() => {}}>
-                <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-                    <FixTabErrorsModal
-                        onConfirm={onConfirm}
-                        closeModal={closeModal!}
-                        tabs={{ ...tabs }}
-                        erroredFiltersMap={erroredFiltersMap}
-                    />
-                </TabMasterContextProvider>
-            </ModalRoot>
-        </div>
+            <div className='tab-master-fix-modal-scope'>
+                {/* Steam throws a fit if onCancel isn't present, so we made it do nothing */}
+                <ModalRoot bAllowFullSize onCancel={() => {}}>
+                    <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+                        <FixTabErrorsModal
+                            onConfirm={onConfirm}
+                            closeModal={closeModal!}
+                            tabs={{ ...tabs }}
+                            erroredFiltersMap={erroredFiltersMap}
+                        />
+                    </TabMasterContextProvider>
+                </ModalRoot>
+            </div>
+        </>
     )
 }
 
@@ -52,7 +55,7 @@ type FixTabErrorsModalProps = {
 /**
  * The modal for fixing tabs with filter errors.
  */
-const FixTabErrorsModal: VFC<FixTabErrorsModalProps> = ({ onConfirm, closeModal, tabs, erroredFiltersMap }) => {
+const FixTabErrorsModal = ({ onConfirm, closeModal, tabs, erroredFiltersMap }: FixTabErrorsModalProps) => {
     const [changedTabs, setChangedTabs] = useState<TabSettingsDictionary>(
         Object.fromEntries(Object.entries(tabs).filter(([id]) => erroredFiltersMap.has(id)))
     )

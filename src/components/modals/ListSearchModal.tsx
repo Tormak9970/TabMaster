@@ -11,7 +11,7 @@ import {
     GamepadEvent,
     GamepadButton,
 } from '@decky/ui'
-import { VFC, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { IconType } from 'react-icons/lib'
 import { FixedSizeList as List } from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
@@ -34,7 +34,7 @@ const iconStyles = {
     width: '1em',
 }
 
-export const ListSearchModal: VFC<ListSearchModalProps> = ({
+export const ListSearchModal = ({
     rgOptions: list,
     entryLabel,
     determineEntryIcon,
@@ -211,7 +211,7 @@ export function ListSearchTrigger({
     determineEntryIcon,
     disabled,
 }: ListSearchTriggerProps) {
-    const ModalWrapper: VFC<BaseModalProps> = ({ onSelectOption, rgOptions, closeModal }: BaseModalProps) => {
+    const ModalWrapper = ({ onSelectOption, rgOptions, closeModal }: BaseModalProps) => {
         return (
             <ListSearchModal
                 entryLabel={entryLabel}

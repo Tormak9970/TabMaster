@@ -1,0 +1,82 @@
+import { SidebarNavigation, SidebarNavigationPage } from '@decky/ui'
+import { ReactNode, useMemo } from 'react'
+
+import { DocPage } from './docs/DocsPage'
+
+//@ts-ignore
+import docs from './docs/docs.codegen'
+import { trans_string as t } from '@utils'
+import { FaBook, FaTag } from 'react-icons/fa6'
+import { FaCog, FaInfoCircle } from 'react-icons/fa'
+import { General } from './General'
+import { About } from './about/About'
+import { Tags } from './tags/Tags'
+
+type RouteEntry = {
+    title: string
+    content: ReactNode
+    route: string
+    icon: ReactNode
+    visible?: boolean
+    hideTitle?: boolean
+}
+
+type Routes = {
+    [pageName: string]: RouteEntry
+}
+
+/**
+ * The Settings Router for TabMaster.
+ */
+export const SettingsRouter = () => {
+    const baseRoute = '/tab-master-settings'
+
+    const pages: (SidebarNavigationPage | 'separator')[] = useMemo(() => {
+        const docPages: Routes = {}
+
+        const _generalSettings = {
+            title: t('TITLE_SETTINGS_GENERAL', 'General'),
+            content: <General />,
+            route: `${baseRoute}/general`,
+            icon: <FaCog />,
+        }
+
+        Object.entries(docs).map(([pageName, doc]) => {
+            pageName = pageName.replace(/_/g, ' ')
+
+            docPages[pageName] = {
+                title: pageName,
+                content: <DocPage content={doc as string} />,
+                route: `${baseRoute}/docs-${pageName.toLowerCase().replace(/ /g, '-')}`,
+                icon: <FaBook />,
+                visible: true,
+                hideTitle: true,
+            }
+        })
+
+        return [
+            // generalSettings,
+            {
+                title: t('TITLE_SETTINGS_TAGS', 'Tags'),
+                content: <Tags />,
+                route: `${baseRoute}/tags`,
+                icon: <FaTag />,
+            },
+            {
+                title: t('TITLE_SETTINGS_ABOUT', 'About'),
+                content: <About />,
+                route: `${baseRoute}/about`,
+                icon: <FaInfoCircle />,
+                hideTitle: true,
+            },
+            'separator',
+            docPages['Overview'],
+            docPages['Tabs'],
+            docPages['Filters'],
+            docPages['Tab Profiles'],
+            docPages['The Fix System'],
+        ]
+    }, [baseRoute])
+
+    return <SidebarNavigation title={'TabMaster'} showTitle pages={pages} />
+}

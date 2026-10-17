@@ -1,14 +1,6 @@
-import { Fragment, VFC, createElement } from 'react'
-import {
-    FilterIcons,
-    FilterLabels,
-    FilterType,
-    SdCardParamType,
-    TabFilterSettings,
-    compatCategoryToLabel,
-    steamOSCompatCategoryToLabel,
-} from './Filters'
-import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
+import { Fragment, createElement } from 'react'
+import { FilterIcons, FilterLabels, compatCategoryToLabel, steamOSCompatCategoryToLabel } from './Filters'
+import { MicroSDeckInterop } from '@lib'
 import {
     trans_string as t,
     getAchievementDisplayData,
@@ -17,6 +9,7 @@ import {
     getSizeOnDiskDisplayData,
     getTimePlayed,
 } from '@utils'
+import { TabFilterSettings, FilterType, SdCardParamType } from '@types'
 
 type FilterPreviewGenericProps = {
     filter: TabFilterSettings<FilterType>
@@ -24,7 +17,7 @@ type FilterPreviewGenericProps = {
     isInverted?: boolean
 }
 
-const FilterPreviewGeneric: VFC<FilterPreviewGenericProps> = ({ filter, displayData, isInverted }) => {
+const FilterPreviewGeneric = ({ filter, displayData, isInverted }: FilterPreviewGenericProps) => {
     return (
         <div style={{ display: 'flex' }}>
             <div style={{ marginRight: '7px' }}>{createElement(FilterIcons[filter.type], { size: '.8em' })}</div>
@@ -40,7 +33,7 @@ type FilterPreviewProps<T extends FilterType> = {
     filter: TabFilterSettings<T>
 }
 
-const CollectionFilterPreview: VFC<FilterPreviewProps<'collection'>> = ({ filter }) => {
+const CollectionFilterPreview = ({ filter }: FilterPreviewProps<'collection'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -50,7 +43,7 @@ const CollectionFilterPreview: VFC<FilterPreviewProps<'collection'>> = ({ filter
     )
 }
 
-const InstalledFilterPreview: VFC<FilterPreviewProps<'installed'>> = ({ filter }) => {
+const InstalledFilterPreview = ({ filter }: FilterPreviewProps<'installed'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -59,11 +52,11 @@ const InstalledFilterPreview: VFC<FilterPreviewProps<'installed'>> = ({ filter }
     )
 }
 
-const RegexFilterPreview: VFC<FilterPreviewProps<'regex'>> = ({ filter }) => {
+const RegexFilterPreview = ({ filter }: FilterPreviewProps<'regex'>) => {
     return <FilterPreviewGeneric filter={filter} displayData={filter.params.regex} isInverted={filter.inverted} />
 }
 
-const FriendsFilterPreview: VFC<FilterPreviewProps<'friends'>> = ({ filter }) => {
+const FriendsFilterPreview = ({ filter }: FilterPreviewProps<'friends'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -73,7 +66,7 @@ const FriendsFilterPreview: VFC<FilterPreviewProps<'friends'>> = ({ filter }) =>
     )
 }
 
-const TagsFilterPreview: VFC<FilterPreviewProps<'tags'>> = ({ filter }) => {
+const TagsFilterPreview = ({ filter }: FilterPreviewProps<'tags'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -83,7 +76,7 @@ const TagsFilterPreview: VFC<FilterPreviewProps<'tags'>> = ({ filter }) => {
     )
 }
 
-const WhitelistFilterPreview: VFC<FilterPreviewProps<'whitelist'>> = ({ filter }) => {
+const WhitelistFilterPreview = ({ filter }: FilterPreviewProps<'whitelist'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -92,7 +85,7 @@ const WhitelistFilterPreview: VFC<FilterPreviewProps<'whitelist'>> = ({ filter }
     )
 }
 
-const BlackListFilterPreview: VFC<FilterPreviewProps<'blacklist'>> = ({ filter }) => {
+const BlackListFilterPreview = ({ filter }: FilterPreviewProps<'blacklist'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -101,7 +94,7 @@ const BlackListFilterPreview: VFC<FilterPreviewProps<'blacklist'>> = ({ filter }
     )
 }
 
-const MergeFilterPreview: VFC<FilterPreviewProps<'merge'>> = ({ filter }) => {
+const MergeFilterPreview = ({ filter }: FilterPreviewProps<'merge'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -111,7 +104,7 @@ const MergeFilterPreview: VFC<FilterPreviewProps<'merge'>> = ({ filter }) => {
     )
 }
 
-const PlatformFilterPreview: VFC<FilterPreviewProps<'platform'>> = ({ filter }) => {
+const PlatformFilterPreview = ({ filter }: FilterPreviewProps<'platform'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -120,7 +113,7 @@ const PlatformFilterPreview: VFC<FilterPreviewProps<'platform'>> = ({ filter }) 
     )
 }
 
-const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = ({ filter }) => {
+const DeckCompatFilterPreview = ({ filter }: FilterPreviewProps<'deck compatibility'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -130,7 +123,7 @@ const DeckCompatFilterPreview: VFC<FilterPreviewProps<'deck compatibility'>> = (
     )
 }
 
-const SteamOSCompatFilterPreview: VFC<FilterPreviewProps<'steamos compatibility'>> = ({ filter }) => {
+const SteamOSCompatFilterPreview = ({ filter }: FilterPreviewProps<'steamos compatibility'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -140,59 +133,62 @@ const SteamOSCompatFilterPreview: VFC<FilterPreviewProps<'steamos compatibility'
     )
 }
 
-const ReviewScoreFilterPreview: VFC<FilterPreviewProps<'review score'>> = ({ filter }) => {
+const ReviewScoreFilterPreview = ({ filter }: FilterPreviewProps<'review score'>) => {
     const { scoreThreshold, condition, type } = filter.params
     let displayData: string = getReviewScoreFilterLabel(scoreThreshold, condition, type)
 
     return <FilterPreviewGeneric filter={filter} displayData={displayData} />
 }
 
-const TimePlayedFilterPreview: VFC<FilterPreviewProps<'time played'>> = ({ filter }) => {
+const TimePlayedFilterPreview = ({ filter }: FilterPreviewProps<'time played'>) => {
     const { timeThreshold, condition, units } = filter.params
 
     return <FilterPreviewGeneric filter={filter} displayData={getTimePlayed(timeThreshold, condition, units)} />
 }
 
-const SizeOnDiskFilterPreview: VFC<FilterPreviewProps<'size on disk'>> = ({ filter }) => {
+const SizeOnDiskFilterPreview = ({ filter }: FilterPreviewProps<'size on disk'>) => {
     const { gbThreshold, condition } = filter.params
 
     return <FilterPreviewGeneric filter={filter} displayData={getSizeOnDiskDisplayData(gbThreshold, condition)} />
 }
 
-const ReleaseDateFilterPreview: VFC<FilterPreviewProps<'release date'>> = ({ filter }) => {
+const ReleaseDateFilterPreview = ({ filter }: FilterPreviewProps<'release date'>) => {
     const displayData = getDateFilterDisplayData(
         filter.type,
         filter.params.date,
         filter.params.daysAgo,
+        filter.params.isUnknown,
         filter.params.condition
     )
 
     return <FilterPreviewGeneric filter={filter} displayData={displayData} />
 }
 
-const PurchaseDateFilterPreview: VFC<FilterPreviewProps<'purchase date'>> = ({ filter }) => {
+const PurchaseDateFilterPreview = ({ filter }: FilterPreviewProps<'purchase date'>) => {
     const displayData = getDateFilterDisplayData(
         filter.type,
         filter.params.date,
         filter.params.daysAgo,
+        filter.params.isUnknown,
         filter.params.condition
     )
 
     return <FilterPreviewGeneric filter={filter} displayData={displayData} />
 }
 
-const LastPlayedFilterPreview: VFC<FilterPreviewProps<'last played'>> = ({ filter }) => {
+const LastPlayedFilterPreview = ({ filter }: FilterPreviewProps<'last played'>) => {
     const displayData = getDateFilterDisplayData(
         filter.type,
         filter.params.date,
         filter.params.daysAgo,
+        filter.params.isUnknown,
         filter.params.condition
     )
 
     return <FilterPreviewGeneric filter={filter} displayData={displayData} />
 }
 
-const FamilySharingFilterPreview: VFC<FilterPreviewProps<'family sharing'>> = ({ filter }) => {
+const FamilySharingFilterPreview = ({ filter }: FilterPreviewProps<'family sharing'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -201,7 +197,7 @@ const FamilySharingFilterPreview: VFC<FilterPreviewProps<'family sharing'>> = ({
     )
 }
 
-const DemoFilterPreview: VFC<FilterPreviewProps<'demo'>> = ({ filter }) => {
+const DemoFilterPreview = ({ filter }: FilterPreviewProps<'demo'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -210,7 +206,7 @@ const DemoFilterPreview: VFC<FilterPreviewProps<'demo'>> = ({ filter }) => {
     )
 }
 
-const ComingSoonFilterPreview: VFC<FilterPreviewProps<'coming soon'>> = ({ filter }) => {
+const ComingSoonFilterPreview = ({ filter }: FilterPreviewProps<'coming soon'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -219,7 +215,7 @@ const ComingSoonFilterPreview: VFC<FilterPreviewProps<'coming soon'>> = ({ filte
     )
 }
 
-const StreamableFilterPreview: VFC<FilterPreviewProps<'streamable'>> = ({ filter }) => {
+const StreamableFilterPreview = ({ filter }: FilterPreviewProps<'streamable'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -228,7 +224,7 @@ const StreamableFilterPreview: VFC<FilterPreviewProps<'streamable'>> = ({ filter
     )
 }
 
-const SteamFeaturesFilterPreview: VFC<FilterPreviewProps<'steam features'>> = ({ filter }) => {
+const SteamFeaturesFilterPreview = ({ filter }: FilterPreviewProps<'steam features'>) => {
     return (
         <FilterPreviewGeneric
             filter={filter}
@@ -238,7 +234,7 @@ const SteamFeaturesFilterPreview: VFC<FilterPreviewProps<'steam features'>> = ({
     )
 }
 
-const AchievementsFilterPreview: VFC<FilterPreviewProps<'achievements'>> = ({ filter }) => {
+const AchievementsFilterPreview = ({ filter }: FilterPreviewProps<'achievements'>) => {
     const { threshold, thresholdType, condition } = filter.params
 
     let displayData = getAchievementDisplayData(condition)
@@ -251,7 +247,7 @@ const AchievementsFilterPreview: VFC<FilterPreviewProps<'achievements'>> = ({ fi
     )
 }
 
-const SDCardFilterPreview: VFC<FilterPreviewProps<'sd card'>> = ({ filter }) => {
+const SDCardFilterPreview = ({ filter }: FilterPreviewProps<'sd card'>) => {
     let displayData: string
     switch (filter.params.card) {
         case SdCardParamType.ANY:
@@ -270,14 +266,14 @@ const SDCardFilterPreview: VFC<FilterPreviewProps<'sd card'>> = ({ filter }) => 
     return <FilterPreviewGeneric filter={filter} displayData={displayData} isInverted={filter.inverted} />
 }
 
-const InstallFolderFilterPreview: VFC<FilterPreviewProps<'install folder'>> = ({ filter }) => {
+const InstallFolderFilterPreview = ({ filter }: FilterPreviewProps<'install folder'>) => {
     return <FilterPreviewGeneric filter={filter} displayData={filter.params.driveName} isInverted={filter.inverted} />
 }
 
 /**
  * Generates the preview data for filters in a merge group.
  */
-export const FilterPreview: VFC<FilterPreviewProps<FilterType>> = ({ filter }) => {
+export const FilterPreview = ({ filter }: FilterPreviewProps<FilterType>) => {
     if (filter) {
         switch (filter.type) {
             case 'collection':

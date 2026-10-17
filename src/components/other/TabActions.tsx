@@ -1,11 +1,11 @@
 import { MenuItem, showModal, Menu, showContextMenu, DialogButton } from '@decky/ui'
-import { VFC } from 'react'
 import { FaEllipsisH } from 'react-icons/fa'
 import { TabMasterManager, CustomTabContainer } from '@state'
 import { showModalDuplicateTab, showModalEditTab } from '../modals/EditTabModal'
 import { DestructiveModal } from '../generic/DestructiveModal'
 import { showAddCollectionModal } from '../modals/AddCollectionModal'
 import { trans_string as t } from '@utils'
+import { TabContainer } from '@types'
 
 interface TabActionsContextMenuProps {
     tabContainer: TabContainer
@@ -15,7 +15,7 @@ interface TabActionsContextMenuProps {
 /**
  * The context menu for Tab Actions.
  */
-export const TabActionsContextMenu: VFC<TabActionsContextMenuProps> = ({ tabContainer, tabMasterManager }) => {
+export const TabActionsContextMenu = ({ tabContainer, tabMasterManager }: TabActionsContextMenuProps) => {
     const menuItems = [
         <MenuItem onSelected={() => tabMasterManager.hideTab(tabContainer.id)}>{t('LABEL_HIDE_TAB', 'Hide')}</MenuItem>,
     ]
@@ -81,7 +81,7 @@ interface TabActionButtionProps {
 /**
  * The Tab Action button.
  */
-export const TabActionsButton: VFC<TabActionButtionProps> = props => {
+export const TabActionsButton = (props: TabActionButtionProps) => {
     const onClick = () => {
         showContextMenu(<TabActionsContextMenu {...props} />)
     }

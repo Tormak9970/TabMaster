@@ -1,6 +1,6 @@
-import { VFC, useState } from 'react'
+import { useState } from 'react'
 import { TabErrorsAccordion } from '../accordions/TabErrorsAccordion'
-import { FilterType, TabFilterSettings } from '../filters/Filters'
+import { FilterErrorEntry, FilterType, TabFilterSettings, TabSettings } from '@types'
 import { ErroredFiltersPanel } from './ErroredFiltersPanel'
 import { ButtonItem, showModal } from '@decky/ui'
 import { ErrorPanelTabNameContext } from '@state'
@@ -17,15 +17,16 @@ type TabErrorsPanelProps = {
 /**
  * Panel for tab that needs changes
  */
-export const TabErrorsPanel: VFC<TabErrorsPanelProps> = ({ index, tab, errorEntries, onTabStatusChange }) => {
+export const TabErrorsPanel = ({ index, tab, errorEntries, onTabStatusChange }: TabErrorsPanelProps) => {
     const [filters, setFilters] = useState(tab.filters!)
     const [isPassing, setIsPassing] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
 
-    function onChange(filters: (TabFilterSettings<FilterType> | [])[], messages: string[][]) {
+    function onChange(filters: (TabFilterSettings<FilterType> | null)[], messages: string[][]) {
         const newTab = { ...tab }
-        newTab.filters = [...filters]
-        setFilters(filters)
+        const truthyFilters = filters.filter(filter => !!filter)
+        newTab.filters = [...truthyFilters]
+        setFilters(truthyFilters)
 
         const passing = messages.every(entry => entry.length === 0)
         setIsPassing(passing)

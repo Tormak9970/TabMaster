@@ -1,5 +1,4 @@
 import { DialogButton, DropdownOption, Field, FieldProps, Focusable } from '@decky/ui'
-import { VFC } from 'react'
 import { FaTimes } from 'react-icons/fa'
 import { trans_string as t } from '@utils'
 
@@ -12,7 +11,7 @@ type MultiSelectedOptionProps = {
 /**
  * A component for multi select dropdown options.
  */
-export const MultiSelectedOption: VFC<MultiSelectedOptionProps> = ({ option, fieldProps, onRemove }) => {
+export const MultiSelectedOption = ({ option, fieldProps, onRemove }: MultiSelectedOptionProps) => {
     return (
         <Field label={option.label} {...fieldProps}>
             <Focusable style={{ display: 'flex', width: '100%', position: 'relative' }}>

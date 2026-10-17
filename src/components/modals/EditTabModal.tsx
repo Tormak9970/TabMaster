@@ -11,9 +11,9 @@ import {
     quickAccessControlsClasses,
     showModal,
 } from '@decky/ui'
-import { useState, VFC, useEffect, Fragment } from 'react'
-import { FilterDefaultParams, FilterType, TabFilterSettings, isValidParams } from '../filters/Filters'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
+import { useState, useEffect, Fragment } from 'react'
+import { FilterDefaultParams, isValidParams } from '../filters/Filters'
+import { PythonInterop } from '@lib'
 import { TabMasterContextProvider, TabMasterManager, CustomTabContainer } from '@state'
 import { ModalStyles } from '../styles/ModalStyles'
 import { FiltersPanel } from '../filters/FiltersPanel'
@@ -22,10 +22,12 @@ import {
     getIncludedCategoriesFromBitField,
     playUISound,
     updateCategoriesToIncludeBitField,
-} from '../../lib/Utils'
+    trans_string as t,
+    getAppCategoryLabels,
+} from '@utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
 import { useSortingMenuItems } from '@hooks'
-import { trans_string as t, getAppCategoryLabels } from '@utils'
+import { TabSettings, TabFilterSettings, FilterType, LogicalMode } from '@types'
 
 export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>
 
@@ -40,13 +42,14 @@ type EditTabModalProps = {
     categoriesToInclude: number //bit field
     autoHide: boolean
     visibleToOthers: boolean
+    displayAsCollection: boolean
     sortBy: number
 }
 
 /**
  * The modal for editing and creating custom tabs.
  */
-export const EditTabModal: VFC<EditTabModalProps> = ({
+export const EditTabModal = ({
     closeModal,
     onConfirm,
     tabId,
@@ -57,8 +60,9 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
     categoriesToInclude,
     autoHide: _autoHide,
     visibleToOthers: _visibleToOthers,
+    displayAsCollection: _displayAsCollection,
     sortBy,
-}) => {
+}: EditTabModalProps) => {
     const [name, setName] = useState<string>(tabTitle ?? '')
     const [topLevelFilters, setTopLevelFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters)
     const [topLevelLogicMode, setTopLevelLogicMode] = useState<LogicalMode>(filtersMode)
@@ -68,6 +72,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
     const [patchInput, setPatchInput] = useState<boolean>(true)
     const [autoHide, setAutoHide] = useState<boolean>(_autoHide)
     const [visibleToOthers, setVisibleToOthers] = useState<boolean>(_visibleToOthers)
+    const [displayAsCollection, setDisplayAsCollection] = useState<boolean>(_displayAsCollection)
     const [sortByOverride, setSortByOverride] = useState(sortBy)
     const sortOptions: SingleDropdownOption[] = useSortingMenuItems([])
 
@@ -124,6 +129,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
                 autoHide: autoHide,
                 sortByOverride: sortByOverride,
                 visibleToOthers: visibleToOthers,
+                displayAsCollection: displayAsCollection,
             }
             onConfirm(tabId, updated)
             closeModal!()
@@ -197,6 +203,12 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
                                 onChange={checked => setVisibleToOthers(checked)}
                                 bottomSeparator='thick'
                             />
+                            <ToggleField
+                                label={t('LABEL_DISPLAY_TAB_AS_COLLECTION', 'Display this tab as a Steam Collection')}
+                                checked={displayAsCollection}
+                                onChange={checked => setDisplayAsCollection(checked)}
+                                bottomSeparator='thick'
+                            />
                             <DropdownItem
                                 label={t('LABEL_SORT_TAB_BY', 'Sort apps by')}
                                 rgOptions={sortOptions}
@@ -228,7 +240,7 @@ type IncludeCategoriesPanelProps = {
 /**
  * Section for selecting categories to include in tab
  */
-const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesToInclude, setCategoriesToInclude }) => {
+const IncludeCategoriesPanel = ({ categoriesToInclude, setCategoriesToInclude }: IncludeCategoriesPanelProps) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const catsToIncludeObj = getIncludedCategoriesFromBitField(categoriesToInclude)
@@ -336,6 +348,7 @@ export function showModalNewTab(tabMasterManager: TabMasterManager) {
                     tabSettings.categoriesToInclude,
                     tabSettings.autoHide,
                     tabSettings.visibleToOthers,
+                    tabSettings.displayAsCollection,
                     tabSettings.sortByOverride
                 )
             }}
@@ -345,6 +358,7 @@ export function showModalNewTab(tabMasterManager: TabMasterManager) {
             categoriesToInclude={IncludeCategories.games}
             autoHide={false}
             visibleToOthers={false}
+            displayAsCollection={false}
             sortBy={-1}
         />
     )
@@ -367,6 +381,7 @@ export function showModalDuplicateTab(tabContainer: CustomTabContainer, tabMaste
                     tabSettings.categoriesToInclude,
                     tabSettings.autoHide,
                     tabSettings.visibleToOthers,
+                    tabSettings.displayAsCollection,
                     tabSettings.sortByOverride
                 )
             }}
@@ -376,6 +391,7 @@ export function showModalDuplicateTab(tabContainer: CustomTabContainer, tabMaste
             categoriesToInclude={tabContainer.categoriesToInclude}
             autoHide={tabContainer.autoHide}
             visibleToOthers={tabContainer.visibleToOthers}
+            displayAsCollection={tabContainer.displayAsCollection}
             sortBy={tabContainer.sortByOverride}
         />
     )
@@ -400,6 +416,7 @@ export function showModalEditTab(tabContainer: CustomTabContainer, tabMasterMana
             categoriesToInclude={tabContainer.categoriesToInclude}
             autoHide={tabContainer.autoHide}
             visibleToOthers={tabContainer.visibleToOthers}
+            displayAsCollection={tabContainer.displayAsCollection}
             sortBy={tabContainer.sortByOverride}
         />
     )

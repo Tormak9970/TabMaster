@@ -1,13 +1,14 @@
-import { Fragment, VFC, createElement, useEffect, useState } from 'react'
+import { Fragment, createElement, useEffect, useState } from 'react'
 import { achievementClasses, Focusable, mainMenuAppRunningClasses, ModalRoot, SingleDropdownOption } from '@decky/ui'
-import { FilterDefaultParams, FilterIcons, FilterType, FilterDescriptions, FilterLabels } from './Filters'
+import { FilterDefaultParams, FilterIcons, FilterDescriptions, FilterLabels } from './Filters'
 import { FilterSelectStyles } from '../styles/FilterSelectionStyles'
 import { IoFilter } from 'react-icons/io5'
-import { MicroSDeckInterop, microSDeckLibVersion } from '../../lib/controllers/MicroSDeckInterop'
+import { MicroSDeckInterop, microSDeckLibVersion } from '@lib'
 import { BaseModalProps, CustomDropdown } from '../generic/CustomDropdown'
 import { trans_string as t } from '@utils'
+import { FilterType } from '@types'
 
-const FilterSelectModal: VFC<BaseModalProps> = ({ rgOptions, selectedOption, onSelectOption, closeModal }) => {
+const FilterSelectModal = ({ rgOptions, selectedOption, onSelectOption, closeModal }: BaseModalProps) => {
     const [focusable, setFocusable] = useState(false) //this is to briefly (on modal mount) disable focus on all selections except last selected so it is remebered
 
     useEffect(() => {
@@ -59,7 +60,7 @@ interface FilterSelectElement {
 /**
  * Individual Filter in the filter selection Modal
  */
-const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, focusable, onClick }) => {
+const FilterSelectElement = ({ filterType, focusable, onClick }: FilterSelectElement) => {
     let disabled = false
     let requiredMicroSDeckVer = ''
 
@@ -107,7 +108,7 @@ type FilterSelectProps = {
 /**
  * Component for handling filter selection.
  */
-export const FilterSelect: VFC<FilterSelectProps> = ({ selectedOption, onChange }) => {
+export const FilterSelect = ({ selectedOption, onChange }: FilterSelectProps) => {
     const filterTypeOptions = Object.keys(FilterDefaultParams()).map(filterType => ({
         label: FilterLabels()[filterType as FilterType],
         data: filterType,

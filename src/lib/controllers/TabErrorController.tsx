@@ -1,10 +1,11 @@
 import { showModal } from '@decky/ui'
 import { LogController } from './LogController'
-import { FilterLabels, FilterType, validateFilter } from '../../components/filters/Filters'
+import { FilterLabels, validateFilter } from '../../components/filters/Filters'
 import { FixTabErrorsModalRoot } from '../../components/modals/FixTabErrorsModal'
 import { TabMasterManager, CustomTabContainer } from '@state'
 import { EditableTabSettings } from '../../components/modals/EditTabModal'
 import { trans_string as t } from '@utils'
+import { TabContainer, TabSettingsDictionary, FilterErrorEntry, FilterType } from '@types'
 
 /**
  * Hanldes the tab filter validation process.

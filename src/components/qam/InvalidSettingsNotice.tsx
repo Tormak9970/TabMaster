@@ -1,14 +1,15 @@
 import { DialogButton, Field, showModal } from '@decky/ui'
-import { FC } from 'react'
 import { FaCircleExclamation } from 'react-icons/fa6'
 import { DestructiveModal } from '../generic/DestructiveModal'
 import { trans_string as t } from '@utils'
+import { ReactNode } from 'react'
 
 interface InvalidSettingsAlertProps {
     onOk: () => void
+    children: ReactNode
 }
 
-export const InvalidSettingsNotice: FC<InvalidSettingsAlertProps> = ({ onOk, children }) => {
+export const InvalidSettingsNotice = ({ onOk, children }: InvalidSettingsAlertProps) => {
     const confMsg = t('MESSAGE_RESET', 'Reset')
 
     const onConfirm = () => {

@@ -29,7 +29,7 @@ import vn from '@localization/vi_VN.json'
 const simplifiedChinese = {
     name: '简体中文',
     strings: zh,
-    credit: [],
+    credit: ['Charles Lew'],
 }
 
 export type LanguageConfig = {
@@ -52,7 +52,7 @@ export const LANGS: Record<string, LanguageConfig> = {
     de: {
         name: 'Deutsch',
         strings: de,
-        credit: [],
+        credit: ['Schneppi', 'pingpong6004'],
     },
     fi: {
         name: 'Suomi',
@@ -67,7 +67,7 @@ export const LANGS: Record<string, LanguageConfig> = {
     es: {
         name: 'Español-España',
         strings: es,
-        credit: [],
+        credit: ['Sebastian Guardo Lugo'],
     },
     'es-419': {
         name: 'Español-Latinoamérica',
@@ -77,12 +77,12 @@ export const LANGS: Record<string, LanguageConfig> = {
     fr: {
         name: 'Français',
         strings: fr,
-        credit: [],
+        credit: ['tonymlcz'],
     },
     it: {
         name: 'Italiano',
         strings: it,
-        credit: [],
+        credit: ['Lemon64k'],
     },
     ja: {
         name: '日本語',
@@ -112,7 +112,7 @@ export const LANGS: Record<string, LanguageConfig> = {
     'pt-br': {
         name: 'Português-Brasil',
         strings: ptBr,
-        credit: [],
+        credit: ['Alberto Eberhardt'],
     },
     ro: {
         name: 'Română',
@@ -122,7 +122,7 @@ export const LANGS: Record<string, LanguageConfig> = {
     ru: {
         name: 'Русский',
         strings: ru,
-        credit: [],
+        credit: ['Vladimir Budylnikov'],
     },
     sv: {
         name: 'Svenska',
@@ -137,7 +137,7 @@ export const LANGS: Record<string, LanguageConfig> = {
     uk: {
         name: 'Українська',
         strings: uk,
-        credit: [],
+        credit: ['Костя'],
     },
     'zh-cn': simplifiedChinese,
     'sc-sc': simplifiedChinese, // sc-sc is "SteamChina" i think?, it's mapped to zh-cn in the client so doing the same here.

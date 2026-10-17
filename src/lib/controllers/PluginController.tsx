@@ -3,8 +3,9 @@ import { PythonInterop } from './PythonInterop'
 import { SteamController } from './SteamController'
 import { LogController } from './LogController'
 import { TabMasterManager } from '@state'
-import { getCurrentUserId } from '../Utils'
+import { getCurrentUserId } from '@utils'
 import { DestructiveModal } from '../../components/generic/DestructiveModal'
+import { Unregisterer } from '@types'
 
 function showMigrationModal(okCallback: () => Promise<void>, cancelCallback: () => Promise<void>) {
     showModal(
@@ -41,8 +42,6 @@ function showDiscardConfirm(okCallback: () => Promise<void>, onCancel: () => Pro
  * Main controller class for the plugin.
  */
 export class PluginController {
-    // @ts-ignore
-    private static server: ServerAPI
     private static tabMasterManager: TabMasterManager
 
     private static steamController: SteamController
@@ -52,7 +51,6 @@ export class PluginController {
 
     /**
      * Sets the plugin's serverAPI.
-     * @param server The serverAPI to use.
      */
     static setup(tabMasterManager: TabMasterManager): void {
         this.tabMasterManager = tabMasterManager

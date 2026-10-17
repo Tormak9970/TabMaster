@@ -1,9 +1,8 @@
 import { afterPatch, ConfirmModal, findInReactTree, findInTree, showModal } from '@decky/ui'
 import { ReactElement } from 'react'
 import { TabMasterManager } from '@state'
-import { LogController } from '../lib/controllers/LogController'
-import { addPatch } from '../lib/Utils'
-import { trans_string as t } from '@utils'
+import { LogController } from '@lib'
+import { addPatch, trans_string as t } from '@utils'
 
 const findHome = (root: any) => {
     const filter = (node: any) => node?.type?.toString?.().includes('#HomeSettings_ShowingLess')

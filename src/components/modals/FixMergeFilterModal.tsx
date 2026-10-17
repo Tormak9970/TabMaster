@@ -1,7 +1,7 @@
 import { ConfirmModal, showModal } from '@decky/ui'
-import { VFC, useState, Fragment } from 'react'
-import { TabFilterSettings, FilterType } from '../filters/Filters'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
+import { useState, Fragment } from 'react'
+import { TabFilterSettings, FilterType, FilterErrorEntry } from '@types'
+import { PythonInterop } from '@lib'
 import { ErroredFiltersPanel } from '../changes-needed/ErroredFiltersPanel'
 import { ErrorPanelTabNameContext } from '@state'
 import { FixModalStyles } from '../styles/FixModalStyles'
@@ -21,7 +21,7 @@ interface FixMergeFilterModalProps {
 /**
  * Modal for fixing a Merge Filter.
  */
-export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({
+export const FixMergeFilterModal = ({
     mergeParams,
     mergeErrorEntries,
     isPassingOuter,
@@ -29,11 +29,11 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({
     saveMerge,
     closeModal,
     tabName,
-}) => {
-    const [filters, setFilters] = useState<(TabFilterSettings<FilterType> | [])[]>(mergeParams.filters)
+}: FixMergeFilterModalProps) => {
+    const [filters, setFilters] = useState<(TabFilterSettings<FilterType> | null)[]>(mergeParams.filters)
     const [isPassing, setIsPassing] = useState(isPassingOuter)
 
-    function onChange(filters: (TabFilterSettings<FilterType> | [])[], messages: string[][]) {
+    function onChange(filters: (TabFilterSettings<FilterType> | null)[], messages: string[][]) {
         setFilters(filters)
 
         const passing = messages.every(entry => entry.length === 0)
@@ -43,7 +43,7 @@ export const FixMergeFilterModal: VFC<FixMergeFilterModalProps> = ({
     function onOkButton() {
         if (isPassing) {
             const newMergeParams = {
-                filters: filters.flatMap(filter => filter),
+                filters: filters.flatMap(filter => filter).filter(filter => !!filter),
                 mode: mergeParams.mode,
             }
 

@@ -1,43 +1,40 @@
 import { DialogButton, Dropdown, DropdownOption, Field, Focusable, SingleDropdownOption, showModal } from '@decky/ui'
-import { VFC, Fragment, useState, useContext } from 'react'
-import { FilterType, SdCardParamType, TabFilterSettings } from '../filters/Filters'
+import { Fragment, useState, useContext } from 'react'
+import { FilterErrorEntry, FilterType, SdCardParamType, TabFilterSettings } from '@types'
 import { FixMergeFilterModal } from '../modals/FixMergeFilterModal'
 import { ErrorPanelTabNameContext } from '@state'
-import { DestructiveModal } from '../generic/DestructiveModal'
-import { TrashButton } from '../generic/TrashButton'
 import { trans_string as t } from '@utils'
+import { GuardedDeleteButton } from '../utils/GuardedDeleteButton'
 
-type GuardedDeleteButtonProps = {
+type FilterErrorDeleteButtonProps = {
     onFilterDelete: () => void
     numFilters: number
     isMergeGroup: boolean
 }
 
-const GuardedDeleteButton = (props: GuardedDeleteButtonProps) => {
+const FilterErrorDeleteButton = (props: FilterErrorDeleteButtonProps) => {
     const { onFilterDelete, numFilters, isMergeGroup } = props
 
     return (
-        <TrashButton
-            onClick={() => {
-                showModal(
-                    <DestructiveModal onOK={onFilterDelete} strTitle={t('TITLE_ALL_CAPS_WARNING', 'WARNING!')}>
-                        {t('MESSAGE_DELETE_FILTER_CONFIRM', 'Are you sure you want to delete this filter?') +
-                            ' ' +
-                            (numFilters === 1
-                                ? (isMergeGroup
-                                      ? t(
-                                            'MESSAGE_NO_FILTERS_IN_GROUP',
-                                            `There are no other filters in this merge group. Deleting it will automatically delete the merge filter as well.`
-                                        )
-                                      : t(
-                                            'MESSAGE_NO_FILTERS_IN_TAB',
-                                            `There are no other filters in this tab. Deleting it will automatically delete the tab as well.`
-                                        )) + ' '
-                                : '') +
-                            `This can't be undone.`}
-                    </DestructiveModal>
-                )
-            }}
+        <GuardedDeleteButton
+            title={t('TITLE_ALL_CAPS_WARNING', 'WARNING!')}
+            confirmationMessage={
+                t('MESSAGE_DELETE_FILTER_CONFIRM', 'Are you sure you want to delete this filter?') +
+                ' ' +
+                (numFilters === 1
+                    ? (isMergeGroup
+                          ? t(
+                                'MESSAGE_NO_FILTERS_IN_GROUP',
+                                `There are no other filters in this merge group. Deleting it will automatically delete the merge filter as well.`
+                            )
+                          : t(
+                                'MESSAGE_NO_FILTERS_IN_TAB',
+                                `There are no other filters in this tab. Deleting it will automatically delete the tab as well.`
+                            )) + ' '
+                    : '') +
+                `This can't be undone.`
+            }
+            onDelete={onFilterDelete}
         />
     )
 }
@@ -47,20 +44,20 @@ type FilterErrorOptionsProps<T extends FilterType> = {
     numFilters: number
     filter: TabFilterSettings<T>
     mergeErrorEntries?: FilterErrorEntry[] | undefined
-    onFilterUpdate: (filter: TabFilterSettings<FilterType> | []) => void
+    onFilterUpdate: (filter: TabFilterSettings<FilterType> | null) => void
     onFilterDelete: () => void
 }
 
 /**
  * The error options for a collection filter.
  */
-const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> = ({
+const CollectionFilterErrorOptions = ({
     isMergeGroup,
     numFilters,
     filter,
     onFilterUpdate,
     onFilterDelete,
-}) => {
+}: FilterErrorOptionsProps<'collection'>) => {
     const collectionDropdownOptions: DropdownOption[] = collectionStore.userCollections.map(
         (collection: { displayName: string; id: string }) => {
             return { label: collection.displayName, data: collection.id }
@@ -103,7 +100,7 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
                                 width: '45px',
                             }}
                         >
-                            <GuardedDeleteButton
+                            <FilterErrorDeleteButton
                                 onFilterDelete={onFilterDelete}
                                 numFilters={numFilters}
                                 isMergeGroup={isMergeGroup ?? false}
@@ -119,14 +116,14 @@ const CollectionFilterErrorOptions: VFC<FilterErrorOptionsProps<'collection'>> =
 /**
  * The error options for a merge filter.
  */
-const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({
+const MergeFilterErrorOptions = ({
     isMergeGroup,
     numFilters,
     filter,
     mergeErrorEntries,
     onFilterUpdate,
     onFilterDelete,
-}) => {
+}: FilterErrorOptionsProps<'merge'>) => {
     const tabName = useContext(ErrorPanelTabNameContext)
     const [isPassing, setIsPassing] = useState(mergeErrorEntries!.length === 0)
 
@@ -141,7 +138,7 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({
         updatedFilter.params.filters = mergeParams.filters
         updatedFilter.params.mode = mergeParams.mode
 
-        onFilterUpdate(mergeParams.filters.length === 0 ? [] : updatedFilter)
+        onFilterUpdate(mergeParams.filters.length === 0 ? null : updatedFilter)
         setMergeParams({ ...mergeParams })
         //* this is necessary so that if the accordian remounts the merge filter it will rememember it's state
         mergeErrorEntries!.length = 0
@@ -197,7 +194,7 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({
                                 width: '45px',
                             }}
                         >
-                            <GuardedDeleteButton
+                            <FilterErrorDeleteButton
                                 onFilterDelete={onFilterDelete}
                                 numFilters={numFilters}
                                 isMergeGroup={isMergeGroup ?? false}
@@ -213,13 +210,13 @@ const MergeFilterErrorOptions: VFC<FilterErrorOptionsProps<'merge'>> = ({
 /**
  * The error options for an sd card filter.
  */
-const SDCardFilterErrorOption: VFC<FilterErrorOptionsProps<'sd card'>> = ({
+const SDCardFilterErrorOption = ({
     isMergeGroup,
     numFilters,
     filter,
     onFilterUpdate,
     onFilterDelete,
-}) => {
+}: FilterErrorOptionsProps<'sd card'>) => {
     const cardsAndGames = window.MicroSDeck?.CardsAndGames || []
     const dropdownOptions: DropdownOption[] = [
         {
@@ -274,7 +271,7 @@ const SDCardFilterErrorOption: VFC<FilterErrorOptionsProps<'sd card'>> = ({
                                 width: '45px',
                             }}
                         >
-                            <GuardedDeleteButton
+                            <FilterErrorDeleteButton
                                 onFilterDelete={onFilterDelete}
                                 numFilters={numFilters}
                                 isMergeGroup={isMergeGroup ?? false}
@@ -290,14 +287,14 @@ const SDCardFilterErrorOption: VFC<FilterErrorOptionsProps<'sd card'>> = ({
 /**
  * The error options for an individual filter.
  */
-export const FilterErrorOptions: VFC<FilterErrorOptionsProps<FilterType>> = ({
+export const FilterErrorOptions = ({
     isMergeGroup,
     numFilters,
     filter,
     mergeErrorEntries,
     onFilterUpdate,
     onFilterDelete,
-}) => {
+}: FilterErrorOptionsProps<FilterType>) => {
     if (filter) {
         const filterCopy = { ...filter, params: { ...filter.params } }
         switch (filter.type) {

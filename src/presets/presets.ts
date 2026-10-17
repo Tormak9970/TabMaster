@@ -1,5 +1,5 @@
-import { FilterType, TabFilterSettings } from '../components/filters/Filters'
-import { IncludeCategories } from '../lib/Utils'
+import { FilterType, LogicalMode, SteamPlatform, TabFilterSettings } from '@types'
+import { IncludeCategories } from '@utils'
 
 type TabPreset = {
     filters: TabFilterSettings<FilterType>[]
@@ -41,6 +41,14 @@ const presetDefines = {
     'deck compatibility': (compat: number) => {
         return {
             filters: [{ type: 'deck compatibility', inverted: false, params: { category: compat } }],
+            filtersMode: 'and',
+            categoriesToInclude: IncludeCategories.games,
+        }
+    },
+
+    'steamos compatibility': (compat: number) => {
+        return {
+            filters: [{ type: 'steamos compatibility', inverted: false, params: { category: compat } }],
             filtersMode: 'and',
             categoriesToInclude: IncludeCategories.games,
         }

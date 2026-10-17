@@ -9,35 +9,22 @@ import {
     ToggleField,
     showModal,
 } from '@decky/ui'
-import React, { VFC, Fragment, useState, useMemo } from 'react'
-import { FaTag, FaTags, FaUser, FaCompactDisc, FaListCheck, FaSteam, FaStar, FaFolder } from 'react-icons/fa6'
-import { FaUserFriends, FaQuestionCircle } from 'react-icons/fa'
+import React, { Fragment, useState, useMemo } from 'react'
+import { FaTag, FaTags, FaUser, FaListCheck, FaSteam, FaStar, FaFolder } from 'react-icons/fa6'
+import { FaUserFriends } from 'react-icons/fa'
 import { MdApps } from 'react-icons/md'
-import { IoGameController, IoGrid } from 'react-icons/io5'
-import { BsWindow } from 'react-icons/bs'
+import { IoGrid } from 'react-icons/io5'
 import { IconType } from 'react-icons/lib'
 
-import {
-    FilterType,
-    ReviewScoreType,
-    SdCardParamType,
-    TabFilterSettings,
-    ThresholdCondition,
-    TimeUnit,
-    compatCategoryToLabel,
-    steamOSCompatCategoryToLabel,
-} from './Filters'
+import { compatCategoryToLabel, steamOSCompatCategoryToLabel } from './Filters'
 import { TabMasterContextProvider, useTabMasterContext } from '@state'
 import { ModeMultiSelect } from '../multi-selects/ModeMultiSelect'
 import { EditMergeFilterModal } from '../modals/EditMergeFilterModal'
 import { MultiSelect } from '../multi-selects/MultiSelect'
 import { FilterPreview } from './FilterPreview'
-import { DateIncludes, DatePicker, DateSelection } from '../generic/DatePickers'
-import { EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from '../generic/EnhancedSelector'
-import { IncludeCategories } from '../../lib/Utils'
 import { Slider } from '../generic/Slider'
 import { STEAM_FEATURES_ID_MAP, STEAM_FEATURES_TO_RENDER } from './SteamFeatures'
-import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
+import { MicroSDeckInterop } from '@lib'
 import { ListSearchDropdown } from '../modals/ListSearchModal'
 import {
     trans_string as t,
@@ -46,38 +33,27 @@ import {
     getLeastMostThresholdOptions,
     getTimeOptions,
     getTimePlayed,
-    getEarlyLateThresholdOptions,
-    getTimeframeOptions,
-    getDateFilterDisplayData,
     getAchievementDisplayData,
     getAchievementOptions,
     getSizeOnDiskDisplayData,
+    getAppIconType,
+    getAllOverviewsFromTypes,
 } from '@utils'
-
-type FilterOptionsProps<T extends FilterType> = {
-    index: number
-    filter: TabFilterSettings<T>
-    containingGroupFilters: TabFilterSettings<FilterType>[]
-    setContainingGroupFilters: React.Dispatch<React.SetStateAction<TabFilterSettings<FilterType>[]>>
-}
-
-/**
- * Gets an entry icon for an app based on its type.
- * @param entry The app entry.
- * @returns The icon for the app.
- */
-function getAppIconType(entry: any): IconType {
-    switch (entry.data.appType) {
-        case IncludeCategories.games:
-            return IoGameController
-        case IncludeCategories.music:
-            return FaCompactDisc
-        case IncludeCategories.software:
-            return BsWindow
-        default:
-            return FaQuestionCircle
-    }
-}
+import {
+    FilterType,
+    TabFilterSettings,
+    SteamCollection,
+    FriendEntry,
+    LogicalMode,
+    TagResponse,
+    SteamAppOverview,
+    ThresholdCondition,
+    ReviewScoreType,
+    TimeUnit,
+    SdCardParamType,
+    FilterOptionsProps,
+} from '@types'
+import { DateFilterOptions } from './utils/DateFilterOptions'
 
 /**
  * Gets an entry icon for a collection based on if its user made.
@@ -98,12 +74,12 @@ function getCollectionIcon(entry: any): IconType {
 /**
  * The options for a collection filter.
  */
-const CollectionFilterOptions: VFC<FilterOptionsProps<'collection'>> = ({
+const CollectionFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'collection'>) => {
     const collectionDropdownOptions: SingleDropdownOption[] = collectionStore.userCollections
         .concat([{ displayName: t('GameList_Category_Hidden', 'Hidden', true), id: 'hidden' }] as any)
         .map((collection: SteamCollection) => {
@@ -142,12 +118,12 @@ const CollectionFilterOptions: VFC<FilterOptionsProps<'collection'>> = ({
 /**
  * The options for an installed filter.
  */
-const InstalledFilterOptions: VFC<FilterOptionsProps<'installed'>> = ({
+const InstalledFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'installed'>) => {
     function onChange(checked: boolean) {
         const updatedFilter = { ...filter }
         updatedFilter.params.installed = checked ?? false
@@ -168,12 +144,12 @@ const InstalledFilterOptions: VFC<FilterOptionsProps<'installed'>> = ({
 /**
  * The options for a regex filter.
  */
-const RegexFilterOptions: VFC<FilterOptionsProps<'regex'>> = ({
+const RegexFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'regex'>) => {
     function onChange(e: React.ChangeEvent<HTMLInputElement>) {
         const updatedFilter = { ...filter }
         updatedFilter.params.regex = e?.target.value
@@ -199,12 +175,12 @@ const RegexFilterOptions: VFC<FilterOptionsProps<'regex'>> = ({
 /**
  * The options for a friends filter.
  */
-const FriendsFilterOptions: VFC<FilterOptionsProps<'friends'>> = ({
+const FriendsFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'friends'>) => {
     const { currentUsersFriends } = useTabMasterContext()
 
     const dropdownOptions: DropdownOption[] = currentUsersFriends
@@ -247,12 +223,12 @@ const FriendsFilterOptions: VFC<FilterOptionsProps<'friends'>> = ({
 /**
  * The options for a tags filter.
  */
-const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({
+const TagsFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'tags'>) => {
     const { allStoreTags } = useTabMasterContext()
 
     const dropdownOptions: DropdownOption[] = allStoreTags
@@ -295,21 +271,14 @@ const TagsFilterOptions: VFC<FilterOptionsProps<'tags'>> = ({
 /**
  * The options for a whitelist filter.
  */
-const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({
+const WhitelistFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
-    let appsList: SteamAppOverview[] = []
+}: FilterOptionsProps<'whitelist'>) => {
+    let appsList: SteamAppOverview[] = getAllOverviewsFromTypes(['games', 'music', 'software'])
     const selected: DropdownOption[] = []
-    const types = ['games', 'music', 'software']
-
-    for (const type of types) {
-        appsList = appsList.concat(
-            collectionStore.appTypeCollectionMap.get(`type-${type as 'games' | 'music' | 'software'}`)!.allApps
-        )
-    }
 
     for (const gameid of filter.params.games) {
         const game = appsList.find(game => game.appid === gameid)
@@ -346,21 +315,14 @@ const WhitelistFilterOptions: VFC<FilterOptionsProps<'whitelist'>> = ({
 /**
  * The options for a blacklist filter.
  */
-const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({
+const BlackListFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
-    let appsList: SteamAppOverview[] = []
+}: FilterOptionsProps<'blacklist'>) => {
+    let appsList: SteamAppOverview[] = getAllOverviewsFromTypes(['games', 'music', 'software'])
     const selected: DropdownOption[] = []
-    const types = ['games', 'music', 'software']
-
-    for (const type of types) {
-        appsList = appsList.concat(
-            collectionStore.appTypeCollectionMap.get(`type-${type as 'games' | 'music' | 'software'}`)!.allApps
-        )
-    }
 
     for (const gameid of filter.params.games) {
         const game = appsList.find(game => game.appid === gameid)
@@ -397,12 +359,12 @@ const BlackListFilterOptions: VFC<FilterOptionsProps<'blacklist'>> = ({
 /**
  * The options for a merge filter.
  */
-const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({
+const MergeFilterOptions = ({
     index,
     filter,
     containingGroupFilters,
     setContainingGroupFilters,
-}) => {
+}: FilterOptionsProps<'merge'>) => {
     const tabMasterManager = useTabMasterContext().tabMasterManager
     const initialParams = {
         filters: [...filter.params.filters],
@@ -465,12 +427,12 @@ const MergeFilterOptions: VFC<FilterOptionsProps<'merge'>> = ({
 /**
  * The options for a platform filter.
  */
-const PlatformFilterOptions: VFC<FilterOptionsProps<'platform'>> = ({
+const PlatformFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'platform'>) => {
     const dropdownOptions: DropdownOption[] = [
         { label: 'Steam', data: 'steam' },
         { label: t('LibraryTab_NonSteam', 'Non Steam', true), data: 'nonSteam' },
@@ -501,12 +463,12 @@ const PlatformFilterOptions: VFC<FilterOptionsProps<'platform'>> = ({
 /**
  * The options for a deck compatibility filter.
  */
-const DeckCompatFilterOptions: VFC<FilterOptionsProps<'deck compatibility'>> = ({
+const DeckCompatFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'deck compatibility'>) => {
     const dropdownOptions: DropdownOption[] = [0, 1, 2, 3].map(level => {
         return { label: compatCategoryToLabel(level), data: level }
     })
@@ -536,12 +498,12 @@ const DeckCompatFilterOptions: VFC<FilterOptionsProps<'deck compatibility'>> = (
 /**
  * The options for a deck compatibility filter.
  */
-const SteamOSCompatFilterOptions: VFC<FilterOptionsProps<'steamos compatibility'>> = ({
+const SteamOSCompatFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'steamos compatibility'>) => {
     const dropdownOptions: DropdownOption[] = [0, 1, 2].map(level => {
         return { label: steamOSCompatCategoryToLabel(level), data: level }
     })
@@ -571,12 +533,12 @@ const SteamOSCompatFilterOptions: VFC<FilterOptionsProps<'steamos compatibility'
 /**
  * The options for a review score filter.
  */
-const ReviewScoreFilterOptions: VFC<FilterOptionsProps<'review score'>> = ({
+const ReviewScoreFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'review score'>) => {
     const [value, setValue] = useState<number>(filter.params.scoreThreshold)
     const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition)
     const [reviewType, setReviewType] = useState<ReviewScoreType>(filter.params.type)
@@ -638,12 +600,12 @@ const ReviewScoreFilterOptions: VFC<FilterOptionsProps<'review score'>> = ({
 /**
  * The options for a time played filter.
  */
-const TimePlayedFilterOptions: VFC<FilterOptionsProps<'time played'>> = ({
+const TimePlayedFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'time played'>) => {
     const [time, setTime] = useState<number>(filter.params.timeThreshold)
     const [units, setUnits] = useState<TimeUnit>(filter.params.units)
     const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition)
@@ -698,12 +660,12 @@ const TimePlayedFilterOptions: VFC<FilterOptionsProps<'time played'>> = ({
 /**
  * The options for a size on disk filter.
  */
-const SizeOnDiskFilterOptions: VFC<FilterOptionsProps<'size on disk'>> = ({
+const SizeOnDiskFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'size on disk'>) => {
     const [value, setValue] = useState<string>(filter.params.gbThreshold.toString())
     const [numericValue, setNumericValue] = useState<number>(filter.params.gbThreshold)
     const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition)
@@ -756,112 +718,18 @@ const SizeOnDiskFilterOptions: VFC<FilterOptionsProps<'size on disk'>> = ({
 /**
  * The options for a release date filter.
  */
-const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({
+const ReleaseDateFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
-    const [date, setDate] = useState<DateObj | undefined>(filter.params.date)
-    const [dateIncludes, setDateIncludes] = useState<DateIncludes>(
-        filter.params.date
-            ? filter.params.date.day === undefined
-                ? filter.params.date.month === undefined
-                    ? DateIncludes.yearOnly
-                    : DateIncludes.monthYear
-                : DateIncludes.dayMonthYear
-            : DateIncludes.dayMonthYear
-    )
-    const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition)
-    const [byDaysAgo, setByDaysAgo] = useState(filter.params.daysAgo !== undefined)
-    const [daysAgo, setDaysAgo] = useState<number>(filter.params.daysAgo ?? 30)
-
-    function onDateChange(dateSelection: DateSelection) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.date = dateSelection.data
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setDate(dateSelection.data)
-    }
-
-    function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition }) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.condition = threshType
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setThresholdType(threshType)
-    }
-
-    function onByDaysAgoChange(byDaysAgo: boolean) {
-        const updatedFilter = { ...filter }
-        if (byDaysAgo) {
-            delete updatedFilter.params.date
-            updatedFilter.params.daysAgo = daysAgo
-        } else {
-            delete updatedFilter.params.daysAgo
-            updatedFilter.params.date = date
-        }
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setByDaysAgo(byDaysAgo)
-    }
-
-    function onSliderChange(value: number) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.daysAgo = value
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setDaysAgo(value)
-    }
-
+}: FilterOptionsProps<'release date'>) => {
     return (
-        <Field
-            label={getDateFilterDisplayData('release date', date, daysAgo, thresholdType)}
-            description={
-                <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-                    {byDaysAgo ? (
-                        <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange} />
-                    ) : (
-                        <DatePicker
-                            focusDropdowns={true}
-                            modalType='simple'
-                            buttonContainerStyle={{ flex: 1 }}
-                            onChange={onDateChange}
-                            dateIncludes={dateIncludes}
-                            selectedDate={date}
-                            toLocaleStringOptions={{ dateStyle: 'long' }}
-                            animate={true}
-                            transparencyMode={EnhancedSelectorTransparencyMode.selection}
-                            focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
-                        />
-                    )}
-                    <div style={{ margin: '0 10px' }}>
-                        <Dropdown
-                            rgOptions={getTimeframeOptions()}
-                            selectedOption={dateIncludes}
-                            onChange={option => {
-                                if (option.data === 'byDaysAgo') {
-                                    onByDaysAgoChange(true)
-                                } else {
-                                    if (byDaysAgo) onByDaysAgoChange(false)
-                                    setDateIncludes(option.data)
-                                }
-                            }}
-                        />
-                    </div>
-                    <div>
-                        <Dropdown
-                            rgOptions={getEarlyLateThresholdOptions()}
-                            selectedOption={thresholdType}
-                            onChange={onThreshTypeChange}
-                        />
-                    </div>
-                </Focusable>
-            }
+        <DateFilterOptions
+            index={index}
+            setContainingGroupFilters={setContainingGroupFilters}
+            filter={filter}
+            containingGroupFilters={containingGroupFilters}
         />
     )
 }
@@ -869,112 +737,18 @@ const ReleaseDateFilterOptions: VFC<FilterOptionsProps<'release date'>> = ({
 /**
  * The options for a purchase date filter.
  */
-const PurchaseDateFilterOptions: VFC<FilterOptionsProps<'purchase date'>> = ({
+const PurchaseDateFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
-    const [date, setDate] = useState<DateObj | undefined>(filter.params.date)
-    const [dateIncludes, setDateIncludes] = useState<DateIncludes>(
-        filter.params.date
-            ? filter.params.date.day === undefined
-                ? filter.params.date.month === undefined
-                    ? DateIncludes.yearOnly
-                    : DateIncludes.monthYear
-                : DateIncludes.dayMonthYear
-            : DateIncludes.dayMonthYear
-    )
-    const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition)
-    const [byDaysAgo, setByDaysAgo] = useState(filter.params.daysAgo !== undefined)
-    const [daysAgo, setDaysAgo] = useState<number>(filter.params.daysAgo ?? 30)
-
-    function onDateChange(dateSelection: DateSelection) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.date = dateSelection.data
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setDate(dateSelection.data)
-    }
-
-    function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition }) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.condition = threshType
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setThresholdType(threshType)
-    }
-
-    function onByDaysAgoChange(byDaysAgo: boolean) {
-        const updatedFilter = { ...filter }
-        if (byDaysAgo) {
-            delete updatedFilter.params.date
-            updatedFilter.params.daysAgo = daysAgo
-        } else {
-            delete updatedFilter.params.daysAgo
-            updatedFilter.params.date = date
-        }
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setByDaysAgo(byDaysAgo)
-    }
-
-    function onSliderChange(value: number) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.daysAgo = value
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setDaysAgo(value)
-    }
-
+}: FilterOptionsProps<'purchase date'>) => {
     return (
-        <Field
-            label={getDateFilterDisplayData('purchase date', date, daysAgo, thresholdType)}
-            description={
-                <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-                    {byDaysAgo ? (
-                        <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange} />
-                    ) : (
-                        <DatePicker
-                            focusDropdowns={true}
-                            modalType='simple'
-                            buttonContainerStyle={{ flex: 1 }}
-                            onChange={onDateChange}
-                            dateIncludes={dateIncludes}
-                            selectedDate={date}
-                            toLocaleStringOptions={{ dateStyle: 'long' }}
-                            animate={true}
-                            transparencyMode={EnhancedSelectorTransparencyMode.selection}
-                            focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
-                        />
-                    )}
-                    <div style={{ margin: '0 10px' }}>
-                        <Dropdown
-                            rgOptions={getTimeframeOptions()}
-                            selectedOption={dateIncludes}
-                            onChange={option => {
-                                if (option.data === 'byDaysAgo') {
-                                    onByDaysAgoChange(true)
-                                } else {
-                                    if (byDaysAgo) onByDaysAgoChange(false)
-                                    setDateIncludes(option.data)
-                                }
-                            }}
-                        />
-                    </div>
-                    <div>
-                        <Dropdown
-                            rgOptions={getEarlyLateThresholdOptions()}
-                            selectedOption={thresholdType}
-                            onChange={onThreshTypeChange}
-                        />
-                    </div>
-                </Focusable>
-            }
+        <DateFilterOptions
+            index={index}
+            setContainingGroupFilters={setContainingGroupFilters}
+            filter={filter}
+            containingGroupFilters={containingGroupFilters}
         />
     )
 }
@@ -982,112 +756,18 @@ const PurchaseDateFilterOptions: VFC<FilterOptionsProps<'purchase date'>> = ({
 /**
  * The options for a last played filter.
  */
-const LastPlayedFilterOptions: VFC<FilterOptionsProps<'last played'>> = ({
+const LastPlayedFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
-    const [date, setDate] = useState<DateObj | undefined>(filter.params.date)
-    const [dateIncludes, setDateIncludes] = useState<DateIncludes>(
-        filter.params.date
-            ? filter.params.date.day === undefined
-                ? filter.params.date.month === undefined
-                    ? DateIncludes.yearOnly
-                    : DateIncludes.monthYear
-                : DateIncludes.dayMonthYear
-            : DateIncludes.dayMonthYear
-    )
-    const [thresholdType, setThresholdType] = useState<ThresholdCondition>(filter.params.condition)
-    const [byDaysAgo, setByDaysAgo] = useState(filter.params.daysAgo !== undefined)
-    const [daysAgo, setDaysAgo] = useState<number>(filter.params.daysAgo ?? 30)
-
-    function onDateChange(dateSelection: DateSelection) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.date = dateSelection.data
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setDate(dateSelection.data)
-    }
-
-    function onThreshTypeChange({ data: threshType }: { data: ThresholdCondition }) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.condition = threshType
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setThresholdType(threshType)
-    }
-
-    function onByDaysAgoChange(byDaysAgo: boolean) {
-        const updatedFilter = { ...filter }
-        if (byDaysAgo) {
-            delete updatedFilter.params.date
-            updatedFilter.params.daysAgo = daysAgo
-        } else {
-            delete updatedFilter.params.daysAgo
-            updatedFilter.params.date = date
-        }
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setByDaysAgo(byDaysAgo)
-    }
-
-    function onSliderChange(value: number) {
-        const updatedFilter = { ...filter }
-        updatedFilter.params.daysAgo = value
-        const updatedFilters = [...containingGroupFilters]
-        updatedFilters[index] = updatedFilter
-        setContainingGroupFilters(updatedFilters)
-        setDaysAgo(value)
-    }
-
+}: FilterOptionsProps<'last played'>) => {
     return (
-        <Field
-            label={getDateFilterDisplayData('last played', date, daysAgo, thresholdType)}
-            description={
-                <Focusable style={{ display: 'flex', flexDirection: 'row' }}>
-                    {byDaysAgo ? (
-                        <Slider value={daysAgo} min={0} max={3000} onChange={onSliderChange} />
-                    ) : (
-                        <DatePicker
-                            focusDropdowns={true}
-                            modalType='simple'
-                            buttonContainerStyle={{ flex: 1 }}
-                            onChange={onDateChange}
-                            dateIncludes={dateIncludes}
-                            selectedDate={date}
-                            toLocaleStringOptions={{ dateStyle: 'long' }}
-                            animate={true}
-                            transparencyMode={EnhancedSelectorTransparencyMode.selection}
-                            focusRingMode={EnhancedSelectorFocusRingMode.transparentOnly}
-                        />
-                    )}
-                    <div style={{ margin: '0 10px' }}>
-                        <Dropdown
-                            rgOptions={getTimeframeOptions()}
-                            selectedOption={dateIncludes}
-                            onChange={option => {
-                                if (option.data === 'byDaysAgo') {
-                                    onByDaysAgoChange(true)
-                                } else {
-                                    if (byDaysAgo) onByDaysAgoChange(false)
-                                    setDateIncludes(option.data)
-                                }
-                            }}
-                        />
-                    </div>
-                    <div>
-                        <Dropdown
-                            rgOptions={getEarlyLateThresholdOptions()}
-                            selectedOption={thresholdType}
-                            onChange={onThreshTypeChange}
-                        />
-                    </div>
-                </Focusable>
-            }
+        <DateFilterOptions
+            index={index}
+            setContainingGroupFilters={setContainingGroupFilters}
+            filter={filter}
+            containingGroupFilters={containingGroupFilters}
         />
     )
 }
@@ -1095,12 +775,12 @@ const LastPlayedFilterOptions: VFC<FilterOptionsProps<'last played'>> = ({
 /**
  * The options for a family sharing filter.
  */
-const FamilySharingFilterOptions: VFC<FilterOptionsProps<'family sharing'>> = ({
+const FamilySharingFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'family sharing'>) => {
     function onChange(checked: boolean) {
         const updatedFilter = { ...filter }
         updatedFilter.params.isFamilyShared = checked ?? false
@@ -1121,12 +801,12 @@ const FamilySharingFilterOptions: VFC<FilterOptionsProps<'family sharing'>> = ({
 /**
  * The options for a demo filter.
  */
-const DemoFilterOptions: VFC<FilterOptionsProps<'demo'>> = ({
+const DemoFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'demo'>) => {
     function onChange(checked: boolean) {
         const updatedFilter = { ...filter }
         updatedFilter.params.isDemo = checked ?? false
@@ -1143,12 +823,12 @@ const DemoFilterOptions: VFC<FilterOptionsProps<'demo'>> = ({
 /**
  * The options for a coming soon filter.
  */
-const ComingSoonFilterOptions: VFC<FilterOptionsProps<'coming soon'>> = ({
+const ComingSoonFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'coming soon'>) => {
     function onChange(checked: boolean) {
         const updatedFilter = { ...filter }
         updatedFilter.params.isComingSoon = checked ?? false
@@ -1169,12 +849,12 @@ const ComingSoonFilterOptions: VFC<FilterOptionsProps<'coming soon'>> = ({
 /**
  * The options for a streamable filter.
  */
-const StreamableFilterOptions: VFC<FilterOptionsProps<'streamable'>> = ({
+const StreamableFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'streamable'>) => {
     function onChange(checked: boolean) {
         const updatedFilter = { ...filter }
         updatedFilter.params.isStreamable = checked ?? false
@@ -1195,12 +875,12 @@ const StreamableFilterOptions: VFC<FilterOptionsProps<'streamable'>> = ({
 /**
  * The options for a cloud save filter.
  */
-const SteamFeatureFilterOptions: VFC<FilterOptionsProps<'steam features'>> = ({
+const SteamFeatureFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'steam features'>) => {
     const dropdownOptions: DropdownOption[] = STEAM_FEATURES_TO_RENDER.map((featureId: number) => {
         // @ts-ignore
         return { label: STEAM_FEATURES_ID_MAP[featureId.toString()].display_name, data: featureId }
@@ -1241,12 +921,12 @@ const SteamFeatureFilterOptions: VFC<FilterOptionsProps<'steam features'>> = ({
 /**
  * The options for a achievements filter.
  */
-const AchievementsFilterOptions: VFC<FilterOptionsProps<'achievements'>> = ({
+const AchievementsFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'achievements'>) => {
     const [value, setValue] = useState<number>(filter.params.threshold)
     const [thresholdType, setThresholdType] = useState<'percent' | 'count'>(filter.params.thresholdType)
     const [thresholdCondition, setThresholdCondition] = useState<ThresholdCondition>(filter.params.condition)
@@ -1307,12 +987,12 @@ const AchievementsFilterOptions: VFC<FilterOptionsProps<'achievements'>> = ({
 /**
  * The options for an sd card filter
  */
-const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({
+const SDCardFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'sd card'>) => {
     const isMicroSDeckInstalled = useMemo(() => MicroSDeckInterop.isInstallOk(), [])
     const cardsAndGames = window.MicroSDeck?.CardsAndGames || []
     const dropdownOptions: DropdownOption[] = [
@@ -1358,12 +1038,12 @@ const SDCardFilterOptions: VFC<FilterOptionsProps<'sd card'>> = ({
 /**
  * The options for an installed folder filter.
  */
-const InstallFolderFilterOptions: VFC<FilterOptionsProps<'install folder'>> = ({
+const InstallFolderFilterOptions = ({
     index,
     setContainingGroupFilters,
     filter,
     containingGroupFilters,
-}) => {
+}: FilterOptionsProps<'install folder'>) => {
     const collectionDropdownOptions: SingleDropdownOption[] = installFolderStore.AllInstallFolders.map(folder => {
         return {
             label: folder.strUserLabel || folder.strDriveName,
@@ -1405,12 +1085,12 @@ const InstallFolderFilterOptions: VFC<FilterOptionsProps<'install folder'>> = ({
 /**
  * The options for an individual filter.
  */
-export const FilterOptions: VFC<FilterOptionsProps<FilterType>> = ({
+export const FilterOptions = ({
     index,
     filter,
     containingGroupFilters,
     setContainingGroupFilters,
-}) => {
+}: FilterOptionsProps<FilterType>) => {
     if (filter) {
         const filterCopy = { ...filter, params: { ...filter.params } }
         switch (filter.type) {

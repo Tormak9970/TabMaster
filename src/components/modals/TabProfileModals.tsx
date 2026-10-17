@@ -1,5 +1,5 @@
 import { ConfirmModal, Field, TextField, quickAccessControlsClasses } from '@decky/ui'
-import { VFC, useState, Fragment, FC } from 'react'
+import { useState, Fragment, ReactNode } from 'react'
 import { TabMasterManager, TabMasterContextProvider } from '@state'
 import { TabProfileModalStyles } from '../styles/TabProfileModalStyles'
 import { TabListLabel } from '../other/TabListLabel'
@@ -12,7 +12,7 @@ export interface CreateTabProfileModalProps {
     closeModal?: () => void
 }
 
-export const CreateTabProfileModal: VFC<CreateTabProfileModalProps> = ({ tabMasterManager, closeModal }) => {
+export const CreateTabProfileModal = ({ tabMasterManager, closeModal }: CreateTabProfileModalProps) => {
     const [name, setName] = useState<string>('')
     const visibleTabs = tabMasterManager.getTabs().visibleTabsList
 
@@ -75,11 +75,11 @@ export interface OverwriteTabProfileModalProps extends CreateTabProfileModalProp
     profileName: string
 }
 
-export const OverwriteTabProfileModal: VFC<OverwriteTabProfileModalProps> = ({
+export const OverwriteTabProfileModal = ({
     profileName,
     tabMasterManager,
     closeModal,
-}) => {
+}: OverwriteTabProfileModalProps) => {
     const { visibleTabsList, tabsMap } = tabMasterManager.getTabs()
     const existingTabs = tabMasterManager.tabProfileManager!.tabProfiles[profileName].map(tabId => tabsMap.get(tabId))
 
@@ -141,7 +141,7 @@ export const OverwriteTabProfileModal: VFC<OverwriteTabProfileModalProps> = ({
     )
 }
 
-const TabItem: FC<{}> = ({ children }) => {
+const TabItem = ({ children }: { children: ReactNode }) => {
     return (
         <>
             <div style={{ padding: '0 15px', height: '28px', display: 'flex', fontSize: 'small' }}>{children}</div>
