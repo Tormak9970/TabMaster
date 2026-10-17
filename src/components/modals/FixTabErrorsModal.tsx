@@ -26,20 +26,22 @@ export const FixTabErrorsModalRoot = ({
     tabMasterManager,
 }: FixTabErrorsModalRootProps) => {
     return (
-        <div className='tab-master-fix-modal-scope'>
+        <>
             <FixModalStyles />
-            {/* Steam throws a fit if onCancel isn't present, so we made it do nothing */}
-            <ModalRoot bAllowFullSize onCancel={() => {}}>
-                <TabMasterContextProvider tabMasterManager={tabMasterManager}>
-                    <FixTabErrorsModal
-                        onConfirm={onConfirm}
-                        closeModal={closeModal!}
-                        tabs={{ ...tabs }}
-                        erroredFiltersMap={erroredFiltersMap}
-                    />
-                </TabMasterContextProvider>
-            </ModalRoot>
-        </div>
+            <div className='tab-master-fix-modal-scope'>
+                {/* Steam throws a fit if onCancel isn't present, so we made it do nothing */}
+                <ModalRoot bAllowFullSize onCancel={() => {}}>
+                    <TabMasterContextProvider tabMasterManager={tabMasterManager}>
+                        <FixTabErrorsModal
+                            onConfirm={onConfirm}
+                            closeModal={closeModal!}
+                            tabs={{ ...tabs }}
+                            erroredFiltersMap={erroredFiltersMap}
+                        />
+                    </TabMasterContextProvider>
+                </ModalRoot>
+            </div>
+        </>
     )
 }
 

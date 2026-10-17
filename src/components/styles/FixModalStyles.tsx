@@ -27,6 +27,13 @@ export const FixModalStyles = ({}) => {
       .tab-master-fix-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldChildrenWithIcon} {
         width: 100%;
       }
+      .tab-master-fix-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldLeftColumn} {
+        display: none;
+      }
+      .tab-master-fix-modal-scope .styled-btn .${(gamepadDialogClasses as any).FieldRightColumn} {
+        width: 100%;
+        max-width: 100% !important;
+      }
 
       /* The button item wrapper */
       .tab-master-fix-modal-scope .filter-entry .${gamepadDialogClasses.Field} {
@@ -69,6 +76,18 @@ export const FixModalStyles = ({}) => {
       }
 
       /* Error Accordion styles */
+      .tab-master-fix-modal-scope .filter-start-cont.styled-btn button {
+        padding: 0rem 2rem;
+        margin: 0px;
+        background: transparent !important;
+        outline: none;
+        border: none;
+        box-shadow: none !important;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
       .tab-master-fix-modal-scope .filter-start-cont.tab-errors {
         background-color: #23262e;
       }
