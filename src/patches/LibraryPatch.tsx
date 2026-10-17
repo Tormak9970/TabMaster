@@ -1,18 +1,16 @@
 import { afterPatch, findInReactTree, Patch, replacePatch, showContextMenu, wrapReactType } from '@decky/ui'
 import { RoutePatch } from '@decky/api'
 import { ReactElement, useEffect, useState } from 'react'
-import { TabMasterManager } from '../state/TabMasterManager'
-import { CustomTabContainer } from '../state/CustomTabContainer'
-import { LogController } from '../lib/controllers/LogController'
+import { TabMasterManager, CustomTabContainer } from '@state'
+import { LogController, MicroSDeckInterop } from '@lib'
 import { LibraryMenu } from '../components/context-menus/LibraryMenu'
-import { MicroSDeckInterop } from '../lib/controllers/MicroSDeckInterop'
-import { addPatch } from '../lib/Utils'
+import { addPatch } from '@utils'
+import type { SteamTab, TabAppGridComponent, TabContext as TabContextType } from '@types'
 
-let TabAppGridComponent: TabAppGridComponent | undefined
+let TabAppGridComponentDef: TabAppGridComponent | undefined
 
 /**
  * Patches the Steam library to allow the plugin to change the tabs.
- * @param serverAPI The plugin's serverAPI.
  * @param tabMasterManager The plugin's core state manager.
  * @returns A routepatch for the library.
  */
@@ -91,7 +89,7 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
                                 }
 
                                 const TabAppGrid =
-                                    TabAppGridComponent ??
+                                    TabAppGridComponentDef ??
                                     findInReactTree(
                                         tabTemplate.content,
                                         elt => elt.type && elt.type.toString?.().includes('Library_FilteredByHeader')
@@ -100,10 +98,11 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
                                     LogController.raiseError(`Couldn't find Tab component`)
                                     return original
                                 } else {
-                                    if (!TabAppGridComponent) TabAppGridComponent = TabAppGrid
+                                    if (!TabAppGridComponentDef) TabAppGridComponentDef = TabAppGrid
                                 }
 
-                                const TabContext: TabContext | undefined = (tabTemplate.content.type as any)._context
+                                const TabContext: TabContextType | undefined = (tabTemplate.content.type as any)
+                                    ._context
 
                                 let patchedTabs: SteamTab[]
 

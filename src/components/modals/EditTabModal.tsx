@@ -11,23 +11,23 @@ import {
     quickAccessControlsClasses,
     showModal,
 } from '@decky/ui'
-import { useState, VFC, useEffect, Fragment } from 'react'
-import { FilterDefaultParams, FilterType, TabFilterSettings, isValidParams } from '../filters/Filters'
-import { PythonInterop } from '../../lib/controllers/PythonInterop'
-import { TabMasterContextProvider } from '../../state/TabMasterContext'
-import { TabMasterManager } from '../../state/TabMasterManager'
+import { useState, useEffect, Fragment } from 'react'
+import { FilterDefaultParams, isValidParams } from '../filters/Filters'
+import { PythonInterop } from '@lib'
+import { TabMasterContextProvider, TabMasterManager, CustomTabContainer } from '@state'
 import { ModalStyles } from '../styles/ModalStyles'
 import { FiltersPanel } from '../filters/FiltersPanel'
 import {
     IncludeCategories,
-    capitalizeFirstLetter,
     getIncludedCategoriesFromBitField,
     playUISound,
     updateCategoriesToIncludeBitField,
-} from '../../lib/Utils'
+    trans_string as t,
+    getAppCategoryLabels,
+} from '@utils'
 import { BiSolidDownArrow } from 'react-icons/bi'
-import { CustomTabContainer } from '../../state/CustomTabContainer'
-import { useSortingMenuItems } from '../../hooks/useSortingMenuItems'
+import { useSortingMenuItems } from '@hooks'
+import { TabSettings, TabFilterSettings, FilterType, LogicalMode } from '@types'
 
 export type EditableTabSettings = Omit<Required<TabSettings>, 'position' | 'id'>
 
@@ -42,13 +42,14 @@ type EditTabModalProps = {
     categoriesToInclude: number //bit field
     autoHide: boolean
     visibleToOthers: boolean
+    displayAsCollection: boolean
     sortBy: number
 }
 
 /**
  * The modal for editing and creating custom tabs.
  */
-export const EditTabModal: VFC<EditTabModalProps> = ({
+export const EditTabModal = ({
     closeModal,
     onConfirm,
     tabId,
@@ -59,8 +60,9 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
     categoriesToInclude,
     autoHide: _autoHide,
     visibleToOthers: _visibleToOthers,
+    displayAsCollection: _displayAsCollection,
     sortBy,
-}) => {
+}: EditTabModalProps) => {
     const [name, setName] = useState<string>(tabTitle ?? '')
     const [topLevelFilters, setTopLevelFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters)
     const [topLevelLogicMode, setTopLevelLogicMode] = useState<LogicalMode>(filtersMode)
@@ -70,10 +72,19 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
     const [patchInput, setPatchInput] = useState<boolean>(true)
     const [autoHide, setAutoHide] = useState<boolean>(_autoHide)
     const [visibleToOthers, setVisibleToOthers] = useState<boolean>(_visibleToOthers)
+    const [displayAsCollection, setDisplayAsCollection] = useState<boolean>(_displayAsCollection)
     const [sortByOverride, setSortByOverride] = useState(sortBy)
     const sortOptions: SingleDropdownOption[] = useSortingMenuItems([])
 
-    const nameInputElement = <TextField value={name} placeholder='The title for this tab' onChange={onNameChange} />
+    const cantSaveTitle = t('TITLE_CANT_SAVE_TAB', 'Cannot Save Tab')
+    const saveLabel = t('LABEL_SAVE_TAB', 'Save')
+    const nameInputElement = (
+        <TextField
+            value={name}
+            placeholder={t('PLACEHOLDER_TAB_TITLE', 'The title for this tab')}
+            onChange={onNameChange}
+        />
+    )
 
     //reference to input field class component instance, which has a focus method
     let inputComponentInstance: any
@@ -118,12 +129,18 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
                 autoHide: autoHide,
                 sortByOverride: sortByOverride,
                 visibleToOthers: visibleToOthers,
+                displayAsCollection: displayAsCollection,
             }
             onConfirm(tabId, updated)
             closeModal!()
         } else {
-            if (!canAddFilter) PythonInterop.toast('Cannot Save Tab', 'Some filters are incomplete')
-            else PythonInterop.toast('Cannot Save Tab', 'Please add a name and at least 1 filter')
+            if (!canAddFilter)
+                PythonInterop.toast(cantSaveTitle, t('MESSAGE_INCOMPLETE_FILTERS', 'Some filters are incomplete'))
+            else
+                PythonInterop.toast(
+                    cantSaveTitle,
+                    t('MESSAGE_ADD_TAB_NAMEE_AND_FILTER', 'Please add a name and at least 1 filter')
+                )
         }
     }
 
@@ -145,11 +162,15 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
                     bAllowFullSize
                     onCancel={closeModal}
                     onEscKeypress={closeModal}
-                    strTitle={tabTitle ? `Modifying: ${tabTitle}` : 'Create New Tab'}
+                    strTitle={
+                        tabTitle
+                            ? `${t('TITLE_MODIFYING_TAB', 'Modifying')}: ${tabTitle}`
+                            : t('TITLE_CREATE_TAB', 'Create New Tab')
+                    }
                     onOK={onSave}
-                    strOKButtonText='Save'
+                    strOKButtonText={saveLabel}
                 >
-                    <Focusable onMenuButton={onSave} onMenuActionDescription='Save'>
+                    <Focusable onMenuButton={onSave} onMenuActionDescription={saveLabel}>
                         <div style={{ padding: '10px 0px' }} className='name-field'>
                             <Field
                                 description={
@@ -158,7 +179,7 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
                                             style={{ paddingBottom: '6px' }}
                                             className={quickAccessControlsClasses.PanelSectionTitle}
                                         >
-                                            Name
+                                            {t('LABEL_TAB_NAME', 'Name')}
                                         </div>
                                         {nameInputElement}
                                     </>
@@ -171,19 +192,25 @@ export const EditTabModal: VFC<EditTabModalProps> = ({
                         />
                         <div className='field-item-container'>
                             <ToggleField
-                                label='Automatically hide tab if empty'
+                                label={t('LABEL_AUTOMATICALLY_HIDE_TAB', 'Automatically hide tab if empty')}
                                 checked={autoHide}
                                 onChange={checked => setAutoHide(checked)}
                                 bottomSeparator='thick'
                             />
                             <ToggleField
-                                label='Other users can copy this tab'
+                                label={t('LABEL_OTHER_USERS_CAN_COPY_TAB', 'Other users can copy this tab')}
                                 checked={visibleToOthers}
                                 onChange={checked => setVisibleToOthers(checked)}
                                 bottomSeparator='thick'
                             />
+                            <ToggleField
+                                label={t('LABEL_DISPLAY_TAB_AS_COLLECTION', 'Display this tab as a Steam Collection')}
+                                checked={displayAsCollection}
+                                onChange={checked => setDisplayAsCollection(checked)}
+                                bottomSeparator='thick'
+                            />
                             <DropdownItem
-                                label='Sort apps by'
+                                label={t('LABEL_SORT_TAB_BY', 'Sort apps by')}
                                 rgOptions={sortOptions}
                                 selectedOption={sortByOverride}
                                 onChange={option => setSortByOverride(option.data)}
@@ -213,7 +240,7 @@ type IncludeCategoriesPanelProps = {
 /**
  * Section for selecting categories to include in tab
  */
-const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesToInclude, setCategoriesToInclude }) => {
+const IncludeCategoriesPanel = ({ categoriesToInclude, setCategoriesToInclude }: IncludeCategoriesPanelProps) => {
     const [isOpen, setIsOpen] = useState(false)
 
     const catsToIncludeObj = getIncludedCategoriesFromBitField(categoriesToInclude)
@@ -222,13 +249,13 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
         .filter(([cat]) => cat !== 'hidden')
         .some(([_cat, checked]) => checked)
 
-    const getCatLabel = (category: string) => (category === 'music' ? 'Soundtracks' : capitalizeFirstLetter(category))
-
     let catStrings = []
     for (const cat in catsToIncludeObj) {
         const include = catsToIncludeObj[cat as keyof typeof catsToIncludeObj]
 
-        include && (cat !== 'hidden' || showHiddenCat) && catStrings.push(getCatLabel(cat))
+        include &&
+            (cat !== 'hidden' || showHiddenCat) &&
+            catStrings.push(getAppCategoryLabels(cat as keyof typeof catsToIncludeObj))
     }
 
     return (
@@ -250,7 +277,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
                                 style={{ padding: '12px 0', float: 'left' }}
                                 className={quickAccessControlsClasses.PanelSectionTitle}
                             >
-                                Include in tab
+                                {t('LABEL_INCLUDE_IN_TAB', 'Include in tab')}
                             </div>
                             <div style={{ padding: '12px 40px', flex: '1' }}>
                                 {!isOpen && (
@@ -273,7 +300,7 @@ const IncludeCategoriesPanel: VFC<IncludeCategoriesPanelProps> = ({ categoriesTo
                 {isOpen && (
                     <div style={{ padding: '10px 18px' }}>
                         {Object.entries(catsToIncludeObj).map(([category, shouldInclude]) => {
-                            const label = getCatLabel(category)
+                            const label = getAppCategoryLabels(category as keyof typeof catsToIncludeObj)
 
                             const onChange = (checked: boolean) => {
                                 playUISound(
@@ -321,6 +348,7 @@ export function showModalNewTab(tabMasterManager: TabMasterManager) {
                     tabSettings.categoriesToInclude,
                     tabSettings.autoHide,
                     tabSettings.visibleToOthers,
+                    tabSettings.displayAsCollection,
                     tabSettings.sortByOverride
                 )
             }}
@@ -330,6 +358,7 @@ export function showModalNewTab(tabMasterManager: TabMasterManager) {
             categoriesToInclude={IncludeCategories.games}
             autoHide={false}
             visibleToOthers={false}
+            displayAsCollection={false}
             sortBy={-1}
         />
     )
@@ -352,6 +381,7 @@ export function showModalDuplicateTab(tabContainer: CustomTabContainer, tabMaste
                     tabSettings.categoriesToInclude,
                     tabSettings.autoHide,
                     tabSettings.visibleToOthers,
+                    tabSettings.displayAsCollection,
                     tabSettings.sortByOverride
                 )
             }}
@@ -361,6 +391,7 @@ export function showModalDuplicateTab(tabContainer: CustomTabContainer, tabMaste
             categoriesToInclude={tabContainer.categoriesToInclude}
             autoHide={tabContainer.autoHide}
             visibleToOthers={tabContainer.visibleToOthers}
+            displayAsCollection={tabContainer.displayAsCollection}
             sortBy={tabContainer.sortByOverride}
         />
     )
@@ -385,6 +416,7 @@ export function showModalEditTab(tabContainer: CustomTabContainer, tabMasterMana
             categoriesToInclude={tabContainer.categoriesToInclude}
             autoHide={tabContainer.autoHide}
             visibleToOthers={tabContainer.visibleToOthers}
+            displayAsCollection={tabContainer.displayAsCollection}
             sortBy={tabContainer.sortByOverride}
         />
     )

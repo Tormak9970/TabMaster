@@ -9,19 +9,19 @@ import {
     MenuItemProps,
     gamepadContextMenuClasses,
 } from '@decky/ui'
-import { FC, Fragment, VFC, useState } from 'react'
-import { TabMasterManager } from '../../state/TabMasterManager'
-import { TabMasterContextProvider, useTabMasterContext } from '../../state/TabMasterContext'
+import { Fragment, useState } from 'react'
+import { TabMasterManager, TabMasterContextProvider, useTabMasterContext, CustomTabContainer } from '@state'
 import { showModalDuplicateTab, showModalEditTab, showModalNewTab } from '../modals/EditTabModal'
 import { LibraryMenuStyles } from '../styles/LibraryMenuStyles'
 import { DestructiveModal } from '../generic/DestructiveModal'
 import { PresetMenuItems } from './PresetMenu'
-import { CustomTabContainer } from '../../state/CustomTabContainer'
 import { TabListLabel } from '../other/TabListLabel'
-import { MicroSDeckInterop } from '../../lib/controllers/MicroSDeckInterop'
+import { MicroSDeckInterop } from '@lib'
 import { TabProfilesSubMenu } from './TabProfileMenu'
 import { TabIdEntryType } from '../qam/QuickAccessContent'
 import { showAddCollectionModal } from '../modals/AddCollectionModal'
+import { trans_string as t } from '@utils'
+import { TabContainer } from '@types'
 
 export interface LibraryMenuProps {
     closeMenu: () => void
@@ -32,7 +32,7 @@ export interface LibraryMenuProps {
 /**
  * The library context menu for configuring tab master.
  */
-export const LibraryMenu: VFC<LibraryMenuProps> = ({ closeMenu, selectedTabId, tabMasterManager }) => {
+export const LibraryMenu = ({ closeMenu, selectedTabId, tabMasterManager }: LibraryMenuProps) => {
     const isMicroSDeckInstalled = MicroSDeckInterop.isInstallOk()
 
     return (
@@ -64,7 +64,7 @@ interface LibraryMenuItemsProps extends Omit<LibraryMenuProps, 'tabMasterManager
 /**
  * The menu items for the library context menu (in a separate component to manage state correctly)
  */
-const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu, isMicroSDeckInstalled }) => {
+const LibraryMenuItems = ({ selectedTabId, closeMenu, isMicroSDeckInstalled }: LibraryMenuItemsProps) => {
     const { tabsMap, visibleTabsList, hiddenTabsList, tabMasterManager } = useTabMasterContext()
     const tabTitle = tabMasterManager.getTabs().tabsMap.get(selectedTabId)?.title
     const tabContainer = tabsMap.get(selectedTabId)
@@ -75,17 +75,17 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
             <MenuItem
                 //@ts-ignore
                 className={gamepadContextMenuClasses.Positive}
-                onOKActionDescription='Add Tab'
+                onOKActionDescription={t('LABEL_ADD_TAB', 'Add Tab')}
                 onClick={() => showModalNewTab(tabMasterManager)}
             >
                 Add Tab
             </MenuItem>
-            <MenuGroup label='Quick Tabs'>
+            <MenuGroup label={t('LABEL_QUICK_TABS', 'Quick Tabs')}>
                 <PresetMenuItems tabMasterManager={tabMasterManager} isMicroSDeckInstalled={isMicroSDeckInstalled} />
             </MenuGroup>
             <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
             <TabProfilesSubMenu tabMasterManager={tabMasterManager} />
-            <MenuGroup label='Reorder Tabs'>
+            <MenuGroup label={t('LABEL_REORDER_TABS', 'Reorder Tabs')}>
                 <Focusable
                     style={{ width: '240px', background: '#23262e', margin: '0' }}
                     className='tab-master-library-menu-reorderable-group'
@@ -118,7 +118,7 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
                 </Focusable>
             </MenuGroup>
             {hiddenTabsList.length > 0 && (
-                <MenuGroup label='Unhide Tabs' disabled={hiddenTabsList.length === 0}>
+                <MenuGroup label={t('LABEL_UNHIDE_TABS', 'Unhide Tabs')} disabled={hiddenTabsList.length === 0}>
                     <HiddenItems
                         onSelectTab={id => tabMasterManager.showTab(id)}
                         hiddenTabsList={hiddenTabsList}
@@ -129,23 +129,23 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
             <div className={gamepadContextMenuClasses.ContextMenuSeparator} />
             {isCustomTab && (
                 <MenuItem
-                    onOKActionDescription={`Edit "${tabTitle}"`}
+                    onOKActionDescription={`${t('LABEL_EDIT_TAB', 'Edit')} "${tabTitle}"`}
                     onClick={() => showModalEditTab(tabContainer as CustomTabContainer, tabMasterManager)}
                 >
-                    Edit
+                    {t('LABEL_EDIT_TAB', 'Edit')}
                 </MenuItem>
             )}
             {isCustomTab && (
                 <MenuItem
-                    onOKActionDescription={`Duplicate "${tabTitle}"`}
+                    onOKActionDescription={`${t('LABEL_DUPLICATE_TAB', 'Duplicate')} "${tabTitle}"`}
                     onClick={() => showModalDuplicateTab(tabContainer as CustomTabContainer, tabMasterManager)}
                 >
-                    Duplicate
+                    {t('LABEL_DUPLICATE_TAB', 'Duplicate')}
                 </MenuItem>
             )}
             {isCustomTab && (
                 <MenuItem
-                    onOKActionDescription={`Create a collection from this tab`}
+                    onOKActionDescription={t('LABEL_TAB_SNAPSHOT_DESCRIPTION', 'Create a collection from this tab')}
                     onClick={() => {
                         const customTab = tabContainer as CustomTabContainer
                         customTab.buildCollection()
@@ -153,18 +153,18 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
                         showAddCollectionModal(customTab.collection.allApps)
                     }}
                 >
-                    Snapshot
+                    {t('LABEL_SNAPSHOT_TAB', 'Snapshot')}
                 </MenuItem>
             )}
             <MenuItem
                 onClick={() => tabMasterManager.hideTab(selectedTabId)}
-                onOKActionDescription={`Hide "${tabTitle}"`}
+                onOKActionDescription={`${t('LABEL_HIDE_TAB', 'Hide')} "${tabTitle}"`}
             >
-                Hide
+                {t('LABEL_HIDE_TAB', 'Hide')}
             </MenuItem>
             {isCustomTab && (
                 <MenuItem
-                    onOKActionDescription={`Delete "${tabTitle}"`}
+                    onOKActionDescription={`${t('LABEL_DELETE_TAB', 'Delete')} "${tabTitle}"`}
                     //@ts-ignore
                     className={gamepadContextMenuClasses.Destructive}
                     onClick={() => {
@@ -176,14 +176,17 @@ const LibraryMenuItems: VFC<LibraryMenuItemsProps> = ({ selectedTabId, closeMenu
                                     closeMenu()
                                 }}
                                 closeModal={closeModal}
-                                strTitle='WARNING!'
+                                strTitle={t('TITLE_ALL_CAPS_WARNING', 'WARNING!')}
                             >
-                                Are you sure you want to delete this Tab? This can't be undone.
+                                {t(
+                                    'MESSAGE_DELETE_CANT_BE_UNDONE',
+                                    "Are you sure you want to delete this Tab? This can't be undone."
+                                )}{' '}
                             </DestructiveModal>
                         )
                     }}
                 >
-                    Delete
+                    {t('LABEL_DELETE_TAB', 'Delete')}
                 </MenuItem>
             )}
         </>
@@ -199,13 +202,13 @@ interface HiddenItemsProps {
 /**
  * The group of hidden tab menu items
  */
-const HiddenItems: VFC<HiddenItemsProps> = ({ hiddenTabsList, isMicroSDeckInstalled, onSelectTab }) => {
+const HiddenItems = ({ hiddenTabsList, isMicroSDeckInstalled, onSelectTab }: HiddenItemsProps) => {
     const [_refresh, setRefresh] = useState(true)
     return (
         <>
             {hiddenTabsList.map(tabContainer => (
                 <MenuItemNoClose
-                    onOKActionDescription='Unhide'
+                    onOKActionDescription={t('LABEL_TAB_UNHIDE', 'Unhide')}
                     onClick={() => {
                         onSelectTab(tabContainer.id)
                         setRefresh(refresh => !refresh)
@@ -228,7 +231,7 @@ interface MenuItemNoCloseProps extends Omit<
 /**
  * Menu items that won't automatically close the menu when clicking
  */
-const MenuItemNoClose: FC<MenuItemNoCloseProps> = ({ onClick, disabled, className, children, ...props }) => {
+const MenuItemNoClose = ({ onClick, disabled, className, children, ...props }: MenuItemNoCloseProps) => {
     return (
         <Focusable
             className={

@@ -1,9 +1,10 @@
 import { DropdownOption, Field, FieldProps, Focusable, SingleDropdownOption } from '@decky/ui'
-import { useState, VFC, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { MultiSelectStyles } from '../styles/MultiSelectStyles'
 import { MultiSelectedOption } from './MultiSelectOption'
 import { ListSearchTrigger } from '../modals/ListSearchModal'
 import { IconType } from 'react-icons/lib'
+import { trans_string as t } from '@utils'
 
 export type MultiSelectProps = {
     entryLabel: string
@@ -21,7 +22,7 @@ export type MultiSelectProps = {
 /**
  * A component for multi select dropdown menus.
  */
-export const MultiSelect: VFC<MultiSelectProps> = ({
+export const MultiSelect = ({
     options,
     selected,
     fieldLabel,
@@ -32,7 +33,7 @@ export const MultiSelect: VFC<MultiSelectProps> = ({
     entryLabel,
     determineEntryIcon,
     TriggerIcon,
-}) => {
+}: MultiSelectProps) => {
     const [sel, setSel] = useState(selected)
     const [available, setAvailable] = useState(options.filter(opt => !selected.includes(opt)))
 
@@ -46,8 +47,10 @@ export const MultiSelect: VFC<MultiSelectProps> = ({
         setDropdownSelected({
             label:
                 avail.length == 0
-                    ? 'All selected'
-                    : ((!!maxOptions && sel.length == maxOptions ? 'Max selected' : dropdownLabel) as string),
+                    ? t('LABEL_ALL_MODES_SELECTED', 'All selected')
+                    : ((!!maxOptions && sel.length == maxOptions
+                          ? t('LABEL_MAX_MODES_SELECTED', 'Max selected')
+                          : dropdownLabel) as string),
             data: '',
         })
         onChange(sel)

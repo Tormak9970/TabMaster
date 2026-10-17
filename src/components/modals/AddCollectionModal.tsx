@@ -1,4 +1,5 @@
 import { findModuleExport } from '@decky/ui'
+import { SteamAppOverview } from '@types'
 
 const AddCollectionModal = findModuleExport(modExport => {
     if (modExport?.toString().includes('"#GameAction_NewCollectionDialogTitle"')) return modExport

@@ -1,5 +1,4 @@
 import { SliderField, SliderFieldProps, gamepadDialogClasses, gamepadSliderClasses } from '@decky/ui'
-import { VFC } from 'react'
 
 export interface SliderProps extends Omit<
     SliderFieldProps,
@@ -49,7 +48,7 @@ const sliderStyle = `
   }
 `
 
-export const Slider: VFC<SliderProps> = ({ highlightOnFocus, ...props }) => {
+export const Slider = ({ highlightOnFocus, ...props }: SliderProps) => {
     return (
         <div
             className={`slider-container${(highlightOnFocus ?? true) ? ' highlight-slider' : ''}`}

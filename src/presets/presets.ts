@@ -1,5 +1,5 @@
-import { FilterType, TabFilterSettings } from '../components/filters/Filters'
-import { IncludeCategories } from '../lib/Utils'
+import { FilterType, LogicalMode, SteamPlatform, TabFilterSettings } from '@types'
+import { IncludeCategories } from '@utils'
 
 type TabPreset = {
     filters: TabFilterSettings<FilterType>[]
@@ -46,6 +46,14 @@ const presetDefines = {
         }
     },
 
+    'steamos compatibility': (compat: number) => {
+        return {
+            filters: [{ type: 'steamos compatibility', inverted: false, params: { category: compat } }],
+            filtersMode: 'and',
+            categoriesToInclude: IncludeCategories.games,
+        }
+    },
+
     platform: (platform: SteamPlatform) => {
         return {
             filters: [{ type: 'platform', inverted: false, params: { platform: platform } }],
@@ -86,7 +94,7 @@ const presetDefines = {
 }
 
 export type PresetName = keyof typeof presetDefines
-export type PresetOptions<Name extends keyof typeof presetDefines> = Parameters<(typeof presetDefines)[Name]>
+export type PresetOptions<Name extends PresetName> = Parameters<(typeof presetDefines)[Name]>
 
 export const presetKeys = Object.keys(presetDefines) as PresetName[]
 

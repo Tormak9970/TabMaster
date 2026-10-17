@@ -1,23 +1,17 @@
 import { ConfirmModal, Focusable, SingleDropdownOption, quickAccessMenuClasses } from '@decky/ui'
-import { ReactElement, VFC, useMemo, useState, Fragment, useEffect } from 'react'
+import { ReactElement, useMemo, useState, Fragment, useEffect } from 'react'
 import { TbCalendarEvent } from 'react-icons/tb'
 import { EnhancedSelector, EnhancedSelectorFocusRingMode, EnhancedSelectorTransparencyMode } from './EnhancedSelector'
-import { SoundEffect } from '../../lib/GamepadUIAudio'
+import { SoundEffect } from '@lib'
 import { CustomDropdown } from './CustomDropdown'
+import { trans_string as t, dateToLabel } from '@utils'
+import { DateIncludes, DateObj } from '@types'
 
 export type DatePickerModalType = 'simple' | 'pretty'
-export type DateObj = { day?: number; month?: number; year: number }
 
 /** A SingleDropdownOption with specific date data */
 export interface DateSelection extends SingleDropdownOption {
     data: DateObj
-}
-
-/** Whether the date includes day/ month and year, month and year, or year only. */
-export enum DateIncludes {
-    yearOnly,
-    monthYear,
-    dayMonthYear,
 }
 
 /** Props for DatePicker component */
@@ -45,6 +39,9 @@ export interface DatePickerProps extends Omit<SimpleDatePickerModalProps, 'onSel
 
     /** Default text to display in the popup button when selectedDate is undefined or invalid @default 'Select Date...' */
     strDefaultLabel?: string
+
+    /** Whether the DatePicker is disabled */
+    disabled?: boolean
 }
 
 /** CSS class names for DatePicker component */
@@ -60,7 +57,7 @@ interface ModalWrapperProps {
 }
 
 /** A highly configurable button component that pops up a modal to select a date and displays the captured result.  */
-export const DatePicker: VFC<DatePickerProps> = ({
+export const DatePicker = ({
     modalType,
     selectedDate,
     buttonLabelCenter,
@@ -72,8 +69,9 @@ export const DatePicker: VFC<DatePickerProps> = ({
     toLocaleStringOptions,
     dateIncludes,
     onChange,
+    disabled = false,
     ...modalProps
-}) => {
+}: DatePickerProps) => {
     const DatePickerModal = modalType === 'pretty' ? PrettyDatePickerModal : SimpleDatePickerModal
     const include = dateIncludes ?? DateIncludes.dayMonthYear
 
@@ -151,7 +149,7 @@ export const DatePicker: VFC<DatePickerProps> = ({
             onChange={onChange}
             selectedOption={date}
             rgOptions={options}
-            strDefaultLabel={strDefaultLabel ?? 'Select Date...'}
+            strDefaultLabel={strDefaultLabel ?? t('LABEL_SELECT_DATE', 'Select Date...')}
             labelCenter={buttonLabelCenter}
             customDropdownIcon={buttonIcon ?? <TbCalendarEvent style={{ margin: 'auto' }} />}
             noDropdownIcon={noIcon ?? false}
@@ -175,6 +173,7 @@ export const DatePicker: VFC<DatePickerProps> = ({
                     />
                 )
             }}
+            disabled={disabled}
         />
     )
 }
@@ -242,7 +241,7 @@ export enum DatePickerModalClasses {
 }
 
 /** A visually simple date picker modal that is configurable */
-export const SimpleDatePickerModal: VFC<SimpleDatePickerModalProps> = ({
+export const SimpleDatePickerModal = ({
     onSelectDate,
     selectedDate,
     toLocaleStringOptions,
@@ -254,7 +253,7 @@ export const SimpleDatePickerModal: VFC<SimpleDatePickerModalProps> = ({
     dateIncludes,
     closeModal,
     ...selectorProps
-}) => {
+}: SimpleDatePickerModalProps) => {
     const thisYear = new Date().getUTCFullYear()
 
     const { day: incomingDay, month: incomingMonth, year: incomingYear } = selectedDate ?? {}
@@ -345,7 +344,7 @@ export const SimpleDatePickerModal: VFC<SimpleDatePickerModalProps> = ({
                     {month && (
                         <div style={sectionStyle}>
                             <div style={titleStyle} className={titleClass}>
-                                Month
+                                {t('LABEL_MONTH', 'Month')}
                             </div>
                             {monthSelector}
                         </div>
@@ -353,14 +352,14 @@ export const SimpleDatePickerModal: VFC<SimpleDatePickerModalProps> = ({
                     {day && (
                         <div style={sectionStyle}>
                             <div style={titleStyle} className={titleClass}>
-                                Day
+                                {t('LABEL_DAY', 'Day')}
                             </div>
                             {daySelector}
                         </div>
                     )}
                     <div style={sectionStyle}>
                         <div style={titleStyle} className={titleClass}>
-                            Year
+                            {t('LABEL_YEAR', 'Year')}
                         </div>
                         {yearSelector}
                     </div>
@@ -372,7 +371,7 @@ export const SimpleDatePickerModal: VFC<SimpleDatePickerModalProps> = ({
 
 export interface PrettyDatePickerModalProps extends SimpleDatePickerModalProps {}
 
-export const PrettyDatePickerModal: VFC<PrettyDatePickerModalProps> = ({}) => {
+export const PrettyDatePickerModal = ({}: PrettyDatePickerModalProps) => {
     return null
 }
 
@@ -404,69 +403,6 @@ function getYearOptions(beginning: number, end: number) {
 
 function getDaysInMonth(month: number, year: number) {
     return new Date(year, month, 0).getDate()
-}
-
-export function dateToLabel(year: number, month?: number, day?: number, formatOptions?: Intl.DateTimeFormatOptions) {
-    const defaultOptions: Intl.DateTimeFormatOptions = {
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-    }
-
-    let _options: Intl.DateTimeFormatOptions
-
-    if (formatOptions?.dateStyle) {
-        switch (formatOptions?.dateStyle) {
-            case 'full':
-                _options = {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    weekday: 'long',
-                }
-                break
-
-            case 'long':
-                _options = {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                }
-                break
-
-            case 'medium':
-                _options = {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                }
-                break
-
-            case 'short':
-                _options = {
-                    year: '2-digit',
-                    month: 'numeric',
-                    day: 'numeric',
-                }
-                break
-
-            default:
-                _options = defaultOptions
-        }
-    } else {
-        _options = formatOptions ?? defaultOptions
-    }
-
-    if (month === undefined) {
-        delete _options.month
-    }
-    if (day === undefined) {
-        delete _options.day
-        delete _options.weekday
-    }
-
-    const date = new Date(year, (month ?? 1) - 1, day ?? 1).toLocaleDateString(locales, _options)
-    return date
 }
 
 function isValidDate(day?: number, month?: number, year?: number) {

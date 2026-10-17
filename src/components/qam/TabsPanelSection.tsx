@@ -1,9 +1,10 @@
 import { PanelSection, ReorderableList, ReorderableEntry, ButtonItem } from '@decky/ui'
-import { VFC, Fragment } from 'react'
+import { Fragment } from 'react'
 import { TabIdEntryType } from './QuickAccessContent'
 import { TabActionsButton } from '../other/TabActions'
-import { useTabMasterContext } from '../../state/TabMasterContext'
+import { useTabMasterContext } from '@state'
 import { TabListLabel } from '../other/TabListLabel'
+import { trans_string as t } from '@utils'
 
 interface TabEntryInteractablesProps {
     entry: ReorderableEntry<TabIdEntryType>
@@ -13,7 +14,7 @@ interface TabsPanelSectionProps {
     isMicroSDeckInstalled: boolean
 }
 
-export const TabsPanelSection: VFC<TabsPanelSectionProps> = ({ isMicroSDeckInstalled }) => {
+export const TabsPanelSection = ({ isMicroSDeckInstalled }: TabsPanelSectionProps) => {
     const { visibleTabsList, hiddenTabsList, tabsMap, tabMasterManager } = useTabMasterContext()
 
     function TabEntryInteractables({ entry }: TabEntryInteractablesProps) {
@@ -31,7 +32,7 @@ export const TabsPanelSection: VFC<TabsPanelSectionProps> = ({ isMicroSDeckInsta
 
     return tabMasterManager.hasSettingsLoaded ? (
         <>
-            <PanelSection title='Tabs'>
+            <PanelSection title={t('TITLE_TABS', 'Tabs')}>
                 <div className='seperator' />
                 <ReorderableList<TabIdEntryType>
                     entries={entries}
@@ -41,7 +42,7 @@ export const TabsPanelSection: VFC<TabsPanelSectionProps> = ({ isMicroSDeckInsta
                     }}
                 />
             </PanelSection>
-            <PanelSection title='Hidden Tabs'>
+            <PanelSection title={t('TITLE_HIDDEN_TABS', 'Hidden Tabs')}>
                 <div className='seperator'></div>
                 {hiddenTabsList.map(tabContainer => (
                     <div className='hidden-tab-btn'>
@@ -51,9 +52,9 @@ export const TabsPanelSection: VFC<TabsPanelSectionProps> = ({ isMicroSDeckInsta
                             }
                             onClick={() => tabMasterManager.showTab(tabContainer.id)}
                             // @ts-ignore
-                            onOKActionDescription='Unhide tab'
+                            onOKActionDescription={t('LABEL_UNHIDE_TAB', 'Unhide Tab')}
                         >
-                            Show
+                            {t('MESSAGE_SHOW_TAB', 'Show')}
                         </ButtonItem>
                     </div>
                 ))}

@@ -1,10 +1,9 @@
 import { gamepadDialogClasses } from '@decky/ui'
-import { VFC } from 'react'
 
 /**
  * All css styling for the TabMaster MultiSelect component.
  */
-export const MultiSelectStyles: VFC<{}> = ({}) => {
+export const MultiSelectStyles = ({}) => {
     return (
         <style>{`
       /* The button item wrapper */

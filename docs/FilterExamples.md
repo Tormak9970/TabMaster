@@ -1,0 +1,27 @@
+# Filter Examples
+
+- **Collection**<br/><img src="./assets/filters/docs_collection-example.png" width="600" />
+- **Installed**<br/><img src="./assets/filters/docs_installed-example.png" width="600" />
+- **Regex**<br/><img src="./assets/filters/docs_regex-example.png" width="600" />
+- **Friends**<br/><img src="./assets/filters/docs_friends-example.png" width="600" />
+- **Tags**<br/><img src="./assets/filters/docs_tags-example.png" width="600" />
+- **Whitelist**<br/><img src="./assets/filters/docs_whitelist-example.png" width="600" />
+- **Blacklist**<br/><img src="./assets/filters/docs_blacklist-example.png" width="600" />
+- **Merge**<br/><img src="./assets/filters/docs_merge-example.png" width="600" />
+- **Platform**<br/><img src="./assets/filters/docs_platform-example.png" width="600" />
+- **Deck Compatibility**<br/><img src="./assets/filters/docs_deck-compat-example.png" width="600" />
+- **SteamOS Compatibility**<br/><img src="./assets/filters/docs_steamos-compat-example.png" width="600" />
+- **Review Score**<br/><img src="./assets/filters/docs_review-score-example.png" width="600" />
+- **Time Played**<br/><img src="./assets/filters/docs_time-played-example.png" width="600" />
+- **Size on Disk**<br/><img src="./assets/filters/docs_size-on-disk-example.png" width="600" />
+- **Release Date**<br/><img src="./assets/filters/docs_release-date-example.png" width="600" />
+- **Purchase Date**<br/><img src="./assets/filters/docs_purchase-date-example.png" width="600" />
+- **Last Played**<br/><img src="./assets/filters/docs_last-played-example.png" width="600" />
+- **Family Sharing**<br/><img src="./assets/filters/docs_family-sharing-example.png" width="600" />
+- **Demo**<br/><img src="./assets/filters/docs_demo-example.png" width="600" />
+- **Coming Soon**<br/><img src="./assets/filters/docs_coming-soon-example.png" width="600" />
+- **Streamable**<br/><img src="./assets/filters/docs_streamable-example.png" width="600" />
+- **Steam Features**<br/><img src="./assets/filters/docs_steam-features-example.png" width="600" />
+- **Achievements**<br/><img src="./assets/filters/docs_achievements-example.png" width="600" />
+- **MicroSD Card**<br/><img src="./assets/filters/docs_microsd-card-example.png" width="600" />
+- **Install Folder**<br/><img src="./assets/filters/docs_install-folder-example.png" width="600" />

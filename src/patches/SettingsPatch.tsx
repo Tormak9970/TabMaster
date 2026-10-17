@@ -1,8 +1,8 @@
 import { afterPatch, ConfirmModal, findInReactTree, findInTree, showModal } from '@decky/ui'
 import { ReactElement } from 'react'
-import { TabMasterManager } from '../state/TabMasterManager'
-import { LogController } from '../lib/controllers/LogController'
-import { addPatch } from '../lib/Utils'
+import { TabMasterManager } from '@state'
+import { LogController } from '@lib'
+import { addPatch, trans_string as t } from '@utils'
 
 const findHome = (root: any) => {
     const filter = (node: any) => node?.type?.toString?.().includes('#HomeSettings_ShowingLess')
@@ -68,15 +68,21 @@ export const patchSettings = (tabMasterManager: TabMasterManager) => {
                             if (tabMasterManager.getTabs().tabsMap.get('Collections')!.position === -1) {
                                 showModal(
                                     <ConfirmModal
-                                        strOKButtonText='Unhide and Manage'
+                                        strOKButtonText={t('LABEL_COLLECTIONS_UNHIDE_MANAGE', 'Unhide and Manage')}
                                         onOK={() => {
                                             tabMasterManager.showTab('Collections')
                                             origOnClick()
                                         }}
                                         bDestructiveWarning={true}
-                                        strTitle='Collections Tab is hidden by Tab Master!'
+                                        strTitle={t(
+                                            'TITLE_COLLECTIONS_HIDDEN',
+                                            'Collections Tab is hidden by Tab Master!'
+                                        )}
                                     >
-                                        In order to manage hidden apps, Tab Master must unhide your Collections tab.
+                                        {t(
+                                            'MESSAGE_COLLECTIONS_UNHIDE',
+                                            'In order to manage hidden apps, Tab Master must unhide your Collections tab.'
+                                        )}
                                     </ConfirmModal>
                                 )
                             } else {

@@ -1,13 +1,14 @@
-import { Fragment, VFC, createElement, useEffect, useState } from 'react'
+import { Fragment, createElement, useEffect, useState } from 'react'
 import { achievementClasses, Focusable, mainMenuAppRunningClasses, ModalRoot, SingleDropdownOption } from '@decky/ui'
-import { FilterDefaultParams, FilterDescriptions, FilterIcons, FilterType } from './Filters'
-import { capitalizeEachWord } from '../../lib/Utils'
+import { FilterDefaultParams, FilterIcons, FilterDescriptions, FilterLabels } from './Filters'
 import { FilterSelectStyles } from '../styles/FilterSelectionStyles'
 import { IoFilter } from 'react-icons/io5'
-import { MicroSDeckInterop, microSDeckLibVersion } from '../../lib/controllers/MicroSDeckInterop'
+import { MicroSDeckInterop, microSDeckLibVersion } from '@lib'
 import { BaseModalProps, CustomDropdown } from '../generic/CustomDropdown'
+import { trans_string as t } from '@utils'
+import { FilterType } from '@types'
 
-const FilterSelectModal: VFC<BaseModalProps> = ({ rgOptions, selectedOption, onSelectOption, closeModal }) => {
+const FilterSelectModal = ({ rgOptions, selectedOption, onSelectOption, closeModal }: BaseModalProps) => {
     const [focusable, setFocusable] = useState(false) //this is to briefly (on modal mount) disable focus on all selections except last selected so it is remebered
 
     useEffect(() => {
@@ -33,7 +34,7 @@ const FilterSelectModal: VFC<BaseModalProps> = ({ rgOptions, selectedOption, onS
                             whiteSpace: 'nowrap',
                         }}
                     >
-                        Change Filter Type
+                        {t('TITLE_CHANGE_FILTER_TYPE', 'Change Filter Type')}
                     </h1>
                     <div className={mainMenuAppRunningClasses.OverlayAchievements}>
                         {rgOptions?.map(option => (
@@ -59,7 +60,7 @@ interface FilterSelectElement {
 /**
  * Individual Filter in the filter selection Modal
  */
-const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, focusable, onClick }) => {
+const FilterSelectElement = ({ filterType, focusable, onClick }: FilterSelectElement) => {
     let disabled = false
     let requiredMicroSDeckVer = ''
 
@@ -86,12 +87,14 @@ const FilterSelectElement: VFC<FilterSelectElement> = ({ filterType, focusable, 
             >
                 <div className='entry-label' style={{ display: 'flex', alignItems: 'baseline' }}>
                     <div style={{ marginRight: '7px' }}>{createElement(FilterIcons[filterType], { size: '.8em' })}</div>
-                    <div>{capitalizeEachWord(filterType)}</div>
+                    <div>{FilterLabels()[filterType]}</div>
                     {filterType === 'sd card' && (
-                        <small style={{ fontSize: '0.5em' }}>{`requires MicroSDeck ${requiredMicroSDeckVer}`}</small>
+                        <small
+                            style={{ fontSize: '0.5em' }}
+                        >{`${t('MESSAGE_REQUIRES_MICROSDECK', 'requires MicroSDeck')} ${requiredMicroSDeckVer}`}</small>
                     )}
                 </div>
-                <div className='entry-desc'>{FilterDescriptions[filterType]}</div>
+                <div className='entry-desc'>{FilterDescriptions()[filterType]}</div>
             </div>
         </Focusable>
     )
@@ -105,9 +108,9 @@ type FilterSelectProps = {
 /**
  * Component for handling filter selection.
  */
-export const FilterSelect: VFC<FilterSelectProps> = ({ selectedOption, onChange }) => {
+export const FilterSelect = ({ selectedOption, onChange }: FilterSelectProps) => {
     const filterTypeOptions = Object.keys(FilterDefaultParams()).map(filterType => ({
-        label: capitalizeEachWord(filterType),
+        label: FilterLabels()[filterType as FilterType],
         data: filterType,
     }))
 
