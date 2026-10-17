@@ -37,6 +37,7 @@ import {
     getAchievementOptions,
     getSizeOnDiskDisplayData,
     getAppIconType,
+    getAllOverviewsFromTypes,
 } from '@utils'
 import {
     FilterType,
@@ -276,15 +277,8 @@ const WhitelistFilterOptions = ({
     filter,
     containingGroupFilters,
 }: FilterOptionsProps<'whitelist'>) => {
-    let appsList: SteamAppOverview[] = []
+    let appsList: SteamAppOverview[] = getAllOverviewsFromTypes(['games', 'music', 'software'])
     const selected: DropdownOption[] = []
-    const types = ['games', 'music', 'software']
-
-    for (const type of types) {
-        appsList = appsList.concat(
-            collectionStore.appTypeCollectionMap.get(`type-${type as 'games' | 'music' | 'software'}`)!.allApps
-        )
-    }
 
     for (const gameid of filter.params.games) {
         const game = appsList.find(game => game.appid === gameid)
@@ -327,15 +321,8 @@ const BlackListFilterOptions = ({
     filter,
     containingGroupFilters,
 }: FilterOptionsProps<'blacklist'>) => {
-    let appsList: SteamAppOverview[] = []
+    let appsList: SteamAppOverview[] = getAllOverviewsFromTypes(['games', 'music', 'software'])
     const selected: DropdownOption[] = []
-    const types = ['games', 'music', 'software']
-
-    for (const type of types) {
-        appsList = appsList.concat(
-            collectionStore.appTypeCollectionMap.get(`type-${type as 'games' | 'music' | 'software'}`)!.allApps
-        )
-    }
 
     for (const gameid of filter.params.games) {
         const game = appsList.find(game => game.appid === gameid)

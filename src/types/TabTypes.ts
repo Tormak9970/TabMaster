@@ -11,6 +11,7 @@ export type TabContainer = {
     autoHide?: boolean
     sortByOverride?: number //The eSortBy number to force use for sorting. -1 ignores override.
     visibleToOthers?: boolean
+    displayAsCollection?: boolean
 }
 
 export interface TabSettings extends TabContainer {}

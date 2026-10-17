@@ -2,7 +2,7 @@ import { EditableTabSettings } from '../../components/modals/EditTabModal'
 import { Filter } from '../../components/filters/Filters'
 import { CustomTabContainer } from '../CustomTabContainer'
 import { v4 as uuidv4 } from 'uuid'
-import { defaultTabsSettings, getNonBigIntUserId } from '@utils'
+import { defaultTabsSettings, getNonBigIntUserId, isCustomTabContainer } from '@utils'
 import { PresetName, PresetOptions, getPreset } from '../../presets/presets'
 import { TabProfileManager } from '../TabProfileManager'
 import { AUTO_BACKUP_NAME } from '../../constants'
@@ -569,6 +569,10 @@ export class TabMasterManager {
     deleteTab(tabId: string) {
         const tabContainer = this.tabsMap.get(tabId)!
 
+        if (isCustomTabContainer(tabContainer)) {
+            tabContainer.cleanupTab()
+        }
+
         let tabsArrayToRemoveFrom: TabContainer[]
         let updateIndexes = false
         let index: number
@@ -581,12 +585,14 @@ export class TabMasterManager {
             tabsArrayToRemoveFrom = this.hiddenTabsList
             index = this.hiddenTabsList.findIndex(hiddenTabContainer => hiddenTabContainer === tabContainer)
         }
+
         tabsArrayToRemoveFrom.splice(index, 1)
         if (updateIndexes) {
             for (let i = index; i < this.visibleTabsList.length; i++) {
                 this.visibleTabsList[i].position--
             }
         }
+
         this.tabsMap.delete(tabId)
         this.tabProfileManager?.onDeleteTab(tabId)
         if (!this.tabProfileManager)
@@ -616,6 +622,7 @@ export class TabMasterManager {
         categoriesToInclude: number,
         autoHide: boolean,
         visibleToOthers: boolean,
+        displayAsCollection: boolean,
         sortByOverride: number
     ) {
         const id = uuidv4()
@@ -630,6 +637,7 @@ export class TabMasterManager {
                 categoriesToInclude,
                 autoHide,
                 visibleToOthers,
+                displayAsCollection,
                 sortByOverride
             )
         )
@@ -644,6 +652,7 @@ export class TabMasterManager {
             filters,
             filtersMode,
             categoriesToInclude,
+            false,
             false,
             false,
             -1
@@ -787,6 +796,7 @@ export class TabMasterManager {
                 autoHide,
                 visibleToOthers,
                 sortByOverride,
+                displayAsCollection = false,
             } = tabsSettings[keyId]
             const filters = Filter.removeUnknownTypes(_filters)
             const tabContainer = filters
@@ -799,6 +809,7 @@ export class TabMasterManager {
                       categoriesToInclude!,
                       autoHide!,
                       visibleToOthers!,
+                      displayAsCollection,
                       sortByOverride
                   )
                 : this.addDefaultTabContainer(tabsSettings[keyId])
@@ -925,6 +936,7 @@ export class TabMasterManager {
         categoriesToInclude: number,
         autoHide: boolean,
         visibleToOthers: boolean,
+        displayAsCollection: boolean,
         sortByOverride: number = -1
     ) {
         const tabContainer = new CustomTabContainer(
@@ -936,6 +948,7 @@ export class TabMasterManager {
             categoriesToInclude,
             autoHide,
             visibleToOthers,
+            displayAsCollection,
             sortByOverride
         )
         this.tabsMap.set(tabId, tabContainer)

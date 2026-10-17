@@ -42,6 +42,7 @@ type EditTabModalProps = {
     categoriesToInclude: number //bit field
     autoHide: boolean
     visibleToOthers: boolean
+    displayAsCollection: boolean
     sortBy: number
 }
 
@@ -59,6 +60,7 @@ export const EditTabModal = ({
     categoriesToInclude,
     autoHide: _autoHide,
     visibleToOthers: _visibleToOthers,
+    displayAsCollection: _displayAsCollection,
     sortBy,
 }: EditTabModalProps) => {
     const [name, setName] = useState<string>(tabTitle ?? '')
@@ -70,6 +72,7 @@ export const EditTabModal = ({
     const [patchInput, setPatchInput] = useState<boolean>(true)
     const [autoHide, setAutoHide] = useState<boolean>(_autoHide)
     const [visibleToOthers, setVisibleToOthers] = useState<boolean>(_visibleToOthers)
+    const [displayAsCollection, setDisplayAsCollection] = useState<boolean>(_displayAsCollection)
     const [sortByOverride, setSortByOverride] = useState(sortBy)
     const sortOptions: SingleDropdownOption[] = useSortingMenuItems([])
 
@@ -126,6 +129,7 @@ export const EditTabModal = ({
                 autoHide: autoHide,
                 sortByOverride: sortByOverride,
                 visibleToOthers: visibleToOthers,
+                displayAsCollection: displayAsCollection,
             }
             onConfirm(tabId, updated)
             closeModal!()
@@ -197,6 +201,12 @@ export const EditTabModal = ({
                                 label={t('LABEL_OTHER_USERS_CAN_COPY_TAB', 'Other users can copy this tab')}
                                 checked={visibleToOthers}
                                 onChange={checked => setVisibleToOthers(checked)}
+                                bottomSeparator='thick'
+                            />
+                            <ToggleField
+                                label={t('LABEL_DISPLAY_TAB_AS_COLLECTION', 'Display this tab as a Steam Collection')}
+                                checked={displayAsCollection}
+                                onChange={checked => setDisplayAsCollection(checked)}
                                 bottomSeparator='thick'
                             />
                             <DropdownItem
@@ -338,6 +348,7 @@ export function showModalNewTab(tabMasterManager: TabMasterManager) {
                     tabSettings.categoriesToInclude,
                     tabSettings.autoHide,
                     tabSettings.visibleToOthers,
+                    tabSettings.displayAsCollection,
                     tabSettings.sortByOverride
                 )
             }}
@@ -347,6 +358,7 @@ export function showModalNewTab(tabMasterManager: TabMasterManager) {
             categoriesToInclude={IncludeCategories.games}
             autoHide={false}
             visibleToOthers={false}
+            displayAsCollection={false}
             sortBy={-1}
         />
     )
@@ -369,6 +381,7 @@ export function showModalDuplicateTab(tabContainer: CustomTabContainer, tabMaste
                     tabSettings.categoriesToInclude,
                     tabSettings.autoHide,
                     tabSettings.visibleToOthers,
+                    tabSettings.displayAsCollection,
                     tabSettings.sortByOverride
                 )
             }}
@@ -378,6 +391,7 @@ export function showModalDuplicateTab(tabContainer: CustomTabContainer, tabMaste
             categoriesToInclude={tabContainer.categoriesToInclude}
             autoHide={tabContainer.autoHide}
             visibleToOthers={tabContainer.visibleToOthers}
+            displayAsCollection={tabContainer.displayAsCollection}
             sortBy={tabContainer.sortByOverride}
         />
     )
@@ -402,6 +416,7 @@ export function showModalEditTab(tabContainer: CustomTabContainer, tabMasterMana
             categoriesToInclude={tabContainer.categoriesToInclude}
             autoHide={tabContainer.autoHide}
             visibleToOthers={tabContainer.visibleToOthers}
+            displayAsCollection={tabContainer.displayAsCollection}
             sortBy={tabContainer.sortByOverride}
         />
     )

@@ -1,6 +1,6 @@
 import { EditableTabSettings } from '../components/modals/EditTabModal'
 import { Filter } from '../components/filters/Filters'
-import { filtersHaveType, getIncludedCategoriesFromBitField } from '@utils'
+import { filtersHaveType, getIncludedCategoriesFromBitField, updateTabCollection } from '@utils'
 import { gamepadTabbedPageClasses, showModal } from '@decky/ui'
 import { SortOverrideMessage } from '../components/modals/SortOverrideMessage'
 import { ReactElement } from 'react'
@@ -8,7 +8,7 @@ import {
     TabFilterSettings,
     FilterType,
     TabContainer,
-    Collection,
+    SteamCollection,
     LogicalMode,
     TabAppGridComponent,
     TabAppGridComponentProps,
@@ -27,13 +27,14 @@ export class CustomTabContainer implements TabContainer {
     title: string
     position: number
     filters: TabFilterSettings<FilterType>[]
-    collection: Collection
+    collection: SteamCollection
     filtersMode: LogicalMode
     categoriesToInclude: number
     autoHide: boolean
     visibleToOthers: boolean
     dependsOnMicroSDeck: boolean
     sortByOverride: number
+    displayAsCollection: boolean
 
     /**
      * Creates a new CustomTabContainer.
@@ -45,6 +46,7 @@ export class CustomTabContainer implements TabContainer {
      * @param categoriesToInclude A bit field of which categories should be included in the tab.
      * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
      * @param visibleToOthers Whether or not the tab can be added by other users.
+     * @param displayAsCollection Whether this tab should also appear in Desktop Mode as a collection.
      * @param sortByOverride The eSortBy number to force use for sorting. -1 ignores override.
      */
     constructor(
@@ -56,6 +58,7 @@ export class CustomTabContainer implements TabContainer {
         categoriesToInclude: number,
         autoHide: boolean,
         visibleToOthers: boolean,
+        displayAsCollection: boolean,
         sortByOverride: number
     ) {
         this.id = id
@@ -67,6 +70,7 @@ export class CustomTabContainer implements TabContainer {
         this.autoHide = autoHide
         this.visibleToOthers = visibleToOthers
         this.dependsOnMicroSDeck = false
+        this.displayAsCollection = displayAsCollection
         this.sortByOverride = sortByOverride
 
         //@ts-ignore
@@ -136,9 +140,9 @@ export class CustomTabContainer implements TabContainer {
 
     /**
      * Builds the list of apps for this tab.
+     * @param oldTabName The old tab name for handling the display collection, if it changed.
      */
-    buildCollection() {
-        console.log('rebuilding!')
+    buildCollection(oldTabName?: string) {
         const tagOverrides = SettingsManager.getTagOverrides()
 
         const { hidden, ...catsToIncludeObj } = getIncludedCategoriesFromBitField(this.categoriesToInclude)
@@ -168,6 +172,10 @@ export class CustomTabContainer implements TabContainer {
         appsList.forEach((appItem: SteamAppOverview) => appMap.set(appItem.appid, appItem))
 
         this.collection.apps = appMap
+
+        if (this.displayAsCollection) {
+            updateTabCollection(oldTabName ?? this.title, this.title, appsList)
+        }
     }
 
     /**
@@ -175,6 +183,7 @@ export class CustomTabContainer implements TabContainer {
      * @param updatedTabInfo The updated tab settings.
      */
     update(updatedTabInfo: EditableTabSettings) {
+        const oldTitle = this.title
         this.title = updatedTabInfo.title
         this.filtersMode = updatedTabInfo.filtersMode
         this.categoriesToInclude = updatedTabInfo.categoriesToInclude
@@ -182,7 +191,13 @@ export class CustomTabContainer implements TabContainer {
         this.autoHide = updatedTabInfo.autoHide
         this.visibleToOthers = updatedTabInfo.visibleToOthers
         this.sortByOverride = updatedTabInfo.sortByOverride
-        this.buildCollection()
+
+        if (!updatedTabInfo.displayAsCollection && this.displayAsCollection) {
+            updateTabCollection(oldTitle, this.title, null)
+        }
+        this.displayAsCollection = updatedTabInfo.displayAsCollection
+
+        this.buildCollection(oldTitle)
         this.checkMicroSDeckDependency()
     }
 
@@ -200,5 +215,14 @@ export class CustomTabContainer implements TabContainer {
      */
     containsFilterType(...filterTypes: FilterType[]) {
         return filtersHaveType(this.filters, ...filterTypes)
+    }
+
+    /**
+     * Handles cleanup such as deleting the display collection tied to this tab.
+     */
+    cleanupTab() {
+        if (this.displayAsCollection) {
+            updateTabCollection(this.title, this.title, null)
+        }
     }
 }

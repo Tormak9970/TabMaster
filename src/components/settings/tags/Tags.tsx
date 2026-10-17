@@ -1,9 +1,8 @@
 import { ButtonItem, Field, gamepadDialogClasses, showModal, SingleDropdownOption } from '@decky/ui'
 import { useSettingsContext } from '@state'
-import { getAppIconType, trans_string as t } from '@utils'
+import { getAllOverviewsFromTypes, getAppIconType, trans_string as t } from '@utils'
 import { TagOverrides } from './tag-overrides/TagOverrides'
 import { Fragment, useMemo } from 'react'
-import { SteamAppOverview } from '@types'
 import { ListSearchModal } from '../../modals/ListSearchModal'
 
 type GamesModalProps = {
@@ -28,24 +27,12 @@ export const Tags = () => {
     const { tagOverrides, setTagOverrides } = useSettingsContext()
     const selectedAppIds = useMemo(() => Object.keys(tagOverrides), [tagOverrides])
 
-    const appsList: SteamAppOverview[] = useMemo(() => {
-        let apps: SteamAppOverview[] = []
-        const types = ['games', 'music', 'software']
-
-        for (const type of types) {
-            apps = apps.concat(
-                collectionStore.appTypeCollectionMap.get(`type-${type as 'games' | 'music' | 'software'}`)!.allApps
-            )
-        }
-
-        return apps
-    }, [collectionStore.appTypeCollectionMap])
-
+    const appsList = getAllOverviewsFromTypes(['games', 'music', 'software'])
     const appsMap = Object.fromEntries(appsList.map(entry => [entry.appid, entry]))
 
     const dropdownOptions: SingleDropdownOption[] = appsList
         .filter(game => !selectedAppIds?.includes(game.appid.toString()))
-        .map((game: SteamAppOverview) => {
+        .map(game => {
             return { label: game.display_name, data: { appid: game.appid, appType: game.app_type } }
         })
 

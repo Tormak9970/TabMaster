@@ -1,4 +1,4 @@
-import { Collection } from './stores'
+import { SteamCollection } from './stores'
 
 export type AppId = number
 
@@ -18,7 +18,7 @@ export type SteamTab = {
 }
 
 export interface TabAppGridComponentProps {
-    collection: Collection
+    collection: SteamCollection
     eSortBy: number
     setSortBy: (e: any) => void
     showSortingContextMenu: (e: any) => void
