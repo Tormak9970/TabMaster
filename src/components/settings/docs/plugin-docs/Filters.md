@@ -102,6 +102,8 @@ Filters apps based on their install state.
 - `and`: Filters apps based on if they have all listed tags.
 - `or`: Filters apps based on if they have any listed tag.
 
+**NOTE:** You can override tags on a per-game basis in the `Tag Overrides` section of the `Tags` settings page!
+
 **Example:**<br/>
 <img title="Tags Example" src="https://raw.githubusercontent.com/tormak9970/TabMaster/master/assets/filters/docs_tags-example.png" />
 
