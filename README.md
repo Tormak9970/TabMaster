@@ -2,6 +2,7 @@
 [![License Badge](https://img.shields.io/github/license/Tormak9970/TabMaster)](LICENSE)
 ![Decky Loader](https://img.shields.io/badge/dynamic/json?url=https://plugins.deckbrew.xyz/plugins?query=TabMaster&query=$[:1].downloads&suffix=%20installs&label=decky&color=3ea6a3)
 [![Crowdin](https://badges.crowdin.net/tabmaster/localized.svg)](https://crowdin.com/project/tabmaster)
+![No AI](https://img.shields.io/badge/Made%20by%20people,%20for%20people-F54927)
 
 # Tab Master
 
