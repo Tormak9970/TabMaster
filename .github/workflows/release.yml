@@ -67,11 +67,16 @@ jobs:
                   fetch-depth: 0
                   ref: release
 
-            - name: Setup Pnpm
-              uses: pnpm/setup@v1
+            - name: Setup Node
+              uses: actions/setup-node@v5
               with:
-                  version: 11
-                  runtime: node@22
+                  node-version: 22
+                  package-manager-cache: false
+
+            - name: Setup Pnpm
+              uses: pnpm/action-setup@v6
+              with:
+                  version: 10
                   cache: false
 
             - name: Install Frontend Dependencies
