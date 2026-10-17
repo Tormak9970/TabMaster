@@ -78,5 +78,5 @@ export const SettingsRouter = () => {
         ]
     }, [baseRoute])
 
-    return <SidebarNavigation title={t('TITLE_TABMASTER_SETTINGS', 'TabMaster Settings')} showTitle pages={pages} />
+    return <SidebarNavigation title={'TabMaster'} showTitle pages={pages} />
 }

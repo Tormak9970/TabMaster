@@ -81,7 +81,7 @@ export default defineConfig({
     ],
     build: {
         // DEV Only
-        minify: false,
+        // minify: false,
         lib: {
             entry: resolve(import.meta.dirname, 'src/index.tsx'),
             name: 'TabMaster',

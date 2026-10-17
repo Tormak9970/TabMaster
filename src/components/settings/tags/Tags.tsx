@@ -87,6 +87,12 @@ export const Tags = () => {
                 background-color: #23262e;
                 margin-top: 0.5rem;
               }
+                
+              .tab-master-tag-settings .game-entry > div > div > .${gamepadDialogClasses.Field} {
+                background: #23262e !important;
+                margin-top: 0 !important;
+                padding-right: 0 !important;
+              }
             `}</style>
             <div className='tab-master-tag-settings'>
                 <Field

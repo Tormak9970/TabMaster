@@ -24,42 +24,26 @@ export const TagOverrides = ({ tagOverrides, appsMap, setTagOverrides }: TagOver
     }, [selectedAppIds, tagOverrides, appsMap])
 
     return (
-        <div className='tag-overrides-body'>
-            <div className='tag-overrides'>
-                {gamesWithOverrides.map(game => (
-                    <GameEntry
-                        key={`${game.appid}|${game.name}`}
-                        tags={allStoreTags}
-                        appid={game.appid}
-                        overrides={game.override}
-                        name={game.name}
-                        onChange={(appid, overrides) => {
-                            const newTagOverrides = { ...tagOverrides }
-                            if (overrides === null) {
-                                delete newTagOverrides[appid]
-                            } else {
-                                newTagOverrides[appid] = overrides
-                            }
+        <div className='tag-overrides'>
+            {gamesWithOverrides.map(game => (
+                <GameEntry
+                    key={`${game.appid}|${game.name}`}
+                    tags={allStoreTags}
+                    appid={game.appid}
+                    overrides={game.override}
+                    name={game.name}
+                    onChange={(appid, overrides) => {
+                        const newTagOverrides = { ...tagOverrides }
+                        if (overrides === null) {
+                            delete newTagOverrides[appid]
+                        } else {
+                            newTagOverrides[appid] = overrides
+                        }
 
-                            setTagOverrides(newTagOverrides)
-                        }}
-                    />
-                ))}
-            </div>
-            {/* <div className='styled-btn no-sep'>
-                <ButtonItem
-                    onClick={() => {
-                        showModal(
-                            <GamesModalWrapper
-                                onSelect={option => onSelect(option)}
-                                dropdownOptions={dropdownOptions}
-                            />
-                        )
+                        setTagOverrides(newTagOverrides)
                     }}
-                >
-                    {t('LABEL_ADD_FILTER', 'Add App')}
-                </ButtonItem>
-            </div> */}
+                />
+            ))}
         </div>
     )
 }

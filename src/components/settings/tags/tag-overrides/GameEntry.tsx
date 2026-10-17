@@ -1,4 +1,12 @@
-import { ButtonItem, Focusable, quickAccessControlsClasses, showModal, SingleDropdownOption } from '@decky/ui'
+import {
+    ButtonItem,
+    DialogButton,
+    Field,
+    Focusable,
+    quickAccessControlsClasses,
+    showModal,
+    SingleDropdownOption,
+} from '@decky/ui'
 import { TagOverride, TagResponse } from '@types'
 import { playUISound, trans_string as t } from '@utils'
 import { useState, Fragment, useMemo } from 'react'
@@ -65,48 +73,82 @@ export const GameEntry = ({ tags, appid, name, overrides, onChange }: GameEntryP
     return (
         <>
             <div className='game-entry'>
-                <Focusable
-                    style={{ margin: '0 calc(-12px - 1.4vw)' }}
-                    onActivate={() => {
-                        playUISound('/sounds/deck_ui_misc_01.wav')
-                        setIsOpen(isOpen => !isOpen)
-                    }}
-                    noFocusRing={true}
-                    className='highlight-on-focus'
-                    focusClassName='start-focused'
-                >
-                    <div style={{ margin: '0 calc(12px + 1.4vw)', padding: '0 16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <div
-                                style={{ padding: '12px 0', float: 'left' }}
-                                className={quickAccessControlsClasses.PanelSectionTitle}
-                            >
-                                {name} - {tagOverrides.length}{' '}
-                                {tagOverrides.length === 1
-                                    ? t('LABEL_TAG_OVERRIDE_SINGULAR', 'Override')
-                                    : t('LABEL_TAG_OVERRIDE_PLURAL', 'Overrides')}
-                            </div>
-                            <div style={{ paddingRight: '10px', display: 'flex', alignItems: 'center' }}>
-                                <BiSolidDownArrow
-                                    style={{
-                                        transform: !isOpen ? 'rotate(90deg)' : '',
-                                        transition: 'transform 0.2s ease-in-out',
-                                    }}
-                                />
-                            </div>
-                            <GuardedDeleteButton
-                                title={t('TITLE_ALL_CAPS_WARNING', 'WARNING!')}
-                                confirmationMessage={t(
-                                    'MESSAGE_DELETE_GAME_TAG_OVERRIDE_CONFIRM',
-                                    "Are you sure you want to delete this game from your overrides? This can't be undone."
-                                )}
-                                onDelete={() => {
-                                    onChange(appid, null)
-                                }}
-                            />
+                <div style={{ margin: '0', width: 'calc(100% - 2rem)', padding: '0 16px' }}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                        }}
+                    >
+                        <div
+                            style={{ padding: '12px 0', float: 'left' }}
+                            className={quickAccessControlsClasses.PanelSectionTitle}
+                        >
+                            {name} - {tagOverrides.length}{' '}
+                            {tagOverrides.length === 1
+                                ? t('LABEL_TAG_OVERRIDE_SINGULAR', 'Override')
+                                : t('LABEL_TAG_OVERRIDE_PLURAL', 'Overrides')}
                         </div>
+                        <Field childrenContainerWidth='max' className='no-sep'>
+                            <Focusable style={{ width: '100%', display: 'flex' }}>
+                                <Focusable style={{ marginRight: '0.5rem' }}>
+                                    <DialogButton
+                                        onClick={() => {
+                                            playUISound('/sounds/deck_ui_misc_01.wav')
+                                            setIsOpen(isOpen => !isOpen)
+                                        }}
+                                        style={{
+                                            height: '40px',
+                                            width: '42px',
+                                            minWidth: 0,
+                                            padding: '10px 12px',
+                                            marginLeft: 'auto',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                        }}
+                                        onOKActionDescription={
+                                            isOpen
+                                                ? t('LABEL_TAG_OVERRIDE_COLLAPSE', 'Collapse')
+                                                : t('LABEL_TAG_OVERRIDE_EXPAND', 'Expand')
+                                        }
+                                    >
+                                        <BiSolidDownArrow
+                                            style={{
+                                                transform: !isOpen ? 'rotate(90deg)' : '',
+                                                transition: 'transform 0.2s ease-in-out',
+                                            }}
+                                        />
+                                    </DialogButton>
+                                </Focusable>
+                                <Focusable>
+                                    <GuardedDeleteButton
+                                        title={t('TITLE_ALL_CAPS_WARNING', 'WARNING!')}
+                                        style={{
+                                            height: '40px',
+                                            width: '42px',
+                                            minWidth: 0,
+                                            padding: '10px 12px',
+                                            marginLeft: 'auto',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                        }}
+                                        confirmationMessage={t(
+                                            'MESSAGE_DELETE_GAME_TAG_OVERRIDE_CONFIRM',
+                                            "Are you sure you want to delete this game from your overrides? This can't be undone."
+                                        )}
+                                        onDelete={() => {
+                                            onChange(appid, null)
+                                        }}
+                                    />
+                                </Focusable>
+                            </Focusable>
+                        </Field>
                     </div>
-                </Focusable>
+                </div>
                 {isOpen && (
                     <>
                         <div style={{ padding: '10px 18px' }}>
@@ -145,15 +187,6 @@ export const GameEntry = ({ tags, appid, name, overrides, onChange }: GameEntryP
                     </>
                 )}
             </div>
-            <div
-                style={{
-                    position: 'relative',
-                    left: 'calc(16px - 1.8vw)',
-                    right: 'calc(16px - 1.8vw)',
-                    height: '1px',
-                    background: '#ffffff1a',
-                }}
-            />
         </>
     )
 }
