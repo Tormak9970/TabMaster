@@ -46,6 +46,14 @@ const presetDefines = {
         }
     },
 
+    'steamos compatibility': (compat: number) => {
+        return {
+            filters: [{ type: 'steamos compatibility', inverted: false, params: { category: compat } }],
+            filtersMode: 'and',
+            categoriesToInclude: IncludeCategories.games,
+        }
+    },
+
     platform: (platform: SteamPlatform) => {
         return {
             filters: [{ type: 'platform', inverted: false, params: { platform: platform } }],

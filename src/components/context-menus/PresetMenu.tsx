@@ -2,7 +2,7 @@ import { Menu, MenuGroup, MenuItem } from '@decky/ui'
 import { Fragment } from 'react'
 import { presetKeys } from '../../presets/presets'
 import { TabMasterManager } from '@state'
-import { compatCategoryToLabel } from '../filters/Filters'
+import { compatCategoryToLabel, steamOSCompatCategoryToLabel } from '../filters/Filters'
 import { trans_string as t, getAppCategoryLabels } from '@utils'
 import { SteamPlatform } from '@types'
 
@@ -81,6 +81,22 @@ export const PresetMenuItems = ({ tabMasterManager, isMicroSDeckInstalled }: Pre
                             <MenuGroup label={t('LABEL_DECK_COMPATIBILITY', 'Deck Compatibility')}>
                                 {[0, 1, 2, 3].map(level => {
                                     const tabName = compatCategoryToLabel(level)
+                                    return (
+                                        <MenuItem
+                                            onClick={() => tabMasterManager.createPresetTab(presetName, tabName, level)}
+                                            {...getActionDescription(tabName)}
+                                        >
+                                            {tabName}
+                                        </MenuItem>
+                                    )
+                                })}
+                            </MenuGroup>
+                        )
+                    case 'steamos compatibility':
+                        return (
+                            <MenuGroup label={t('LABEL_MACHINE_COMPAT_FILTER', 'SteamOS Compatibility')}>
+                                {[0, 1, 2].map(level => {
+                                    const tabName = steamOSCompatCategoryToLabel(level)
                                     return (
                                         <MenuItem
                                             onClick={() => tabMasterManager.createPresetTab(presetName, tabName, level)}
