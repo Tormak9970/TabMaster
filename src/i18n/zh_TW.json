@@ -207,7 +207,7 @@
   "MESSAGE_MODE": "mode",
   "LABEL_GROUP_COMBINATION_LOGIC": "Group Combination Logic",
   "MESSAGE_FINISH_CURRENT_FILTER_BEFORE_ADDING": "Please finish the current filter before adding another",
-  "LABEL_ADD_FILTER": "Add App",
+  "LABEL_ADD_FILTER": "Add Filter",
   "TITLE_CANT_SAVE_TAB": "Cannot Save Tab",
   "LABEL_SAVE_TAB": "Save",
   "PLACEHOLDER_TAB_TITLE": "The title for this tab",
@@ -310,5 +310,6 @@
   "LABEL_TAG_OVERRIDES": "App Tag Overrides",
   "DESCRIPTION_TAG_OVERRIDES": "Allows you to override specific tags for apps you own.",
   "TITLE_SETTINGS_GENERAL": "General",
-  "TITLE_SETTINGS_TAGS": "Tags"
+  "TITLE_SETTINGS_TAGS": "Tags",
+  "TITLE_TABMASTER_SETTINGS": "TabMaster Settings"
 }

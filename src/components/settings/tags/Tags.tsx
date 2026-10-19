@@ -100,7 +100,7 @@ export const Tags = () => {
                                 )
                             }}
                         >
-                            {t('LABEL_ADD_FILTER', 'Add App')}
+                            {t('LABEL_TAGS_ADD_APP', 'Add App')}
                         </ButtonItem>
                     </div>
                 </Field>
