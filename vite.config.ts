@@ -5,47 +5,53 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import pluginExternal from 'vite-plugin-external'
 import codegen from 'vite-plugin-codegen'
 
+const minified = true
+
 function extractStrings(): Plugin {
     return {
         name: 'extract-translation-strings',
         apply: 'build',
 
-        generateBundle(_options, bundle) {
-            const strings: Record<string, string> = {}
-            const steamKeys = new Set()
-            const chunks = Object.values(bundle).filter(file => file.type === 'chunk')
+        generateBundle(options, bundle) {
+            if (minified === false) {
+                const strings: Record<string, string> = {}
+                const steamKeys = new Set()
+                const chunks = Object.values(bundle).filter(file => file.type === 'chunk')
 
-            const translationRegex = /(?<![A-Za-z\d_$])trans_string\(\s*(['"])(.*?)\1\s*,\s*(['"])(.*?)\3\s*\)/g
+                const translationRegex = /(?<![A-Za-z\d_$])trans_string\(\s*(['"])(.*?)\1\s*,\s*(['"])(.*?)\3\s*\)/g
 
-            const steamRegex =
-                /(?<![A-Za-z\d_$])trans_string\(\s*(['"])(.*?)\1\s*,\s*(['"])(.*?)\3\s*,\s*(?:true|1)\s*\)/g
+                const steamRegex =
+                    /(?<![A-Za-z\d_$])trans_string\(\s*(['"])(.*?)\1\s*,\s*(['"])(.*?)\3\s*,\s*(?:true|1)\s*\)/g
 
-            for (const chunk of chunks) {
-                for (const match of chunk.code.matchAll(steamRegex)) {
-                    steamKeys.add(match[2])
-                }
-            }
-
-            for (const chunk of chunks) {
-                for (const match of chunk.code.matchAll(translationRegex)) {
-                    const key = match[2]
-                    const value = match[4]
-
-                    if (!steamKeys.has(key)) {
-                        strings[key] = value.replace(/\\(.)/g, '$1')
+                for (const chunk of chunks) {
+                    for (const match of chunk.code.matchAll(steamRegex)) {
+                        steamKeys.add(match[2])
                     }
                 }
+
+                for (const chunk of chunks) {
+                    for (const match of chunk.code.matchAll(translationRegex)) {
+                        const key = match[2]
+                        const value = match[4]
+
+                        if (!steamKeys.has(key)) {
+                            strings[key] = value.replace(/\\(.)/g, '$1')
+                        }
+                    }
+                }
+
+                const outputPath = path.resolve('src/i18n/strings.json')
+
+                mkdirSync(path.dirname(outputPath), {
+                    recursive: true,
+                })
+
+                writeFileSync(outputPath, JSON.stringify(strings, null, 2))
+
+                console.info(`Extracted ${Object.keys(strings).length} strings`)
+            } else {
+                console.info(`Minifying build, skipping extract strings`)
             }
-
-            const outputPath = path.resolve('src/i18n/strings.json')
-
-            mkdirSync(path.dirname(outputPath), {
-                recursive: true,
-            })
-
-            writeFileSync(outputPath, JSON.stringify(strings, null, 2))
-
-            console.info(`Extracted ${Object.keys(strings).length} strings`)
         },
     }
 }
@@ -69,7 +75,7 @@ export default defineConfig({
     ],
     build: {
         // DEV Only
-        // minify: false,
+        minify: minified,
         lib: {
             entry: resolve(import.meta.dirname, 'src/index.tsx'),
             name: 'TabMaster',
