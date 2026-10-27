@@ -60,6 +60,8 @@ This is where you can add new tabs to your library. You can find the various opt
 
 **Sort apps by** - The order to sort apps by. This overrides the order from Steam's library sort feature.
 
+**Show apps in one grid** - Keeps the sort order but removes the groups some sorts add, like the dates for Last Played or the size ranges for Size on Disk.
+
 **Display as Collection** - When checked, TabMaster will create and automatically update a collection named `tabName (TabMaster)`. This will show up across devices, and be automatically deleted when the tab is deleted.
 
 **Auto Hide** - Whether this tab should automatically be hidden from the library when it has no games (this preserves the order of the tabs, unlike hiding it manually).

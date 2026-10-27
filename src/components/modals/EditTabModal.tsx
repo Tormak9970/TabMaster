@@ -44,6 +44,7 @@ type EditTabModalProps = {
     visibleToOthers: boolean
     displayAsCollection: boolean
     sortBy: number
+    flattenGroups: boolean
 }
 
 /**
@@ -62,6 +63,7 @@ export const EditTabModal = ({
     visibleToOthers: _visibleToOthers,
     displayAsCollection: _displayAsCollection,
     sortBy,
+    flattenGroups: _flattenGroups,
 }: EditTabModalProps) => {
     const [name, setName] = useState<string>(tabTitle ?? '')
     const [topLevelFilters, setTopLevelFilters] = useState<TabFilterSettings<FilterType>[]>(tabFilters)
@@ -74,6 +76,7 @@ export const EditTabModal = ({
     const [visibleToOthers, setVisibleToOthers] = useState<boolean>(_visibleToOthers)
     const [displayAsCollection, setDisplayAsCollection] = useState<boolean>(_displayAsCollection)
     const [sortByOverride, setSortByOverride] = useState(sortBy)
+    const [flattenGroups, setFlattenGroups] = useState<boolean>(_flattenGroups)
     const sortOptions: SingleDropdownOption[] = useSortingMenuItems([])
 
     const cantSaveTitle = t('TITLE_CANT_SAVE_TAB', 'Cannot Save Tab')
@@ -130,6 +133,7 @@ export const EditTabModal = ({
                 sortByOverride: sortByOverride,
                 visibleToOthers: visibleToOthers,
                 displayAsCollection: displayAsCollection,
+                flattenGroups: flattenGroups,
             }
             onConfirm(tabId, updated)
             closeModal!()
@@ -214,6 +218,16 @@ export const EditTabModal = ({
                                 rgOptions={sortOptions}
                                 selectedOption={sortByOverride}
                                 onChange={option => setSortByOverride(option.data)}
+                                bottomSeparator='thick'
+                            />
+                            <ToggleField
+                                label={t('LABEL_FLATTEN_SORT_GROUPS', 'Show apps in one grid')}
+                                description={t(
+                                    'DESCRIPTION_FLATTEN_SORT_GROUPS',
+                                    'Keep the sort order but remove the groups some sorts add, like Last Played or Size on Disk'
+                                )}
+                                checked={flattenGroups}
+                                onChange={checked => setFlattenGroups(checked)}
                                 bottomSeparator='thick'
                             />
                         </div>
@@ -349,7 +363,8 @@ export function showModalNewTab(tabMasterManager: TabMasterManager) {
                     tabSettings.autoHide,
                     tabSettings.visibleToOthers,
                     tabSettings.displayAsCollection,
-                    tabSettings.sortByOverride
+                    tabSettings.sortByOverride,
+                    tabSettings.flattenGroups
                 )
             }}
             tabFilters={[]}
@@ -360,6 +375,7 @@ export function showModalNewTab(tabMasterManager: TabMasterManager) {
             visibleToOthers={false}
             displayAsCollection={false}
             sortBy={-1}
+            flattenGroups={false}
         />
     )
 }
@@ -382,7 +398,8 @@ export function showModalDuplicateTab(tabContainer: CustomTabContainer, tabMaste
                     tabSettings.autoHide,
                     tabSettings.visibleToOthers,
                     tabSettings.displayAsCollection,
-                    tabSettings.sortByOverride
+                    tabSettings.sortByOverride,
+                    tabSettings.flattenGroups
                 )
             }}
             tabMasterManager={tabMasterManager}
@@ -393,6 +410,7 @@ export function showModalDuplicateTab(tabContainer: CustomTabContainer, tabMaste
             visibleToOthers={tabContainer.visibleToOthers}
             displayAsCollection={tabContainer.displayAsCollection}
             sortBy={tabContainer.sortByOverride}
+            flattenGroups={tabContainer.flattenGroups}
         />
     )
 }
@@ -418,6 +436,7 @@ export function showModalEditTab(tabContainer: CustomTabContainer, tabMasterMana
             visibleToOthers={tabContainer.visibleToOthers}
             displayAsCollection={tabContainer.displayAsCollection}
             sortBy={tabContainer.sortByOverride}
+            flattenGroups={tabContainer.flattenGroups}
         />
     )
 }
