@@ -26,7 +26,7 @@ Here you can find everything about tabs, including adding, availale options, reo
 
 ### Custom vs. Default
 
-Before you continue, it is important to understand that there are two types of tabs, default tabs (marked with the Steam logo) and custom tabs (ones you make). Default tabs can only be hidden, while custom tabs have all the following features.
+Before you continue, it is important to understand that there are two types of tabs, default tabs (marked with the Steam logo) and custom tabs (ones you make). Default tabs can only be hidden and set to show their apps in one grid (from Edit in the TabMaster menu), while custom tabs have all the following features.
 
 <br/>
 
@@ -60,7 +60,7 @@ This is where you can add new tabs to your library. You can find the various opt
 
 **Sort apps by** - The order to sort apps by. This overrides the order from Steam's library sort feature.
 
-**Show apps in one grid** - Keeps the sort order but removes the groups some sorts add, like the dates for Last Played or the size ranges for Size on Disk.
+**Disable grouping** - Keeps the sort order but removes the groups some sorts add, like the dates for Last Played or the size ranges for Size on Disk.
 
 **Display as Collection** - When checked, TabMaster will create and automatically update a collection named `tabName (TabMaster)`. This will show up across devices, and be automatically deleted when the tab is deleted.
 

@@ -221,7 +221,7 @@ export const EditTabModal = ({
                                 bottomSeparator='thick'
                             />
                             <ToggleField
-                                label={t('LABEL_FLATTEN_SORT_GROUPS', 'Show apps in one grid')}
+                                label={t('LABEL_FLATTEN_SORT_GROUPS', 'Disable grouping')}
                                 description={t(
                                     'DESCRIPTION_FLATTEN_SORT_GROUPS',
                                     'Keep the sort order but remove the groups some sorts add, like Last Played or Size on Disk'

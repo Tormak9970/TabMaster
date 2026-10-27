@@ -12,6 +12,7 @@ import {
 import { Fragment, useState } from 'react'
 import { TabMasterManager, TabMasterContextProvider, useTabMasterContext, CustomTabContainer } from '@state'
 import { showModalDuplicateTab, showModalEditTab, showModalNewTab } from '../modals/EditTabModal'
+import { canEditDefaultTab, showModalEditDefaultTab } from '../modals/EditDefaultTabModal'
 import { LibraryMenuStyles } from '../styles/LibraryMenuStyles'
 import { DestructiveModal } from '../generic/DestructiveModal'
 import { PresetMenuItems } from './PresetMenu'
@@ -131,6 +132,14 @@ const LibraryMenuItems = ({ selectedTabId, closeMenu, isMicroSDeckInstalled }: L
                 <MenuItem
                     onOKActionDescription={`${t('LABEL_EDIT_TAB', 'Edit')} "${tabTitle}"`}
                     onClick={() => showModalEditTab(tabContainer as CustomTabContainer, tabMasterManager)}
+                >
+                    {t('LABEL_EDIT_TAB', 'Edit')}
+                </MenuItem>
+            )}
+            {tabContainer && canEditDefaultTab(tabContainer) && (
+                <MenuItem
+                    onOKActionDescription={`${t('LABEL_EDIT_TAB', 'Edit')} "${tabTitle}"`}
+                    onClick={() => showModalEditDefaultTab(tabContainer, tabMasterManager)}
                 >
                     {t('LABEL_EDIT_TAB', 'Edit')}
                 </MenuItem>

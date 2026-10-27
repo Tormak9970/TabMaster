@@ -1,6 +1,6 @@
 import { findInReactTree } from '@decky/ui'
 import { ReactElement } from 'react'
-import { TabAppGridComponent } from '@types'
+import { SteamTab, TabAppGridComponent } from '@types'
 
 type AppGridSection = {
     subSectionName: string
@@ -30,6 +30,16 @@ export function getFlatTabAppGrid(TabAppGrid: TabAppGridComponent): TabAppGridCo
     }
 
     return FlatTabAppGridDef
+}
+
+/**
+ * Swaps the tab app grid in one of Steam's default tabs for the flat one.
+ * @param tab The default tab. Its content is created for this render, so it is changed in place.
+ * @param TabAppGrid Steam's tab app grid component.
+ */
+export function flattenDefaultTab(tab: SteamTab, TabAppGrid: TabAppGridComponent) {
+    const grid = findInReactTree(tab.content, elt => elt?.type === TabAppGrid)
+    if (grid) grid.type = getFlatTabAppGrid(TabAppGrid)
 }
 
 /**

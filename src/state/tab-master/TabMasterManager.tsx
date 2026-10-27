@@ -516,6 +516,16 @@ export class TabMasterManager {
     }
 
     /**
+     * Updates the settings of one of Steam's default tabs.
+     * @param tabId The id of the default tab.
+     * @param flattenGroups Whether to show the sorted apps in one grid instead of one per group.
+     */
+    updateDefaultTab(tabId: string, flattenGroups: boolean) {
+        this.tabsMap.get(tabId)!.flattenGroups = flattenGroups
+        this.updateAndSave()
+    }
+
+    /**
      * Reorders the tabs.
      * @param orederedTabIds The updated order of tabs.
      */
