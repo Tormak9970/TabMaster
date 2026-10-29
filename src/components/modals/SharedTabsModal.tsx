@@ -143,7 +143,9 @@ export function showModalSharedTabs(tabMasterManager: TabMasterManager) {
                     tabSettings.categoriesToInclude!,
                     tabSettings.autoHide ?? false,
                     tabSettings.visibleToOthers ?? false,
-                    tabSettings.sortByOverride ?? -1
+                    tabSettings.displayAsCollection ?? false,
+                    tabSettings.sortByOverride ?? -1,
+                    tabSettings.flattenGroups ?? false
                 )
 
                 showModalDuplicateTab(container, tabMasterManager)
