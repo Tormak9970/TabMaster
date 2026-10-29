@@ -7,6 +7,7 @@ const contributors = [
     'Denilson Sá Maia',
     'KennethThomson1212',
     'Simon Ma',
+    'Kaporli',
     'Joshua Freudenhammer',
     'Vladimir Budylnikov',
 ]

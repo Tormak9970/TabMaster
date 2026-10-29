@@ -516,6 +516,16 @@ export class TabMasterManager {
     }
 
     /**
+     * Updates the settings of one of Steam's default tabs.
+     * @param tabId The id of the default tab.
+     * @param flattenGroups Whether to show the sorted apps in one grid instead of one per group.
+     */
+    updateDefaultTab(tabId: string, flattenGroups: boolean) {
+        this.tabsMap.get(tabId)!.flattenGroups = flattenGroups
+        this.updateAndSave()
+    }
+
+    /**
      * Reorders the tabs.
      * @param orederedTabIds The updated order of tabs.
      */
@@ -613,6 +623,7 @@ export class TabMasterManager {
      * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
      * @param visibleToOthers Whether or not the tab can be copied by other users.
      * @param sortByOverride The eSortBy number to force use for sorting. -1 ignores override.
+     * @param flattenGroups Whether to show the sorted apps in one grid instead of one per group.
      */
     createCustomTab(
         title: string,
@@ -623,7 +634,8 @@ export class TabMasterManager {
         autoHide: boolean,
         visibleToOthers: boolean,
         displayAsCollection: boolean,
-        sortByOverride: number
+        sortByOverride: number,
+        flattenGroups: boolean
     ) {
         const id = uuidv4()
         this.addCollectionReactionsForFilters(flattenFilters(filterSettingsList))
@@ -638,7 +650,8 @@ export class TabMasterManager {
                 autoHide,
                 visibleToOthers,
                 displayAsCollection,
-                sortByOverride
+                sortByOverride,
+                flattenGroups
             )
         )
         this.updateAndSave()
@@ -655,7 +668,8 @@ export class TabMasterManager {
             false,
             false,
             false,
-            -1
+            -1,
+            false
         )
     }
 
@@ -797,6 +811,7 @@ export class TabMasterManager {
                 visibleToOthers,
                 sortByOverride,
                 displayAsCollection = false,
+                flattenGroups = false,
             } = tabsSettings[keyId]
             const filters = Filter.removeUnknownTypes(_filters)
             const tabContainer = filters
@@ -810,7 +825,8 @@ export class TabMasterManager {
                       autoHide!,
                       visibleToOthers!,
                       displayAsCollection,
-                      sortByOverride
+                      sortByOverride,
+                      flattenGroups
                   )
                 : this.addDefaultTabContainer(tabsSettings[keyId])
 
@@ -907,6 +923,7 @@ export class TabMasterManager {
                       autoHide: (tabContainer as CustomTabContainer).autoHide,
                       visibleToOthers: (tabContainer as CustomTabContainer).visibleToOthers,
                       sortByOverride: (tabContainer as CustomTabContainer).sortByOverride,
+                      flattenGroups: (tabContainer as CustomTabContainer).flattenGroups,
                   }
                 : tabContainer
 
@@ -925,6 +942,7 @@ export class TabMasterManager {
      * @param autoHide Whether or not the tab should automatically be hidden if it's collection is empty.
      * @param visibleToOthers Whether or not the tab can be added by other users.
      * @param sortByOverride The eSortBy number to force use for sorting. -1 ignores override.
+     * @param flattenGroups Whether to show the sorted apps in one grid instead of one per group.
      * @returns A tab container for this tab.
      */
     private addCustomTabContainer(
@@ -937,7 +955,8 @@ export class TabMasterManager {
         autoHide: boolean,
         visibleToOthers: boolean,
         displayAsCollection: boolean,
-        sortByOverride: number = -1
+        sortByOverride: number = -1,
+        flattenGroups: boolean = false
     ) {
         const tabContainer = new CustomTabContainer(
             tabId,
@@ -949,7 +968,8 @@ export class TabMasterManager {
             autoHide,
             visibleToOthers,
             displayAsCollection,
-            sortByOverride
+            sortByOverride,
+            flattenGroups
         )
         this.tabsMap.set(tabId, tabContainer)
         return tabContainer
