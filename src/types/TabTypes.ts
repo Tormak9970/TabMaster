@@ -12,6 +12,7 @@ export type TabContainer = {
     sortByOverride?: number //The eSortBy number to force use for sorting. -1 ignores override.
     visibleToOthers?: boolean
     displayAsCollection?: boolean
+    flattenGroups?: boolean //show the sorted apps in one grid instead of one per group
 }
 
 export interface TabSettings extends TabContainer {}

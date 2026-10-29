@@ -2,6 +2,7 @@ import { MenuItem, showModal, Menu, showContextMenu, DialogButton } from '@decky
 import { FaEllipsisH } from 'react-icons/fa'
 import { TabMasterManager, CustomTabContainer } from '@state'
 import { showModalDuplicateTab, showModalEditTab } from '../modals/EditTabModal'
+import { canEditDefaultTab, showModalEditDefaultTab } from '../modals/EditDefaultTabModal'
 import { DestructiveModal } from '../generic/DestructiveModal'
 import { showAddCollectionModal } from '../modals/AddCollectionModal'
 import { trans_string as t } from '@utils'
@@ -19,6 +20,14 @@ export const TabActionsContextMenu = ({ tabContainer, tabMasterManager }: TabAct
     const menuItems = [
         <MenuItem onSelected={() => tabMasterManager.hideTab(tabContainer.id)}>{t('LABEL_HIDE_TAB', 'Hide')}</MenuItem>,
     ]
+
+    if (canEditDefaultTab(tabContainer)) {
+        menuItems.unshift(
+            <MenuItem onSelected={() => showModalEditDefaultTab(tabContainer, tabMasterManager)}>
+                {t('LABEL_EDIT_TAB', 'Edit')}
+            </MenuItem>
+        )
+    }
 
     if (tabContainer.filters) {
         menuItems.unshift(

@@ -4,7 +4,7 @@ import { ReactElement, useEffect, useState } from 'react'
 import { TabMasterManager, CustomTabContainer } from '@state'
 import { LogController, MicroSDeckInterop } from '@lib'
 import { LibraryMenu } from '../components/context-menus/LibraryMenu'
-import { addPatch } from '@utils'
+import { addPatch, flattenDefaultTab } from '@utils'
 import type { SteamTab, TabAppGridComponent, TabContext as TabContextType } from '@types'
 
 let TabAppGridComponentDef: TabAppGridComponent | undefined
@@ -126,20 +126,22 @@ export const patchLibrary = (tabMasterManager: TabMasterManager): RoutePatch => 
                                                 ) || []
                                             )
                                         } else {
-                                            return (
-                                                tabs.find(actualTab => {
-                                                    if (actualTab.id === tabContainer.id) {
-                                                        if (!actualTab.footer) actualTab.footer = {}
-                                                        actualTab.footer.onMenuActionDescription = 'Tab Master'
-                                                        actualTab.footer.onMenuButton = getShowMenu(
-                                                            tabContainer.id,
-                                                            tabMasterManager
-                                                        )
-                                                        return true
-                                                    }
-                                                    return false
-                                                }) ?? []
-                                            )
+                                            const defaultTab = tabs.find(actualTab => {
+                                                if (actualTab.id === tabContainer.id) {
+                                                    if (!actualTab.footer) actualTab.footer = {}
+                                                    actualTab.footer.onMenuActionDescription = 'Tab Master'
+                                                    actualTab.footer.onMenuButton = getShowMenu(
+                                                        tabContainer.id,
+                                                        tabMasterManager
+                                                    )
+                                                    return true
+                                                }
+                                                return false
+                                            })
+                                            if (defaultTab && tabContainer.flattenGroups) {
+                                                flattenDefaultTab(defaultTab, TabAppGrid)
+                                            }
+                                            return defaultTab ?? []
                                         }
                                     })
                                 } else {

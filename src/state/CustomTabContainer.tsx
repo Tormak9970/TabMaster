@@ -1,6 +1,6 @@
 import { EditableTabSettings } from '../components/modals/EditTabModal'
 import { Filter } from '../components/filters/Filters'
-import { filtersHaveType, getIncludedCategoriesFromBitField, updateTabCollection } from '@utils'
+import { filtersHaveType, getFlatTabAppGrid, getIncludedCategoriesFromBitField, updateTabCollection } from '@utils'
 import { gamepadTabbedPageClasses, showModal } from '@decky/ui'
 import { SortOverrideMessage } from '../components/modals/SortOverrideMessage'
 import { ReactElement } from 'react'
@@ -35,6 +35,7 @@ export class CustomTabContainer implements TabContainer {
     dependsOnMicroSDeck: boolean
     sortByOverride: number
     displayAsCollection: boolean
+    flattenGroups: boolean
 
     /**
      * Creates a new CustomTabContainer.
@@ -48,6 +49,7 @@ export class CustomTabContainer implements TabContainer {
      * @param visibleToOthers Whether or not the tab can be added by other users.
      * @param displayAsCollection Whether this tab should also appear in Desktop Mode as a collection.
      * @param sortByOverride The eSortBy number to force use for sorting. -1 ignores override.
+     * @param flattenGroups Whether to show the sorted apps in one grid instead of one per group.
      */
     constructor(
         id: string,
@@ -59,7 +61,8 @@ export class CustomTabContainer implements TabContainer {
         autoHide: boolean,
         visibleToOthers: boolean,
         displayAsCollection: boolean,
-        sortByOverride: number
+        sortByOverride: number,
+        flattenGroups: boolean
     ) {
         this.id = id
         this.title = title
@@ -72,6 +75,7 @@ export class CustomTabContainer implements TabContainer {
         this.dependsOnMicroSDeck = false
         this.displayAsCollection = displayAsCollection
         this.sortByOverride = sortByOverride
+        this.flattenGroups = flattenGroups
 
         //@ts-ignore
         this.collection = {
@@ -111,6 +115,7 @@ export class CustomTabContainer implements TabContainer {
         if (this.autoHide && this.collection.visibleApps.length === 0) return null
         const showSortOverride = () => showModal(<SortOverrideMessage eSortBy={this.sortByOverride} />)
         if (this.sortByOverride !== -1) footer.onOptionsButton = showSortOverride
+        const Grid = this.flattenGroups ? getFlatTabAppGrid(TabAppGrid) : TabAppGrid
         const createContent = (inner: ReactElement) =>
             !TabContext ? inner : <TabContext.Provider value={{ label: this.title }}>{inner}</TabContext.Provider>
 
@@ -119,7 +124,7 @@ export class CustomTabContainer implements TabContainer {
             id: this.id,
             footer: footer,
             content: createContent(
-                <TabAppGrid
+                <Grid
                     collection={this.collection}
                     setSortBy={sortingProps.setSortBy}
                     eSortBy={this.sortByOverride === -1 ? sortingProps.eSortBy : this.sortByOverride}
@@ -191,6 +196,7 @@ export class CustomTabContainer implements TabContainer {
         this.autoHide = updatedTabInfo.autoHide
         this.visibleToOthers = updatedTabInfo.visibleToOthers
         this.sortByOverride = updatedTabInfo.sortByOverride
+        this.flattenGroups = updatedTabInfo.flattenGroups ?? false
 
         if (!updatedTabInfo.displayAsCollection && this.displayAsCollection) {
             updateTabCollection(oldTitle, this.title, null)
