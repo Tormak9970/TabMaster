@@ -220,6 +220,8 @@
   "LABEL_OTHER_USERS_CAN_COPY_TAB": "Другие пользователи могут скопировать эту вкладку",
   "LABEL_DISPLAY_TAB_AS_COLLECTION": "Display this tab as a Steam Collection",
   "LABEL_SORT_TAB_BY": "Сортировать приложение по",
+  "LABEL_FLATTEN_SORT_GROUPS": "Disable grouping",
+  "DESCRIPTION_FLATTEN_SORT_GROUPS": "Keep the sort order but remove the groups some sorts add, like Last Played or Size on Disk",
   "LABEL_INCLUDE_IN_TAB": "Включить в вкладку",
   "LABEL_QUICK_TABS": "Быстрые вкладки",
   "LABEL_CREATE_TAB": "Создать вкладку",

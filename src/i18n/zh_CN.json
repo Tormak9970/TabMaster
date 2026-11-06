@@ -220,6 +220,8 @@
   "LABEL_OTHER_USERS_CAN_COPY_TAB": "其他用户可以复制此标签页",
   "LABEL_DISPLAY_TAB_AS_COLLECTION": "Display this tab as a Steam Collection",
   "LABEL_SORT_TAB_BY": "应用排序依据",
+  "LABEL_FLATTEN_SORT_GROUPS": "Disable grouping",
+  "DESCRIPTION_FLATTEN_SORT_GROUPS": "Keep the sort order but remove the groups some sorts add, like Last Played or Size on Disk",
   "LABEL_INCLUDE_IN_TAB": "在标签页中包含",
   "LABEL_QUICK_TABS": "快速标签页",
   "LABEL_CREATE_TAB": "创建标签页",
