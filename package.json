@@ -77,6 +77,9 @@
         "react",
         "react-dom"
       ]
-    }
+    },
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }
