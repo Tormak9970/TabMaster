@@ -220,6 +220,8 @@
   "LABEL_OTHER_USERS_CAN_COPY_TAB": "Les autres utilisateurs peuvent copier cet onglet",
   "LABEL_DISPLAY_TAB_AS_COLLECTION": "Display this tab as a Steam Collection",
   "LABEL_SORT_TAB_BY": "Trier les applications par",
+  "LABEL_FLATTEN_SORT_GROUPS": "Disable grouping",
+  "DESCRIPTION_FLATTEN_SORT_GROUPS": "Keep the sort order but remove the groups some sorts add, like Last Played or Size on Disk",
   "LABEL_INCLUDE_IN_TAB": "Inclure dans l'onglet",
   "LABEL_QUICK_TABS": "Onglets rapides",
   "LABEL_CREATE_TAB": "Créer un Onglet",
