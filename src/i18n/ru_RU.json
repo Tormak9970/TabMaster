@@ -208,7 +208,7 @@
   "LABEL_GROUP_COMBINATION_LOGIC": "Логика компоновки групп",
   "MESSAGE_FINISH_CURRENT_FILTER_BEFORE_ADDING": "Прежде чем добавлять новый фильтр, сначала закончите с этим",
   "LABEL_ADD_FILTER": "Добавить фильтр",
-  "LABEL_TAGS_ADD_APP": "Add App",
+  "LABEL_TAGS_ADD_APP": "Добавить приложение",
   "TITLE_CANT_SAVE_TAB": "Не получается сохранить вкладку",
   "LABEL_SAVE_TAB": "Сохранить",
   "PLACEHOLDER_TAB_TITLE": "Название для этой вкладки",
@@ -220,6 +220,8 @@
   "LABEL_OTHER_USERS_CAN_COPY_TAB": "Другие пользователи могут скопировать эту вкладку",
   "LABEL_DISPLAY_TAB_AS_COLLECTION": "Display this tab as a Steam Collection",
   "LABEL_SORT_TAB_BY": "Сортировать приложение по",
+  "LABEL_FLATTEN_SORT_GROUPS": "Disable grouping",
+  "DESCRIPTION_FLATTEN_SORT_GROUPS": "Keep the sort order but remove the groups some sorts add, like Last Played or Size on Disk",
   "LABEL_INCLUDE_IN_TAB": "Включить в вкладку",
   "LABEL_QUICK_TABS": "Быстрые вкладки",
   "LABEL_CREATE_TAB": "Создать вкладку",
@@ -301,7 +303,7 @@
   "LABEL_TAG_OVERRIDE_ADD": "Add",
   "LABEL_TAG_OVERRIDE_IGNORE": "Ignore",
   "MESSAGE_DELETE_GAME_TAG_OVERRIDE_TAG_CONFIRM": "Are you sure you want to delete this tag from your overrides? This can't be undone.",
-  "LABEL_YOUR_TAGS": "Your Tags",
+  "LABEL_YOUR_TAGS": "Ваши теги",
   "LABEL_TAG_OVERRIDE_SINGULAR": "Override",
   "LABEL_TAG_OVERRIDE_PLURAL": "Overrides",
   "LABEL_TAG_OVERRIDE_COLLAPSE": "Collapse",
@@ -309,7 +311,7 @@
   "MESSAGE_DELETE_GAME_TAG_OVERRIDE_CONFIRM": "Are you sure you want to delete this game from your overrides? This can't be undone.",
   "LABEL_ADD_TAG": "Add Tag",
   "LABEL_TAG_OVERRIDES": "App Tag Overrides",
-  "DESCRIPTION_TAG_OVERRIDES": "Allows you to override specific tags for apps you own.",
-  "TITLE_SETTINGS_GENERAL": "General",
-  "TITLE_SETTINGS_TAGS": "Tags"
+  "DESCRIPTION_TAG_OVERRIDES": "Даёт переназначить теги для ваших приложений.",
+  "TITLE_SETTINGS_GENERAL": "Основные",
+  "TITLE_SETTINGS_TAGS": "Теги"
 }
