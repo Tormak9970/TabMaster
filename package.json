@@ -43,7 +43,7 @@
     "@commitlint/config-conventional": "^17.8.1",
     "@decky/api": "1.1.3",
     "@decky/rollup": "^1.0.2",
-    "@decky/ui": "4.13.0",
+    "@decky/ui": "5.0.1",
     "@types/lodash": "^4.17.19",
     "@types/markdown-it": "^12.2.3",
     "@types/node": "^26.6.5",
@@ -75,7 +75,8 @@
     "peerDependencyRules": {
       "ignoreMissing": [
         "react",
-        "react-dom"
+        "react-dom",
+        "@decky/ui"
       ]
     },
     "onlyBuiltDependencies": [
